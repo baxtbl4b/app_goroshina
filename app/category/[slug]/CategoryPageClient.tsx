@@ -703,10 +703,10 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
       )}
 
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] py-2 shadow-sm flex flex-col items-center"
+        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[60px]"
         style={{ "--header-height": "60px" } as React.CSSProperties}
       >
-        <div className="container max-w-md flex items-center justify-center h-full relative">
+        <div className="container max-w-md flex items-center justify-center h-full relative overflow-hidden">
           <button
             onClick={() => router.push("/")}
             className="fixed left-0 top-2 p-2 rounded-tr-md rounded-br-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors z-50 bg-white dark:bg-[#1F1F1F]"
@@ -715,7 +715,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
           </button>
 
-          <div className="flex items-center justify-center space-x-2 h-full">
+          <div className="flex items-center justify-center space-x-2 h-full overflow-hidden">
             <Link href={{ pathname: "/category/summer", query: queryParams }} className="h-full">
               <Button
                 variant="ghost"
@@ -780,7 +780,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
       </header>
 
       {/* Quick size links section */}
-      <div className="bg-white dark:bg-[#2A2A2A] p-3 mx-4 rounded-lg shadow-sm mb-4 mt-[30px] overflow-hidden">
+      <div className="bg-white dark:bg-[#2A2A2A] p-3 mx-4 rounded-lg shadow-sm mb-4 mt-4 overflow-hidden">
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent snap-x">
           {[
             { label: "195/65 R15", width: "195", profile: "65", diameter: "15" },
@@ -816,7 +816,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
         <TireSearchFilter season={season} />
       </div>
 
-      <div className="flex-1 p-4 space-y-6 pt-2">
+      <div className="flex-1 px-4 pb-4 space-y-6">
         <QuickFilterButtons
           onSortChange={handleSortChange}
           onFilterToggle={handleFilterToggle}

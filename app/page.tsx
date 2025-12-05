@@ -271,13 +271,13 @@ export default function HomePage() {
   }, [])
 
   return (
-    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-20">
+    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px]">
       {/* Show loading screen if isLoading is true */}
       {isLoading ? (
         <LoadingScreen onLoadingComplete={handleLoadingComplete} />
       ) : (
         <>
-          <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm">
+          <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm h-[60px]">
             <style jsx>{`
               @keyframes shine {
                 0% {
@@ -288,7 +288,7 @@ export default function HomePage() {
                 }
               }
             `}</style>
-            <div className="p-4 relative flex items-center justify-between">
+            <div className="h-full px-4 relative flex items-center justify-between">
               <div className="flex items-center">
                 <div className="relative overflow-hidden rounded-lg">
                   <Image
@@ -299,7 +299,6 @@ export default function HomePage() {
                     className="h-8 w-auto dark:invert relative z-10"
                     priority
                   />
-                  <div className="absolute inset-0 -translate-x-full animate-[shine_4s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 z-20 [mask-image:url(/images/no_signature.svg)] [mask-size:contain] [mask-repeat:no-repeat] [mask-position:center]"></div>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -522,11 +521,10 @@ export default function HomePage() {
             )}
           </div>
 
-          <div className="flex-1 px-4 pt-0 pb-20 space-y-6">
+          <div className="flex-1 px-4 pb-20 space-y-6">
             {/* Rest of the content remains the same */}
             {/* Loyalty System Information */}
             <div className="relative">
-              <div className="mb-2"></div>
               <div onClick={() => toggleLoyaltyVisibility()} className="cursor-pointer">
                 <div
                   className={`bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm overflow-hidden transition-all duration-300 ease-in-out ${isLoyaltyVisible ? "max-h-[300px] opacity-100" : "max-h-[40px] opacity-70 py-2 px-4"}`}
@@ -615,7 +613,7 @@ export default function HomePage() {
             </div>
 
             {/* Category Buttons - Moved here from TabsContent */}
-            <div className="grid grid-cols-3 gap-5">
+            <div className="grid grid-cols-3 gap-5 overflow-hidden">
               <Link href="/category/all-season">
                 <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                   <Image
@@ -623,7 +621,7 @@ export default function HomePage() {
                     alt="Всесезонные шины"
                     width={300}
                     height={200}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform group-hover:scale-[1.03]"
                   />
                   <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
                     <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
@@ -640,7 +638,7 @@ export default function HomePage() {
                     alt="Зимние шины"
                     width={300}
                     height={200}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform group-hover:scale-[1.03]"
                     onError={(e) => {
                       // Fallback to local image if blob URL fails
                       ;(e.target as HTMLImageElement).src = "/images/winter-tire-new.png"
@@ -661,7 +659,7 @@ export default function HomePage() {
                     alt="Летние шины"
                     width={300}
                     height={200}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform group-hover:scale-[1.03]"
                     onError={(e) => {
                       // Fallback to local image if blob URL fails
                       ;(e.target as HTMLImageElement).src = "/images/summer-tire-new.png"
@@ -701,7 +699,7 @@ export default function HomePage() {
                         alt="Диски"
                         width={300}
                         height={200}
-                        className="w-full h-full object-contain transition-transform group-hover:scale-105 scale-[1.375]"
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
                         onError={(e) => {
                           // Fallback to local image if blob URL fails
                           ;(e.target as HTMLImageElement).src = "/images/black-wheel.png"

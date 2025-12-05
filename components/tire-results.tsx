@@ -243,7 +243,7 @@ export default function TireResults({ season }: TireResultsProps) {
 
   return (
     <div
-      className={`space-y-6 p-4 rounded-xl transition-all duration-500 ${calculateGradientColors()} mt-[-13px] mb-32`}
+      className={`space-y-6 p-4 rounded-xl transition-all duration-500 ${calculateGradientColors()} mb-32`}
       aria-label="Результаты поиска шин"
       data-testid="tire-results-container"
     >
