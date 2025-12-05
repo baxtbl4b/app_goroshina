@@ -521,7 +521,7 @@ export default function HomePage() {
             )}
           </div>
 
-          <div className="flex-1 px-4 pb-20 space-y-6">
+          <div className="flex-1 px-4 pb-28 space-y-4">
             {/* Rest of the content remains the same */}
             {/* Loyalty System Information */}
             <div className="relative">
