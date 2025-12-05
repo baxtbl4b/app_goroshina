@@ -1,0 +1,411 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { ChevronLeft, Search, Package, CheckCircle, XCircle, Clock } from "lucide-react"
+import { useRouter } from "next/navigation"
+import OrderHistoryItem from "@/components/order-history-item"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import BottomNavigation from "@/components/bottom-navigation"
+import { Input } from "@/components/ui/input"
+
+// Типы для заказов
+type OrderStatus = "в обработке" | "подтвержден" | "доставляется" | "выполнен" | "отменен"
+
+interface Order {
+  id: string
+  orderNumber: string
+  date: string
+  status: OrderStatus
+  items: number
+  total: string
+  products: Array<{
+    name: string
+    quantity: number
+    image?: string
+  }>
+}
+
+export default function OrdersPage() {
+  const router = useRouter()
+  const [orders, setOrders] = useState<Order[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState("")
+
+  // Загрузка заказов (имитация)
+  useEffect(() => {
+    const loadOrders = () => {
+      setIsLoading(true)
+
+      try {
+        const allOrders: Order[] = []
+
+        // Загружаем заказы покраски
+        const paintingOrder = localStorage.getItem("paintingOrderData")
+        if (paintingOrder) {
+          const order = JSON.parse(paintingOrder)
+          allOrders.push({
+            id: order.orderNumber || `P${Date.now()}`,
+            orderNumber: order.orderNumber || `P${Date.now()}`,
+            date: new Date(order.date).toLocaleDateString("ru-RU") || new Date().toLocaleDateString("ru-RU"),
+            status: "в обработке",
+            items: Object.keys(order.services || {}).length + Object.keys(order.tireMountingServices || {}).length,
+            total: `${order.totalPrice || 0} ₽`,
+            products: [
+              { name: "Покраска дисков", quantity: 1, image: "/images/pokraska4.png" },
+              ...(order.tireMountingServices
+                ? [{ name: "Шиномонтаж", quantity: 1, image: "/images/shinomontazh-new.png" }]
+                : []),
+            ],
+          })
+        }
+
+        // Загружаем заказы шиномонтажа
+        const tireMountingOrder = localStorage.getItem("tireMountingOrderData")
+        console.log("Загружаем заказы шиномонтажа:", tireMountingOrder) // Отладка
+        if (tireMountingOrder) {
+          const order = JSON.parse(tireMountingOrder)
+          console.log("Парсим заказ шиномонтажа:", order) // Отладка
+          allOrders.push({
+            id: order.orderNumber || `TM${Date.now()}`,
+            orderNumber: order.orderNumber || `TM${Date.now()}`,
+            date: new Date().toLocaleDateString("ru-RU"), // Используем текущую дату
+            status: "подтвержден",
+            items: Object.keys(order.services || {}).length || 1,
+            total: `${order.totalPrice || 0} ₽`,
+            products: [{ name: "Шиномонтаж", quantity: 1, image: "/images/shinomontazh-new.png" }],
+          })
+          console.log("Добавлен заказ шиномонтажа в список:", allOrders[allOrders.length - 1]) // Отладка
+        }
+
+        // Загружаем заказ���� дошиповки
+        const studdingOrder = localStorage.getItem("studdingOrderData")
+        if (studdingOrder) {
+          const order = JSON.parse(studdingOrder)
+          allOrders.push({
+            id: order.orderNumber || `ST${Date.now()}`,
+            orderNumber: order.orderNumber || `ST${Date.now()}`,
+            date: new Date(order.date).toLocaleDateString("ru-RU") || new Date().toLocaleDateString("ru-RU"),
+            status: "в обработке",
+            items: 1,
+            total: `${order.totalPrice || 0} ₽`,
+            products: [{ name: "Дошиповка шин", quantity: 1, image: "/images/stupinators.png" }],
+          })
+        }
+
+        // Загружаем заказы хранения шин
+        const tireStorageOrder = localStorage.getItem("tireStorageOrderData")
+        if (tireStorageOrder) {
+          const order = JSON.parse(tireStorageOrder)
+          allOrders.push({
+            id: order.orderNumber || `TS${Date.now()}`,
+            orderNumber: order.orderNumber || `TS${Date.now()}`,
+            date: new Date(order.date).toLocaleDateString("ru-RU") || new Date().toLocaleDateString("ru-RU"),
+            status: "подтвержден",
+            items: 1,
+            total: `${order.totalPrice || 0} ₽`,
+            products: [{ name: "Хранение шин", quantity: 1, image: "/images/tire-storage-bags.png" }],
+          })
+        }
+
+        // Если нет реальных заказов, показываем демо-данные
+        if (allOrders.length === 0) {
+          const demoOrders: Order[] = [
+            {
+              id: "TM001",
+              orderNumber: "TM001",
+              date: new Date().toLocaleDateString("ru-RU"),
+              status: "подтвержден",
+              items: 3,
+              total: "2 500 ₽",
+              products: [{ name: "Записаться на шиномонтаж", quantity: 1, image: "/images/shinomontazh-new.png" }],
+            },
+            {
+              id: "1",
+              orderNumber: "P123456",
+              date: "20.04.2025",
+              status: "выполнен",
+              items: 4,
+              total: "32 000 ₽",
+              products: [
+                { name: "Michelin Pilot Sport 4", quantity: 2, image: "/images/michelin-tire.png" },
+                { name: "Continental PremiumContact 6", quantity: 2, image: "/images/continental-tire.png" },
+              ],
+            },
+            {
+              id: "2",
+              orderNumber: "P123457",
+              date: "15.04.2025",
+              status: "доставляется",
+              items: 2,
+              total: "15 600 ₽",
+              products: [{ name: "Pirelli P Zero", quantity: 2, image: "/images/pirelli-tire.png" }],
+            },
+          ]
+          allOrders.push(...demoOrders)
+        }
+
+        // Сортируем заказы по дате (новые сначала)
+        allOrders.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+        setOrders(allOrders)
+      } catch (error) {
+        console.error("Ошибка при загрузке заказов:", error)
+        setOrders([])
+      } finally {
+        // Имитация задержки загрузки
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 800)
+      }
+    }
+
+    loadOrders()
+  }, [])
+
+  // Функция для очистки всех заказов (для тестирования)
+  const clearAllOrders = () => {
+    localStorage.removeItem("paintingOrderData")
+    localStorage.removeItem("tireMountingOrderData")
+    localStorage.removeItem("studdingOrderData")
+    localStorage.removeItem("tireStorageOrderData")
+    window.location.reload()
+  }
+
+  // Фильтрация заказов по статусу и поиску
+  const filteredOrders = orders.filter((order) => order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()))
+
+  const activeOrders = filteredOrders.filter((order) =>
+    ["в обработке", "подтвержден", "доставляется"].includes(order.status),
+  )
+  const completedOrders = filteredOrders.filter((order) => order.status === "выполнен")
+  const canceledOrders = filteredOrders.filter((order) => order.status === "отменен")
+
+  // Функция для отображения скелетона загрузки
+  const renderSkeletons = () => {
+    return Array(3)
+      .fill(0)
+      .map((_, index) => (
+        <div key={index} className="bg-white dark:bg-[#2A2A2A] rounded-xl p-5 shadow-md animate-pulse">
+          <div className="flex justify-between items-center mb-3">
+            <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/5"></div>
+          </div>
+          <div className="flex justify-between items-center">
+            <div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+            </div>
+            <div className="h-6 w-6 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+          </div>
+        </div>
+      ))
+  }
+
+  // Функция для получения иконки статуса
+  const getStatusIcon = (status: OrderStatus) => {
+    switch (status) {
+      case "выполнен":
+        return <CheckCircle className="h-4 w-4 text-green-500" />
+      case "отменен":
+        return <XCircle className="h-4 w-4 text-red-500" />
+      case "в обработке":
+        return <Clock className="h-4 w-4 text-orange-500" />
+      case "подтвержден":
+        return <CheckCircle className="h-4 w-4 text-blue-500" />
+      case "доставляется":
+        return <Package className="h-4 w-4 text-purple-500" />
+      default:
+        return null
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#F8F8F8] to-[#E8E8E8] dark:from-[#121212] dark:to-[#1A1A1A]">
+      {/* Заголовок */}
+      <header className="sticky top-0 z-50 bg-white dark:bg-[#1F1F1F] py-4 shadow-lg">
+        <div className="flex items-center justify-start pl-4">
+          <button
+            onClick={() => router.back()}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors mr-3"
+            aria-label="Вернуться назад"
+          >
+            <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+          </button>
+          <h1 className="text-lg font-bold text-[#1F1F1F] dark:text-white">Мои заказы</h1>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-6">
+        {/* Поиск и фильтры */}
+        <div className="mb-6 flex items-center gap-4">
+          <div className="relative flex-grow">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Поиск по номеру заказа"
+              className="pl-10 pr-4 py-2 w-full bg-white dark:bg-[#2A2A2A] border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-[#D3DF3D] focus:border-transparent"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Вкладки для фильтрации заказов */}
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="grid grid-cols-4 mb-6 bg-white dark:bg-[#2A2A2A] p-1 rounded-lg shadow-sm">
+            <TabsTrigger
+              value="all"
+              className="data-[state=active]:bg-[#D3DF3D] data-[state=active]:text-black rounded-md transition-all duration-200"
+            >
+              Все
+            </TabsTrigger>
+            <TabsTrigger
+              value="active"
+              className="data-[state=active]:bg-[#D3DF3D] data-[state=active]:text-black rounded-md transition-all duration-200"
+            >
+              Активные
+            </TabsTrigger>
+            <TabsTrigger
+              value="completed"
+              className="data-[state=active]:bg-[#D3DF3D] data-[state=active]:text-black rounded-md transition-all duration-200"
+            >
+              Выполненные
+            </TabsTrigger>
+            <TabsTrigger
+              value="canceled"
+              className="data-[state=active]:bg-[#D3DF3D] data-[state=active]:text-black rounded-md transition-all duration-200"
+            >
+              Отмененные
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Все заказы */}
+          <TabsContent value="all" className="space-y-4 animate-in fade-in-50 duration-300">
+            {isLoading ? (
+              renderSkeletons()
+            ) : filteredOrders.length > 0 ? (
+              <div className="space-y-4">
+                {filteredOrders.map((order) => (
+                  <div key={order.id} className="transform transition-all duration-200 hover:scale-[1.02]">
+                    <OrderHistoryItem
+                      id={order.id}
+                      orderNumber={order.orderNumber}
+                      date={order.date}
+                      status={order.status}
+                      items={order.items}
+                      total={order.total}
+                      products={order.products}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 bg-white dark:bg-[#2A2A2A] rounded-xl shadow-sm p-6">
+                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">У вас пока нет заказов</h3>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">Здесь будет отображаться история ваших заказов</p>
+                <button
+                  onClick={() => router.push("/")}
+                  className="px-4 py-2 bg-[#D3DF3D] text-black font-medium rounded-lg hover:bg-opacity-90 transition-colors"
+                >
+                  Перейти к покупкам
+                </button>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Активные заказы */}
+          <TabsContent value="active" className="space-y-4 animate-in fade-in-50 duration-300">
+            {isLoading ? (
+              renderSkeletons()
+            ) : activeOrders.length > 0 ? (
+              <div className="space-y-4">
+                {activeOrders.map((order) => (
+                  <div key={order.id} className="transform transition-all duration-200 hover:scale-[1.02]">
+                    <OrderHistoryItem
+                      id={order.id}
+                      orderNumber={order.orderNumber}
+                      date={order.date}
+                      status={order.status}
+                      items={order.items}
+                      total={order.total}
+                      products={order.products}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 bg-white dark:bg-[#2A2A2A] rounded-xl shadow-sm p-6">
+                <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">У вас нет активных заказов</h3>
+                <p className="text-gray-500 dark:text-gray-400">Активные заказы будут отображаться здесь</p>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Выполненные заказы */}
+          <TabsContent value="completed" className="space-y-4 animate-in fade-in-50 duration-300">
+            {isLoading ? (
+              renderSkeletons()
+            ) : completedOrders.length > 0 ? (
+              <div className="space-y-4">
+                {completedOrders.map((order) => (
+                  <div key={order.id} className="transform transition-all duration-200 hover:scale-[1.02]">
+                    <OrderHistoryItem
+                      id={order.id}
+                      orderNumber={order.orderNumber}
+                      date={order.date}
+                      status={order.status}
+                      items={order.items}
+                      total={order.total}
+                      products={order.products}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 bg-white dark:bg-[#2A2A2A] rounded-xl shadow-sm p-6">
+                <CheckCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  У вас нет выполненных заказов
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400">Выполненные заказы будут отображаться здесь</p>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Отмененные заказы */}
+          <TabsContent value="canceled" className="space-y-4 animate-in fade-in-50 duration-300">
+            {isLoading ? (
+              renderSkeletons()
+            ) : canceledOrders.length > 0 ? (
+              <div className="space-y-4">
+                {canceledOrders.map((order) => (
+                  <div key={order.id} className="transform transition-all duration-200 hover:scale-[1.02]">
+                    <OrderHistoryItem
+                      id={order.id}
+                      orderNumber={order.orderNumber}
+                      date={order.date}
+                      status={order.status}
+                      items={order.items}
+                      total={order.total}
+                      products={order.products}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 bg-white dark:bg-[#2A2A2A] rounded-xl shadow-sm p-6">
+                <XCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">У вас нет отмененных заказов</h3>
+                <p className="text-gray-500 dark:text-gray-400">Отмененные заказы будут отображаться здесь</p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </main>
+      <div className="pb-20"></div>
+      <BottomNavigation />
+    </div>
+  )
+}
