@@ -614,8 +614,10 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             background: var(--tab-color);
             border: none;
             color: #1F1F1F;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             z-index: 2;
           }
 

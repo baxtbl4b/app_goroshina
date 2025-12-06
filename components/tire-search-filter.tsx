@@ -857,20 +857,24 @@ export default function TireSearchFilter({ season }: { season: Season }) {
           {/* My Garage section */}
           <div className="flex-1 flex items-center gap-1 sm:gap-2 overflow-hidden">
             <div className="flex flex-col w-full">
-              <div className="flex gap-1 overflow-x-auto scrollbar-hide mb-1 w-[70%]">
-                {userVehicles.map((vehicle) => (
-                  <button
-                    key={vehicle.id}
-                    onClick={() => selectVehicle(vehicle)}
-                    className={`text-xs px-2 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0 ${
-                      selectedVehicle === vehicle.id
-                        ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
-                        : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
-                    }`}
-                  >
-                    {vehicle.name}
-                  </button>
-                ))}
+              <div className="relative w-[70%]">
+                <div className="flex gap-1 overflow-x-auto scrollbar-hide mb-1">
+                  {userVehicles.map((vehicle) => (
+                    <button
+                      key={vehicle.id}
+                      onClick={() => selectVehicle(vehicle)}
+                      className={`text-xs px-2 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0 ${
+                        selectedVehicle === vehicle.id
+                          ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
+                          : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                      }`}
+                    >
+                      {vehicle.name}
+                    </button>
+                  ))}
+                </div>
+                {/* Gradient fade-out overlay */}
+                <div className="absolute top-0 right-0 bottom-0 w-12 bg-gradient-to-l from-white dark:from-[#2A2A2A] to-transparent pointer-events-none"></div>
               </div>
               <span className="text-xs text-gray-500 dark:text-gray-400 hidden">Мой гараж</span>
             </div>

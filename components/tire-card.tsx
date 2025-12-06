@@ -627,7 +627,7 @@ export default function TireCard({ tire }: TireCardProps) {
           </div>
 
           <Link href={`/product/${tire.id}`}>
-            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-[10px] sm:text-xs md:text-sm lg:text-base leading-tight">
+            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-[11px] sm:text-[13px] md:text-[15px] lg:text-[17px] leading-tight">
               {tire.name}
             </h3>
           </Link>
@@ -704,12 +704,13 @@ export default function TireCard({ tire }: TireCardProps) {
             </div>
             <div className="flex items-center flex-1 justify-end ml-2">
               {/* Новая кнопка корзины в стиле из изображения */}
-              <div className="flex h-[24px] sm:h-[27px] md:h-[31px] rounded-lg overflow-hidden w-full max-w-[120px] sm:max-w-[137px] md:max-w-[154px] border-0">
+              <div className="flex h-[24px] sm:h-[27px] md:h-[31px] rounded-lg overflow-hidden w-full max-w-[120px] sm:max-w-[137px] md:max-w-[154px]" style={{ border: 'none', outline: 'none' }}>
                 {/* Кнопка минус */}
                 <button
                   onClick={removeFromCart}
                   disabled={cartCount <= 0 || tire.stock <= 0}
-                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-0 outline-none ring-0 focus:outline-none focus:ring-0"
+                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                   aria-label="Уменьшить количество"
                 >
                   <Minus className="w-[12px] h-[12px] sm:w-[14px] sm:h-[14px] md:w-[17px] md:h-[17px]" />
@@ -725,7 +726,8 @@ export default function TireCard({ tire }: TireCardProps) {
                   ref={addButtonRef}
                   onClick={addToCart}
                   disabled={tire.stock <= 0}
-                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-0 outline-none ring-0 focus:outline-none focus:ring-0"
+                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                   aria-label="Увеличить количество"
                 >
                   <Plus className="w-[12px] h-[12px] sm:w-[14px] sm:h-[14px] md:w-[17px] md:h-[17px]" />
