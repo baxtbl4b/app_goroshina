@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Image from "next/image"
+import { ShoppingCart } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 interface CartButtonProps {
@@ -126,15 +126,12 @@ export default function CartButton({ className = "" }: CartButtonProps) {
         aria-label="Корзина"
       >
         <div className={`relative ${isAnimating ? "cart-icon-bounce" : ""}`}>
-          <Image
-            src="/images/korzina2.png"
-            alt="Корзина"
-            width={26}
-            height={26}
-            className={`opacity-90 hover:opacity-100 transition-all ${cartItemCount > 0 ? "cart-has-items-yellow" : "cart-empty-white"}`}
+          <ShoppingCart
+            size={23}
+            className={cartItemCount > 0 ? "text-[#D3DF3D]" : "text-white"}
           />
           {cartItemCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-[#D3DF3D] text-[#1F1F1F] text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+            <span className="absolute -top-3 -right-3 bg-[#D3DF3D] text-[#1F1F1F] text-[10px] font-bold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-0.5">
               {cartItemCount}
             </span>
           )}

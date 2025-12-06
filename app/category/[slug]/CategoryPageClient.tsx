@@ -578,16 +578,16 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
           /* Season tabs styles */
           .season-tabs-container {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
-            justify-content: center;
-            gap: 4px;
             height: 100%;
-            padding: 0 45px;
+            padding: 0 50px;
             touch-action: pan-y pinch-zoom;
             user-select: none;
             -webkit-user-select: none;
             cursor: grab;
+            width: 100%;
           }
 
           .season-tab {
@@ -600,7 +600,6 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             font-weight: 500;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
-            min-width: 90px;
             text-align: center;
           }
 
@@ -635,6 +634,17 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             background: rgba(211, 223, 61, 0.1);
             border-color: rgba(211, 223, 61, 0.3);
             transform: scale(0.88);
+          }
+
+          /* Grid positioning for tabs */
+          .season-tab[style*="order: 0"] {
+            justify-self: end;
+          }
+          .season-tab[style*="order: 1"] {
+            justify-self: center;
+          }
+          .season-tab[style*="order: 2"] {
+            justify-self: start;
           }
 
           .dark .season-tab-inactive {
@@ -713,7 +723,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
         <div className="container max-w-md flex items-center justify-center h-full relative overflow-hidden">
           <button
             onClick={() => router.push("/")}
-            className="fixed left-0 top-2 p-2 rounded-tr-md rounded-br-md hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors z-50"
+            className="fixed left-0 top-[30px] -translate-y-1/2 p-2 rounded-tr-md rounded-br-md hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors z-50"
             aria-label="На главную"
           >
             <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
@@ -772,7 +782,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
           </div>
 
           {/* Global cart button */}
-          <CartButton className="fixed right-2 top-2 z-[100]" />
+          <CartButton className="fixed right-8 top-[20px] -translate-y-1/2 z-[100]" />
         </div>
       </header>
 
