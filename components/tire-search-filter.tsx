@@ -787,9 +787,11 @@ export default function TireSearchFilter({ season }: { season: Season }) {
 
       <div
         ref={filterRef}
-        className={`bg-white dark:bg-[#2A2A2A] p-4 fixed bottom-0 left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] ${
-          isFilterCollapsed ? "max-h-[120px] overflow-hidden" : ""
-        } pb-[calc(env(safe-area-inset-bottom)_+_1rem)]`}
+        className={`bg-white dark:bg-[#2A2A2A] px-4 pt-2 pb-4 fixed left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)]`}
+        style={{
+          bottom: '0',
+          transform: isFilterCollapsed ? 'translateY(calc(100% - 35px))' : 'translateY(0)',
+        }}
         aria-label="Блок фильтра шин"
         data-testid="tire-filter-container"
         onTouchStart={(e) => setTouchStartY(e.touches[0].clientY)}
@@ -810,9 +812,38 @@ export default function TireSearchFilter({ season }: { season: Season }) {
         }}
         onTouchEnd={(e) => setTouchEndY(e.changedTouches[0].clientY)}
       >
-        {/* Collapse toggle button */}
+        {/* Swipe handle for collapse/expand */}
+        <div className="flex items-center justify-center mb-2">
+          <div
+            className="flex items-center justify-center py-1.5 cursor-grab active:cursor-grabbing"
+            onTouchStart={(e) => {
+              setTouchStartY(e.touches[0].clientY)
+            }}
+            onTouchMove={(e) => {
+              if (touchStartY) {
+                setTouchEndY(e.touches[0].clientY)
+              }
+            }}
+            onTouchEnd={(e) => {
+              if (touchStartY && touchEndY) {
+                const diff = touchEndY - touchStartY
+                // Свайп вниз - закрыть, свайп вверх - открыть
+                if (diff > 30 && !isFilterCollapsed) {
+                  setIsFilterCollapsed(true)
+                } else if (diff < -30 && isFilterCollapsed) {
+                  setIsFilterCollapsed(false)
+                }
+              }
+              setTouchStartY(null)
+              setTouchEndY(null)
+            }}
+            aria-label={isFilterCollapsed ? "Свайп вверх для раскрытия" : "Свайп вниз для скрытия"}
+          >
+            <div className="w-16 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+          </div>
+        </div>
         {/* Size selectors - always visible part of the filter */}
-        <div className="flex items-end gap-3 mb-4">
+        <div className="flex items-end gap-3 mb-3 mt-1">
           <div className="grid grid-cols-3 gap-3 flex-1">
             <div>
               <Label htmlFor="width" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
@@ -834,7 +865,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
 
             <div>
               <Label htmlFor="profile" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
-                Профиль
+                Высота
               </Label>
               <Select value={profile} onValueChange={handleProfileChange}>
                 <SelectTrigger id="profile" className="w-full bg-[#333333] text-white border-0">
@@ -889,7 +920,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
         </div>
 
         {/* Header section with filter title and buttons - all on one horizontal line */}
-        <div className="flex flex-row items-center justify-between gap-3 mb-4">
+        <div className="flex flex-row items-center justify-between gap-3 mb-3">
           {/* My Garage section */}
           <div className="flex-1 flex items-center gap-1 sm:gap-2 overflow-hidden">
             <div className="flex flex-col w-full">
@@ -1372,8 +1403,29 @@ export default function TireSearchFilter({ season }: { season: Season }) {
         </div>
         {/* Indicator when filter is collapsed */}
         {isFilterCollapsed && (
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-[#2A2A2A] to-transparent pointer-events-none flex items-end justify-center pb-1">
-            <span className="text-xs text-gray-500 dark:text-gray-400">Нажмите, чтобы развернуть фильтр</span>
+          <div
+            className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white dark:from-[#2A2A2A] to-transparent flex items-end justify-center pb-2 pointer-events-none"
+            aria-label="Свайп вверх для раскрытия"
+          >
+            <div className="flex flex-col items-center gap-1">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-gray-400 dark:text-gray-500 animate-bounce"
+              >
+                <path
+                  d="M6 9L12 15L18 9"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Свайп вверх</span>
+            </div>
           </div>
         )}
       </div>
