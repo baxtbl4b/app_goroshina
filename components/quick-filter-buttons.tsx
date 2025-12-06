@@ -12,6 +12,7 @@ interface QuickFilterButtonsProps {
   activeFiltersCount?: number
   insideTireResults?: boolean
   onBrandSelect?: (brands: string[]) => void
+  resultsCount?: number
 }
 
 export default function QuickFilterButtons({
@@ -20,9 +21,10 @@ export default function QuickFilterButtons({
   activeFiltersCount = 0,
   insideTireResults = false,
   onBrandSelect,
+  resultsCount,
 }: QuickFilterButtonsProps) {
   // Базовые состояния
-  const [priceFilter, setPriceFilter] = useState("cheaper")
+  const [priceFilter, setPriceFilter] = useState("expensive")
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   const [showBrandSelector, setShowBrandSelector] = useState(false)
   const [debugMode, setDebugMode] = useState(false)
@@ -178,7 +180,7 @@ export default function QuickFilterButtons({
 
   return (
     <div
-      className="flex flex-col bg-white dark:bg-[#2A2A2A] rounded-xl p-2 sm:p-3 mb-2 sm:mb-4 shadow-sm w-full"
+      className="flex flex-col bg-white dark:bg-[#2A2A2A] rounded-lg p-1.5 shadow-sm w-full"
       id="quick-filter-container"
       data-testid="quick-filter-panel"
     >
@@ -196,10 +198,10 @@ export default function QuickFilterButtons({
       )}
 
       {/* Верхняя часть с кнопкой выбора брендов и сортировкой */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
         {/* Кнопка выбора брендов */}
         <div className="relative brand-selector-container w-full">
-          <div className="relative w-full p-2 flex items-center space-x-3">
+          <div className="relative w-full p-1.5 flex items-center bg-white dark:bg-[#2A2A2A] rounded-lg">
             <input
               type="text"
               value={brandSearchInput}
@@ -221,10 +223,10 @@ export default function QuickFilterButtons({
                 }
               }}
               placeholder={window.location.pathname.includes("/krepezh") ? "Фильтр по модели авто" : "Введите бренд"}
-              className="w-[calc(100%-48px)] px-3 py-2 text-sm border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-[#1A1A1A] dark:text-white"
+              className="flex-1 px-3 py-1 text-xs border-0 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-100 dark:bg-[#1A1A1A] dark:text-white mr-1.5"
             />
             <div
-              className="absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer hover:opacity-70 transition-opacity p-2 bg-gray-100 dark:bg-gray-800 rounded-full w-10 h-10 flex items-center justify-center"
+              className="cursor-pointer hover:opacity-70 transition-opacity p-1 bg-gray-100 dark:bg-gray-800 rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0"
               onClick={() => {
                 // Toggle the price filter
                 const newFilter = priceFilter === "cheaper" ? "expensive" : "cheaper"
@@ -257,8 +259,8 @@ export default function QuickFilterButtons({
               <Image
                 src="/images/icons8-sorting-arrows-96.png"
                 alt="Сортировка по цене"
-                width={28}
-                height={28}
+                width={20}
+                height={20}
                 className={`transform ${priceFilter === "expensive" ? "rotate-180" : ""} transition-transform`}
               />
             </div>

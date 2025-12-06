@@ -243,16 +243,13 @@ export default function TireResults({ season }: TireResultsProps) {
 
   return (
     <div
-      className={`space-y-6 p-4 rounded-xl transition-all duration-500 ${calculateGradientColors()} mb-32`}
+      className="space-y-3 mb-32"
       aria-label="Результаты поиска шин"
       data-testid="tire-results-container"
     >
-      <div className="flex flex-col space-y-2">
-        <div className="text-xs text-gray-600 dark:text-gray-400">Найдено {tires.length} моделей</div>
-        <QuickFilterButtons onSortChange={handleSortChange} insideTireResults={true} />
-      </div>
+      <QuickFilterButtons onSortChange={handleSortChange} insideTireResults={true} resultsCount={tires.length} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1.5 sm:gap-2 md:gap-2.5">
         {tires.map((tire) => (
           <TireCard key={tire.id} tire={tire} />
         ))}

@@ -136,3 +136,54 @@ body {
 .animate-vibrate {
   animation: vibrate 0.4s linear infinite;
 }
+
+/* Анимация +1 при добавлении в корзину */
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -150%) scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -250%) scale(1);
+  }
+}
+
+.floating-plus-one {
+  animation: floatUp 0.7s ease-out forwards;
+}
+
+.floating-plus-one span {
+  text-shadow:
+    0 0 10px rgba(211, 223, 61, 0.8),
+    0 0 20px rgba(211, 223, 61, 0.5),
+    2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Пульсация корзины */
+@keyframes cartPulse {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.25);
+  }
+  60% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cart-pulse-effect {
+  animation: cartPulse 0.4s ease-out;
+}
+
+.cart-pulse-effect img {
+  filter: drop-shadow(0 0 8px #D3DF3D) drop-shadow(0 0 15px #D3DF3D);
+}

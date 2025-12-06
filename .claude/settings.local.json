@@ -8,7 +8,9 @@
       "Bash(taskkill:*)",
       "Bash(npm install:*)",
       "Bash(npm run dev:*)",
-      "Bash(npx kill-port:*)"
+      "Bash(npx kill-port:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

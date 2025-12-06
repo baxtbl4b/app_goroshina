@@ -2,7 +2,7 @@
 
 import React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { Heart, Gift, Calendar, CheckCircle, Clock, Plus, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -99,6 +99,8 @@ export default function TireCard({ tire }: TireCardProps) {
   const [imageError, setImageError] = useState(false)
   const [flagError, setFlagError] = useState(false)
   const [isButtonPulsing, setIsButtonPulsing] = useState(false)
+  const [floatingNumber, setFloatingNumber] = useState<{ x: number; y: number; count: number } | null>(null)
+  const addButtonRef = useRef<HTMLButtonElement>(null)
 
   // Специальная проверка для проблемных товаров с RunFlat
   const isKnownRunflatTire =
@@ -185,6 +187,27 @@ export default function TireCard({ tire }: TireCardProps) {
   const addToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+
+    // Запускаем анимацию числа
+    const newCount = cartCount + 1
+    if (addButtonRef.current) {
+      const buttonRect = addButtonRef.current.getBoundingClientRect()
+      setFloatingNumber({
+        x: buttonRect.left + buttonRect.width / 2,
+        y: buttonRect.top + buttonRect.height / 2,
+        count: newCount,
+      })
+
+      // Убираем число после анимации
+      setTimeout(() => setFloatingNumber(null), 700)
+
+      // Добавляем пульсацию корзине
+      const cartButton = document.querySelector('.global-cart-button')
+      if (cartButton) {
+        cartButton.classList.add('cart-pulse-effect')
+        setTimeout(() => cartButton.classList.remove('cart-pulse-effect'), 600)
+      }
+    }
 
     // Запускаем анимацию пульсации
     setIsButtonPulsing(true)
@@ -401,7 +424,7 @@ export default function TireCard({ tire }: TireCardProps) {
   return (
     <div id={`tire-card-${tire.id}`} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
       {/* Left side - Image */}
-      <div className="relative p-4 flex-shrink-0 w-[180px] overflow-hidden" style={{ maxHeight: "170px" }}>
+      <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[123px] sm:w-[161px] md:w-[197px] lg:w-[222px] overflow-hidden bg-white rounded-l-xl" style={{ maxHeight: "209px" }}>
         {tire.item_day && <Badge className="absolute left-2 top-2 z-10 bg-[#D3DF3D] text-[#1F1F1F]">Товар дня</Badge>}
         {/* Gift icon badge - only shown for specific tires */}
         {hasGiftPromotion && (
@@ -436,7 +459,7 @@ export default function TireCard({ tire }: TireCardProps) {
                 <img
                   src={getProcessedImageUrl(imageUrl) || "/placeholder.svg"}
                   alt={tire.name || "Tire"}
-                  className="absolute inset-0 w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                  className="absolute inset-0 w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
@@ -449,9 +472,6 @@ export default function TireCard({ tire }: TireCardProps) {
                   style={{
                     filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
                     backgroundColor: "transparent",
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
                   }}
                 />
               </div>
@@ -482,12 +502,12 @@ export default function TireCard({ tire }: TireCardProps) {
       </div>
 
       {/* Right side - Content */}
-      <div className="p-4 sm:p-5 md:p-6 flex-1 flex flex-col justify-between">
+      <div className="p-2 sm:p-3 md:p-4 flex-1 flex flex-col justify-between">
         {/* Debug API Response */}
         {/* API Response section hidden as requested */}
         <div>
           <div className="mt-0.5 sm:mt-1 md:mt-2 flex items-center gap-1 sm:gap-2 md:gap-3 flex-wrap">
-            <span className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 md:py-1.5 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white">
+            <span className="text-[9px] sm:text-xs md:text-sm font-medium px-1 sm:px-1.5 md:px-2 py-0.5 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white whitespace-nowrap">
               {tire.width}/{tire.height} R{tire.diam}
             </span>
 
@@ -497,11 +517,11 @@ export default function TireCard({ tire }: TireCardProps) {
               actualRunflat === "true" ||
               actualRunflat === "1" ||
               isKnownRunflatTire) && (
-              <div className="flex items-center justify-center p-1 rounded-md">
+              <div className="flex items-center justify-center">
                 <img
                   src="/images/rft-icon.png"
                   alt="RunFlat"
-                  className="h-6 w-6 sm:h-7 sm:w-7"
+                  className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6"
                   title="RunFlat Technology"
                 />
               </div>
@@ -509,11 +529,11 @@ export default function TireCard({ tire }: TireCardProps) {
 
             {/* Cargo icon - only shown for tires with cargo: true */}
             {(tire.cargo === true || tire.cargo === 1 || tire.cargo === "true" || tire.cargo === "1") && (
-              <div className="flex items-center justify-center p-1 rounded-md">
+              <div className="flex items-center justify-center">
                 <img
                   src="/images/cargo-truck-new.png"
                   alt="Cargo"
-                  className="h-6 w-6 sm:h-7 sm:w-7"
+                  className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6"
                   title="Грузовая шина"
                 />
               </div>
@@ -521,20 +541,20 @@ export default function TireCard({ tire }: TireCardProps) {
 
             {/* Проверка для отображения шипов, работает с булевыми значениями true/false */}
             {tire.spike && (
-              <span className="flex items-center justify-center h-6 w-6" title="Шипованная шина">
-                <img src="/images/bykvaSH.png" alt="Шипы" className="h-6 w-6" />
+              <span className="flex items-center justify-center" title="Шипованная шина">
+                <img src="/images/bykvaSH.png" alt="Шипы" className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
               </span>
             )}
             <span className="flex-grow"></span>
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ml-auto sm:ml-0"
+              className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 ml-auto p-0"
               onClick={toggleFavorite}
               aria-label={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
             >
               <Heart
-                className={`h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 transition-colors ${
+                className={`h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-colors ${
                   isFavorite ? "text-red-500 fill-red-500" : "text-gray-400 hover:text-red-500"
                 }`}
               />
@@ -542,7 +562,7 @@ export default function TireCard({ tire }: TireCardProps) {
           </div>
 
           <Link href={`/product/${tire.id}`}>
-            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-xs sm:text-sm md:text-base lg:text-lg">
+            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-[10px] sm:text-xs md:text-sm lg:text-base leading-tight">
               {tire.name}
             </h3>
           </Link>
@@ -550,20 +570,11 @@ export default function TireCard({ tire }: TireCardProps) {
           {/* Add article number display - временно скрыто */}
           {/* <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">артикул: {article}</p> */}
 
-          <div className="mt-0.5 sm:mt-1 md:mt-2 flex items-center gap-1 sm:gap-2 md:gap-3">
+          <div className="mt-0.5 sm:mt-1 flex items-center gap-1 sm:gap-1.5">
             {flagError ? (
-              // Placeholder if flag image fails to load
               <div
-                className="rounded-sm w-[20px] h-[14px] sm:w-[24px] sm:h-[16px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[8px] text-gray-500"
+                className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[6px] sm:text-[8px] text-gray-500"
                 title={`URL флага: ${flagUrl}`}
-                onClick={() => {
-                  console.log("URL флага:", flagUrl)
-                  // Копируем URL в буфер обмена
-                  navigator.clipboard.writeText(flagUrl).then(() => {
-                    alert(`URL скопирован: ${flagUrl}`)
-                  })
-                }}
-                style={{ cursor: "pointer" }}
               >
                 {tire.model?.brand?.country?.id || "?"}
               </div>
@@ -571,43 +582,29 @@ export default function TireCard({ tire }: TireCardProps) {
               <img
                 src={flagUrl || "/placeholder.svg"}
                 alt={tire.model?.brand?.country?.name || "Country"}
-                width={20}
-                height={14}
-                className="rounded-sm w-[20px] h-[14px] sm:w-[24px] sm:h-[16px] border border-gray-200"
-                title={`URL флага: ${flagUrl}`}
-                onClick={() => {
-                  console.log("URL флага:", flagUrl)
-                  navigator.clipboard.writeText(flagUrl).then(() => {
-                    alert(`URL скопирован: ${flagUrl}`)
-                  })
-                }}
-                style={{ cursor: "pointer" }}
-                onError={(e) => {
-                  console.log(`Ошибка загрузки флага: ${flagUrl}`)
-                  setFlagError(true)
-                  // Не устанавливаем fallback изображение, чтобы показать код страны
-                }}
+                className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] border border-gray-200"
+                onError={() => setFlagError(true)}
               />
             )}
-            <span className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 dark:text-gray-400">
+            <span className="text-[8px] sm:text-[10px] md:text-xs text-gray-500 dark:text-gray-400 truncate">
               {tire.model?.brand?.country?.name || "Страна не указана"}
             </span>
           </div>
         </div>
 
-        <div className="mt-0.5 sm:mt-1 md:mt-2 lg:mt-3 flex flex-col relative pb-8 sm:pb-10 md:pb-12 lg:pb-14">
-          <div className="flex items-center justify-between w-full mb-1">
+        <div className="mt-0.5 sm:mt-1 flex flex-col relative pb-7 sm:pb-8 md:pb-10">
+          <div className="flex items-center justify-between w-full mb-0.5 sm:mb-1">
             <div>
               {/* Добавляем статус готовности к выдаче с использованием иконок из Lucide */}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5 sm:gap-1">
                 <span className="flex items-center justify-center">
                   {React.cloneElement(stockStatus.icon as React.ReactElement, {
-                    className: `h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 ${
+                    className: `h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 ${
                       (stockStatus.icon as React.ReactElement).props.className
                     }`,
                   })}
                 </span>
-                <span className={`text-xs sm:text-sm md:text-base lg:text-lg font-medium ${stockStatus.className}`}>
+                <span className={`text-[9px] sm:text-[10px] md:text-xs font-medium ${stockStatus.className}`}>
                   {stockStatus.tooltip}
                 </span>
               </div>
@@ -616,66 +613,57 @@ export default function TireCard({ tire }: TireCardProps) {
               {tire.stock > 0 ? (
                 <>
                   <span
-                    className={`text-base sm:text-xl md:text-2xl lg:text-3xl font-medium opacity-80 ${
+                    className={`text-sm sm:text-base md:text-lg font-medium opacity-80 ${
                       tire.stock > 10 ? "text-green-500" : tire.stock > 5 ? "text-yellow-500" : "text-orange-500"
                     }`}
                   >
                     {tire.stock} шт
                   </span>
-                  <span className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 dark:text-gray-400">
+                  <span className="text-[8px] sm:text-[9px] md:text-[10px] text-gray-500 dark:text-gray-400">
                     Количество:
                   </span>
                 </>
               ) : (
-                <span className="text-base sm:text-xl font-medium opacity-80 text-red-500">Нет в наличии</span>
+                <span className="text-xs sm:text-sm font-medium opacity-80 text-red-500">Нет в наличии</span>
               )}
             </div>
           </div>
-          <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center mt-2 sm:mt-0 px-0">
+          <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
             <div>
-              <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 dark:text-gray-400 line-through">
+              <p className="text-[8px] sm:text-[10px] md:text-xs text-gray-500 dark:text-gray-400 line-through">
                 {formatPrice(tire.rrc)}
               </p>
-              <p
-                className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-[#1F1F1F] dark:text-white relative"
-                style={{
-                  textShadow: "1px 1px 0 rgba(0,0,0,0.1), 2px 2px 0 rgba(0,0,0,0.05), 3px 3px 5px rgba(0,0,0,0.1)",
-                  transform: "translateZ(0)",
-                  perspective: "1000px",
-                  transition: "transform 0.3s ease",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateZ(10px) scale(1.02)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateZ(0)")}
-              >
+              <p className="text-xs sm:text-sm md:text-base font-bold text-[#1F1F1F] dark:text-white">
                 {formatPrice(tire.price)}
               </p>
             </div>
-            <div className="flex items-center gap-0">
+            <div className="flex items-center flex-1 justify-end ml-2">
               {/* Новая кнопка корзины в стиле из изображения */}
-              <div className="flex h-9 sm:h-10 md:h-11 lg:h-[12.5] rounded-xl overflow-hidden border border-black/80">
-                {/* Красная кнопка минус */}
+              <div className="flex h-7 sm:h-8 md:h-9 rounded-lg overflow-hidden w-full max-w-[140px] sm:max-w-[160px] md:max-w-[180px]">
+                {/* Кнопка минус */}
                 <button
                   onClick={removeFromCart}
                   disabled={cartCount <= 0 || tire.stock <= 0}
-                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full px-3 sm:px-4 md:px-5 lg:px-6 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
+                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Уменьшить количество"
                 >
-                  <Minus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:w-7" />
+                  <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                 </button>
 
                 {/* Счетчик количества */}
-                <div className="bg-black/85 text-white h-full px-2 sm:px-3 md:px-4 flex items-center justify-center min-w-[2.5rem] sm:min-w-[3rem] md:min-w-[3.5rem] lg:min-w-[4rem] backdrop-blur-sm">
-                  <span className="text-sm sm:text-base md:text-lg lg:text-xl font-medium">{cartCount}</span>
+                <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2rem] sm:min-w-[2.5rem] md:min-w-[3rem]">
+                  <span className="text-xs sm:text-sm md:text-base font-medium">{cartCount}</span>
                 </div>
 
-                {/* Зеленая кнопка плюс */}
+                {/* Кнопка плюс */}
                 <button
+                  ref={addButtonRef}
                   onClick={addToCart}
                   disabled={tire.stock <= 0}
-                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full px-3 sm:px-4 md:px-5 lg:px-6 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
+                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Увеличить количество"
                 >
-                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:w-7" />
+                  <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                 </button>
               </div>
             </div>
@@ -736,6 +724,19 @@ export default function TireCard({ tire }: TireCardProps) {
               </div>
             </div>
           </details>
+        </div>
+      )}
+
+      {/* Эффект +N при добавлении в корзину */}
+      {floatingNumber && (
+        <div
+          className="fixed pointer-events-none z-[9999] floating-plus-one"
+          style={{
+            left: floatingNumber.x,
+            top: floatingNumber.y,
+          }}
+        >
+          <span className="text-xl font-bold text-[#D3DF3D]">+{floatingNumber.count}</span>
         </div>
       )}
     </div>

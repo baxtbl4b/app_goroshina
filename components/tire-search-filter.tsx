@@ -787,7 +787,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
 
       <div
         ref={filterRef}
-        className={`bg-white dark:bg-[#2A2A2A] p-4 shadow-lg fixed bottom-0 left-0 right-0 z-40 transition-all duration-300 ${
+        className={`bg-white dark:bg-[#2A2A2A] p-4 fixed bottom-0 left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] ${
           isFilterCollapsed ? "max-h-[120px] overflow-hidden" : ""
         } pb-[calc(env(safe-area-inset-bottom)_+_1rem)]`}
         aria-label="Блок фильтра шин"
@@ -815,11 +815,11 @@ export default function TireSearchFilter({ season }: { season: Season }) {
         <div className="flex items-end gap-3 mb-4">
           <div className="grid grid-cols-3 gap-3 flex-1">
             <div>
-              <Label htmlFor="width" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+              <Label htmlFor="width" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                 Ширина
               </Label>
               <Select value={width} onValueChange={handleWidthChange}>
-                <SelectTrigger id="width" className="w-full bg-[#333333] text-white border border-gray-300/50">
+                <SelectTrigger id="width" className="w-full bg-[#333333] text-white border-0">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -833,11 +833,11 @@ export default function TireSearchFilter({ season }: { season: Season }) {
             </div>
 
             <div>
-              <Label htmlFor="profile" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+              <Label htmlFor="profile" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                 Профиль
               </Label>
               <Select value={profile} onValueChange={handleProfileChange}>
-                <SelectTrigger id="profile" className="w-full bg-[#333333] text-white border border-gray-300/50">
+                <SelectTrigger id="profile" className="w-full bg-[#333333] text-white border-0">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -854,12 +854,12 @@ export default function TireSearchFilter({ season }: { season: Season }) {
               <div className="flex items-center justify-center mb-1 w-full">
                 {" "}
                 {/* Updated line */}
-                <Label htmlFor="diameter" className="text-sm text-[#1F1F1F] dark:text-gray-300 text-center">
+                <Label htmlFor="diameter" className="text-xs text-[#1F1F1F] dark:text-gray-300 text-center">
                   Диаметр
                 </Label>
               </div>
               <Select value={diameter} onValueChange={handleDiameterChange}>
-                <SelectTrigger id="diameter" className="w-full bg-[#333333] text-white border border-gray-300/50">
+                <SelectTrigger id="diameter" className="w-full bg-[#333333] text-white border-0">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -877,7 +877,11 @@ export default function TireSearchFilter({ season }: { season: Season }) {
             variant="outline"
             size="sm"
             onClick={clearAllDimensions}
-            className="h-10 px-3 text-xs"
+            className={`h-10 px-3 text-xs border-0 transition-all duration-300 ${
+              width || profile || diameter
+                ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 hover:scale-105 active:scale-95 shadow-md hover:shadow-red-500/30"
+                : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+            }`}
             disabled={!width && !profile && !diameter}
           >
             Сбросить
@@ -932,39 +936,70 @@ export default function TireSearchFilter({ season }: { season: Season }) {
           {/* Winter tire type toggle - only show for winter season */}
           {season === "w" && (
             <div className="flex-1 max-w-[210px]">
+              <style jsx>{`
+                @keyframes spikeGlow {
+                  0%, 100% {
+                    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5), 0 0 16px rgba(59, 130, 246, 0.5);
+                  }
+                  50% {
+                    box-shadow: 0 0 12px rgba(59, 130, 246, 0.5), 0 0 24px rgba(59, 130, 246, 0.5);
+                  }
+                }
+                .spike-btn-active {
+                  animation: spikeGlow 2s ease-in-out infinite;
+                }
+              `}</style>
               <div
-                className="relative h-8 w-full rounded-full border border-gray-300 dark:border-gray-600 flex items-center z-0 overflow-hidden"
+                className="relative h-8 w-full rounded-full bg-gray-100 dark:bg-gray-800 flex items-center z-0 overflow-hidden touch-pan-x"
                 role="radiogroup"
                 aria-label="Тип зимних шин"
-              >
-                {/* Background highlight that moves based on selection */}
-                <div
-                  className="absolute h-full bg-blue-600 transition-all duration-300 ease-in-out"
-                  style={{
-                    width: "33.333%",
-                    left: spike === true ? "0%" : spike === false ? "33.333%" : "66.666%",
-                  }}
-                />
+                onTouchStart={(e) => {
+                  const touch = e.touches[0]
+                  e.currentTarget.dataset.touchStartX = touch.clientX.toString()
+                }}
+                onTouchEnd={(e) => {
+                  const startX = parseFloat(e.currentTarget.dataset.touchStartX || "0")
+                  const endX = e.changedTouches[0].clientX
+                  const diff = endX - startX
 
+                  // Swipe threshold
+                  if (Math.abs(diff) > 30) {
+                    // Swipe left - move to next option
+                    if (diff < 0) {
+                      if (spike === true) toggleSpikeParameter(false)
+                      else if (spike === false) toggleSpikeParameter(null)
+                    }
+                    // Swipe right - move to previous option
+                    else {
+                      if (spike === null) toggleSpikeParameter(false)
+                      else if (spike === false) toggleSpikeParameter(true)
+                    }
+                  }
+                }}
+              >
                 {/* Toggle buttons */}
                 <button
                   onClick={() => {
                     console.log("Setting spike filter to TRUE")
                     toggleSpikeParameter(true)
                   }}
-                  className={`flex-1 h-full rounded-l-full flex items-center justify-center text-xs font-medium transition-all duration-200 z-10 relative ${
-                    spike === true ? "text-white font-bold" : "text-[#1F1F1F] dark:text-white"
+                  className={`flex-1 h-full rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 z-10 relative mx-0.5 ${
+                    spike === true
+                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold spike-btn-active"
+                      : "text-[#1F1F1F] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
                   }`}
                   aria-pressed={spike === true}
                   role="radio"
                   aria-checked={spike === true}
                 >
-                  {spike === true ? "✓ Шип" : "Шип"}
+                  Шип
                 </button>
                 <button
                   onClick={() => toggleSpikeParameter(false)}
-                  className={`flex-1 h-full flex items-center justify-center text-xs font-medium transition-all duration-200 z-10 relative ${
-                    spike === false ? "text-white" : "text-[#1F1F1F] dark:text-white"
+                  className={`flex-1 h-full rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 z-10 relative mx-0.5 ${
+                    spike === false
+                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold spike-btn-active"
+                      : "text-[#1F1F1F] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
                   }`}
                   aria-pressed={spike === false}
                   role="radio"
@@ -974,8 +1009,10 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                 </button>
                 <button
                   onClick={() => toggleSpikeParameter(null)}
-                  className={`flex-1 h-full rounded-r-full flex items-center justify-center text-xs font-medium transition-all duration-200 z-10 relative ${
-                    spike === null ? "text-white" : "text-[#1F1F1F] dark:text-white"
+                  className={`flex-1 h-full rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 z-10 relative mx-0.5 ${
+                    spike === null
+                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold spike-btn-active"
+                      : "text-[#1F1F1F] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
                   }`}
                   aria-pressed={spike === null}
                   role="radio"
@@ -1012,7 +1049,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                     Ширина (2 ось)
                   </Label>
                   <Select>
-                    <SelectTrigger id="width2" className="w-full bg-[#333333] text-white border border-gray-300/50">
+                    <SelectTrigger id="width2" className="w-full bg-[#333333] text-white border-0">
                       <SelectValue placeholder="~" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1031,7 +1068,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                     Профиль (2 ось)
                   </Label>
                   <Select>
-                    <SelectTrigger id="profile2" className="w-full bg-[#333333] text-white border border-gray-300/50">
+                    <SelectTrigger id="profile2" className="w-full bg-[#333333] text-white border-0">
                       <SelectValue placeholder="~" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1049,7 +1086,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                     Диаметр (2 ось)
                   </Label>
                   <Select>
-                    <SelectTrigger id="diameter2" className="w-full bg-[#333333] text-white border border-gray-300/50">
+                    <SelectTrigger id="diameter2" className="w-full bg-[#333333] text-white border-0">
                       <SelectValue placeholder="~" />
                     </SelectTrigger>
                     <SelectContent>

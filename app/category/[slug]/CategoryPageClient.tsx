@@ -33,6 +33,51 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
   // Inspector mode state
   const [inspectorMode, setInspectorMode] = useState(false)
+
+  // Swipe handling for season tabs
+  const touchStartRef = useRef<number | null>(null)
+  const touchEndRef = useRef<number | null>(null)
+  const minSwipeDistance = 50
+
+  const seasonsList = [
+    { key: "s", path: "/category/summer" },
+    { key: "w", path: "/category/winter" },
+    { key: "a", path: "/category/all-season" },
+  ]
+
+  const currentSeasonIndex = seasonsList.findIndex((s) => s.key === season)
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchEndRef.current = null
+    touchStartRef.current = e.targetTouches[0].clientX
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    touchEndRef.current = e.targetTouches[0].clientX
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStartRef.current || !touchEndRef.current) return
+
+    const distance = touchStartRef.current - touchEndRef.current
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    const params = new URLSearchParams(searchParams.toString())
+
+    if (isLeftSwipe) {
+      // Swipe left = next season (circular)
+      const nextIndex = (currentSeasonIndex + 1) % seasonsList.length
+      router.push(`${seasonsList[nextIndex].path}?${params.toString()}`)
+    } else if (isRightSwipe) {
+      // Swipe right = previous season (circular)
+      const prevIndex = (currentSeasonIndex - 1 + seasonsList.length) % seasonsList.length
+      router.push(`${seasonsList[prevIndex].path}?${params.toString()}`)
+    }
+
+    touchStartRef.current = null
+    touchEndRef.current = null
+  }
   const [hoveredElement, setHoveredElement] = useState<{ name: string; x: number; y: number } | null>(null)
 
   // Track winter button coordinates
@@ -191,8 +236,8 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
         // If cart count increased, trigger animation
         if (newCount > cartItemCount) {
-          setIsCartAnimating(true)
-          setTimeout(() => setIsCartAnimating(false), 1000)
+          setIsCartButtonAnimating(true)
+          setTimeout(() => setIsCartButtonAnimating(false), 600)
         }
 
         setCartItemCount(newCount)
@@ -254,220 +299,6 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
     console.log("Dimension filter cleared") // Add logging for debugging
   }
 
-  // Season-specific styles and animations
-  const getSeasonStyles = () => {
-    switch (season) {
-      case "s":
-        return {
-          buttonStyle: {
-            marginTop: "-6px",
-            marginBottom: "-6px",
-          },
-          buttonClass: "relative overflow-hidden summer-button-active text-[#1F1F1F] dark:text-white font-medium",
-          animationStyle: `
-.summer-button-active {
-  background: linear-gradient(120deg, rgba(255, 236, 179, 0.15), rgba(255, 193, 7, 0.2));
-  border: 1px solid rgba(255, 193, 7, 0.6);
-  box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
-  position: relative;
-}
-
-.summer-button-active::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: summerShine 3s infinite;
-  z-index: 1;
-}
-
-@keyframes summerShine {
-  0% {
-    left: -100%;
-  }
-  20%, 100% {
-    left: 100%;
-  }
-}
-`,
-        }
-      case "w":
-        return {
-          buttonStyle: {
-            marginTop: "-6px",
-            marginBottom: "-6px",
-          },
-          buttonClass: "relative overflow-hidden winter-button-active text-[#1F1F1F] dark:text-white font-medium",
-          animationStyle: `
-.winter-button-active {
-  background: linear-gradient(120deg, rgba(224, 242, 254, 0.15), rgba(59, 130, 246, 0.2));
-  border: 1px solid rgba(59, 130, 246, 0.6);
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
-  position: relative;
-}
-
-.winter-button-active::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: winterShine 3s infinite;
-  z-index: 1;
-}
-
-@keyframes winterShine {
-  0% {
-    left: -100%;
-  }
-  20%, 100% {
-    left: 100%;
-  }
-}
-`,
-        }
-      case "a":
-        return {
-          buttonStyle: {
-            marginTop: "-6px",
-            marginBottom: "-6px",
-          },
-          buttonClass: "relative overflow-hidden allseason-button-active text-[#1F1F1F] dark:text-white font-medium",
-          animationStyle: `
-      .allseason-button-active {
-        background: linear-gradient(120deg, rgba(236, 253, 245, 0.15), rgba(16, 185, 129, 0.2));
-        border: 1px solid rgba(16, 185, 129, 0.6);
-        box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
-        position: relative;
-      }
-      
-      .allseason-button-active::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          90deg,
-          rgba(255, 255, 255, 0) 0%,
-          rgba(255, 255, 255, 0.4) 50%,
-          rgba(255, 255, 255, 0) 100%
-        );
-        animation: allseasonShine 3s infinite;
-        z-index: 1;
-      }
-      
-      @keyframes allseasonShine {
-        0% {
-          left: -100%;
-        }
-        20%, 100% {
-          left: 100%;
-        }
-      }
-      
-      .allseason-gradient {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          45deg,
-          rgba(16, 185, 129, 0.1) 0%,
-          rgba(245, 158, 11, 0.1) 50%,
-          rgba(16, 185, 129, 0.1) 100%
-        );
-        background-size: 200% 200%;
-        animation: allseasonGradient 6s ease infinite;
-        z-index: 0;
-      }
-      
-      @keyframes allseasonGradient {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
-      }
-    `,
-        }
-      default:
-        return {
-          buttonStyle: {
-            marginTop: "-6px",
-            marginBottom: "-6px",
-          },
-          buttonClass: "",
-          animationStyle: "",
-        }
-    }
-  }
-
-  const getButtonClass = (tabSeason: "s" | "w" | "a") => {
-    const isActive = season === tabSeason
-    const baseClass =
-      "text-sm px-3 py-3 h-full flex items-center justify-center transition-all duration-300 ease-in-out"
-
-    if (isActive) {
-      return `${baseClass} ${tabSeason === season ? buttonClass : ""}`
-    }
-
-    switch (tabSeason) {
-      case "s":
-        return `${baseClass} border border-transparent hover:border-[#FFB300] hover:bg-gradient-to-r hover:from-[#FFB300]/5 hover:to-[#FFB300]/10 text-[#1F1F1F] dark:text-white`
-      case "w":
-        return `${baseClass} border border-transparent hover:border-[#3B82F6] hover:bg-gradient-to-r hover:from-[#3B82F6]/5 hover:to-[#3B82F6]/10 text-[#1F1F1F] dark:text-white`
-      case "a":
-        return `${baseClass} border border-transparent hover:border-[#10B981] hover:bg-gradient-to-r hover:from-[#10B981]/5 hover:to-[#10B981]/10 text-[#1F1F1F] dark:text-white`
-      default:
-        return baseClass
-    }
-  }
-
-  const { buttonStyle, buttonClass, animationStyle } = getSeasonStyles()
-
-  // Helper function to get button classes for each season tab
-  // const getButtonClass = (tabSeason: string) => {
-  //   const isActive = slug === tabSeason
-  //   const baseClass = "text-sm px-3 py-3 h-full flex items-center"
-
-  //   if (isActive) {
-  //     return `${baseClass} ${tabSeason === slug ? buttonClass : ""}`
-  //   }
-
-  //   switch (tabSeason) {
-  //     case "summer":
-  //       return `${baseClass} border border-transparent hover:border-[#D3DF3D] hover:bg-[#D3DF3D]/10 transition-all duration-200 ease-in-out text-[#1F1F1F] dark:text-white`
-  //     case "winter":
-  //       return `${baseClass} border border-transparent hover:border-[#3D8DDF] hover:bg-[#3D8DDF]/10 transition-all duration-200 ease-in-out text-[#1F1F1F] dark:text-white`
-  //     case "all-season":
-  //       return `${baseClass} border border-transparent hover:border-gradient-to-r hover:from-yellow-400 hover:to-green-400 hover:bg-gradient-to-r hover:from-yellow-400/10 hover:to-green-400/10 transition-all duration-200 ease-in-out text-[#1F1F1F] dark:text-white`
-  //     default:
-  //       return baseClass
-  //   }
-  // }
-
   // Определяем позицию для индикатора корзины в зависимости от наличия фильтра размеров
   const cartIndicatorTopClass = isDimensionFilterActive ? "top-24" : "top-16"
 
@@ -494,9 +325,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px]">
       <style jsx global>
         {`
-          ${animationStyle}
-          
-          /* New cart button animation */
+          /* Cart button animation */
           @keyframes cartButtonAnimation {
             0% {
               transform: scale(1);
@@ -638,46 +467,218 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             animation: cartPulse 0.6s ease-in-out;
           }
 
-          @keyframes cartIconBounce {
+          /* Анимация покачивания корзины */
+          @keyframes cartWiggle {
             0%, 100% {
-              transform: translateY(0);
+              transform: rotate(0deg);
+            }
+            15% {
+              transform: rotate(-15deg);
+            }
+            30% {
+              transform: rotate(12deg);
+            }
+            45% {
+              transform: rotate(-10deg);
+            }
+            60% {
+              transform: rotate(8deg);
+            }
+            75% {
+              transform: rotate(-5deg);
+            }
+            90% {
+              transform: rotate(3deg);
+            }
+          }
+
+          /* Анимация прыжка с отскоком */
+          @keyframes cartJump {
+            0% {
+              transform: translateY(0) scale(1);
+            }
+            20% {
+              transform: translateY(-12px) scale(1.1);
+            }
+            40% {
+              transform: translateY(0) scale(0.95);
+            }
+            60% {
+              transform: translateY(-6px) scale(1.05);
+            }
+            80% {
+              transform: translateY(0) scale(0.98);
+            }
+            100% {
+              transform: translateY(0) scale(1);
+            }
+          }
+
+          /* Анимация появления бейджа */
+          @keyframes badgePop {
+            0% {
+              transform: scale(0);
+              opacity: 0;
             }
             50% {
-              transform: translateY(-4px);
+              transform: scale(1.4);
+              opacity: 1;
+            }
+            70% {
+              transform: scale(0.9);
+            }
+            100% {
+              transform: scale(1);
+              opacity: 1;
             }
           }
 
           .cart-icon-bounce {
-            animation: cartIconBounce 0.6s ease-in-out;
+            animation: cartWiggle 0.5s ease-in-out;
           }
-          
+
+          /* Анимация бейджа */
+          .cart-badge-animate {
+            animation: badgePop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          }
+
           /* Global cart button styles - IMPORTANT: Use these exact styles for all cart buttons across the app */
           .global-cart-button {
             position: fixed;
             top: 5px;
-            right: 16px;
+            right: 0;
             z-index: 100;
             padding: 8px;
             border-radius: 9999px;
-            background-color: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background-color: transparent;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease-in-out;
           }
-          
-          .dark .global-cart-button {
-            background-color: #1F1F1F;
-          }
-          
+
           .global-cart-button:hover {
-            background-color: #f3f4f6;
+            background-color: rgba(0, 0, 0, 0.05);
           }
-          
+
           .dark .global-cart-button:hover {
-            background-color: #2d2d2d;
+            background-color: rgba(255, 255, 255, 0.1);
+          }
+
+          /* Hide scrollbar but keep scroll functionality */
+          .hide-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+          }
+          .hide-scrollbar::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari and Opera */
+          }
+
+          /* Season tabs styles */
+          .season-tabs-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            height: 100%;
+            padding: 0 45px;
+            touch-action: pan-y pinch-zoom;
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: grab;
+          }
+
+          .season-tab {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 8px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            min-width: 90px;
+            text-align: center;
+          }
+
+          .season-tab-active {
+            position: relative;
+            overflow: hidden;
+            transform: scale(1.1);
+            background: linear-gradient(135deg,
+              color-mix(in srgb, var(--tab-color) 20%, transparent),
+              color-mix(in srgb, var(--tab-color) 10%, transparent)
+            );
+            border: none;
+            color: #1F1F1F;
+            font-size: 13px;
+            z-index: 2;
+            animation: softPulse 2s ease-in-out infinite;
+          }
+
+          /* Glow effect */
+          .season-tab-active::after {
+            content: "";
+            position: absolute;
+            inset: -4px;
+            border-radius: 24px;
+            background: var(--tab-color);
+            opacity: 0.3;
+            filter: blur(12px);
+            z-index: -1;
+            animation: glowPulse 2s ease-in-out infinite;
+          }
+
+          @keyframes softPulse {
+            0%, 100% {
+              transform: scale(1.1);
+            }
+            50% {
+              transform: scale(1.12);
+            }
+          }
+
+          @keyframes glowPulse {
+            0%, 100% {
+              opacity: 0.25;
+              filter: blur(12px);
+            }
+            50% {
+              opacity: 0.4;
+              filter: blur(16px);
+            }
+          }
+
+          .dark .season-tab-active {
+            color: white;
+          }
+
+          .season-tab-inactive {
+            transform: scale(0.85);
+            background: rgba(128, 128, 128, 0.1);
+            border: 1px solid transparent;
+            color: #888;
+            font-size: 11px;
+            opacity: 0.8;
+            backdrop-filter: blur(4px);
+          }
+
+          .season-tab-inactive:hover {
+            opacity: 1;
+            background: color-mix(in srgb, var(--tab-color) 15%, transparent);
+            border-color: color-mix(in srgb, var(--tab-color) 50%, transparent);
+            transform: scale(0.88);
+          }
+
+          .dark .season-tab-inactive {
+            color: #aaa;
+            background: rgba(255, 255, 255, 0.05);
+          }
+
+          .dark .season-tab-inactive:hover {
+            color: white;
           }
         `}
       </style>
@@ -705,52 +706,69 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
       <header
         className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[60px]"
         style={{ "--header-height": "60px" } as React.CSSProperties}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
       >
         <div className="container max-w-md flex items-center justify-center h-full relative overflow-hidden">
           <button
             onClick={() => router.push("/")}
-            className="fixed left-0 top-2 p-2 rounded-tr-md rounded-br-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors z-50 bg-white dark:bg-[#1F1F1F]"
+            className="fixed left-0 top-2 p-2 rounded-tr-md rounded-br-md hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors z-50"
             aria-label="На главную"
           >
             <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
           </button>
 
-          <div className="flex items-center justify-center space-x-2 h-full overflow-hidden">
-            <Link href={{ pathname: "/category/summer", query: queryParams }} className="h-full">
-              <Button
-                variant="ghost"
-                className={getButtonClass("s")}
-                style={season === "s" ? buttonStyle : { marginTop: "-6px", marginBottom: "-6px" }}
-              >
-                <span className="relative z-10">ЛЕТНИЕ</span>
-                {season === "s" && (
-                  <div className="absolute left-0 top-0 w-full h-full bg-gradient-to-r from-[#FFB300]/5 to-[#FFB300]/10 z-0"></div>
-                )}
-              </Button>
-            </Link>
-            <Link href={{ pathname: "/category/winter", query: queryParams }} className="h-full">
-              <Button
-                ref={winterButtonRef}
-                variant="ghost"
-                className={getButtonClass("w")}
-                style={season === "w" ? buttonStyle : { marginTop: "-6px", marginBottom: "-6px" }}
-              >
-                <span className="relative z-10">ЗИМНИЕ</span>
-                {season === "w" && (
-                  <div className="absolute left-0 top-0 w-full h-full bg-gradient-to-r from-[#3B82F6]/5 to-[#3B82F6]/10 z-0 rounded-lg"></div>
-                )}
-              </Button>
-            </Link>
-            <Link href={{ pathname: "/category/all-season", query: queryParams }} className="h-full">
-              <Button
-                variant="ghost"
-                className={getButtonClass("a")}
-                style={season === "a" ? buttonStyle : { marginTop: "-6px", marginBottom: "-6px" }}
-              >
-                <span className="relative z-10">ALLSEASON</span>
-                {season === "a" && <div className="allseason-gradient"></div>}
-              </Button>
-            </Link>
+          {/* Season tabs with centered active element */}
+          <div
+            className="season-tabs-container"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
+            {[
+              { key: "s", label: "Летние", path: "/category/summer", color: "#D3DF3D" },
+              { key: "w", label: "Зимние", path: "/category/winter", color: "#3B82F6" },
+              { key: "a", label: "Всесезонные", path: "/category/all-season", color: "#10B981" },
+            ].map((tab) => {
+              const isActive = season === tab.key
+              const activeIndex = season === "s" ? 0 : season === "w" ? 1 : 2
+              const tabIndex = tab.key === "s" ? 0 : tab.key === "w" ? 1 : 2
+
+              // Calculate order for circular carousel (prev - active - next)
+              // Order: s(0) -> w(1) -> a(2) -> s(0) ...
+              let order = tabIndex
+              if (activeIndex === 0) {
+                // s active: a(prev), s(center), w(next)
+                if (tabIndex === 0) order = 1      // s -> center
+                else if (tabIndex === 1) order = 2 // w -> right (next)
+                else order = 0                      // a -> left (prev)
+              } else if (activeIndex === 1) {
+                // w active: s(prev), w(center), a(next)
+                if (tabIndex === 0) order = 0      // s -> left (prev)
+                else if (tabIndex === 1) order = 1 // w -> center
+                else order = 2                      // a -> right (next)
+              } else if (activeIndex === 2) {
+                // a active: w(prev), a(center), s(next)
+                if (tabIndex === 0) order = 2      // s -> right (next)
+                else if (tabIndex === 1) order = 0 // w -> left (prev)
+                else order = 1                      // a -> center
+              }
+
+              return (
+                <Link
+                  key={tab.key}
+                  href={{ pathname: tab.path, query: queryParams }}
+                  className={`season-tab ${isActive ? "season-tab-active" : "season-tab-inactive"}`}
+                  style={{
+                    order,
+                    "--tab-color": tab.color,
+                  } as React.CSSProperties}
+                >
+                  <span>{tab.label}</span>
+                </Link>
+              )
+            })}
           </div>
 
           {/* Global cart button - IMPORTANT: Use this same markup and class on all pages */}
@@ -765,13 +783,15 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                 alt="Корзина"
                 width={26}
                 height={26}
-                className="opacity-90 hover:opacity-100 transition-opacity dark:invert dark:brightness-200 dark:contrast-200"
+                className="opacity-90 hover:opacity-100 transition-opacity dark:invert dark:brightness-200 dark:contrast-200 -scale-x-100"
               />
             </div>
 
             {/* Cart count badge */}
             {cartItemCount > 0 && (
-              <div className="absolute top-[5px] -right-1 bg-[#D3DF3D] text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium shadow-sm">
+              <div
+                className={`absolute -top-1 left-0 bg-[#D3DF3D] text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium shadow-sm ${isCartButtonAnimating ? "cart-badge-animate" : ""}`}
+              >
                 {cartItemCount}
               </div>
             )}
@@ -781,7 +801,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
       {/* Quick size links section */}
       <div className="bg-white dark:bg-[#2A2A2A] p-3 mx-4 rounded-lg shadow-sm mb-4 mt-4 overflow-hidden">
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent snap-x">
+        <div className="flex gap-2 overflow-x-auto snap-x hide-scrollbar">
           {[
             { label: "195/65 R15", width: "195", profile: "65", diameter: "15" },
             { label: "205/55 R16", width: "205", profile: "55", diameter: "16" },
@@ -816,7 +836,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
         <TireSearchFilter season={season} />
       </div>
 
-      <div className="flex-1 px-4 pb-4 space-y-6">
+      <div className="flex-1 px-4 pb-4 space-y-4">
         <QuickFilterButtons
           onSortChange={handleSortChange}
           onFilterToggle={handleFilterToggle}
