@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 // Update the import to point to the correct file
 import CategoryPageClient from "./CategoryPageClient"
-import { WheelLocksButton } from "@/components/wheel-locks-button"
 
 interface CategoryPageProps {
   params: Promise<{
@@ -50,10 +49,5 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params
   const normalizedSeason = slug === "summer" ? "s" : slug === "winter" ? "w" : "a"
 
-  return (
-    <>
-      <CategoryPageClient season={normalizedSeason} />
-      <WheelLocksButton />
-    </>
-  )
+  return <CategoryPageClient season={normalizedSeason} />
 }

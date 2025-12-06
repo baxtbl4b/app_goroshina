@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -24,61 +23,6 @@ interface TireSearchFilterProps {
   season?: Season
 }
 
-// Mock API response for demonstration purposes
-const mockApiResponse = {
-  success: true,
-  count: 12,
-  items: [
-    {
-      id: "NT001",
-      brand: "Nokian",
-      model: "Hakkapeliitta 10",
-      width: 225,
-      height: 45,
-      diam: 17,
-      season: "winter",
-      spike: true,
-      runflat: false,
-      price: 12500,
-      stock: 8,
-      image: "https://example.com/images/nokian-hakka10.jpg",
-    },
-    {
-      id: "CT002",
-      brand: "Continental",
-      model: "IceContact 3",
-      width: 225,
-      height: 45,
-      diam: 17,
-      season: "winter",
-      spike: true,
-      runflat: false,
-      price: 13200,
-      stock: 4,
-      image: "https://example.com/images/continental-ice3.jpg",
-    },
-    {
-      id: "MC003",
-      brand: "Michelin",
-      model: "X-Ice North 4",
-      width: 225,
-      height: 45,
-      diam: 17,
-      season: "winter",
-      spike: true,
-      runflat: true,
-      price: 14800,
-      stock: 6,
-      image: "https://example.com/images/michelin-xice4.jpg",
-    },
-    // Additional items would be here in a real response
-  ],
-}
-
-// Опрделение стиля пульсации с использованием CSS animation
-const pulseAnimationStyle = {
-  animation: "pulse-filter 2s infinite",
-}
 
 export default function TireSearchFilter({ season }: { season: Season }) {
   const router = useRouter()
@@ -112,9 +56,6 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     ],
   )
 
-  // Add state for API response display
-  const [showApiResponse, setShowApiResponse] = useState(false)
-  const [apiResponseLoading, setApiResponseLoading] = useState(false)
 
   // Add mock data for user's vehicles
   const userVehicles: VehicleWithTires[] = [
@@ -183,6 +124,9 @@ export default function TireSearchFilter({ season }: { season: Season }) {
   // Добавьте новые состояния для отслеживания свайпа после других useState объявлений
   const [touchStartY, setTouchStartY] = useState<number | null>(null)
   const [touchEndY, setTouchEndY] = useState<number | null>(null)
+
+  // Отдельные состояния для свайпа на полоске
+  const [handleTouchStartY, setHandleTouchStartY] = useState<number | null>(null)
 
   // Check if all dimensions are specified
   useEffect(() => {
@@ -503,57 +447,6 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     router.push(`${window.location.pathname}?${params.toString()}`)
   }
 
-  const handleSearch = () => {
-    // Create URL parameters
-    const params = new URLSearchParams(searchParams.toString())
-
-    if (width) params.set("width", width)
-    else params.delete("width")
-
-    if (profile) params.set("profile", profile)
-    else params.delete("width")
-
-    if (diameter) params.set("profile", diameter)
-    else params.delete("profile")
-
-    if (diameter) params.set("diameter", diameter)
-    else params.delete("diameter")
-
-    // Add this to the handleSearch function, before the router.push call
-    if (priceRange[0] > 3000) params.set("minPrice", priceRange[0].toString())
-    else params.delete("minPrice")
-
-    if (priceRange[1] < 30000) params.set("maxPrice", priceRange[1].toString())
-    else params.delete("maxPrice")
-
-    // Map the UI states to API parameter values
-    const stockValue = stockFilter === "single" ? "low" : "in-stock"
-    params.set("stock", stockValue)
-
-    // Add the runflat parameter when checkbox is checked
-    if (runflat) {
-      params.set("runflat", "true")
-    }
-
-    // Добавляем параметр cargo, когда чекбокс активирован
-    if (cargo) {
-      params.set("cargo", "true")
-    }
-
-    // Add the spike parameter for winter tires
-    if (season === "w") {
-      if (spike !== null) {
-        params.set("spike", spike.toString())
-      } else {
-        params.delete("spike")
-      }
-    } else {
-      params.delete("spike")
-    }
-
-    // Navigate with the parameters
-    router.push(`${window.location.pathname}?${params.toString()}`)
-  }
 
   // Функция для применения быстрого фильтра по типоразмеру
   const applyQuickSizeFilter = (size: { width: string; profile: string; diameter: string }) => {
@@ -626,7 +519,18 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     setProfile("")
     setDiameter("")
     setSelectedVehicle(null) // Reset the selected vehicle
-    clearDimensionFilter()
+    setPriceRange([3000, 30000]) // Reset price range
+    setStockFilter("single") // Reset stock filter
+    setRunflat(false) // Reset runflat
+    setCargo(false) // Reset cargo
+    setSecondAxis(false) // Reset second axis
+    setStuds(false) // Reset studs
+    setSpike(null) // Reset spike filter
+    setSelectedBrands([]) // Reset brands
+
+    // Clear all URL parameters
+    const params = new URLSearchParams()
+    router.push(`${window.location.pathname}?${params.toString()}`)
   }
 
   // Initialize from URL parameters
@@ -688,72 +592,6 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     }
   }, [])
 
-  // Function to fetch studded tires from external API
-  const fetchStuddedTiresFromExternalAPI = async () => {
-    try {
-      setApiResponseLoading(true)
-
-      // Create the URL with parameters
-      const params = new URLSearchParams({
-        width: width || "",
-        height: profile || "", // Changed from profile to height
-        diam: diameter || "", // Changed from diameter to diam
-        season: "winter", // Always winter for studded tires
-        spike: "true", // Always true for studded tires
-        ...(priceRange[0] > 3000 ? { priceMin: priceRange[0].toString() } : {}),
-        ...(priceRange[1] < 30000 ? { priceMax: priceRange[1].toString() } : {}),
-        inStock: stockFilter === "full" ? "true" : "",
-        ...(runflat ? { runflat: "true" } : {}),
-        ...(cargo ? { cargo: "true" } : {}),
-        apiKey: "API_TOKEN", // Replace with actual token in production
-      })
-
-      // Filter out empty parameters
-      const filteredParams = new URLSearchParams()
-      for (const [key, value] of params.entries()) {
-        if (value !== "") {
-          filteredParams.append(key, value)
-        }
-      }
-
-      const url = `https://api.fxcode.ru/v1/tires?${filteredParams.toString()}`
-
-      console.log("Fetching studded tires from external API:", url)
-
-      // Simulate API call with a delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // In a real implementation, you would make the actual fetch request here
-      // const response = await fetch(url);
-      // const data = await response.json();
-
-      // For demonstration, we'll use our mock data
-      setShowApiResponse(true)
-      setApiResponseLoading(false)
-
-      return {
-        success: true,
-        data: mockApiResponse,
-        url,
-      }
-    } catch (error) {
-      console.error("Error fetching from external API:", error)
-      setApiResponseLoading(false)
-      return { error: "Failed to fetch from external API" }
-    }
-  }
-
-  // Function to test API and show response
-  const testApiRequest = async () => {
-    setApiResponseLoading(true)
-    setShowApiResponse(false)
-
-    // Simulate API call with a delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    setShowApiResponse(true)
-    setApiResponseLoading(false)
-  }
 
   const [isOpen, setIsOpen] = useState(true)
   const [selectedWidths, setSelectedWidths] = useState<string[]>([])
@@ -794,48 +632,37 @@ export default function TireSearchFilter({ season }: { season: Season }) {
         }}
         aria-label="Блок фильтра шин"
         data-testid="tire-filter-container"
-        onTouchStart={(e) => setTouchStartY(e.touches[0].clientY)}
-        onTouchMove={(e) => {
-          if (touchStartY) {
-            const currentY = e.touches[0].clientY
-            const diff = touchStartY - currentY
-
-            // Предотвращаем прокрутку страницы при свайпе вверх на свёрнутом фильтре
-            if (isFilterCollapsed && diff > 0) {
-              e.preventDefault()
-            }
-            // Предотвращаем прокрутку страницы при свайпе вниз на развёрнутом фильтре
-            else if (!isFilterCollapsed && diff < 0) {
-              e.preventDefault()
-            }
-          }
-        }}
-        onTouchEnd={(e) => setTouchEndY(e.changedTouches[0].clientY)}
       >
         {/* Swipe handle for collapse/expand */}
-        <div className="flex items-center justify-center mb-2">
+        <div className="flex items-center justify-center mb-2 -mx-4 px-4">
           <div
-            className="flex items-center justify-center py-1.5 cursor-grab active:cursor-grabbing"
+            className="flex items-center justify-center py-3 cursor-grab active:cursor-grabbing w-full"
             onTouchStart={(e) => {
-              setTouchStartY(e.touches[0].clientY)
+              e.stopPropagation()
+              setHandleTouchStartY(e.touches[0].clientY)
             }}
             onTouchMove={(e) => {
-              if (touchStartY) {
-                setTouchEndY(e.touches[0].clientY)
+              if (handleTouchStartY !== null) {
+                e.preventDefault()
+                e.stopPropagation()
               }
             }}
             onTouchEnd={(e) => {
-              if (touchStartY && touchEndY) {
-                const diff = touchEndY - touchStartY
-                // Свайп вниз - закрыть, свайп вверх - открыть
-                if (diff > 30 && !isFilterCollapsed) {
-                  setIsFilterCollapsed(true)
-                } else if (diff < -30 && isFilterCollapsed) {
-                  setIsFilterCollapsed(false)
+              if (handleTouchStartY !== null) {
+                const endY = e.changedTouches[0].clientY
+                const diff = endY - handleTouchStartY
+
+                // Свайп вниз (diff > 0) - закрыть, свайп вверх (diff < 0) - открыть
+                if (Math.abs(diff) > 20) {
+                  if (diff > 0 && !isFilterCollapsed) {
+                    setIsFilterCollapsed(true)
+                  } else if (diff < 0 && isFilterCollapsed) {
+                    setIsFilterCollapsed(false)
+                  }
                 }
+
+                setHandleTouchStartY(null)
               }
-              setTouchStartY(null)
-              setTouchEndY(null)
             }}
             aria-label={isFilterCollapsed ? "Свайп вверх для раскрытия" : "Свайп вниз для скрытия"}
           >
@@ -909,15 +736,87 @@ export default function TireSearchFilter({ season }: { season: Season }) {
             size="sm"
             onClick={clearAllDimensions}
             className={`h-10 px-3 text-xs border-0 transition-all duration-300 ${
-              width || profile || diameter
+              width || profile || diameter || priceRange[0] > 3000 || priceRange[1] < 30000 || stockFilter === "full" || runflat || cargo || secondAxis || studs || spike !== null || selectedBrands.length > 0
                 ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 hover:scale-105 active:scale-95 shadow-md hover:shadow-red-500/30"
                 : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
             }`}
-            disabled={!width && !profile && !diameter}
+            disabled={!width && !profile && !diameter && priceRange[0] === 3000 && priceRange[1] === 30000 && stockFilter === "single" && !runflat && !cargo && !secondAxis && !studs && spike === null && selectedBrands.length === 0}
           >
             Сбросить
           </Button>
         </div>
+
+        {/* Second axis selectors (conditional) */}
+        {secondAxis && (
+          <div className="flex items-end gap-3 mb-3 mt-1">
+            <div className="grid grid-cols-3 gap-3 flex-1">
+              <div>
+                <Label htmlFor="width2" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                  Ширина (2 ось)
+                </Label>
+                <Select>
+                  <SelectTrigger id="width2" className="w-full bg-[#333333] text-white border-0">
+                    <SelectValue placeholder="~" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {widthOptions.map((width) => (
+                      <SelectItem key={width} value={width}>
+                        {width}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="profile2" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                  Высота (2 ось)
+                </Label>
+                <Select>
+                  <SelectTrigger id="profile2" className="w-full bg-[#333333] text-white border-0">
+                    <SelectValue placeholder="~" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {profileOptions.map((profile) => (
+                      <SelectItem key={profile} value={profile}>
+                        {profile}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-center mb-1 w-full">
+                  <Label htmlFor="diameter2" className="text-xs text-[#1F1F1F] dark:text-gray-300 text-center">
+                    Диаметр (2 ось)
+                  </Label>
+                </div>
+                <Select>
+                  <SelectTrigger id="diameter2" className="w-full bg-[#333333] text-white border-0">
+                    <SelectValue placeholder="~" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {diameterOptions.map((diameter) => (
+                      <SelectItem key={diameter} value={diameter}>
+                        R{diameter}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-10 px-3 text-xs border-0 invisible"
+              disabled
+            >
+              Сбросить
+            </Button>
+          </div>
+        )}
 
         {/* Header section with filter title and buttons - all on one horizontal line */}
         <div className="flex flex-row items-center justify-between gap-3 mb-3">
@@ -1072,66 +971,6 @@ export default function TireSearchFilter({ season }: { season: Season }) {
           }`}
         >
           <div className="space-y-4">
-            {/* Second axis selectors (conditional) */}
-            {secondAxis && (
-              <div className="grid grid-cols-3 gap-3 pt-2 border-t border-[#D9D9DD] dark:border-[#3A3A3A]">
-                <div>
-                  <Label htmlFor="width2" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block">
-                    Ширина (2 ось)
-                  </Label>
-                  <Select>
-                    <SelectTrigger id="width2" className="w-full bg-[#333333] text-white border-0">
-                      <SelectValue placeholder="~" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {widthOptions.map((width) => (
-                        <SelectItem key={width} value={width}>
-                          {width}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  {" "}
-                  <Label htmlFor="profile2" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block">
-                    Профиль (2 ось)
-                  </Label>
-                  <Select>
-                    <SelectTrigger id="profile2" className="w-full bg-[#333333] text-white border-0">
-                      <SelectValue placeholder="~" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {profileOptions.map((profile) => (
-                        <SelectItem key={profile} value={profile}>
-                          {profile}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="diameter2" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block">
-                    Диаметр (2 ось)
-                  </Label>
-                  <Select>
-                    <SelectTrigger id="diameter2" className="w-full bg-[#333333] text-white border-0">
-                      <SelectValue placeholder="~" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {diameterOptions.map((diameter) => (
-                        <SelectItem key={diameter} value={diameter}>
-                          R{diameter}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
-
             <div className="space-y-3">
               {/* More compact filters in a row */}
               <div className="flex flex-wrap gap-3 justify-between">
@@ -1249,185 +1088,8 @@ export default function TireSearchFilter({ season }: { season: Season }) {
               </div>
             </div>
 
-            {/* Search button (completely hidden) */}
-            <Button
-              className="w-full bg-[#1F1F1F] hover:bg-[#1F1F1F]/90 text-white font-bold mt-2 hidden"
-              onClick={handleSearch}
-              hidden
-            >
-              <Search className="h-4 w-4 mr-2" />
-              ПОДОБРАТЬ
-            </Button>
           </div>
         </div>
-        {/* API Request Debug Section - Hidden */}
-        <div className="hidden">
-          <h4 className="font-bold mb-2 text-[#1F1F1F] dark:text-white">API Request Debug:</h4>
-          {/* Rest of the debug content remains the same but will be hidden */}
-          <div className="space-y-2">
-            <div>
-              <span className="font-medium text-[#1F1F1F] dark:text-white">Endpoint:</span>
-              <code className="ml-2 p-1 bg-white dark:bg-gray-900 rounded text-[#1F1F1F] dark:text-white">
-                GET https://api.fxcode.ru/v1/tires
-              </code>
-            </div>
-            <div>
-              <span className="font-medium text-[#1F1F1F] dark:text-white">Query Parameters:</span>
-              <pre className="mt-1 p-2 bg-white dark:bg-gray-900 rounded overflow-x-auto text-[#1F1F1F] dark:text-white">
-                {JSON.stringify(
-                  {
-                    width: width || undefined,
-                    height: profile || undefined, // Changed from profile to height
-                    diam: diameter || undefined, // Changed from diameter to diam
-                    season,
-                    spike: season === "w" ? spike : undefined,
-                    minPrice: priceRange[0] > 3000 ? priceRange[0] : undefined,
-                    maxPrice: priceRange[1] < 30000 ? priceRange[1] : undefined,
-                    stock: stockFilter === "single" ? "low" : "in-stock",
-                    runflat: runflat ? true : undefined, // Explicitly show as true boolean
-                    cargo: cargo || undefined,
-                    secondAxis: secondAxis || undefined,
-                    brands: selectedBrands.length > 0 ? selectedBrands.join(",") : undefined,
-                  },
-                  null,
-                  2,
-                )}
-              </pre>
-            </div>
-            <div>
-              <span className="font-medium text-[#1F1F1F] dark:text-white">API Request:</span>
-              <div className="mt-1 space-y-2">
-                <div>
-                  <span className="text-xs font-semibold text-[#1F1F1F] dark:text-white">
-                    FXCode API {season === "w" && spike === true && "(Searching for studded tires)"}:
-                  </span>
-                  <div className="mt-1 p-2 bg-white dark:bg-gray-900 rounded overflow-x-auto text-[#1F1F1F] dark:text-white break-all">
-                    {`https://api.fxcode.ru/v1/tires?${new URLSearchParams(
-                      Object.entries({
-                        width: width || "",
-                        height: profile || "", // Changed from profile to height
-                        diam: diameter || "", // Changed from diameter to diam
-                        season: season === "s" ? "summer" : season === "w" ? "winter" : "all-season",
-                        spike:
-                          season === "w" && spike === true ? "true" : season === "w" && spike === false ? "false" : "",
-                        priceMin: priceRange[0] > 3000 ? priceRange[0].toString() : "",
-                        priceMax: priceRange[1] < 30000 ? priceRange[1].toString() : "",
-                        inStock: stockFilter === "full" ? "true" : "",
-                        runflat: runflat ? "true" : "", // Ensure runflat is included
-                        cargo: cargo ? "true" : "",
-                        brands: selectedBrands.length > 0 ? selectedBrands.join(",") : "",
-                        apiKey: "${API_TOKEN}",
-                      }).filter(([_, v]) => v !== ""),
-                    ).toString()}`}
-                  </div>
-                  {season === "w" && spike === true && (
-                    <div className="mt-1 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-xs text-green-800 dark:text-green-400">
-                      Активно: поиск шипованных шин в API FXCode
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* API Response Section */}
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-[#1F1F1F] dark:text-white">API Response:</span>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      // Создаем URL с текущими параметрами фильтра
-                      const params = new URLSearchParams()
-                      if (width) params.set("width", width)
-                      if (profile) params.set("height", profile)
-                      if (diameter) params.set("diam", diameter)
-                      params.set("season", season === "s" ? "summer" : season === "w" ? "winter" : "all-season")
-                      if (season === "w" && spike !== null) params.set("spike", spike.toString())
-                      if (priceRange[0] > 3000) params.set("priceMin", priceRange[0].toString())
-                      if (priceRange[1] < 30000) params.set("priceMax", priceRange[1].toString())
-                      if (stockFilter === "full") params.set("inStock", "true")
-                      if (runflat) params.set("runflat", "true")
-                      if (cargo) params.set("cargo", "true")
-                      params.set("apiKey", "API_TOKEN")
-
-                      // Обновляем запрос в API
-                      setApiResponseLoading(true)
-                      setShowApiResponse(false)
-
-                      console.log("Обновление запроса в API:", `https://api.fxcode.ru/v1/tires?${params.toString()}`)
-
-                      // Симулируем задержку API
-                      setTimeout(() => {
-                        setApiResponseLoading(false)
-                        setShowApiResponse(true)
-                      }, 1000)
-                    }}
-                    className="text-xs h-6 px-2"
-                  >
-                    Обновить запрос в API
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={testApiRequest}
-                    disabled={apiResponseLoading}
-                    className="text-xs h-6 px-2"
-                  >
-                    {apiResponseLoading ? "Загрузка..." : "Тест API"}
-                  </Button>
-                </div>
-              </div>
-
-              {apiResponseLoading && (
-                <div className="mt-2 p-4 bg-white dark:bg-gray-900 rounded flex items-center justify-center">
-                  <div className="animate-spin h-4 w-4 border-2 border-blue-500 rounded-full border-t-transparent"></div>
-                  <span className="ml-2 text-xs text-gray-500">Загрузка данных...</span>
-                </div>
-              )}
-
-              {showApiResponse && !apiResponseLoading && (
-                <div className="mt-2">
-                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded text-xs text-blue-800 dark:text-blue-400 mb-2">
-                    Симуляция ответа API для URL:
-                    https://api.fxcode.ru/v1/tires?width=225&height=45&diam=17&season=winter&spike=true&apiKey=API_TOKEN
-                  </div>
-                  <pre className="mt-1 p-2 bg-white dark:bg-gray-900 rounded overflow-x-auto text-[#1F1F1F] dark:text-white max-h-60">
-                    {JSON.stringify(mockApiResponse, null, 2)}
-                  </pre>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        {/* Indicator when filter is collapsed */}
-        {isFilterCollapsed && (
-          <div
-            className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white dark:from-[#2A2A2A] to-transparent flex items-end justify-center pb-2 pointer-events-none"
-            aria-label="Свайп вверх для раскрытия"
-          >
-            <div className="flex flex-col items-center gap-1">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-gray-400 dark:text-gray-500 animate-bounce"
-              >
-                <path
-                  d="M6 9L12 15L18 9"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Свайп вверх</span>
-            </div>
-          </div>
-        )}
       </div>
     </>
   )
