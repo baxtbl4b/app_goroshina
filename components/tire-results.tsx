@@ -27,6 +27,7 @@ export default function TireResults({ season }: TireResultsProps) {
   const runflatFilter = searchParams.get("runflat") // Добавляем извлечение параметра runflat
   const cargoFilter = searchParams.get("cargo") // Добавляем извлечение параметра cargo
   const todayFilter = searchParams.get("today") // Добавляем извлечение параметра today
+  const minStockFilter = searchParams.get("minStock") // Добавляем извлечение параметра minStock
 
   // Создаем мемоизированный объект фильтров
   const filters = useMemo(() => {
@@ -67,14 +68,22 @@ export default function TireResults({ season }: TireResultsProps) {
     return `/api/tires?${apiParams.toString()}`
   }, [filters])
 
-  // Применяем клиентский фильтр "Сегодня" если он активен
+  // Применяем клиентские фильтры
   const filteredTires = useMemo(() => {
+    let result = tires
+
+    // Фильтр "Сегодня" - только товары с provider === "tireshop"
     if (todayFilter === "true") {
-      // Фильтруем только товары с provider === "tireshop" (забрать сегодня)
-      return tires.filter((tire) => tire.provider?.toLowerCase() === "tireshop")
+      result = result.filter((tire) => tire.provider?.toLowerCase() === "tireshop")
     }
-    return tires
-  }, [tires, todayFilter])
+
+    // Фильтр минимального количества на складе
+    if (minStockFilter === "4") {
+      result = result.filter((tire) => (tire.stock || 0) >= 4)
+    }
+
+    return result
+  }, [tires, todayFilter, minStockFilter])
 
   // Функция для повторной загрузки данных
   const retryLoading = () => {

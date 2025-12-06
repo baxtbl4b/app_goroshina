@@ -226,7 +226,7 @@ export default function QuickFilterButtons({
                 }
               }}
               placeholder={pathname?.includes("/krepezh") ? "Фильтр по модели авто" : "Введите бренд"}
-              className="flex-1 px-3 py-1 text-xs border-0 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-100 dark:bg-[#1A1A1A] dark:text-white mr-1.5"
+              className="flex-1 px-3 py-1 text-xs border-0 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-100 dark:bg-[#1A1A1A] dark:text-white mr-1.5"
             />
             <div
               className="cursor-pointer hover:opacity-70 transition-opacity p-1 bg-gray-100 dark:bg-gray-800 rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0"

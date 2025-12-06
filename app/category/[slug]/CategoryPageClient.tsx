@@ -780,7 +780,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
       </header>
 
       {/* Quick size links section */}
-      <div className="bg-white dark:bg-[#2A2A2A] p-3 mx-4 rounded-lg shadow-sm mb-4 mt-4 overflow-hidden">
+      <div className="px-4 mb-4 mt-4 overflow-hidden">
         <div className="flex gap-2 overflow-x-auto snap-x hide-scrollbar">
           {[
             { label: "195/65 R15", width: "195", profile: "65", diameter: "15" },

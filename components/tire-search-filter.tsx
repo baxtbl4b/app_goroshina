@@ -595,6 +595,14 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     } else {
       setTodayOnly(false)
     }
+
+    // Initialize stock filter from URL parameter
+    const minStockParam = searchParams.get("minStock")
+    if (minStockParam === "4") {
+      setStockFilter("full")
+    } else {
+      setStockFilter("single")
+    }
   }, [searchParams, season])
 
   // Function to scroll to filter
@@ -1067,7 +1075,19 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                   {/* Stock Filter - Checkbox style button */}
                   <div className="w-[45%] sm:w-[30%] bg-[#F5F5F5] dark:bg-[#333333] rounded-md p-2">
                     <button
-                      onClick={() => setStockFilter(stockFilter === "single" ? "full" : "single")}
+                      onClick={() => {
+                        const newStockFilter = stockFilter === "single" ? "full" : "single"
+                        setStockFilter(newStockFilter)
+
+                        // Apply to URL parameters
+                        const params = new URLSearchParams(searchParams.toString())
+                        if (newStockFilter === "full") {
+                          params.set("minStock", "4")
+                        } else {
+                          params.delete("minStock")
+                        }
+                        router.push(`${window.location.pathname}?${params.toString()}`)
+                      }}
                       className={`w-full h-16 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center px-2 ${
                         stockFilter === "full"
                           ? "bg-blue-500 text-white"
