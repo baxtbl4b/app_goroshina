@@ -16,7 +16,19 @@ const API_TOKEN = "KYf-JMMTweMWASr-zktunkLwnPKfzeIO"
 // Функция для получения URL флага из API
 function getCountryFlag(tire: Tire): string {
   try {
-    // Проверяем наличие полного пути к флагу
+    // Проверяем наличие прямого поля flag из Tirebase API
+    if (tire.flag) {
+      // Если флаг уже полный URL, возвращаем его
+      if (typeof tire.flag === "string" && tire.flag.startsWith("http")) {
+        return tire.flag
+      }
+      // Если это ID, формируем URL
+      if (typeof tire.flag === "string") {
+        return `https://api.fxcode.ru/assets/${tire.flag}?access_token=${API_TOKEN}`
+      }
+    }
+
+    // Проверяем наличие полного пути к флагу (старый формат)
     if (
       tire.model &&
       typeof tire.model === "object" &&
@@ -287,26 +299,79 @@ export default function TireCard({ tire }: TireCardProps) {
     window.dispatchEvent(cartUpdateEvent)
   }
 
-  // Обновим функцию getStockStatus, чтобы она возвращала тип статуса
+  // Функция для определения статуса доставки на основе поставщика
+  const getDeliveryStatusByProvider = (provider: string | null | undefined): string => {
+    if (!provider) return "Уточняйте наличие"
+
+    const providerLower = provider.toLowerCase()
+
+    // TireShop - Забрать сегодня
+    if (providerLower === "tireshop") {
+      return "Забрать сегодня"
+    }
+
+    // Доставка 1-2 дня
+    if (["brinex", "exclusive", "fourtochki", "shinservice", "yst"].includes(providerLower)) {
+      return "Доставка 1-2 дня"
+    }
+
+    // Доставка 2-3 дня
+    if (providerLower === "severauto") {
+      return "Доставка 2-3 дня"
+    }
+
+    // Доставка 2-4 дня
+    if (providerLower === "ikon") {
+      return "Доставка 2-4 дня"
+    }
+
+    // Доставка 3-6 дней
+    if (providerLower === "mosautoshina") {
+      return "Доставка 3-6 дней"
+    }
+
+    // Доставка 5-7 дней
+    if (["bagoria", "severautodist"].includes(providerLower)) {
+      return "Доставка 5-7 дней"
+    }
+
+    // Доставка 5-9 дней
+    if (providerLower === "vels") {
+      return "Доставка 5-9 дней"
+    }
+
+    // Доставка 7-10 дней
+    if (providerLower === "sibzapaska") {
+      return "Доставка 7-10 дней"
+    }
+
+    // По умолчанию
+    return "Уточняйте наличие"
+  }
+
+  // Обновим функцию getStockStatus, чтобы она возвращала тип статуса на основе поставщика
   const getStockStatus = (): { type: StockStatusType; tooltip: string; className: string; icon: React.ReactNode } => {
-    if (tire.stock > 10) {
+    const deliveryStatus = getDeliveryStatusByProvider(tire.provider)
+
+    // Определяем тип и иконку на основе текста статуса
+    if (deliveryStatus === "Забрать сегодня") {
       return {
         type: "today",
-        tooltip: "Сегодня",
+        tooltip: deliveryStatus,
         className: "text-green-500",
         icon: <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />,
       }
-    } else if (tire.stock > 0) {
+    } else if (deliveryStatus.includes("1-2") || deliveryStatus.includes("2-3") || deliveryStatus.includes("2-4")) {
       return {
         type: "oneday",
-        tooltip: "Доставка 1-2 дня",
+        tooltip: deliveryStatus,
         className: "text-blue-500",
         icon: <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />,
       }
     } else {
       return {
         type: "moredays",
-        tooltip: "Доставка 3 и более дня",
+        tooltip: deliveryStatus,
         className: "text-orange-500",
         icon: <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />,
       }
@@ -424,7 +489,7 @@ export default function TireCard({ tire }: TireCardProps) {
   return (
     <div id={`tire-card-${tire.id}`} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
       {/* Left side - Image */}
-      <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[123px] sm:w-[161px] md:w-[197px] lg:w-[222px] overflow-hidden bg-white rounded-l-xl" style={{ maxHeight: "209px" }}>
+      <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[135px] sm:w-[177px] md:w-[217px] lg:w-[244px] overflow-hidden bg-white rounded-l-xl" style={{ maxHeight: "230px" }}>
         {tire.item_day && <Badge className="absolute left-2 top-2 z-10 bg-[#D3DF3D] text-[#1F1F1F]">Товар дня</Badge>}
         {/* Gift icon badge - only shown for specific tires */}
         {hasGiftPromotion && (
@@ -533,7 +598,7 @@ export default function TireCard({ tire }: TireCardProps) {
                 <img
                   src="/images/cargo-truck-new.png"
                   alt="Cargo"
-                  className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6"
+                  className="h-[20px] w-[20px] sm:h-[24px] sm:w-[24px] md:h-[29px] md:w-[29px]"
                   title="Грузовая шина"
                 />
               </div>
@@ -542,7 +607,7 @@ export default function TireCard({ tire }: TireCardProps) {
             {/* Проверка для отображения шипов, работает с булевыми значениями true/false */}
             {tire.spike && (
               <span className="flex items-center justify-center" title="Шипованная шина">
-                <img src="/images/bykvaSH.png" alt="Шипы" className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
+                <img src="/images/bykvaSH.png" alt="Шипы" className="h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] md:h-[26px] md:w-[26px]" />
               </span>
             )}
             <span className="flex-grow"></span>
@@ -576,18 +641,18 @@ export default function TireCard({ tire }: TireCardProps) {
                 className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[6px] sm:text-[8px] text-gray-500"
                 title={`URL флага: ${flagUrl}`}
               >
-                {tire.model?.brand?.country?.id || "?"}
+                {tire.country_code || tire.model?.brand?.country?.id || "?"}
               </div>
             ) : (
               <img
                 src={flagUrl || "/placeholder.svg"}
-                alt={tire.model?.brand?.country?.name || "Country"}
+                alt={tire.country || tire.model?.brand?.country?.name || "Country"}
                 className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] border border-gray-200"
                 onError={() => setFlagError(true)}
               />
             )}
             <span className="text-[8px] sm:text-[10px] md:text-xs text-gray-500 dark:text-gray-400 truncate">
-              {tire.model?.brand?.country?.name || "Страна не указана"}
+              {tire.country || tire.model?.brand?.country?.name || "Страна не указана"}
             </span>
           </div>
         </div>
@@ -617,7 +682,7 @@ export default function TireCard({ tire }: TireCardProps) {
                       tire.stock > 10 ? "text-green-500" : tire.stock > 5 ? "text-yellow-500" : "text-orange-500"
                     }`}
                   >
-                    {tire.stock} шт
+                    {tire.stock > 20 ? ">20 шт" : `${tire.stock} шт`}
                   </span>
                   <span className="text-[8px] sm:text-[9px] md:text-[10px] text-gray-500 dark:text-gray-400">
                     Количество:
@@ -630,28 +695,28 @@ export default function TireCard({ tire }: TireCardProps) {
           </div>
           <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
             <div>
-              <p className="text-[8px] sm:text-[10px] md:text-xs text-gray-500 dark:text-gray-400 line-through">
+              <p className="text-[9px] sm:text-[11px] md:text-[13px] text-gray-500 dark:text-gray-400 line-through">
                 {formatPrice(tire.rrc)}
               </p>
-              <p className="text-xs sm:text-sm md:text-base font-bold text-[#1F1F1F] dark:text-white">
+              <p className="text-[13px] sm:text-[15px] md:text-[18px] font-bold text-[#1F1F1F] dark:text-white">
                 {formatPrice(tire.price)}
               </p>
             </div>
             <div className="flex items-center flex-1 justify-end ml-2">
               {/* Новая кнопка корзины в стиле из изображения */}
-              <div className="flex h-7 sm:h-8 md:h-9 rounded-lg overflow-hidden w-full max-w-[140px] sm:max-w-[160px] md:max-w-[180px]">
+              <div className="flex h-[24px] sm:h-[27px] md:h-[31px] rounded-lg overflow-hidden w-full max-w-[120px] sm:max-w-[137px] md:max-w-[154px] border-0">
                 {/* Кнопка минус */}
                 <button
                   onClick={removeFromCart}
                   disabled={cartCount <= 0 || tire.stock <= 0}
-                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-0 outline-none ring-0 focus:outline-none focus:ring-0"
                   aria-label="Уменьшить количество"
                 >
-                  <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                  <Minus className="w-[12px] h-[12px] sm:w-[14px] sm:h-[14px] md:w-[17px] md:h-[17px]" />
                 </button>
 
                 {/* Счетчик количества */}
-                <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2rem] sm:min-w-[2.5rem] md:min-w-[3rem]">
+                <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[1.7rem] sm:min-w-[2.2rem] md:min-w-[2.6rem]">
                   <span className="text-xs sm:text-sm md:text-base font-medium">{cartCount}</span>
                 </div>
 
@@ -660,10 +725,10 @@ export default function TireCard({ tire }: TireCardProps) {
                   ref={addButtonRef}
                   onClick={addToCart}
                   disabled={tire.stock <= 0}
-                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-0 outline-none ring-0 focus:outline-none focus:ring-0"
                   aria-label="Увеличить количество"
                 >
-                  <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                  <Plus className="w-[12px] h-[12px] sm:w-[14px] sm:h-[14px] md:w-[17px] md:h-[17px]" />
                 </button>
               </div>
             </div>

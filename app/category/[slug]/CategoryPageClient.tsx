@@ -712,7 +712,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
         <div className="container max-w-md flex items-center justify-center h-full relative overflow-hidden">
           <button
             onClick={() => router.push("/")}
-            className="fixed left-0 top-[30px] -translate-y-1/2 p-2 rounded-tr-md rounded-br-md hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors z-50"
+            className="fixed left-0 top-[30px] -translate-y-1/2 p-2 transition-colors z-50"
             aria-label="На главную"
           >
             <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />

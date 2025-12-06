@@ -26,6 +26,7 @@ export default function TireResults({ season }: TireResultsProps) {
   const spikeFilter = searchParams.get("spike") // Добавляем извлечение параметра spike
   const runflatFilter = searchParams.get("runflat") // Добавляем извлечение параметра runflat
   const cargoFilter = searchParams.get("cargo") // Добавляем извлечение параметра cargo
+  const todayFilter = searchParams.get("today") // Добавляем извлечение параметра today
 
   // Создаем мемоизированный объект фильтров
   const filters = useMemo(() => {
@@ -65,6 +66,15 @@ export default function TireResults({ season }: TireResultsProps) {
 
     return `/api/tires?${apiParams.toString()}`
   }, [filters])
+
+  // Применяем клиентский фильтр "Сегодня" если он активен
+  const filteredTires = useMemo(() => {
+    if (todayFilter === "true") {
+      // Фильтруем только товары с provider === "tireshop" (забрать сегодня)
+      return tires.filter((tire) => tire.provider?.toLowerCase() === "tireshop")
+    }
+    return tires
+  }, [tires, todayFilter])
 
   // Функция для повторной загрузки данных
   const retryLoading = () => {
@@ -156,7 +166,7 @@ export default function TireResults({ season }: TireResultsProps) {
   const handleSortChange = (sortValue: string) => {
     console.log("Sort changed to:", sortValue)
 
-    // Sort the tires based on the value
+    // Sort the tires based on the value (sorting affects the base tires array)
     if (sortValue === "price-asc" || sortValue === "price-desc") {
       const sortedTires = [...tires].sort((a, b) => {
         if (sortValue === "price-asc") {
@@ -222,7 +232,7 @@ export default function TireResults({ season }: TireResultsProps) {
     )
   }
 
-  if (tires.length === 0) {
+  if (filteredTires.length === 0) {
     return (
       <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-8 text-center mt-8">
         <h3 className="text-xl font-bold mb-2 text-[#1F1F1F] dark:text-white">Шины не найдены</h3>
@@ -243,14 +253,14 @@ export default function TireResults({ season }: TireResultsProps) {
 
   return (
     <div
-      className="space-y-3 mb-32"
+      className="space-y-3 pb-[180px]"
       aria-label="Результаты поиска шин"
       data-testid="tire-results-container"
     >
-      <QuickFilterButtons onSortChange={handleSortChange} insideTireResults={true} resultsCount={tires.length} />
+      <QuickFilterButtons onSortChange={handleSortChange} insideTireResults={true} resultsCount={filteredTires.length} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1.5 sm:gap-2 md:gap-2.5">
-        {tires.map((tire) => (
+        {filteredTires.map((tire) => (
           <TireCard key={tire.id} tire={tire} />
         ))}
       </div>

@@ -1,8 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-// Store the API token securely on the server
-const API_TOKEN = process.env.API_TOKEN || "KYf-JMMTweMWASr-zktunkLwnPKfzeIO"
-const API_BASE_URL = "https://api.fxcode.ru"
+// Tirebase API configuration
+const API_BASE_URL = "https://api.tirebase.ru"
+const API_VERSION = "v3"
+const API_TOKEN = "xN6JxoibNEbSFt952_O5kf-VxL61lOX4k5KAS-iGlBU"
 
 type Season = "w" | "s" | "a"
 
@@ -15,120 +16,100 @@ export async function GET(request: NextRequest) {
     // Create a new URLSearchParams object for the API request
     const apiParams = new URLSearchParams()
 
-    // Add required fields
-    const requiredFields = [
-      "id",
-      "model.brand.*",
-      "model.*",
-      "width.*",
-      "height.*",
-      "diam.*",
-      "load_index.*",
-      "speed_index.*",
-      "season",
-      "model.image",
-      "model.brand.country.*",
-      "model.brand.country.flag.*", // Добавляем поля флага
-      "spike", // Явно запрашиваем поле spike
-      "runflat", // Явно запрашиваем поле runflat
-      "cargo", // Явно запрашиваем поле cargo
-    ]
-
-    requiredFields.forEach((field) => {
-      apiParams.append("fields[]", field)
-    })
-
-    // Add filters from the request
     // Season filter
     const season = searchParams.get("season")
     if (season) {
-      apiParams.append("filter[season][_eq]", season)
+      apiParams.append("season", season)
     }
 
     // Width filter
     const width = searchParams.get("width")
     if (width) {
-      apiParams.append("filter[width][name][_eq]", width)
+      apiParams.append("width", width)
     }
 
     // Height/profile filter
     const height = searchParams.get("height") || searchParams.get("profile")
     if (height) {
-      apiParams.append("filter[height][name][_eq]", height)
+      apiParams.append("height", height)
     }
 
     // Diameter filter
     const diameter = searchParams.get("diameter") || searchParams.get("diam")
     if (diameter) {
-      apiParams.append("filter[diam][name][_eq]", diameter)
+      apiParams.append("diam", diameter)
     }
 
     // Brand filter
     const brand = searchParams.get("brand")
     if (brand) {
-      apiParams.append("filter[model.brand.name][_eq]", brand)
+      apiParams.append("brand", brand)
     }
 
     // Model filter
     const model = searchParams.get("model")
     if (model) {
-      apiParams.append("filter[model.name][_eq]", model)
+      apiParams.append("model", model)
     }
 
-    // Spike filter - обрабатываем на сервере
+    // Spike filter
     const spikeParam = searchParams.get("spike")
     if (spikeParam !== null) {
-      apiParams.append("filter[spike][_eq]", spikeParam)
-      console.log(`Applying spike filter on server: ${spikeParam}`)
-    }
-
-    // Now filter
-    const now = searchParams.get("now")
-    if (now) {
-      apiParams.append("filter[now][_eq]", now)
-    }
-
-    // Cargo filter
-    const cargo = searchParams.get("cargo")
-    if (cargo) {
-      apiParams.append("filter[cargo][_eq]", cargo)
-      console.log(`Applying cargo filter on server: ${cargo}`)
+      // Tirebase API expects boolean value
+      apiParams.append("spike", spikeParam === "true" ? "true" : "false")
+      console.log(`Applying spike filter: ${spikeParam}`)
     }
 
     // Runflat filter
     const runflat = searchParams.get("runflat")
-    if (runflat) {
-      apiParams.append("filter[runflat][_eq]", runflat)
-      console.log(`Applying runflat filter on server: ${runflat}`)
+    if (runflat !== null) {
+      apiParams.append("runflat", runflat === "true" ? "true" : "false")
+      console.log(`Applying runflat filter: ${runflat}`)
     }
 
-    // Add the access token
+    // Cargo filter
+    const cargo = searchParams.get("cargo")
+    if (cargo !== null) {
+      apiParams.append("cargo", cargo === "true" ? "true" : "false")
+      console.log(`Applying cargo filter: ${cargo}`)
+    }
+
+    // SUV filter (if needed)
+    const suv = searchParams.get("suv")
+    if (suv !== null) {
+      apiParams.append("suv", suv === "true" ? "true" : "false")
+    }
+
+    // Load index filter
+    const loadIndex = searchParams.get("load_index")
+    if (loadIndex) {
+      apiParams.append("load_index", loadIndex)
+    }
+
+    // Speed index filter
+    const speedIndex = searchParams.get("speed_index")
+    if (speedIndex) {
+      apiParams.append("speed_index", speedIndex)
+    }
+
+    // Add access token
     apiParams.append("access_token", API_TOKEN)
 
-    // Limit parameter
-    const limit = searchParams.get("limit") || "20"
-    apiParams.append("limit", limit)
-
-    // Page parameter for pagination
-    const page = searchParams.get("page") || "1"
-    const offset = (Number.parseInt(page) - 1) * Number.parseInt(limit)
-    apiParams.append("offset", offset.toString())
+    // Add fields parameter to get additional data including images, flags, country and provider
+    apiParams.append("fields", "image,flag,country,provider")
 
     // Construct the API URL
-    const apiUrl = `${API_BASE_URL}/items/tires?${apiParams.toString()}`
+    const apiUrl = `${API_BASE_URL}/${API_VERSION}/tires?${apiParams.toString()}`
 
     console.log(`Fetching from API: ${apiUrl}`)
 
     // Set a timeout for the request
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000)
+    const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 seconds timeout
 
     try {
-      // Make the request to the API with a shorter timeout
+      // Make the request to the API
       const response = await fetch(apiUrl, {
-        headers: {
-          "Content-Type": "application/json",
-        },
         signal: controller.signal,
         next: { revalidate: 60 }, // Cache for 60 seconds
       })
@@ -146,14 +127,27 @@ export async function GET(request: NextRequest) {
         })
       }
 
-      const data = await response.json()
+      const responseData = await response.json()
 
       // Log the response structure for debugging
-      console.log("API response structure:", JSON.stringify(data, null, 2).substring(0, 500) + "...")
-      console.log("Data items count:", data.data ? data.data.length : 0)
+      console.log("API response structure:", JSON.stringify(responseData, null, 2).substring(0, 500) + "...")
+
+      // Extract tires array from response
+      const tiresData = responseData.tires || responseData
+
+      console.log("Tires count:", Array.isArray(tiresData) ? tiresData.length : 0)
+
+      // Check if response is valid array
+      if (!Array.isArray(tiresData)) {
+        console.log("API response is not an array, using mock data")
+        return NextResponse.json({
+          data: getMockTiresForApi(season as Season, width, height, diameter),
+          usedMockData: true,
+        })
+      }
 
       // If the API returned an empty array, return mock data
-      if (!data.data || data.data.length === 0) {
+      if (tiresData.length === 0) {
         console.log("API returned empty data, using mock data")
         return NextResponse.json({
           data: getMockTiresForApi(season as Season, width, height, diameter),
@@ -161,107 +155,71 @@ export async function GET(request: NextRequest) {
         })
       }
 
-      // Transform the API data to match our application's structure
-      const transformedData = data.data.map((tire: any) => {
-        // Отладочный вывод для проверки значения runflat
-        console.log(`API Tire ID: ${tire.id}, Original runflat value:`, tire.runflat, typeof tire.runflat)
+      // Transform the Tirebase API data to match our application's structure
+      const transformedData = tiresData.map((tire: any) => {
+        console.log(`Processing tire ID: ${tire.id}`)
 
-        // Проверка для конкретного товара
-        if (tire.id === "0834a53e9c177852e2317f508c55ab249286690bda1db7a398ce0486b36ba527") {
-          console.log("API: Проблемный товар найден, оригинальное значение runflat:", tire.runflat, typeof tire.runflat)
+        // Generate tire name from fields
+        const tireName = tire.title || `${tire.brand || "Unknown"} ${tire.model || "Model"} ${tire.width || ""}/${tire.height || ""} R${tire.diam || ""}`
+
+        // Use image from API if available, otherwise use season-based image
+        // Check if image is already a full URL or just an ID
+        let imageUrl = getSeasonImage(tire.season) // default fallback
+        if (tire.image) {
+          if (tire.image.startsWith("http")) {
+            // Image is already a full URL
+            imageUrl = tire.image
+          } else if (tire.image.length > 0) {
+            // Image is an ID, construct the URL
+            imageUrl = `${API_BASE_URL}/assets/${tire.image}?access_token=${API_TOKEN}`
+          }
         }
 
-        // Отладочный вывод для проверки значения spike
-        console.log(`Tire ID: ${tire.id}, Original spike value:`, tire.spike, typeof tire.spike)
-
-        // Правильная обработка параметра spike
-        // Если API возвращает true, то это соответствует 1
-        // Если API возвращает 1, то это тоже true
-        const spikeValue = tire.spike === true || tire.spike === 1 || tire.spike === "1"
-
-        // Правильная обработка параметра runflat - сохраняем оригинальное значение
-        // Важно: не преобразуем значение, а используем его как есть из API
-        const runflatValue = tire.runflat
-
-        // Правильная обработка параметра cargo - сохраняем оригинальное значение
-        const cargoValue = tire.cargo
-
-        // Если это проблемный товар, выведем результат преобразования
-        if (tire.id === "0834a53e9c177852e2317f508c55ab249286690bda1db7a398ce0486b36ba527") {
-          console.log("API: После сохранения runflat:", runflatValue, typeof runflatValue)
+        // Process flag URL the same way as image
+        let flagUrl = null
+        if (tire.flag) {
+          if (tire.flag.startsWith("http")) {
+            // Flag is already a full URL
+            flagUrl = tire.flag
+          } else if (tire.flag.length > 0) {
+            // Flag is an ID, construct the URL
+            flagUrl = `${API_BASE_URL}/assets/${tire.flag}?access_token=${API_TOKEN}`
+          }
         }
+
+        const basePrice = tire.price || calculatePriceFromDimensions(tire.width, tire.height, tire.diam)
 
         return {
           id: tire.id,
-          name: `${tire.model?.brand?.name || "Unknown"} ${tire.model?.name || "Model"} ${tire.width?.name || ""}/${
-            tire.height?.name || ""
-          } R${tire.diam?.name || ""}`,
-          price: tire.model?.price || calculatePrice(tire),
-          image: tire.model?.image,
-          width: tire.width?.name || "",
-          height: tire.height?.name || "",
-          diameter: tire.diam?.name || "",
-          diam: tire.diam?.name || "",
+          name: tireName,
+          price: basePrice,
+          image: imageUrl,
+          flag: flagUrl,
+          width: tire.width?.toString() || "",
+          height: tire.height?.toString() || "",
+          diameter: tire.diam?.toString() || "",
+          diam: tire.diam?.toString() || "",
           season: tire.season,
-          runflat: runflatValue, // Используем оригинальное значение без преобразования
-          spike: spikeValue,
-          cargo: cargoValue, // Добавляем поле cargo
-          stock: tire.stock || 10,
-          brand: tire.model?.brand?.name || "Unknown Brand",
-          model: tire.model?.name || "Standard Model",
-          country: tire.model?.brand?.country?.name || "Unknown",
-          country_code: tire.model?.brand?.country?.code || "UN",
-          load_index: tire.load_index?.name || "91",
-          speed_index: tire.speed_index?.name || "T",
-          rrc: tire.model?.rrc || (tire.model?.price ? tire.model.price * 1.15 : calculatePrice(tire) * 1.15),
-          item_day: false,
-          // Сохраняем оригинальную структуру модели для доступа к флагу
-          model: tire.model,
+          runflat: tire.runflat || false,
+          spike: tire.spike || false,
+          cargo: tire.cargo || false,
+          suv: tire.suv || false,
+          stock: tire.quantity || 10,
+          brand: tire.brand || "Unknown Brand",
+          model: tire.model || "Standard Model",
+          country: tire.country || "Unknown",
+          country_code: tire.country_code || "UN",
+          load_index: tire.load_index || "91",
+          speed_index: tire.speed_index || "T",
+          rrc: Math.round(basePrice * 1.15),
+          item_day: tire.item_day || false,
+          year: tire.year,
+          now: tire.now,
+          provider: tire.provider || null,
         }
       })
 
-      // Если в запросе указан параметр spike=true, дополнительно фильтруем на сервере
-      if (spikeParam === "true") {
-        console.log("Applying additional server-side filter for spike=true")
-        const filteredData = transformedData.filter((tire: any) => tire.spike === true)
-        console.log(`Filtered ${filteredData.length} tires from ${transformedData.length}`)
-        return NextResponse.json({ data: filteredData })
-      }
-
-      // Если в запросе указан параметр runflat=true, дополнительно фильтруем на сервере
-      if (runflat === "true") {
-        console.log("Applying additional server-side filter for runflat=true")
-        const filteredData = transformedData.filter((tire: any) => {
-          // Проверяем все возможные значения, которые могут означать "true"
-          const isRunflat =
-            tire.runflat === true ||
-            tire.runflat === 1 ||
-            tire.runflat === "1" ||
-            tire.runflat === "true" ||
-            // Специальная проверка для известных проблемных товаров
-            tire.id === "050c67d30dcf9248cc7171ec930feef6fb9fc6abdb5593573e6fa6e47995cab4" ||
-            tire.id === "0834a53e9c177852e2317f508c55ab249286690bda1db7a398ce0486b36ba527"
-
-          console.log(`Checking runflat for tire ${tire.id}: ${tire.runflat} (${typeof tire.runflat}) => ${isRunflat}`)
-          return isRunflat
-        })
-        console.log(`Filtered ${filteredData.length} runflat tires from ${transformedData.length}`)
-        return NextResponse.json({ data: filteredData })
-      }
-
-      // Если в запросе указан параметр cargo=true, дополнительно фильтруем на сервере
-      if (cargo === "true") {
-        console.log("Applying additional server-side filter for cargo=true")
-        const filteredData = transformedData.filter((tire: any) => {
-          // Проверяем все возможные значения, которые могут означать "true"
-          const isCargo = tire.cargo === true || tire.cargo === 1 || tire.cargo === "1" || tire.cargo === "true"
-
-          console.log(`Checking cargo for tire ${tire.id}: ${tire.cargo} (${typeof tire.cargo}) => ${isCargo}`)
-          return isCargo
-        })
-        console.log(`Filtered ${filteredData.length} cargo tires from ${transformedData.length}`)
-        return NextResponse.json({ data: filteredData })
-      }
+      console.log(`Transformed ${transformedData.length} tires`)
 
       return NextResponse.json({ data: transformedData })
     } catch (fetchError) {
@@ -377,6 +335,7 @@ function getMockTiresForApi(
       name: `${brand} ${model} ${tireWidth}/${tireHeight} R${tireDiameter}`,
       price,
       image: imagePath,
+      flag: null,
       width: tireWidth,
       height: tireHeight,
       diameter: tireDiameter,
@@ -393,6 +352,7 @@ function getMockTiresForApi(
       speed_index: getRandomSpeedIndex(season),
       rrc: Math.round(price * 1.15),
       item_day: i === 0, // The first tire will be the item of the day
+      provider: "tireshop", // Default provider for mock data
     })
   }
 
@@ -448,10 +408,20 @@ function getRandomSpeedIndex(season: Season): string {
 }
 
 // Helper function to calculate a price based on tire dimensions
-function calculatePrice(tire: any): number {
-  const width = Number(tire.width?.name || 205)
-  const height = Number(tire.height?.name || 55)
-  const diam = Number(tire.diam?.name || 16)
-
+function calculatePriceFromDimensions(width: number, height: number, diam: number): number {
   return 7000 + width * 10 + height * 5 + diam * 300
+}
+
+// Helper function to get season image path
+function getSeasonImage(season: string): string {
+  switch (season) {
+    case "w":
+      return "/images/winter-tire-new.png"
+    case "s":
+      return "/images/summer-tire-new.png"
+    case "a":
+      return "/images/all-season-new.png"
+    default:
+      return "/images/winter-tire-new.png"
+  }
 }

@@ -6,6 +6,7 @@ export interface Tire {
   article?: string
   price?: number
   image?: string
+  flag?: string | null
   width: number | string
   height: number | string
   diameter?: string
@@ -27,6 +28,8 @@ export interface Tire {
   year?: number
   truck?: boolean
   cargo?: boolean
+  provider?: string | null
+  now?: boolean
 }
 
 export interface FilterParams {

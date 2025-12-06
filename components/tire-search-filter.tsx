@@ -89,7 +89,6 @@ export default function TireSearchFilter({ season }: { season: Season }) {
   const [isPriceFilterVisible, setIsPriceFilterVisible] = useState(true)
   const [isStockFilterVisible, setIsStockFilterVisible] = useState(true)
   const [cargo, setCargo] = useState(false)
-  const [studs, setStuds] = useState(false)
 
   // Add state for the new round toggle button
   const [quickFilterActive, setQuickFilterActive] = useState(false)
@@ -243,6 +242,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
 
   const [secondAxis, setSecondAxis] = useState(false)
   const [runflat, setRunflat] = useState(false)
+  const [todayOnly, setTodayOnly] = useState(false)
 
   // Function to toggle runflat parameter and update API request
   const toggleRunflatParameter = (checked: boolean) => {
@@ -291,6 +291,32 @@ export default function TireSearchFilter({ season }: { season: Season }) {
 
     // Log the filter being applied for debugging
     console.log(`Applying cargo filter: ${checked}`, params.toString())
+
+    // Navigate with the updated parameters - force a full navigation to ensure filter is applied
+    router.push(`${window.location.pathname}?${params.toString()}`)
+  }
+
+  // Function to toggle today parameter and update API request
+  const toggleTodayParameter = (checked: boolean) => {
+    setTodayOnly(checked)
+
+    // Apply the filter immediately
+    const params = new URLSearchParams(searchParams.toString())
+
+    // Preserve existing parameters
+    if (width) params.set("width", width)
+    if (profile) params.set("profile", profile)
+    if (diameter) params.set("diameter", diameter)
+
+    // Update today parameter
+    if (checked) {
+      params.set("today", "true")
+    } else {
+      params.delete("today")
+    }
+
+    // Log the filter being applied for debugging
+    console.log(`Applying today filter: ${checked}`, params.toString())
 
     // Navigate with the updated parameters - force a full navigation to ensure filter is applied
     router.push(`${window.location.pathname}?${params.toString()}`)
@@ -524,7 +550,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     setRunflat(false) // Reset runflat
     setCargo(false) // Reset cargo
     setSecondAxis(false) // Reset second axis
-    setStuds(false) // Reset studs
+    setTodayOnly(false) // Reset today filter
     setSpike(null) // Reset spike filter
     setSelectedBrands([]) // Reset brands
 
@@ -560,6 +586,14 @@ export default function TireSearchFilter({ season }: { season: Season }) {
       setRunflat(true)
     } else {
       setRunflat(false)
+    }
+
+    // Initialize todayOnly from URL parameter
+    const todayParam = searchParams.get("today")
+    if (todayParam === "true") {
+      setTodayOnly(true)
+    } else {
+      setTodayOnly(false)
     }
   }, [searchParams, season])
 
@@ -736,11 +770,11 @@ export default function TireSearchFilter({ season }: { season: Season }) {
             size="sm"
             onClick={clearAllDimensions}
             className={`h-10 px-3 text-xs border-0 transition-all duration-300 ${
-              width || profile || diameter || priceRange[0] > 3000 || priceRange[1] < 30000 || stockFilter === "full" || runflat || cargo || secondAxis || studs || spike !== null || selectedBrands.length > 0
+              width || profile || diameter || priceRange[0] > 3000 || priceRange[1] < 30000 || stockFilter === "full" || runflat || cargo || secondAxis || todayOnly || spike !== null || selectedBrands.length > 0
                 ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 hover:scale-105 active:scale-95 shadow-md hover:shadow-red-500/30"
                 : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
             }`}
-            disabled={!width && !profile && !diameter && priceRange[0] === 3000 && priceRange[1] === 30000 && stockFilter === "single" && !runflat && !cargo && !secondAxis && !studs && spike === null && selectedBrands.length === 0}
+            disabled={!width && !profile && !diameter && priceRange[0] === 3000 && priceRange[1] === 30000 && stockFilter === "single" && !runflat && !cargo && !secondAxis && !todayOnly && spike === null && selectedBrands.length === 0}
           >
             Сбросить
           </Button>
@@ -1012,13 +1046,13 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="studs"
-                        checked={studs}
-                        onCheckedChange={(checked) => setStuds(!!checked)}
+                        id="today"
+                        checked={todayOnly}
+                        onCheckedChange={(checked) => toggleTodayParameter(!!checked)}
                         className="h-4 w-4"
                       />
-                      <Label htmlFor="studs" className="text-xs text-[#1F1F1F] dark:text-gray-300">
-                        Б/У
+                      <Label htmlFor="today" className="text-xs text-[#1F1F1F] dark:text-gray-300">
+                        Сегодня
                       </Label>
                     </div>
                   </div>

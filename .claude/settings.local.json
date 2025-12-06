@@ -12,7 +12,10 @@
       "Bash(tasklist:*)",
       "Bash(findstr:*)",
       "Bash(timeout:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "WebFetch(domain:api.tirebase.ru)",
+      "Bash(curl:*)",
+      "Bash(python -c:*)"
     ],
     "deny": [],
     "ask": []
