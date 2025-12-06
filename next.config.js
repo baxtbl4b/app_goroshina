@@ -9,7 +9,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["api.fxcode.ru"],
+    domains: ["api.fxcode.ru", "api.tirebase.ru"],
     remotePatterns: [
       {
         protocol: "https",
@@ -17,8 +17,13 @@ const nextConfig = {
         port: "",
         pathname: "/assets/**",
       },
+      {
+        protocol: "https",
+        hostname: "api.tirebase.ru",
+        port: "",
+        pathname: "/assets/**",
+      },
     ],
-    unoptimized: true,
   },
   webpack: (config, { isServer }) => {
     // Instead of aliasing the entire 'react' module, we'll use a more targeted approach

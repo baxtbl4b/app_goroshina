@@ -4,6 +4,7 @@ import React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Heart, Gift, Calendar, CheckCircle, Clock, Plus, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -505,15 +506,18 @@ export default function TireCard({ tire }: TireCardProps) {
             // Fallback image if there's an error loading the API image
             <div className="relative w-full h-full flex items-center justify-center">
               <div className="w-full h-0 pb-[100%] relative">
-                <img
+                <Image
                   src="/images/tire-closeup.jpg"
                   alt={tire.name || "Tire"}
-                  className="absolute inset-0 w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                  fill
+                  sizes="(max-width: 640px) 135px, (max-width: 768px) 177px, (max-width: 1024px) 217px, 244px"
+                  className="object-contain cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
                     setImageModalOpen(true)
                   }}
+                  priority
                 />
               </div>
             </div>
@@ -521,10 +525,12 @@ export default function TireCard({ tire }: TireCardProps) {
             // Try to load the image from the API first
             <div className="relative w-full h-full flex items-center justify-center">
               <div className="w-full h-0 pb-[100%] relative">
-                <img
+                <Image
                   src={getProcessedImageUrl(imageUrl) || "/placeholder.svg"}
                   alt={tire.name || "Tire"}
-                  className="absolute inset-0 w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                  fill
+                  sizes="(max-width: 640px) 135px, (max-width: 768px) 177px, (max-width: 1024px) 217px, 244px"
+                  className="object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
@@ -538,6 +544,7 @@ export default function TireCard({ tire }: TireCardProps) {
                     filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
                     backgroundColor: "transparent",
                   }}
+                  loading="lazy"
                 />
               </div>
             </div>
@@ -548,18 +555,30 @@ export default function TireCard({ tire }: TireCardProps) {
           <DialogContent className="sm:max-w-[600px] flex items-center justify-center p-1" style={{ zIndex: 50 }}>
             <div className="relative w-full h-full max-h-[80vh] flex items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-[#2a2a2a] dark:to-[#1a1a1a] rounded-lg">
               {imageError ? (
-                <img src="/images/tire-closeup.jpg" alt={tire.name || "Tire"} className="object-contain max-h-[80vh]" />
+                <div className="relative w-full h-[80vh]">
+                  <Image
+                    src="/images/tire-closeup.jpg"
+                    alt={tire.name || "Tire"}
+                    fill
+                    className="object-contain"
+                    sizes="600px"
+                  />
+                </div>
               ) : (
-                <img
-                  src={getProcessedImageUrl(imageUrl) || "/placeholder.svg"}
-                  alt={tire.name || "Tire"}
-                  className="object-contain max-h-[80vh]"
-                  onError={() => setImageError(true)}
-                  style={{
-                    filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
-                    backgroundColor: "transparent",
-                  }}
-                />
+                <div className="relative w-full h-[80vh]">
+                  <Image
+                    src={getProcessedImageUrl(imageUrl) || "/placeholder.svg"}
+                    alt={tire.name || "Tire"}
+                    fill
+                    className="object-contain"
+                    onError={() => setImageError(true)}
+                    style={{
+                      filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
+                      backgroundColor: "transparent",
+                    }}
+                    sizes="600px"
+                  />
+                </div>
               )}
             </div>
           </DialogContent>
@@ -582,10 +601,12 @@ export default function TireCard({ tire }: TireCardProps) {
               actualRunflat === "true" ||
               actualRunflat === "1" ||
               isKnownRunflatTire) && (
-              <div className="flex items-center justify-center">
-                <img
-                  src="/images/rft-icon.png"
+              <div className="flex items-center justify-center relative h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6">
+                <Image
+                  src="/images/runflat-icon.png"
                   alt="RunFlat"
+                  width={24}
+                  height={24}
                   className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6"
                   title="RunFlat Technology"
                 />
@@ -594,10 +615,12 @@ export default function TireCard({ tire }: TireCardProps) {
 
             {/* Cargo icon - only shown for tires with cargo: true */}
             {(tire.cargo === true || tire.cargo === 1 || tire.cargo === "true" || tire.cargo === "1") && (
-              <div className="flex items-center justify-center">
-                <img
+              <div className="flex items-center justify-center relative h-[20px] w-[20px] sm:h-[24px] sm:w-[24px] md:h-[29px] md:w-[29px]">
+                <Image
                   src="/images/cargo-truck-new.png"
                   alt="Cargo"
+                  width={29}
+                  height={29}
                   className="h-[20px] w-[20px] sm:h-[24px] sm:w-[24px] md:h-[29px] md:w-[29px]"
                   title="Грузовая шина"
                 />
@@ -606,8 +629,8 @@ export default function TireCard({ tire }: TireCardProps) {
 
             {/* Проверка для отображения шипов, работает с булевыми значениями true/false */}
             {tire.spike && (
-              <span className="flex items-center justify-center" title="Шипованная шина">
-                <img src="/images/bykvaSH.png" alt="Шипы" className="h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] md:h-[26px] md:w-[26px]" />
+              <span className="flex items-center justify-center relative h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] md:h-[26px] md:w-[26px]" title="Шипованная шина">
+                <Image src="/images/bykvaSH.png" alt="Шипы" width={26} height={26} className="h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] md:h-[26px] md:w-[26px]" />
               </span>
             )}
             <span className="flex-grow"></span>
@@ -644,12 +667,16 @@ export default function TireCard({ tire }: TireCardProps) {
                 {tire.country_code || tire.model?.brand?.country?.id || "?"}
               </div>
             ) : (
-              <img
-                src={flagUrl || "/placeholder.svg"}
-                alt={tire.country || tire.model?.brand?.country?.name || "Country"}
-                className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] border border-gray-200"
-                onError={() => setFlagError(true)}
-              />
+              <div className="relative w-[16px] h-[11px] sm:w-[20px] sm:h-[14px]">
+                <Image
+                  src={flagUrl || "/placeholder.svg"}
+                  alt={tire.country || tire.model?.brand?.country?.name || "Country"}
+                  width={20}
+                  height={14}
+                  className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] border border-gray-200"
+                  onError={() => setFlagError(true)}
+                />
+              </div>
             )}
             <span className="text-[8px] sm:text-[10px] md:text-xs text-gray-500 dark:text-gray-400 truncate">
               {tire.country || tire.model?.brand?.country?.name || "Страна не указана"}
