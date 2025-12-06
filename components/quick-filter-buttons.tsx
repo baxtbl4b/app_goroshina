@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
@@ -23,6 +24,8 @@ export default function QuickFilterButtons({
   onBrandSelect,
   resultsCount,
 }: QuickFilterButtonsProps) {
+  const pathname = usePathname()
+
   // Базовые состояния
   const [priceFilter, setPriceFilter] = useState("expensive")
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
@@ -222,7 +225,7 @@ export default function QuickFilterButtons({
                   handleBrandSearch(e as any)
                 }
               }}
-              placeholder={window.location.pathname.includes("/krepezh") ? "Фильтр по модели авто" : "Введите бренд"}
+              placeholder={pathname?.includes("/krepezh") ? "Фильтр по модели авто" : "Введите бренд"}
               className="flex-1 px-3 py-1 text-xs border-0 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-100 dark:bg-[#1A1A1A] dark:text-white mr-1.5"
             />
             <div

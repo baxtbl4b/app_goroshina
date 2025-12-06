@@ -7,6 +7,7 @@ import { FastenerSearchFilter } from "./fastener-search-filter"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import QuickFilterButtons from "@/components/quick-filter-buttons"
 import { FastenerCard } from "@/components/fastener-card"
+import CartButton from "@/components/cart-button"
 
 export default function KrepezhPageClient() {
   const searchParams = useSearchParams()
@@ -766,29 +767,8 @@ export default function KrepezhPageClient() {
             </button>
           </div>
 
-          {/* Global cart button - IMPORTANT: Use this same markup and class on all pages */}
-          <button
-            onClick={handleCartClick}
-            className={`global-cart-button ${isCartButtonAnimating ? "cart-button-pulse" : ""}`}
-            aria-label="Корзина"
-          >
-            <div className={isCartButtonAnimating ? "cart-icon-bounce" : ""}>
-              <Image
-                src="/images/korzina2.png"
-                alt="Корзина"
-                width={26}
-                height={26}
-                className="opacity-90 hover:opacity-100 transition-opacity dark:invert dark:brightness-200 dark:contrast-200"
-              />
-            </div>
-
-            {/* Cart count badge */}
-            {cartItemCount > 0 && (
-              <div className="absolute top-[5px] -right-1 bg-[#D3DF3D] text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium shadow-sm">
-                {cartItemCount}
-              </div>
-            )}
-          </button>
+          {/* Cart button */}
+          <CartButton className="fixed right-0 top-2 z-50" />
         </div>
       </header>
 

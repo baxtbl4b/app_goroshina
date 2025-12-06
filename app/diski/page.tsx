@@ -7,6 +7,7 @@ import DiskSearchFilter from "./disk-search-filter"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import QuickFilterButtons from "@/components/quick-filter-buttons"
 import DiskCard from "@/components/disk-card"
+import CartButton from "@/components/cart-button"
 import Link from "next/link"
 
 export default function DiskiPage() {
@@ -430,8 +431,15 @@ export default function DiskiPage() {
     const updateCartCount = () => {
       try {
         const cart = JSON.parse(localStorage.getItem("cart") || "[]")
-        const count = cart.reduce((total: number, item: any) => total + (item.quantity || 1), 0)
-        setCartItemCount(count)
+        const newCount = cart.reduce((total: number, item: any) => total + (item.quantity || 1), 0)
+
+        // If cart count increased, trigger animation
+        if (newCount > cartItemCount) {
+          setIsCartButtonAnimating(true)
+          setTimeout(() => setIsCartButtonAnimating(false), 600)
+        }
+
+        setCartItemCount(newCount)
       } catch (error) {
         console.error("Ошибка при получении данных корзины:", error)
         setCartItemCount(0)
@@ -446,7 +454,7 @@ export default function DiskiPage() {
       window.removeEventListener("cartUpdated", updateCartCount)
       window.removeEventListener("cartItemAdded", updateCartCount)
     }
-  }, [])
+  }, [cartItemCount])
 
   const handleCartClick = () => {
     setIsCartButtonAnimating(true)
@@ -467,69 +475,30 @@ export default function DiskiPage() {
     window.dispatchEvent(new CustomEvent("resetAllCartCounters"))
   }
 
-  // Disk type-specific styles and animations
+  // Disk type-specific styles and animations - unified brand color
   const getDiskTypeStyles = () => {
-    switch (diskType) {
-      case "stamped":
-        return {
-          buttonStyle: {
-            marginTop: "-6px",
-            marginBottom: "-6px",
-          },
-          buttonClass: "border border-[#D3DF3D] bg-[#D3DF3D]/10 text-[#1F1F1F] dark:text-white font-medium",
-          animationStyle: "",
-        }
-      case "cast":
-        return {
-          buttonStyle: {
-            marginTop: "-6px",
-            marginBottom: "-6px",
-          },
-          buttonClass: "border border-[#3D8DDF] bg-[#3D8DDF]/10 text-[#1F1F1F] dark:text-white font-medium",
-          animationStyle: "",
-        }
-      case "forged":
-        return {
-          buttonStyle: {
-            marginTop: "-6px",
-            marginBottom: "-6px",
-          },
-          buttonClass: "border border-[#F59E0B] bg-[#F59E0B]/10 text-[#1F1F1F] dark:text-white font-medium",
-          animationStyle: "",
-        }
-      default:
-        return {
-          buttonStyle: {
-            marginTop: "-6px",
-            marginBottom: "-6px",
-          },
-          buttonClass: "",
-          animationStyle: "",
-        }
+    return {
+      buttonStyle: {
+        marginTop: "-6px",
+        marginBottom: "-6px",
+      },
+      buttonClass: "border border-[#D3DF3D] bg-[#D3DF3D]/10 text-[#1F1F1F] dark:text-white font-medium",
+      animationStyle: "",
     }
   }
 
   const { buttonStyle, buttonClass, animationStyle } = getDiskTypeStyles()
 
-  // Helper function to get button classes for each disk type tab
+  // Helper function to get button classes for each disk type tab - unified brand color
   const getButtonClass = (tabDiskType: string) => {
     const isActive = diskType === tabDiskType
     const baseClass = "text-sm px-3 py-3 h-full flex items-center transition-all duration-200 ease-in-out"
 
     if (isActive) {
-      return `${baseClass} ${tabDiskType === diskType ? buttonClass : ""} rounded-xl`
+      return `${baseClass} ${buttonClass} rounded-xl`
     }
 
-    switch (tabDiskType) {
-      case "stamped":
-        return `${baseClass} border border-transparent hover:border-[#D3DF3D] hover:bg-[#D3DF3D]/10 text-[#1F1F1F] dark:text-white rounded-xl`
-      case "cast":
-        return `${baseClass} border border-transparent hover:border-[#3D8DDF] hover:bg-[#3D8DDF]/10 text-[#1F1F1F] dark:text-white rounded-xl`
-      case "forged":
-        return `${baseClass} border border-transparent hover:border-[#F59E0B] hover:bg-[#F59E0B]/10 text-[#1F1F1F] dark:text-white rounded-xl`
-      default:
-        return baseClass
-    }
+    return `${baseClass} border border-transparent hover:border-[#D3DF3D] hover:bg-[#D3DF3D]/10 text-[#1F1F1F] dark:text-white rounded-xl`
   }
 
   const handleBrandSelect = (brands: string[]) => {
@@ -549,11 +518,137 @@ export default function DiskiPage() {
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px]">
       <style jsx global>
         {`
-          
+          /* Disk type tabs styles - same as season tabs */
+          .disk-tabs-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            height: 100%;
+            padding: 0 45px;
+            touch-action: pan-y pinch-zoom;
+            user-select: none;
+            -webkit-user-select: none;
+          }
 
-          /* Basket icon animation */
-          
-          
+          .disk-tab {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            min-width: 80px;
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+          }
+
+          .disk-tab-active {
+            position: relative;
+            overflow: hidden;
+            transform: scale(1.1);
+            background: linear-gradient(135deg,
+              color-mix(in srgb, var(--tab-color) 80%, transparent),
+              color-mix(in srgb, var(--tab-color) 60%, transparent)
+            );
+            border: none;
+            color: white;
+            font-size: 13px;
+            z-index: 2;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 0 12px color-mix(in srgb, var(--tab-color) 50%, transparent);
+          }
+
+          .disk-tab-inactive {
+            transform: scale(0.85);
+            background: rgba(128, 128, 128, 0.1);
+            border: 1px solid transparent;
+            color: #6B7280;
+            font-size: 11px;
+            opacity: 0.8;
+            backdrop-filter: blur(4px);
+          }
+
+          .disk-tab-inactive:hover {
+            opacity: 1;
+            background: rgba(211, 223, 61, 0.1);
+            border-color: rgba(211, 223, 61, 0.3);
+            transform: scale(0.88);
+          }
+
+          .dark .disk-tab-inactive {
+            color: #9CA3AF;
+            background: rgba(255, 255, 255, 0.05);
+          }
+
+          .dark .disk-tab-inactive:hover {
+            color: white;
+            background: rgba(211, 223, 61, 0.15);
+            border-color: rgba(211, 223, 61, 0.3);
+          }
+
+          /* Cart button animation */
+          @keyframes cartPulse {
+            0% {
+              transform: scale(1);
+              box-shadow: 0 0 0 0 rgba(211, 223, 61, 0.7);
+            }
+            50% {
+              transform: scale(1.15);
+              box-shadow: 0 0 10px 5px rgba(211, 223, 61, 0.5);
+            }
+            100% {
+              transform: scale(1);
+              box-shadow: 0 0 0 0 rgba(211, 223, 61, 0);
+            }
+          }
+
+          .cart-button-pulse {
+            animation: cartPulse 0.6s ease-in-out;
+          }
+
+          /* Cart badge pop animation */
+          @keyframes badgePop {
+            0% {
+              transform: scale(1);
+            }
+            50% {
+              transform: scale(1.4);
+            }
+            100% {
+              transform: scale(1);
+            }
+          }
+
+          .cart-badge-animate {
+            animation: badgePop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          }
+
+          /* Cart icon bounce */
+          @keyframes cartIconBounce {
+            0%, 100% {
+              transform: translateY(0) scaleX(-1);
+            }
+            25% {
+              transform: translateY(-4px) scaleX(-1);
+            }
+            50% {
+              transform: translateY(0) scaleX(-1);
+            }
+            75% {
+              transform: translateY(-2px) scaleX(-1);
+            }
+          }
+
+          .cart-icon-bounce {
+            animation: cartIconBounce 0.5s ease-in-out;
+          }
+
           .element-inspector {
             position: fixed;
             background-color: rgba(0, 0, 0, 0.8);
@@ -604,91 +699,73 @@ export default function DiskiPage() {
         </div>
       )}
 
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-[#1F1F1F] shadow-sm">
-        <div className="p-2 px-4 flex items-center justify-between w-full h-[60px]">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="text-[#1F1F1F] dark:text-white">
-              <ChevronLeft className="h-6 w-6" />
-            </Link>
+      <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[60px]">
+        <div className="container max-w-md flex items-center justify-center h-full relative overflow-hidden">
+          <Link
+            href="/"
+            className="fixed left-0 top-2 p-2 rounded-tr-md rounded-br-md hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors z-50"
+            aria-label="На главную"
+          >
+            <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+          </Link>
+
+          <div className="disk-tabs-container">
+            {[
+              { key: "stamped", label: "Штампы", color: "#D3DF3D", index: 0 },
+              { key: "cast", label: "Литые", color: "#D3DF3D", index: 1 },
+              { key: "forged", label: "Кованные", color: "#D3DF3D", index: 2 },
+            ].map((tab) => {
+              const isActive = diskType === tab.key
+              const activeIndex = diskType === "stamped" ? 0 : diskType === "cast" ? 1 : 2
+
+              // Calculate order for circular carousel (prev - active - next)
+              let order = tab.index
+              if (activeIndex === 0) {
+                // stamped active: forged(prev), stamped(center), cast(next)
+                if (tab.index === 0) order = 1      // stamped -> center
+                else if (tab.index === 1) order = 2 // cast -> right (next)
+                else order = 0                       // forged -> left (prev)
+              } else if (activeIndex === 1) {
+                // cast active: stamped(prev), cast(center), forged(next)
+                if (tab.index === 0) order = 0      // stamped -> left (prev)
+                else if (tab.index === 1) order = 1 // cast -> center
+                else order = 2                       // forged -> right (next)
+              } else if (activeIndex === 2) {
+                // forged active: cast(prev), forged(center), stamped(next)
+                if (tab.index === 0) order = 2      // stamped -> right (next)
+                else if (tab.index === 1) order = 0 // cast -> left (prev)
+                else order = 1                       // forged -> center
+              }
+
+              return (
+                <button
+                  key={tab.key}
+                  ref={tab.key === "cast" ? castButtonRef : undefined}
+                  onClick={() => setDiskType(tab.key as "stamped" | "cast" | "forged")}
+                  className={`disk-tab ${isActive ? "disk-tab-active" : "disk-tab-inactive"}`}
+                  style={{ "--tab-color": tab.color, order } as React.CSSProperties}
+                >
+                  <span>{tab.label}</span>
+                </button>
+              )
+            })}
           </div>
 
-          <div className="flex items-center space-x-2 h-full">
-            <button
-              onClick={() => setDiskType("stamped")}
-              className={getButtonClass("stamped")}
-              style={{
-                ...(diskType === "stamped" ? buttonStyle : { marginTop: "-6px", marginBottom: "-6px" }),
-                borderRadius: "6px",
-              }}
-            >
-              <span className="relative z-10">ШТАМПЫ</span>
-            </button>
-            <button
-              ref={castButtonRef}
-              onClick={() => setDiskType("cast")}
-              className={getButtonClass("cast")}
-              style={{
-                ...(diskType === "cast" ? buttonStyle : { marginTop: "-6px", marginBottom: "-6px" }),
-                borderRadius: "6px",
-              }}
-            >
-              <span className="relative z-10">ЛИТЫЕ</span>
-            </button>
-            <button
-              onClick={() => setDiskType("forged")}
-              className={getButtonClass("forged")}
-              style={{
-                ...(diskType === "forged" ? buttonStyle : { marginTop: "-6px", marginBottom: "-6px" }),
-                borderRadius: "6px",
-              }}
-            >
-              <span className="relative z-10">КОВАННЫЕ</span>
-            </button>
-          </div>
-
-          {/* Cart button positioned at the right */}
-          <div className="flex items-center h-full">
-            <button
-              onClick={() => router.push("/order/checkout")}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex flex-col items-center justify-center relative"
-              aria-label="Оформить заказ"
-            >
-              <div>
-                <Image
-                  src="/images/korzina2.png"
-                  alt="Оформить заказ"
-                  width={26}
-                  height={26}
-                  className="opacity-90 hover:opacity-100 transition-opacity dark:invert dark:brightness-200 dark:contrast-200"
-                />
-              </div>
-
-              {/* Cart count badge */}
-              {cartItemCount > 0 && (
-                <div className="absolute top-[4px] -right-1 bg-[#D3DF3D] text-black text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartItemCount}
-                </div>
-              )}
-            </button>
-          </div>
+          {/* Cart button */}
+          <CartButton className="fixed right-0 top-2 z-50" />
         </div>
       </header>
 
-      <div className="flex-1 p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 pt-4 sm:pt-6 pb-[250px] sm:pb-[280px] mt-2 sm:mt-4 max-w-7xl mx-auto">
-        {/* Quick Filter Container */}
-        <div className="w-full">
-          <QuickFilterButtons
-            insideTireResults={true}
-            onBrandSelect={handleBrandSelect}
-            onSortChange={handleSortChange}
-            activeFiltersCount={selectedBrands.length}
-          />
-        </div>
+      <div className="flex-1 px-4 pt-4 pb-4 space-y-4">
+        <QuickFilterButtons
+          insideTireResults={true}
+          onBrandSelect={handleBrandSelect}
+          onSortChange={handleSortChange}
+          activeFiltersCount={selectedBrands.length}
+        />
 
-        {/* Диски в стиле карточек шин */}
         {/* Адаптивная сетка карточек дисков */}
-        <div className="space-y-3 sm:space-y-4 sm:grid sm:grid-cols-1 sm:gap-3 sm:space-y-0 md:grid-cols-2 md:gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {/* Отдельные карточки для каждого диска */}
+        <div className="space-y-3 sm:space-y-4 sm:grid sm:grid-cols-1 sm:gap-3 sm:space-y-0 md:grid-cols-2 md:gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 pb-[200px]">
           {filteredDisks.map((disk) => (
             <div key={disk.id} className="w-full">
               <DiskCard disk={disk} />

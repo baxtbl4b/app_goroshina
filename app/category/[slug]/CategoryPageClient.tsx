@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import TireSearchFilter from "@/components/tire-search-filter"
 import TireResults from "@/components/tire-results"
 import QuickFilterButtons from "@/components/quick-filter-buttons"
+import CartButton from "@/components/cart-button"
 import { useState, useEffect, useRef } from "react"
 
 interface CategoryPageClientProps {
@@ -608,58 +609,22 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             overflow: hidden;
             transform: scale(1.1);
             background: linear-gradient(135deg,
-              color-mix(in srgb, var(--tab-color) 20%, transparent),
-              color-mix(in srgb, var(--tab-color) 10%, transparent)
+              color-mix(in srgb, var(--tab-color) 80%, transparent),
+              color-mix(in srgb, var(--tab-color) 60%, transparent)
             );
             border: none;
-            color: #1F1F1F;
+            color: white;
             font-size: 13px;
             z-index: 2;
-            animation: softPulse 2s ease-in-out infinite;
-          }
-
-          /* Glow effect */
-          .season-tab-active::after {
-            content: "";
-            position: absolute;
-            inset: -4px;
-            border-radius: 24px;
-            background: var(--tab-color);
-            opacity: 0.3;
-            filter: blur(12px);
-            z-index: -1;
-            animation: glowPulse 2s ease-in-out infinite;
-          }
-
-          @keyframes softPulse {
-            0%, 100% {
-              transform: scale(1.1);
-            }
-            50% {
-              transform: scale(1.12);
-            }
-          }
-
-          @keyframes glowPulse {
-            0%, 100% {
-              opacity: 0.25;
-              filter: blur(12px);
-            }
-            50% {
-              opacity: 0.4;
-              filter: blur(16px);
-            }
-          }
-
-          .dark .season-tab-active {
-            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 0 12px color-mix(in srgb, var(--tab-color) 50%, transparent);
           }
 
           .season-tab-inactive {
             transform: scale(0.85);
             background: rgba(128, 128, 128, 0.1);
             border: 1px solid transparent;
-            color: #888;
+            color: #6B7280;
             font-size: 11px;
             opacity: 0.8;
             backdrop-filter: blur(4px);
@@ -667,18 +632,53 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
           .season-tab-inactive:hover {
             opacity: 1;
-            background: color-mix(in srgb, var(--tab-color) 15%, transparent);
-            border-color: color-mix(in srgb, var(--tab-color) 50%, transparent);
+            background: rgba(211, 223, 61, 0.1);
+            border-color: rgba(211, 223, 61, 0.3);
             transform: scale(0.88);
           }
 
           .dark .season-tab-inactive {
-            color: #aaa;
+            color: #9CA3AF;
             background: rgba(255, 255, 255, 0.05);
           }
 
           .dark .season-tab-inactive:hover {
             color: white;
+            background: rgba(211, 223, 61, 0.15);
+            border-color: rgba(211, 223, 61, 0.3);
+          }
+
+          /* Cart pulsation when has items */
+          @keyframes cartPulseGlow {
+            0%, 100% {
+              filter: brightness(0) saturate(100%) invert(83%) sepia(44%) saturate(484%) hue-rotate(22deg) brightness(97%) contrast(91%) drop-shadow(0 0 2px rgba(211, 223, 61, 0.5));
+            }
+            50% {
+              filter: brightness(0) saturate(100%) invert(83%) sepia(44%) saturate(484%) hue-rotate(22deg) brightness(97%) contrast(91%) drop-shadow(0 0 8px rgba(211, 223, 61, 0.9));
+            }
+          }
+
+          /* Rare wobble animation */
+          @keyframes cartWobble {
+            0%, 90%, 100% {
+              transform: rotate(0deg) scaleX(-1);
+            }
+            92% {
+              transform: rotate(-8deg) scaleX(-1);
+            }
+            94% {
+              transform: rotate(6deg) scaleX(-1);
+            }
+            96% {
+              transform: rotate(-4deg) scaleX(-1);
+            }
+            98% {
+              transform: rotate(2deg) scaleX(-1);
+            }
+          }
+
+          .cart-has-items {
+            animation: cartPulseGlow 2s ease-in-out infinite, cartWobble 6s ease-in-out infinite;
           }
         `}
       </style>
@@ -728,8 +728,8 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
           >
             {[
               { key: "s", label: "Летние", path: "/category/summer", color: "#D3DF3D" },
-              { key: "w", label: "Зимние", path: "/category/winter", color: "#3B82F6" },
-              { key: "a", label: "Всесезонные", path: "/category/all-season", color: "#10B981" },
+              { key: "w", label: "Зимние", path: "/category/winter", color: "#D3DF3D" },
+              { key: "a", label: "Всесезонные", path: "/category/all-season", color: "#D3DF3D" },
             ].map((tab) => {
               const isActive = season === tab.key
               const activeIndex = season === "s" ? 0 : season === "w" ? 1 : 2
@@ -771,31 +771,8 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             })}
           </div>
 
-          {/* Global cart button - IMPORTANT: Use this same markup and class on all pages */}
-          <button
-            onClick={handleCartClick}
-            className={`global-cart-button ${isCartButtonAnimating ? "cart-button-pulse" : ""}`}
-            aria-label="Корзина"
-          >
-            <div className={isCartButtonAnimating ? "cart-icon-bounce" : ""}>
-              <Image
-                src="/images/korzina2.png"
-                alt="Корзина"
-                width={26}
-                height={26}
-                className="opacity-90 hover:opacity-100 transition-opacity dark:invert dark:brightness-200 dark:contrast-200 -scale-x-100"
-              />
-            </div>
-
-            {/* Cart count badge */}
-            {cartItemCount > 0 && (
-              <div
-                className={`absolute -top-1 left-0 bg-[#D3DF3D] text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium shadow-sm ${isCartButtonAnimating ? "cart-badge-animate" : ""}`}
-              >
-                {cartItemCount}
-              </div>
-            )}
-          </button>
+          {/* Global cart button */}
+          <CartButton className="fixed right-2 top-2 z-[100]" />
         </div>
       </header>
 

@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation"
 import { useState, useEffect, useRef } from "react"
 import LoadingScreen from "@/components/loading-screen"
 import TireCard from "@/components/tire-card"
+import CartButton from "@/components/cart-button"
 import type { Tire } from "@/lib/api"
 import {
   Dialog,
@@ -306,20 +307,7 @@ export default function HomePage() {
                   <Link href="/favorites" className="flex items-center gap-2 text-[#1F1F1F] dark:text-white">
                     <Heart className="h-6 w-6" />
                   </Link>
-                  <Link href="/order" className="relative">
-                    <div className="relative">
-                      <Image
-                        src="/images/korzina2.png"
-                        alt="Shopping Cart"
-                        width={28}
-                        height={28}
-                        className="dark:invert"
-                      />
-                      <span className="absolute top-[-9px] -right-2 bg-[#D3DF3D] text-black text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
-                        2
-                      </span>
-                    </div>
-                  </Link>
+                  <CartButton />
                 </div>
                 <Button
                   variant="ghost"

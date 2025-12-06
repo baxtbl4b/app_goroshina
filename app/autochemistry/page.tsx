@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import BottomNavigation from "@/components/bottom-navigation"
 import { Badge } from "@/components/ui/badge"
+import CartButton from "@/components/cart-button"
 import Link from "next/link"
 
 // Define the chemical product type
@@ -458,32 +459,8 @@ export default function AutochemistryPage() {
           </div>
 
           {/* Cart button positioned at the right */}
-          <div className="flex items-center h-full">
-            <button
-              onClick={handleCartClick}
-              className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex flex-col items-center justify-center ${
-                isCartButtonAnimating ? "cart-button-pulse" : ""
-              }`}
-              aria-label="Корзина"
-            >
-              <div className={isCartButtonAnimating ? "cart-icon-bounce" : ""}>
-                <Image
-                  src="/images/korzina2.png"
-                  alt="Корзина"
-                  width={26}
-                  height={26}
-                  className="opacity-90 hover:opacity-100 transition-opacity dark:invert dark:brightness-200 dark:contrast-200"
-                />
-              </div>
-
-              {/* Cart count badge */}
-              {cartItemCount > 0 && (
-                <div className="absolute top-[4px] -right-1 bg-[#D3DF3D] text-black text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartItemCount}
-                </div>
-              )}
-            </button>
-          </div>
+          {/* Cart button */}
+          <CartButton className="fixed right-0 top-2 z-50" />
         </div>
       </header>
 
@@ -494,8 +471,8 @@ export default function AutochemistryPage() {
               <div key={product.id} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
                 {/* Левая часть - Изображение */}
                 <div
-                  className="relative p-2 flex-shrink-0 w-[200px] overflow-hidden flex items-center justify-center"
-                  style={{ height: "200px" }}
+                  className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[123px] sm:w-[161px] md:w-[197px] lg:w-[222px] overflow-hidden flex items-center justify-center bg-white rounded-l-xl"
+                  style={{ maxHeight: "209px" }}
                 >
                   {product.brand === "AXIOM" && (
                     <Badge className="absolute left-2 top-2 z-10 bg-[#3D8DDF] text-white">AXIOM</Badge>
@@ -510,15 +487,10 @@ export default function AutochemistryPage() {
                     <img
                       src={product.image || "/placeholder.svg"}
                       alt={product.name}
-                      className="max-w-full max-h-full object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                      className="w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
                       style={{
-                        filter: "drop-shadow(0 0 3px rgba(0,0,0,0.25))",
+                        filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
                         backgroundColor: "transparent",
-                        objectFit: "contain",
-                        width: "auto",
-                        height: "auto",
-                        maxWidth: "180px",
-                        maxHeight: "180px",
                       }}
                     />
                   </div>
@@ -548,7 +520,7 @@ export default function AutochemistryPage() {
                     </p>
                   </div>
 
-                  <div className="mt-0.5 sm:mt-1 md:mt-2 lg:mt-3 flex flex-col relative pb-8 sm:pb-10 md:pb-12 lg:pb-14">
+                  <div className="mt-0.5 sm:mt-1 flex flex-col relative pb-7 sm:pb-8 md:pb-10">
                     <div className="flex items-center justify-between w-full mb-1">
                       <div>
                         {/* Статус наличия - всегда показываем "Сегодня" для автохимии */}
@@ -585,22 +557,22 @@ export default function AutochemistryPage() {
                           {product.price} ₽
                         </p>
                       </div>
-                      <div className="flex items-center gap-0">
+                      <div className="flex items-center flex-1 justify-end ml-2">
                         {/* Кнопки корзины */}
-                        <div className="flex h-9 sm:h-10 md:h-11 lg:h-[12.5] rounded-xl overflow-hidden border border-black/80">
+                        <div className="flex h-7 sm:h-8 md:h-9 rounded-lg overflow-hidden w-full max-w-[140px] sm:max-w-[160px] md:max-w-[180px]">
                           {/* Кнопка минус */}
                           <button
                             onClick={(e) => removeFromCart(product, e)}
                             disabled={!cartCounts[product.id] || cartCounts[product.id] <= 0}
-                            className="bg-gray-500/90 hover:bg-gray-600 text-white h-full px-3 sm:px-4 md:px-5 lg:px-6 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
+                            className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Уменьшить количество"
                           >
-                            <Minus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:w-7" />
+                            <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                           </button>
 
                           {/* Счетчик количества */}
-                          <div className="bg-black/85 text-white h-full px-2 sm:px-3 md:px-4 flex items-center justify-center min-w-[2.5rem] sm:min-w-[3rem] md:min-w-[3.5rem] lg:min-w-[4rem] backdrop-blur-sm">
-                            <span className="text-sm sm:text-base md:text-lg lg:text-xl font-medium">
+                          <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2rem] sm:min-w-[2.5rem] md:min-w-[3rem]">
+                            <span className="text-xs sm:text-sm md:text-base font-medium">
                               {cartCounts[product.id] || 0}
                             </span>
                           </div>
@@ -608,10 +580,10 @@ export default function AutochemistryPage() {
                           {/* Кнопка плюс */}
                           <button
                             onClick={(e) => addToCart(product, e)}
-                            className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full px-3 sm:px-4 md:px-5 lg:px-6 flex items-center justify-center transition-colors backdrop-blur-sm"
+                            className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors"
                             aria-label="Увеличить количество"
                           >
-                            <Plus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:w-7" />
+                            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                           </button>
                         </div>
                       </div>

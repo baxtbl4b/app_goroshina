@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import BottomNavigation from "@/components/bottom-navigation"
 import { Badge } from "@/components/ui/badge"
+import CartButton from "@/components/cart-button"
 
 // Define the pressure sensor type
 interface PressureSensor {
@@ -397,29 +398,8 @@ export default function PressureSensorsPage() {
             </button>
           </div>
 
-          {/* Global cart button - IMPORTANT: Use this same markup and class on all pages */}
-          <button
-            onClick={handleCartClick}
-            className={`global-cart-button ${isCartButtonAnimating ? "cart-button-pulse" : ""}`}
-            aria-label="Корзина"
-          >
-            <div className={isCartButtonAnimating ? "cart-icon-bounce" : ""}>
-              <Image
-                src="/images/korzina2.png"
-                alt="Корзина"
-                width={26}
-                height={26}
-                className="opacity-90 hover:opacity-100 transition-opacity dark:invert dark:brightness-200 dark:contrast-200"
-              />
-            </div>
-
-            {/* Cart count badge */}
-            {cartItemCount > 0 && (
-              <div className="absolute top-[5px] -right-1 bg-[#D3DF3D] text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium shadow-sm">
-                {cartItemCount}
-              </div>
-            )}
-          </button>
+          {/* Cart button */}
+          <CartButton className="fixed right-0 top-2 z-50" />
         </div>
       </header>
 
@@ -431,8 +411,8 @@ export default function PressureSensorsPage() {
               <div key={sensor.id} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
                 {/* Left part - Image */}
                 <div
-                  className="relative p-2 flex-shrink-0 w-[200px] overflow-hidden flex items-center justify-center"
-                  style={{ height: "200px" }}
+                  className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[123px] sm:w-[161px] md:w-[197px] lg:w-[222px] overflow-hidden flex items-center justify-center bg-white rounded-l-xl"
+                  style={{ maxHeight: "209px" }}
                 >
                   <div
                     className="flex justify-center items-center h-full w-full relative overflow-hidden bg-transparent"
@@ -441,7 +421,7 @@ export default function PressureSensorsPage() {
                     <img
                       src={sensor.image || "/placeholder.svg"}
                       alt={sensor.name || "Датчик"}
-                      className="max-w-full max-h-full object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                      className="w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
                       onClick={(e) => {
                         e.preventDefault()
                         // Handle image click if needed
@@ -451,13 +431,8 @@ export default function PressureSensorsPage() {
                         e.currentTarget.src = "/placeholder.svg"
                       }}
                       style={{
-                        filter: "drop-shadow(0 0 3px rgba(0,0,0,0.25))",
+                        filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
                         backgroundColor: "transparent",
-                        objectFit: "contain",
-                        width: "auto",
-                        height: "auto",
-                        maxWidth: "180px",
-                        maxHeight: "180px",
                       }}
                     />
                   </div>
@@ -493,7 +468,7 @@ export default function PressureSensorsPage() {
                     </p>
                   </div>
 
-                  <div className="mt-0.5 sm:mt-1 md:mt-2 lg:mt-3 flex flex-col relative pb-8 sm:pb-10 md:pb-12 lg:pb-14">
+                  <div className="mt-0.5 sm:mt-1 flex flex-col relative pb-7 sm:pb-8 md:pb-10">
                     <div className="flex items-center justify-between w-full mb-1">
                       <div>
                         {/* Stock status */}
@@ -559,33 +534,35 @@ export default function PressureSensorsPage() {
                           {formatPrice(sensor.price)}
                         </p>
                       </div>
-                      <div className="flex h-9 sm:h-10 md:h-11 lg:h-[12.5] rounded-xl overflow-hidden border border-black/80">
-                        {/* Minus button */}
-                        <button
-                          onClick={(e) => removeFromCart(sensor, e)}
-                          disabled={!cartCounts[sensor.id] || cartCounts[sensor.id] <= 0 || sensor.stock <= 0}
-                          className="bg-gray-500/90 hover:bg-gray-600 text-white h-full px-3 sm:px-4 md:px-5 lg:px-6 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
-                          aria-label="Уменьшить количество"
-                        >
-                          <Minus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:w-7" />
-                        </button>
+                      <div className="flex items-center flex-1 justify-end ml-2">
+                        <div className="flex h-7 sm:h-8 md:h-9 rounded-lg overflow-hidden w-full max-w-[140px] sm:max-w-[160px] md:max-w-[180px]">
+                          {/* Minus button */}
+                          <button
+                            onClick={(e) => removeFromCart(sensor, e)}
+                            disabled={!cartCounts[sensor.id] || cartCounts[sensor.id] <= 0 || sensor.stock <= 0}
+                            className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label="Уменьшить количество"
+                          >
+                            <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                          </button>
 
-                        {/* Counter */}
-                        <div className="bg-black/85 text-white h-full px-2 sm:px-3 md:px-4 flex items-center justify-center min-w-[2.5rem] sm:min-w-[3rem] md:min-w-[3.5rem] lg:min-w-[4rem] backdrop-blur-sm">
-                          <span className="text-sm sm:text-base md:text-lg lg:text-xl font-medium">
-                            {cartCounts[sensor.id] || 0}
-                          </span>
+                          {/* Counter */}
+                          <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2rem] sm:min-w-[2.5rem] md:min-w-[3rem]">
+                            <span className="text-xs sm:text-sm md:text-base font-medium">
+                              {cartCounts[sensor.id] || 0}
+                            </span>
+                          </div>
+
+                          {/* Plus button */}
+                          <button
+                            onClick={(e) => addToCart(sensor, e)}
+                            disabled={sensor.stock <= 0}
+                            className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label="Увеличить количество"
+                          >
+                            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                          </button>
                         </div>
-
-                        {/* Plus button */}
-                        <button
-                          onClick={(e) => addToCart(sensor, e)}
-                          disabled={sensor.stock <= 0}
-                          className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full px-3 sm:px-4 md:px-5 lg:px-6 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
-                          aria-label="Увеличить количество"
-                        >
-                          <Plus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:w-7" />
-                        </button>
                       </div>
                     </div>
                   </div>
