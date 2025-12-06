@@ -578,16 +578,19 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
           /* Season tabs styles */
           .season-tabs-container {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
+            position: fixed;
+            left: 50%;
+            top: 30px;
+            transform: translateX(-50%) translateY(-50%);
+            display: flex;
             align-items: center;
-            height: 100%;
-            padding: 0 50px;
+            justify-content: center;
+            gap: 4px;
             touch-action: pan-y pinch-zoom;
             user-select: none;
             -webkit-user-select: none;
             cursor: grab;
-            width: 100%;
+            z-index: 51;
           }
 
           .season-tab {
@@ -601,22 +604,19 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
             text-align: center;
+            width: 95px;
           }
 
           .season-tab-active {
             position: relative;
             overflow: hidden;
             transform: scale(1.1);
-            background: linear-gradient(135deg,
-              color-mix(in srgb, var(--tab-color) 80%, transparent),
-              color-mix(in srgb, var(--tab-color) 60%, transparent)
-            );
+            background: var(--tab-color);
             border: none;
-            color: white;
+            color: #1F1F1F;
             font-size: 13px;
+            font-weight: 600;
             z-index: 2;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            box-shadow: 0 0 12px color-mix(in srgb, var(--tab-color) 50%, transparent);
           }
 
           .season-tab-inactive {
@@ -634,17 +634,6 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             background: rgba(211, 223, 61, 0.1);
             border-color: rgba(211, 223, 61, 0.3);
             transform: scale(0.88);
-          }
-
-          /* Grid positioning for tabs */
-          .season-tab[style*="order: 0"] {
-            justify-self: end;
-          }
-          .season-tab[style*="order: 1"] {
-            justify-self: center;
-          }
-          .season-tab[style*="order: 2"] {
-            justify-self: start;
           }
 
           .dark .season-tab-inactive {
@@ -781,8 +770,10 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             })}
           </div>
 
-          {/* Global cart button */}
-          <CartButton className="fixed right-8 top-[20px] -translate-y-1/2 z-[100]" />
+        </div>
+        {/* Global cart button - outside container */}
+        <div style={{ position: 'fixed', right: '8px', top: '30px', transform: 'translateY(-50%)', zIndex: 100 }}>
+          <CartButton />
         </div>
       </header>
 
