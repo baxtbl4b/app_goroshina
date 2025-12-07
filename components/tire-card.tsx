@@ -676,7 +676,13 @@ export default function TireCard({ tire }: TireCardProps) {
             </Button>
           </div>
 
-          <Link href={`/product/${tire.id}`}>
+          <Link
+            href={`/product/${tire.id}`}
+            onClick={() => {
+              // Store tire data in localStorage for product page
+              localStorage.setItem(`tire_${tire.id}`, JSON.stringify(tire))
+            }}
+          >
             <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-[11px] sm:text-[13px] md:text-[15px] lg:text-[17px] leading-tight">
               {tire.name}
             </h3>

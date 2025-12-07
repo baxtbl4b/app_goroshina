@@ -27,6 +27,7 @@ export interface Tire {
   year?: number
   truck?: boolean
   cargo?: boolean
+  storehouse?: Record<string, number>
 }
 
 export interface TireDimensions {

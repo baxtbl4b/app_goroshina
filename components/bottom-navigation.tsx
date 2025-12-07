@@ -49,7 +49,7 @@ export function BottomNavigation() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-10 pb-[env(safe-area-inset-bottom)]">
+    <div className="fixed bottom-0 left-0 right-0 z-10 pb-[env(safe-area-inset-bottom)]" style={{ boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.3)' }}>
       {/* SVG cutout shape with smooth rounded transitions */}
       <svg
         className="absolute bottom-0 left-0 right-0 w-full h-[84px] pointer-events-none"
