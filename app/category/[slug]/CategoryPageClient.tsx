@@ -67,16 +67,21 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
     const isLeftSwipe = distance > minSwipeDistance
     const isRightSwipe = distance < -minSwipeDistance
 
-    const params = new URLSearchParams(searchParams.toString())
+    // Remove spike param for non-winter seasons
+    const getCleanParams = (seasonKey: string) => {
+      const p = new URLSearchParams(searchParams.toString())
+      if (seasonKey !== 'w') p.delete('spike')
+      return p.toString()
+    }
 
     if (isLeftSwipe) {
-      // Swipe left = next season (circular)
+      // Swipe left = next season
       const nextIndex = (currentSeasonIndex + 1) % seasonsList.length
-      router.push(`${seasonsList[nextIndex].path}?${params.toString()}`)
+      router.push(`${seasonsList[nextIndex].path}?${getCleanParams(seasonsList[nextIndex].key)}`)
     } else if (isRightSwipe) {
-      // Swipe right = previous season (circular)
+      // Swipe right = previous season
       const prevIndex = (currentSeasonIndex - 1 + seasonsList.length) % seasonsList.length
-      router.push(`${seasonsList[prevIndex].path}?${params.toString()}`)
+      router.push(`${seasonsList[prevIndex].path}?${getCleanParams(seasonsList[prevIndex].key)}`)
     }
 
     touchStartRef.current = null
@@ -590,102 +595,77 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             display: none;  /* Chrome, Safari and Opera */
           }
 
-          /* Season tabs styles */
-          .season-tabs-container {
+          /* Season Horizontal Carousel styles */
+          .carousel-container {
             position: fixed;
             left: 50%;
             top: 30px;
             transform: translateX(-50%) translateY(-50%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            touch-action: pan-y pinch-zoom;
-            user-select: none;
-            -webkit-user-select: none;
-            cursor: grab;
+            height: 44px;
             z-index: 51;
+            -webkit-tap-highlight-color: transparent;
           }
 
-          .season-tab {
+          .carousel-track {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 8px 10px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
-            text-align: center;
-            width: 120px;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            outline: none;
+            height: 100%;
           }
 
-          .season-tab-active {
-            position: relative;
-            overflow: hidden;
-            transform: scale(1.1);
-            background: var(--tab-color);
-            border: none;
+          .carousel-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+
+          .carousel-item-center {
+            padding: 10px 24px;
+            background: #D3DF3D;
             color: #1F1F1F;
             font-size: 15px;
-            font-weight: 500;
-            letter-spacing: 0.2px;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            z-index: 2;
+            font-weight: 600;
+            border-radius: 22px;
+            box-shadow: 0 4px 20px rgba(211, 223, 61, 0.4);
+            z-index: 3;
           }
 
-          .season-tab-inactive {
-            transform: scale(0.85);
-            background: rgba(128, 128, 128, 0.1);
-            border: 1px solid transparent;
+          .carousel-item-side {
+            position: absolute;
+            padding: 6px 12px;
+            background: transparent;
             color: #6B7280;
-            font-size: 14px;
-            opacity: 0.8;
-            backdrop-filter: blur(4px);
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 14px;
+            z-index: 1;
+            opacity: 0.5;
           }
 
-          @media (hover: hover) {
-            .season-tab-inactive:hover {
-              opacity: 1;
-              background: rgba(211, 223, 61, 0.1);
-              border-color: rgba(211, 223, 61, 0.3);
-              transform: scale(0.88);
-            }
+          .carousel-item-left {
+            right: 100%;
+            margin-right: 8px;
           }
 
-          .season-tab-inactive:active {
-            opacity: 1;
-            transform: scale(0.82);
+          .carousel-item-right {
+            left: 100%;
+            margin-left: 8px;
           }
 
-          .season-tab:focus {
-            outline: none;
-          }
-
-          .season-tab-inactive:focus {
-            background: rgba(128, 128, 128, 0.1);
-            border-color: transparent;
-          }
-
-          .dark .season-tab-inactive {
+          .dark .carousel-item-side {
             color: #9CA3AF;
-            background: rgba(255, 255, 255, 0.05);
-          }
-
-          .dark .season-tab-inactive:focus {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: transparent;
           }
 
           @media (hover: hover) {
-            .dark .season-tab-inactive:hover {
-              color: white;
-              background: rgba(211, 223, 61, 0.15);
-              border-color: rgba(211, 223, 61, 0.3);
+            .carousel-item-side:hover {
+              opacity: 0.8;
+              background: rgba(128, 128, 128, 0.1);
             }
           }
 
@@ -757,70 +737,68 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             className="fixed left-0 top-[30px] -translate-y-1/2 p-2 transition-colors z-50"
             aria-label="На главную"
           >
-            <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+            <ChevronLeft className="h-6 w-6 text-gray-700 dark:text-gray-300" />
           </button>
 
-          {/* Season tabs with centered active element */}
-          <div
-            className="season-tabs-container"
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
-          >
-            {[
-              { key: "s", label: "Летние", path: "/category/summer", color: "#D3DF3D" },
-              { key: "w", label: "Зимние", path: "/category/winter", color: "#D3DF3D" },
-              { key: "a", label: "Всесезонные", path: "/category/all-season", color: "#D3DF3D" },
-            ].map((tab) => {
-              const isActive = season === tab.key
-              const activeIndex = season === "s" ? 0 : season === "w" ? 1 : 2
-              const tabIndex = tab.key === "s" ? 0 : tab.key === "w" ? 1 : 2
+          {/* Season Horizontal Carousel */}
+          {(() => {
+            const tabs = [
+              { key: "s", label: "Летние", path: "/category/summer" },
+              { key: "w", label: "Зимние", path: "/category/winter" },
+              { key: "a", label: "Всесезонные", path: "/category/all-season" },
+            ]
 
-              // Calculate order for circular carousel (prev - active - next)
-              // Order: s(0) -> w(1) -> a(2) -> s(0) ...
-              let order = tabIndex
-              if (activeIndex === 0) {
-                // s active: a(prev), s(center), w(next)
-                if (tabIndex === 0) order = 1      // s -> center
-                else if (tabIndex === 1) order = 2 // w -> right (next)
-                else order = 0                      // a -> left (prev)
-              } else if (activeIndex === 1) {
-                // w active: s(prev), w(center), a(next)
-                if (tabIndex === 0) order = 0      // s -> left (prev)
-                else if (tabIndex === 1) order = 1 // w -> center
-                else order = 2                      // a -> right (next)
-              } else if (activeIndex === 2) {
-                // a active: w(prev), a(center), s(next)
-                if (tabIndex === 0) order = 2      // s -> right (next)
-                else if (tabIndex === 1) order = 0 // w -> left (prev)
-                else order = 1                      // a -> center
-              }
+            // Current active index
+            const activeIndex = season === "s" ? 0 : season === "w" ? 1 : 2
 
-              // Remove spike filter for non-winter tires
-              const tabQueryParams = { ...queryParams }
-              if (tab.key !== 'w') {
-                delete tabQueryParams.spike
-              }
+            // Get prev and next indices (circular)
+            const prevIndex = (activeIndex - 1 + 3) % 3
+            const nextIndex = (activeIndex + 1) % 3
 
-              return (
-                <Link
-                  key={tab.key}
-                  href={{ pathname: tab.path, query: tabQueryParams }}
-                  className={`season-tab ${isActive ? "season-tab-active" : "season-tab-inactive"}`}
-                  style={{
-                    order,
-                    "--tab-color": tab.color,
-                  } as React.CSSProperties}
-                >
-                  <span>{tab.label}</span>
-                </Link>
-              )
-            })}
-          </div>
+            // Order: [prev, active, next]
+            const orderedTabs = [
+              { ...tabs[prevIndex], position: 'left' },
+              { ...tabs[activeIndex], position: 'center' },
+              { ...tabs[nextIndex], position: 'right' },
+            ]
+
+            return (
+              <div
+                className="carousel-container"
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+              >
+                <div className="carousel-track">
+                  {orderedTabs.map((tab) => {
+                    const isCenter = tab.position === 'center'
+
+                    // Remove spike filter for non-winter
+                    const tabQueryParams = { ...queryParams }
+                    if (tab.key !== 'w') delete tabQueryParams.spike
+
+                    const positionClass = isCenter
+                      ? 'carousel-item-center'
+                      : `carousel-item-side carousel-item-${tab.position}`
+
+                    return (
+                      <Link
+                        key={tab.key}
+                        href={{ pathname: tab.path, query: tabQueryParams }}
+                        className={`carousel-item ${positionClass}`}
+                      >
+                        {tab.label}
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })()}
 
         </div>
         {/* Global cart button - outside container */}
-        <div style={{ position: 'fixed', right: '8px', top: '30px', transform: 'translateY(-50%) scale(0.9)', zIndex: 100 }}>
+        <div style={{ position: 'fixed', right: '8px', top: '30px', transform: 'translateY(-50%) scale(1.035)', zIndex: 100 }}>
           <CartButton />
         </div>
       </header>

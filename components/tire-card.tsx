@@ -110,10 +110,13 @@ export default function TireCard({ tire }: TireCardProps) {
   const [imageModalOpen, setImageModalOpen] = useState(false)
   const [cartCount, setCartCount] = useState(0)
   const [imageError, setImageError] = useState(false)
+  const [imageRetryCount, setImageRetryCount] = useState(0)
+  const [imageKey, setImageKey] = useState(0) // Ключ для принудительной перезагрузки изображения
   const [flagError, setFlagError] = useState(false)
   const [isButtonPulsing, setIsButtonPulsing] = useState(false)
   const [floatingNumber, setFloatingNumber] = useState<{ x: number; y: number; count: number } | null>(null)
   const addButtonRef = useRef<HTMLButtonElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
 
   // Специальная проверка для проблемных товаров с RunFlat
   const isKnownRunflatTire =
@@ -167,6 +170,54 @@ export default function TireCard({ tire }: TireCardProps) {
       window.removeEventListener("resetAllCartCounters", handleResetCartCounters)
     }
   }, [])
+
+  // Сбрасываем состояние ошибки изображения при изменении товара
+  useEffect(() => {
+    setImageError(false)
+    setImageRetryCount(0)
+    setImageKey(prev => prev + 1)
+    setFlagError(false)
+  }, [tire.id])
+
+  // Функция для повторной попытки загрузки изображения
+  const handleImageError = () => {
+    const maxRetries = 3
+    if (imageRetryCount < maxRetries) {
+      // Добавляем небольшую задержку перед повторной попыткой
+      setTimeout(() => {
+        setImageRetryCount(prev => prev + 1)
+        setImageKey(prev => prev + 1) // Меняем ключ для перезагрузки изображения
+      }, 500 * (imageRetryCount + 1)) // Увеличиваем задержку с каждой попыткой
+    } else {
+      console.log(`Image failed to load after ${maxRetries} retries: ${imageUrl}, falling back to default image`)
+      setImageError(true)
+    }
+  }
+
+  // IntersectionObserver для повторной загрузки изображений при возвращении в область видимости
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && imageError) {
+            // Если карточка вернулась в область видимости и изображение было с ошибкой, пробуем снова
+            setImageError(false)
+            setImageRetryCount(0)
+            setImageKey(prev => prev + 1)
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: '50px' }
+    )
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current)
+    }
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [imageError])
 
   // Удалено отладочный код
 
@@ -479,7 +530,7 @@ export default function TireCard({ tire }: TireCardProps) {
   }, [tire.id, tire.runflat, actualRunflat, isKnownRunflatTire])
 
   return (
-    <div id={`tire-card-${tire.id}`} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
+    <div ref={cardRef} id={`tire-card-${tire.id}`} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
       {/* Left side - Image */}
       <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[132px] sm:w-[173px] md:w-[213px] lg:w-[239px] overflow-hidden bg-white rounded-l-xl" style={{ maxHeight: "225px" }}>
         {tire.item_day && <Badge className="absolute left-2 top-2 z-10 bg-[#D3DF3D] text-[#1F1F1F]">Товар дня</Badge>}
@@ -517,7 +568,8 @@ export default function TireCard({ tire }: TireCardProps) {
             <div className="relative w-full h-full flex items-center justify-center">
               <div className="w-full h-0 pb-[100%] relative">
                 <Image
-                  src={getProcessedImageUrl(imageUrl) || "/placeholder.svg"}
+                  key={`tire-image-${tire.id}-${imageKey}`}
+                  src={`${getProcessedImageUrl(imageUrl) || "/placeholder.svg"}${imageRetryCount > 0 ? `&_retry=${imageRetryCount}` : ''}`}
                   alt={tire.name || "Tire"}
                   fill
                   sizes="(max-width: 640px) 135px, (max-width: 768px) 177px, (max-width: 1024px) 217px, 244px"
@@ -527,10 +579,7 @@ export default function TireCard({ tire }: TireCardProps) {
                     e.stopPropagation()
                     setImageModalOpen(true)
                   }}
-                  onError={(e) => {
-                    console.log(`Image failed to load: ${imageUrl}, falling back to default image`)
-                    setImageError(true)
-                  }}
+                  onError={handleImageError}
                   style={{
                     filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
                     backgroundColor: "transparent",
@@ -558,11 +607,12 @@ export default function TireCard({ tire }: TireCardProps) {
               ) : (
                 <div className="relative w-full h-[80vh]">
                   <Image
-                    src={getProcessedImageUrl(imageUrl) || "/placeholder.svg"}
+                    key={`tire-modal-image-${tire.id}-${imageKey}`}
+                    src={`${getProcessedImageUrl(imageUrl) || "/placeholder.svg"}${imageRetryCount > 0 ? `&_retry=${imageRetryCount}` : ''}`}
                     alt={tire.name || "Tire"}
                     fill
                     className="object-contain"
-                    onError={() => setImageError(true)}
+                    onError={handleImageError}
                     style={{
                       filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
                       backgroundColor: "transparent",
