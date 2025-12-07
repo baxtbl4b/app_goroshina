@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import { X } from "lucide-react"
 
 interface QuickFilterButtonsProps {
   onSortChange?: (value: string) => void
@@ -248,6 +249,23 @@ export default function QuickFilterButtons({
               placeholder={pathname?.includes("/krepezh") ? "Фильтр по модели авто" : "Введите бренд"}
               className="flex-1 px-3 py-1 text-xs border-0 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-100 dark:bg-[#1A1A1A] dark:text-white mr-1.5"
             />
+            {/* Clear button - показывается когда есть выбранные бренды или текст в поле */}
+            {(selectedBrands.length > 0 || brandSearchInput.trim()) && (
+              <button
+                onClick={() => {
+                  setBrandSearchInput("")
+                  setSelectedBrands([])
+                  if (onBrandSelect) {
+                    onBrandSelect([])
+                  }
+                  setShowBrandSelector(false)
+                }}
+                className="mr-1.5 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors flex-shrink-0"
+                aria-label="Очистить фильтр брендов"
+              >
+                <X className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+              </button>
+            )}
             <div
               className="cursor-pointer hover:opacity-70 transition-opacity p-1 bg-gray-100 dark:bg-gray-800 rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0"
               onClick={() => {

@@ -591,30 +591,25 @@ export default function TireCard({ tire }: TireCardProps) {
       </div>
 
       {/* Right side - Content */}
-      <div className="p-2 sm:p-3 md:p-4 flex-1 flex flex-col justify-between">
+      <div className="p-2 sm:p-3 md:p-4 flex-1 flex flex-col justify-between gap-2 sm:gap-3">
         {/* Debug API Response */}
         {/* API Response section hidden as requested */}
-        <div>
-          <div className="mt-0.5 sm:mt-1 md:mt-2 flex items-center gap-1 sm:gap-2 md:gap-3 flex-wrap">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-wrap">
             <span className="text-[9px] sm:text-xs md:text-sm font-medium px-1 sm:px-1.5 md:px-2 py-0.5 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white whitespace-nowrap">
               {tire.width}/{tire.height} R{tire.diam}
             </span>
 
-            {/* RunFlat icon - only shown for tires with runflat: true */}
+            {/* RunFlat badge - only shown for tires with runflat: true */}
             {(actualRunflat === true ||
               actualRunflat === 1 ||
               actualRunflat === "true" ||
               actualRunflat === "1" ||
               isKnownRunflatTire) && (
-              <div className="flex items-center justify-center relative h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6">
-                <Image
-                  src="/images/runflat-icon.png"
-                  alt="RunFlat"
-                  width={24}
-                  height={24}
-                  className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6"
-                  title="RunFlat Technology"
-                />
+              <div className="flex items-center justify-center">
+                <span className="text-xs font-bold text-[#1F1F1F] dark:text-white" title="RunFlat Technology">
+                  RFT
+                </span>
               </div>
             )}
 
@@ -639,10 +634,37 @@ export default function TireCard({ tire }: TireCardProps) {
               </span>
             )}
             <span className="flex-grow"></span>
+
+            {/* Flag and Country */}
+            <div className="flex items-center gap-1">
+              {flagError ? (
+                <div
+                  className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[6px] sm:text-[8px] text-gray-500"
+                  title={`URL флага: ${flagUrl}`}
+                >
+                  {tire.country_code || tire.model?.brand?.country?.id || "?"}
+                </div>
+              ) : (
+                <div className="relative w-[16px] h-[11px] sm:w-[20px] sm:h-[14px]">
+                  <Image
+                    src={flagUrl || "/placeholder.svg"}
+                    alt={tire.country || tire.model?.brand?.country?.name || "Country"}
+                    width={20}
+                    height={14}
+                    className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] border border-gray-200"
+                    onError={() => setFlagError(true)}
+                  />
+                </div>
+              )}
+              <span className="text-[8px] sm:text-[10px] md:text-xs text-gray-500 dark:text-gray-400 truncate max-w-[60px] sm:max-w-[80px]">
+                {tire.country || tire.model?.brand?.country?.name || "Страна не указана"}
+              </span>
+            </div>
+
             <Button
               variant="ghost"
               size="icon"
-              className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 ml-auto p-0"
+              className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 p-0"
               onClick={toggleFavorite}
               aria-label={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
             >
@@ -662,34 +684,9 @@ export default function TireCard({ tire }: TireCardProps) {
 
           {/* Add article number display - временно скрыто */}
           {/* <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">артикул: {article}</p> */}
-
-          <div className="mt-0.5 sm:mt-1 flex items-center gap-1 sm:gap-1.5">
-            {flagError ? (
-              <div
-                className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[6px] sm:text-[8px] text-gray-500"
-                title={`URL флага: ${flagUrl}`}
-              >
-                {tire.country_code || tire.model?.brand?.country?.id || "?"}
-              </div>
-            ) : (
-              <div className="relative w-[16px] h-[11px] sm:w-[20px] sm:h-[14px]">
-                <Image
-                  src={flagUrl || "/placeholder.svg"}
-                  alt={tire.country || tire.model?.brand?.country?.name || "Country"}
-                  width={20}
-                  height={14}
-                  className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] border border-gray-200"
-                  onError={() => setFlagError(true)}
-                />
-              </div>
-            )}
-            <span className="text-[8px] sm:text-[10px] md:text-xs text-gray-500 dark:text-gray-400 truncate">
-              {tire.country || tire.model?.brand?.country?.name || "Страна не указана"}
-            </span>
-          </div>
         </div>
 
-        <div className="mt-0.5 sm:mt-1 flex flex-col relative pb-7 sm:pb-8 md:pb-10">
+        <div className="flex flex-col relative pb-7 sm:pb-8 md:pb-10 -mt-[10px]">
           <div className="flex items-center justify-between w-full mb-0.5 sm:mb-1">
             <div>
               {/* Добавляем статус готовности к выдаче с использованием иконок из Lucide */}
