@@ -206,25 +206,11 @@ export default function TireCard({ tire }: TireCardProps) {
       return
     }
 
-    // Запускаем анимацию числа
-    const newCount = cartCount + 1
-    if (addButtonRef.current) {
-      const buttonRect = addButtonRef.current.getBoundingClientRect()
-      setFloatingNumber({
-        x: buttonRect.left + buttonRect.width / 2,
-        y: buttonRect.top + buttonRect.height / 2,
-        count: newCount,
-      })
-
-      // Убираем число после анимации
-      setTimeout(() => setFloatingNumber(null), 700)
-
-      // Добавляем пульсацию корзине
-      const cartButton = document.querySelector('.global-cart-button')
-      if (cartButton) {
-        cartButton.classList.add('cart-pulse-effect')
-        setTimeout(() => cartButton.classList.remove('cart-pulse-effect'), 600)
-      }
+    // Добавляем пульсацию корзине
+    const cartButton = document.querySelector('.global-cart-button')
+    if (cartButton) {
+      cartButton.classList.add('cart-pulse-effect')
+      setTimeout(() => cartButton.classList.remove('cart-pulse-effect'), 600)
     }
 
     // Запускаем анимацию пульсации
@@ -829,18 +815,6 @@ export default function TireCard({ tire }: TireCardProps) {
         </div>
       )}
 
-      {/* Эффект +N при добавлении в корзину */}
-      {floatingNumber && (
-        <div
-          className="fixed pointer-events-none z-[9999] floating-plus-one"
-          style={{
-            left: floatingNumber.x,
-            top: floatingNumber.y,
-          }}
-        >
-          <span className="text-xl font-bold text-[#D3DF3D]">+{floatingNumber.count}</span>
-        </div>
-      )}
     </div>
   )
 }

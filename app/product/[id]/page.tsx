@@ -136,6 +136,12 @@ export default function ProductPage() {
 
     if (!tire) return
 
+    // Проверяем, не превышен ли лимит доступного товара
+    const stock = tire.stock || 0
+    if (cartCount >= stock) {
+      return
+    }
+
     // Increase cart count
     setCartCount((prev) => prev + 1)
 
@@ -487,8 +493,8 @@ export default function ProductPage() {
   }
 
   return (
-    <main className="flex flex-col min-h-screen bg-[#1F1F1F]">
-      <header className="sticky top-0 z-10 bg-[#2A2A2A] pr-4 shadow-sm h-[60px] flex items-center">
+    <main className="flex flex-col min-h-screen bg-black">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] pr-4 shadow-sm h-[60px] flex items-center">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <button
@@ -587,11 +593,6 @@ export default function ProductPage() {
                 </span>
               </div>
             </div>
-
-            {/* Country disclaimer */}
-            <p className="text-xs text-gray-500 italic mt-1">
-              Информация о происхождение бренда, страна производства может отличаться
-            </p>
           </div>
 
           {/* Stock availability section */}
@@ -639,6 +640,7 @@ export default function ProductPage() {
                 {/* Plus button */}
                 <button
                   onClick={addToCart}
+                  disabled={cartCount >= (tire?.stock || 0)}
                   className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full px-3 sm:px-4 md:px-5 lg:px-6 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
                   style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                   aria-label="Увеличить количество"
