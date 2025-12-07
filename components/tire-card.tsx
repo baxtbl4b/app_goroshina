@@ -201,6 +201,11 @@ export default function TireCard({ tire }: TireCardProps) {
     e.preventDefault()
     e.stopPropagation()
 
+    // Проверяем, не превышен ли лимит доступного товара
+    if (cartCount >= tire.stock) {
+      return
+    }
+
     // Запускаем анимацию числа
     const newCount = cartCount + 1
     if (addButtonRef.current) {
@@ -752,7 +757,7 @@ export default function TireCard({ tire }: TireCardProps) {
                 <button
                   ref={addButtonRef}
                   onClick={addToCart}
-                  disabled={tire.stock <= 0}
+                  disabled={tire.stock <= 0 || cartCount >= tire.stock}
                   className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                   aria-label="Увеличить количество"

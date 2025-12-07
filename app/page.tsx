@@ -603,7 +603,7 @@ export default function HomePage() {
             {/* Category Buttons - Moved here from TabsContent */}
             <div className="grid grid-cols-3 gap-5 overflow-hidden">
               <Link href="/category/all-season">
-                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-lg overflow-hidden group transition-all hover:shadow-md h-[160px]">
                   <Image
                     src="/images/allseason2-new.png"
                     alt="Всесезонные шины"
@@ -620,7 +620,7 @@ export default function HomePage() {
               </Link>
 
               <Link href="/category/winter">
-                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-lg overflow-hidden group transition-all hover:shadow-md h-[160px]">
                   <Image
                     src="/images/winter-tire-new.png"
                     alt="Зимние шины"
@@ -641,7 +641,7 @@ export default function HomePage() {
               </Link>
 
               <Link href="/category/summer">
-                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-lg overflow-hidden group transition-all hover:shadow-md h-[160px]">
                   <Image
                     src="/images/summer-tire-new.png"
                     alt="Летние шины"

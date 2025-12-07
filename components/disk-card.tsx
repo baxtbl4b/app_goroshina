@@ -125,6 +125,11 @@ export default function DiskCard({ disk }: DiskCardProps) {
     e.preventDefault()
     e.stopPropagation()
 
+    // Проверяем, не превышен ли лимит доступного товара (для дисков добавляем по 4 шт)
+    if (cartCount + 4 > disk.stock) {
+      return
+    }
+
     // Запускаем анимацию числа
     const newCount = cartCount + 4
     if (addButtonRef.current) {
@@ -439,7 +444,7 @@ export default function DiskCard({ disk }: DiskCardProps) {
                 <button
                   ref={addButtonRef}
                   onClick={addToCart}
-                  disabled={disk.stock <= 0}
+                  disabled={disk.stock <= 0 || cartCount + 4 > disk.stock}
                   className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Увеличить количество"
                 >

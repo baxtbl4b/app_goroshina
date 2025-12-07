@@ -118,6 +118,11 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
     e.preventDefault()
     e.stopPropagation()
 
+    // Проверяем, не превышен ли лимит доступного товара
+    if (cartCount >= fastener.stock) {
+      return
+    }
+
     // Запускаем анимацию пульсации
     setIsButtonPulsing(true)
     setTimeout(() => setIsButtonPulsing(false), 1000)
@@ -425,7 +430,7 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
                 {/* Кнопка плюс */}
                 <button
                   onClick={addToCart}
-                  disabled={fastener.stock <= 0}
+                  disabled={fastener.stock <= 0 || cartCount >= fastener.stock}
                   className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Увеличить количество"
                 >

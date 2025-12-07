@@ -5,13 +5,13 @@ import { Loader2, AlertTriangle } from "lucide-react"
 import TireCard from "@/components/tire-card"
 import { getTires, type Tire, type Season } from "@/lib/api"
 import { useSearchParams } from "next/navigation"
-import QuickFilterButtons from "@/components/quick-filter-buttons"
 
 interface TireResultsProps {
   season: Season
+  selectedBrands?: string[]
 }
 
-export default function TireResults({ season }: TireResultsProps) {
+export default function TireResults({ season, selectedBrands = [] }: TireResultsProps) {
   const [tires, setTires] = useState<Tire[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -82,8 +82,18 @@ export default function TireResults({ season }: TireResultsProps) {
       result = result.filter((tire) => (tire.stock || 0) >= 4)
     }
 
+    // Фильтр по брендам
+    if (selectedBrands.length > 0) {
+      result = result.filter((tire) => {
+        const tireBrand = tire.model?.brand?.name || tire.brand
+        return selectedBrands.some(brand =>
+          tireBrand?.toLowerCase() === brand.toLowerCase()
+        )
+      })
+    }
+
     return result
-  }, [tires, todayFilter, minStockFilter])
+  }, [tires, todayFilter, minStockFilter, selectedBrands])
 
   // Функция для повторной загрузки данных
   const retryLoading = () => {
@@ -172,50 +182,6 @@ export default function TireResults({ season }: TireResultsProps) {
     }
   }
 
-  const handleSortChange = (sortValue: string) => {
-    console.log("Sort changed to:", sortValue)
-
-    // Sort the tires based on the value (sorting affects the base tires array)
-    if (sortValue === "price-asc" || sortValue === "price-desc") {
-      const sortedTires = [...tires].sort((a, b) => {
-        if (sortValue === "price-asc") {
-          return (a.price || 0) - (b.price || 0)
-        } else {
-          return (b.price || 0) - (a.price || 0)
-        }
-      })
-
-      setTires(sortedTires)
-    }
-  }
-
-  // Listen for sorting events
-  useEffect(() => {
-    const handleSorting = (event: CustomEvent) => {
-      const { type, value } = event.detail
-      console.log(`Applying sorting: ${type} - ${value}`)
-
-      // Sort the tires based on the value
-      if (type === "price") {
-        const sortedTires = [...tires].sort((a, b) => {
-          if (value === "price-asc") {
-            return (a.price || 0) - (b.price || 0)
-          } else {
-            return (b.price || 0) - (a.price || 0)
-          }
-        })
-
-        setTires(sortedTires)
-      }
-    }
-
-    window.addEventListener("applySorting", handleSorting as EventListener)
-
-    return () => {
-      window.removeEventListener("applySorting", handleSorting as EventListener)
-    }
-  }, [tires])
-
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12 mt-8">
@@ -266,8 +232,6 @@ export default function TireResults({ season }: TireResultsProps) {
       aria-label="Результаты поиска шин"
       data-testid="tire-results-container"
     >
-      <QuickFilterButtons onSortChange={handleSortChange} insideTireResults={true} resultsCount={filteredTires.length} />
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1.5 sm:gap-2 md:gap-2.5">
         {filteredTires.map((tire) => (
           <TireCard key={tire.id} tire={tire} />

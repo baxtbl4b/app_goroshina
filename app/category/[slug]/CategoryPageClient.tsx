@@ -35,6 +35,9 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   // Inspector mode state
   const [inspectorMode, setInspectorMode] = useState(false)
 
+  // Brand filter state
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([])
+
   // Swipe handling for season tabs
   const touchStartRef = useRef<number | null>(null)
   const touchEndRef = useRef<number | null>(null)
@@ -140,6 +143,12 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   // Inspector mode event handlers
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input or textarea
+      const target = e.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        return
+      }
+
       if (e.key === "i") {
         setInspectorMode((prev) => !prev)
         if (!inspectorMode) {
@@ -288,6 +297,11 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
     if (filterElement) {
       filterElement.scrollIntoView({ behavior: "smooth" })
     }
+  }
+
+  const handleBrandSelect = (brands: string[]) => {
+    setSelectedBrands(brands)
+    console.log("Brands selected:", brands)
   }
 
   // Function to clear dimension filter
@@ -598,7 +612,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             align-items: center;
             justify-content: center;
             padding: 6px 8px;
-            border-radius: 20px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: 500;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -756,10 +770,16 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                 else order = 1                      // a -> center
               }
 
+              // Remove spike filter for non-winter tires
+              const tabQueryParams = { ...queryParams }
+              if (tab.key !== 'w') {
+                delete tabQueryParams.spike
+              }
+
               return (
                 <Link
                   key={tab.key}
-                  href={{ pathname: tab.path, query: queryParams }}
+                  href={{ pathname: tab.path, query: tabQueryParams }}
                   className={`season-tab ${isActive ? "season-tab-active" : "season-tab-inactive"}`}
                   style={{
                     order,
@@ -821,8 +841,10 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
           onSortChange={handleSortChange}
           onFilterToggle={handleFilterToggle}
           activeFiltersCount={activeFiltersCount}
+          insideTireResults={true}
+          onBrandSelect={handleBrandSelect}
         />
-        <TireResults season={season} />
+        <TireResults season={season} selectedBrands={selectedBrands} />
       </div>
     </main>
   )

@@ -34,6 +34,41 @@ export default function QuickFilterButtons({
   const [lastAction, setLastAction] = useState<string>("Нет действий")
   // Add a new state for the search input
   const [brandSearchInput, setBrandSearchInput] = useState("")
+  // Add state for brands loaded from API
+  const [brands, setBrands] = useState<string[]>([])
+  const [brandsLoading, setBrandsLoading] = useState(true)
+
+  // Load brands from API
+  useEffect(() => {
+    async function loadBrands() {
+      try {
+        const response = await fetch("/api/brands")
+        if (response.ok) {
+          const data = await response.json()
+          setBrands(data.brands || [])
+        }
+      } catch (error) {
+        console.error("Failed to load brands:", error)
+        // Fallback to default brands
+        setBrands([
+          "Michelin",
+          "Continental",
+          "Bridgestone",
+          "Pirelli",
+          "Goodyear",
+          "Nokian",
+          "Dunlop",
+          "Hankook",
+          "Yokohama",
+          "Toyo",
+          "Westlake",
+        ])
+      } finally {
+        setBrandsLoading(false)
+      }
+    }
+    loadBrands()
+  }, [])
 
   // Add click outside handler to close brand selector
   useEffect(() => {
@@ -49,21 +84,6 @@ export default function QuickFilterButtons({
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [])
-
-  // Список брендов
-  const brands = [
-    "Michelin",
-    "Continental",
-    "Bridgestone",
-    "Pirelli",
-    "Goodyear",
-    "Nokian",
-    "Dunlop",
-    "Hankook",
-    "Yokohama",
-    "Toyo",
-    "Westlake",
-  ]
 
   // Список брендов дисков
   const wheelBrands = [
@@ -333,7 +353,6 @@ export default function QuickFilterButtons({
       {/* Контейнер активных фильтров */}
       {selectedBrands.length > 0 && (
         <div className="flex flex-wrap gap-1 sm:gap-2 mt-1 sm:mt-2">
-          <span className="text-xs sm:text-sm text-[#1F1F1F]/70 dark:text-white/70 self-center">Активные фильтры:</span>
           {selectedBrands.map((brand) => (
             <div
               key={brand}
