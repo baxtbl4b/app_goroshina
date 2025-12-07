@@ -247,7 +247,8 @@ export default function QuickFilterButtons({
                 }
               }}
               placeholder={pathname?.includes("/krepezh") ? "Фильтр по модели авто" : "Введите бренд"}
-              className="flex-1 px-3 py-1 text-xs border-0 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-100 dark:bg-[#1A1A1A] dark:text-white mr-1.5"
+              className="flex-1 px-3 py-1 border-0 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-100 dark:bg-[#1A1A1A] dark:text-white mr-1.5"
+              style={{ fontSize: '16px' }}
             />
             {/* Clear button - показывается когда есть выбранные бренды или текст в поле */}
             {(selectedBrands.length > 0 || brandSearchInput.trim()) && (

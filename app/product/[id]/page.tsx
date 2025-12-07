@@ -13,7 +13,7 @@ import BottomNavigation from "@/components/bottom-navigation"
 import CartButton from "@/components/cart-button"
 import { useParams, useRouter } from "next/navigation"
 import type { Tire } from "@/lib/api"
-import MD5 from "crypto-js/md5"
+import CryptoJS from "crypto-js"
 
 export default function ProductPage() {
   const params = useParams()
@@ -294,7 +294,7 @@ export default function ProductPage() {
   // Get mid (MD5 hash of id)
   const getMid = (): string => {
     if (!tire || !tire.id) return "—"
-    return MD5(tire.id).toString()
+    return CryptoJS.MD5(tire.id).toString()
   }
 
   // Get delivery status by provider

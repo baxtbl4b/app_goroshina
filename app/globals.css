@@ -8,6 +8,16 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
+  overscroll-behavior-y: none;
+}
+
+html {
+  overflow: hidden;
+}
+
+body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {

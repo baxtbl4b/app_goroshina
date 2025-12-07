@@ -272,13 +272,13 @@ export default function HomePage() {
   }, [])
 
   return (
-    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px]">
+    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[calc(60px+env(safe-area-inset-top))]">
       {/* Show loading screen if isLoading is true */}
       {isLoading ? (
         <LoadingScreen onLoadingComplete={handleLoadingComplete} />
       ) : (
         <>
-          <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm h-[60px]">
+          <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
             <div className="h-full px-4 relative flex items-center justify-between">
               <div className="flex items-center">
                 <div className="relative overflow-hidden rounded-lg">

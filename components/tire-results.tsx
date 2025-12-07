@@ -16,6 +16,7 @@ export default function TireResults({ season, selectedBrands = [] }: TireResults
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
+  const [sortOrder, setSortOrder] = useState<"price-asc" | "price-desc">("price-desc")
   const searchParams = useSearchParams()
 
   // Извлекаем параметры фильтров из URL
@@ -92,8 +93,30 @@ export default function TireResults({ season, selectedBrands = [] }: TireResults
       })
     }
 
+    // Сортировка по цене
+    result = [...result].sort((a, b) => {
+      const priceA = a.price || 0
+      const priceB = b.price || 0
+      return sortOrder === "price-asc" ? priceA - priceB : priceB - priceA
+    })
+
     return result
-  }, [tires, todayFilter, minStockFilter, selectedBrands])
+  }, [tires, todayFilter, minStockFilter, selectedBrands, sortOrder])
+
+  // Слушаем событие сортировки
+  useEffect(() => {
+    const handleSorting = (event: CustomEvent) => {
+      const { value } = event.detail
+      if (value === "price-asc" || value === "price-desc") {
+        setSortOrder(value)
+      }
+    }
+
+    window.addEventListener("applySorting", handleSorting as EventListener)
+    return () => {
+      window.removeEventListener("applySorting", handleSorting as EventListener)
+    }
+  }, [])
 
   // Функция для повторной загрузки данных
   const retryLoading = () => {

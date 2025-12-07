@@ -481,7 +481,7 @@ export default function TireCard({ tire }: TireCardProps) {
   return (
     <div id={`tire-card-${tire.id}`} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
       {/* Left side - Image */}
-      <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[135px] sm:w-[177px] md:w-[217px] lg:w-[244px] overflow-hidden bg-white rounded-l-xl" style={{ maxHeight: "230px" }}>
+      <div className="relative p-2.5 sm:p-3.5 md:p-5 flex-shrink-0 w-[155px] sm:w-[204px] md:w-[250px] lg:w-[281px] overflow-hidden bg-white rounded-l-xl" style={{ maxHeight: "265px" }}>
         {tire.item_day && <Badge className="absolute left-2 top-2 z-10 bg-[#D3DF3D] text-[#1F1F1F]">Товар дня</Badge>}
         {/* Gift icon badge - only shown for specific tires */}
         {hasGiftPromotion && (
@@ -577,12 +577,12 @@ export default function TireCard({ tire }: TireCardProps) {
       </div>
 
       {/* Right side - Content */}
-      <div className="p-2 sm:p-3 md:p-4 flex-1 flex flex-col justify-between gap-2 sm:gap-3">
+      <div className="p-2.5 sm:p-3.5 md:p-5 flex-1 flex flex-col justify-between gap-2.5 sm:gap-3.5">
         {/* Debug API Response */}
         {/* API Response section hidden as requested */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-wrap">
-            <span className="text-[9px] sm:text-xs md:text-sm font-medium px-1 sm:px-1.5 md:px-2 py-0.5 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white whitespace-nowrap">
+            <span className="text-[10px] sm:text-sm md:text-base font-medium px-1.5 sm:px-2 md:px-2.5 py-1 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white whitespace-nowrap">
               {tire.width}/{tire.height} R{tire.diam}
             </span>
 
@@ -593,7 +593,7 @@ export default function TireCard({ tire }: TireCardProps) {
               actualRunflat === "1" ||
               isKnownRunflatTire) && (
               <div className="flex items-center justify-center">
-                <span className="text-xs font-bold text-[#1F1F1F] dark:text-white" title="RunFlat Technology">
+                <span className="text-sm font-bold text-[#1F1F1F] dark:text-white" title="RunFlat Technology">
                   RFT
                 </span>
               </div>
@@ -601,13 +601,13 @@ export default function TireCard({ tire }: TireCardProps) {
 
             {/* Cargo icon - only shown for tires with cargo: true */}
             {(tire.cargo === true || tire.cargo === 1 || tire.cargo === "true" || tire.cargo === "1") && (
-              <div className="flex items-center justify-center relative h-[20px] w-[20px] sm:h-[24px] sm:w-[24px] md:h-[29px] md:w-[29px]">
+              <div className="flex items-center justify-center relative h-[23px] w-[23px] sm:h-[28px] sm:w-[28px] md:h-[33px] md:w-[33px]">
                 <Image
                   src="/images/cargo-truck-new.png"
                   alt="Cargo"
-                  width={29}
-                  height={29}
-                  className="h-[20px] w-[20px] sm:h-[24px] sm:w-[24px] md:h-[29px] md:w-[29px]"
+                  width={33}
+                  height={33}
+                  className="h-[23px] w-[23px] sm:h-[28px] sm:w-[28px] md:h-[33px] md:w-[33px]"
                   title="Грузовая шина"
                 />
               </div>
@@ -615,34 +615,34 @@ export default function TireCard({ tire }: TireCardProps) {
 
             {/* Проверка для отображения шипов, работает с булевыми значениями true/false */}
             {tire.spike && (
-              <span className="flex items-center justify-center relative h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] md:h-[26px] md:w-[26px]" title="Шипованная шина">
-                <Image src="/images/bykvaSH.png" alt="Шипы" width={26} height={26} className="h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] md:h-[26px] md:w-[26px]" />
+              <span className="flex items-center justify-center relative h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] md:h-[30px] md:w-[30px]" title="Шипованная шина">
+                <Image src="/images/bykvaSH.png" alt="Шипы" width={30} height={30} className="h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] md:h-[30px] md:w-[30px]" />
               </span>
             )}
             <span className="flex-grow"></span>
 
             {/* Flag and Country */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               {flagError ? (
                 <div
-                  className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[6px] sm:text-[8px] text-gray-500"
+                  className="rounded-sm w-[18px] h-[13px] sm:w-[23px] sm:h-[16px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[7px] sm:text-[9px] text-gray-500"
                   title={`URL флага: ${flagUrl}`}
                 >
                   {tire.country_code || tire.model?.brand?.country?.id || "?"}
                 </div>
               ) : (
-                <div className="relative w-[16px] h-[11px] sm:w-[20px] sm:h-[14px]">
+                <div className="relative w-[18px] h-[13px] sm:w-[23px] sm:h-[16px]">
                   <Image
                     src={flagUrl || "/placeholder.svg"}
                     alt={tire.country || tire.model?.brand?.country?.name || "Country"}
-                    width={20}
-                    height={14}
-                    className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] border border-gray-200"
+                    width={23}
+                    height={16}
+                    className="rounded-sm w-[18px] h-[13px] sm:w-[23px] sm:h-[16px] border border-gray-200"
                     onError={() => setFlagError(true)}
                   />
                 </div>
               )}
-              <span className="text-[8px] sm:text-[10px] md:text-xs text-gray-500 dark:text-gray-400 truncate max-w-[60px] sm:max-w-[80px]">
+              <span className="text-[9px] sm:text-[11px] md:text-sm text-gray-500 dark:text-gray-400 truncate max-w-[70px] sm:max-w-[90px]">
                 {tire.country || tire.model?.brand?.country?.name || "Страна не указана"}
               </span>
             </div>
@@ -650,12 +650,12 @@ export default function TireCard({ tire }: TireCardProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 p-0"
+              className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 p-0"
               onClick={toggleFavorite}
               aria-label={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
             >
               <Heart
-                className={`h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-colors ${
+                className={`h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 transition-colors ${
                   isFavorite ? "text-red-500 fill-red-500" : "text-gray-400 hover:text-red-500"
                 }`}
               />
@@ -669,7 +669,7 @@ export default function TireCard({ tire }: TireCardProps) {
               localStorage.setItem(`tire_${tire.id}`, JSON.stringify(tire))
             }}
           >
-            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-[11px] sm:text-[13px] md:text-[15px] lg:text-[17px] leading-tight">
+            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-[13px] sm:text-[15px] md:text-[17px] lg:text-[20px] leading-tight">
               {tire.name}
             </h3>
           </Link>
@@ -678,19 +678,19 @@ export default function TireCard({ tire }: TireCardProps) {
           {/* <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">артикул: {article}</p> */}
         </div>
 
-        <div className="flex flex-col relative pb-7 sm:pb-8 md:pb-10 -mt-[10px]">
-          <div className="flex items-center justify-between w-full mb-0.5 sm:mb-1">
+        <div className="flex flex-col relative pb-8 sm:pb-9 md:pb-11 -mt-[10px]">
+          <div className="flex items-center justify-between w-full mb-1 sm:mb-1.5">
             <div>
               {/* Добавляем статус готовности к выдаче с использованием иконок из Lucide */}
-              <div className="flex items-center gap-0.5 sm:gap-1">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <span className="flex items-center justify-center">
                   {React.cloneElement(stockStatus.icon as React.ReactElement, {
-                    className: `h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 ${
+                    className: `h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 ${
                       (stockStatus.icon as React.ReactElement).props.className
                     }`,
                   })}
                 </span>
-                <span className={`text-[9px] sm:text-[10px] md:text-xs font-medium ${stockStatus.className}`}>
+                <span className={`text-[10px] sm:text-[11px] md:text-sm font-medium ${stockStatus.className}`}>
                   {stockStatus.tooltip}
                 </span>
               </div>
@@ -699,33 +699,30 @@ export default function TireCard({ tire }: TireCardProps) {
               {tire.stock > 0 ? (
                 <>
                   <span
-                    className={`text-sm sm:text-base md:text-lg font-medium opacity-80 ${
+                    className={`text-base sm:text-lg md:text-xl font-medium opacity-80 ${
                       tire.stock > 10 ? "text-green-500" : tire.stock > 5 ? "text-yellow-500" : "text-orange-500"
                     }`}
                   >
                     {tire.stock > 20 ? ">20 шт" : `${tire.stock} шт`}
                   </span>
-                  <span className="text-[8px] sm:text-[9px] md:text-[10px] text-gray-500 dark:text-gray-400">
-                    Количество:
-                  </span>
                 </>
               ) : (
-                <span className="text-xs sm:text-sm font-medium opacity-80 text-red-500">Нет в наличии</span>
+                <span className="text-sm sm:text-base font-medium opacity-80 text-red-500">Нет в наличии</span>
               )}
             </div>
           </div>
           <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
             <div>
-              <p className="text-[9px] sm:text-[11px] md:text-[13px] text-gray-500 dark:text-gray-400 line-through">
+              <p className="text-[10px] sm:text-[13px] md:text-[15px] text-gray-500 dark:text-gray-400 line-through">
                 {formatPrice(tire.rrc)}
               </p>
-              <p className="text-[13px] sm:text-[15px] md:text-[18px] font-bold text-[#1F1F1F] dark:text-white">
+              <p className="text-[15px] sm:text-[17px] md:text-[21px] font-bold text-[#1F1F1F] dark:text-white">
                 {formatPrice(tire.price)}
               </p>
             </div>
             <div className="flex items-center flex-1 justify-end ml-2">
               {/* Новая кнопка корзины в стиле из изображения */}
-              <div className="flex h-[24px] sm:h-[27px] md:h-[31px] rounded-lg overflow-hidden w-full max-w-[120px] sm:max-w-[137px] md:max-w-[154px]" style={{ border: 'none', outline: 'none' }}>
+              <div className="flex h-[28px] sm:h-[31px] md:h-[36px] rounded-lg overflow-hidden w-full max-w-[138px] sm:max-w-[158px] md:max-w-[177px]" style={{ border: 'none', outline: 'none' }}>
                 {/* Кнопка минус */}
                 <button
                   onClick={removeFromCart}
@@ -734,12 +731,12 @@ export default function TireCard({ tire }: TireCardProps) {
                   style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                   aria-label="Уменьшить количество"
                 >
-                  <Minus className="w-[12px] h-[12px] sm:w-[14px] sm:h-[14px] md:w-[17px] md:h-[17px]" />
+                  <Minus className="w-[14px] h-[14px] sm:w-[16px] sm:h-[16px] md:w-[20px] md:h-[20px]" />
                 </button>
 
                 {/* Счетчик количества */}
-                <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[1.7rem] sm:min-w-[2.2rem] md:min-w-[2.6rem]">
-                  <span className="text-xs sm:text-sm md:text-base font-medium">{cartCount}</span>
+                <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2rem] sm:min-w-[2.5rem] md:min-w-[3rem]">
+                  <span className="text-sm sm:text-base md:text-lg font-medium">{cartCount}</span>
                 </div>
 
                 {/* Кнопка плюс */}
@@ -751,7 +748,7 @@ export default function TireCard({ tire }: TireCardProps) {
                   style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                   aria-label="Увеличить количество"
                 >
-                  <Plus className="w-[12px] h-[12px] sm:w-[14px] sm:h-[14px] md:w-[17px] md:h-[17px]" />
+                  <Plus className="w-[14px] h-[14px] sm:w-[16px] sm:h-[16px] md:w-[20px] md:h-[20px]" />
                 </button>
               </div>
             </div>

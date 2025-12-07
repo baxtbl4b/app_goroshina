@@ -611,14 +611,17 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 6px 8px;
-            border-radius: 8px;
+            padding: 8px 10px;
+            border-radius: 10px;
             text-decoration: none;
             font-weight: 500;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
             text-align: center;
-            width: 95px;
+            width: 120px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            outline: none;
           }
 
           .season-tab-active {
@@ -628,7 +631,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             background: var(--tab-color);
             border: none;
             color: #1F1F1F;
-            font-size: 12px;
+            font-size: 15px;
             font-weight: 500;
             letter-spacing: 0.2px;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -640,16 +643,32 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             background: rgba(128, 128, 128, 0.1);
             border: 1px solid transparent;
             color: #6B7280;
-            font-size: 11px;
+            font-size: 14px;
             opacity: 0.8;
             backdrop-filter: blur(4px);
           }
 
-          .season-tab-inactive:hover {
+          @media (hover: hover) {
+            .season-tab-inactive:hover {
+              opacity: 1;
+              background: rgba(211, 223, 61, 0.1);
+              border-color: rgba(211, 223, 61, 0.3);
+              transform: scale(0.88);
+            }
+          }
+
+          .season-tab-inactive:active {
             opacity: 1;
-            background: rgba(211, 223, 61, 0.1);
-            border-color: rgba(211, 223, 61, 0.3);
-            transform: scale(0.88);
+            transform: scale(0.82);
+          }
+
+          .season-tab:focus {
+            outline: none;
+          }
+
+          .season-tab-inactive:focus {
+            background: rgba(128, 128, 128, 0.1);
+            border-color: transparent;
           }
 
           .dark .season-tab-inactive {
@@ -657,10 +676,17 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             background: rgba(255, 255, 255, 0.05);
           }
 
-          .dark .season-tab-inactive:hover {
-            color: white;
-            background: rgba(211, 223, 61, 0.15);
-            border-color: rgba(211, 223, 61, 0.3);
+          .dark .season-tab-inactive:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: transparent;
+          }
+
+          @media (hover: hover) {
+            .dark .season-tab-inactive:hover {
+              color: white;
+              background: rgba(211, 223, 61, 0.15);
+              border-color: rgba(211, 223, 61, 0.3);
+            }
           }
 
           /* Cart pulsation when has items */

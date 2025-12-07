@@ -127,6 +127,21 @@ export default function TireSearchFilter({ season }: { season: Season }) {
   // Отдельные состояния для свайпа на полоске
   const [handleTouchStartY, setHandleTouchStartY] = useState<number | null>(null)
 
+  // Состояние для подсветки полоски
+  const [isHandleHighlighted, setIsHandleHighlighted] = useState(false)
+  const handleHighlightTimeout = useRef<NodeJS.Timeout | null>(null)
+
+  // Функция для подсветки полоски с задержкой затухания
+  const highlightHandle = () => {
+    setIsHandleHighlighted(true)
+    if (handleHighlightTimeout.current) {
+      clearTimeout(handleHighlightTimeout.current)
+    }
+    handleHighlightTimeout.current = setTimeout(() => {
+      setIsHandleHighlighted(false)
+    }, 1000)
+  }
+
   // Check if all dimensions are specified
   useEffect(() => {
     setAllDimensionsSpecified(!!width && !!profile && !!diameter)
@@ -670,15 +685,19 @@ export default function TireSearchFilter({ season }: { season: Season }) {
         className={`bg-white dark:bg-[#2A2A2A] px-4 pt-2 pb-4 fixed left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)]`}
         style={{
           bottom: '0',
-          transform: isFilterCollapsed ? 'translateY(calc(100% - 35px))' : 'translateY(0)',
+          transform: isFilterCollapsed ? 'translateY(calc(100% - 50px))' : 'translateY(0)',
         }}
         aria-label="Блок фильтра шин"
         data-testid="tire-filter-container"
       >
-        {/* Swipe handle for collapse/expand */}
+        {/* Swipe handle for collapse/expand - now also clickable */}
         <div className="flex items-center justify-center mb-2 -mx-4 px-4">
-          <div
-            className="flex items-center justify-center py-3 cursor-grab active:cursor-grabbing w-full"
+          <button
+            className="flex items-center justify-center py-3 cursor-pointer w-full group"
+            onClick={() => {
+              setIsFilterCollapsed(!isFilterCollapsed)
+              highlightHandle()
+            }}
             onTouchStart={(e) => {
               e.stopPropagation()
               setHandleTouchStartY(e.touches[0].clientY)
@@ -698,18 +717,34 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                 if (Math.abs(diff) > 20) {
                   if (diff > 0 && !isFilterCollapsed) {
                     setIsFilterCollapsed(true)
+                    highlightHandle()
                   } else if (diff < 0 && isFilterCollapsed) {
                     setIsFilterCollapsed(false)
+                    highlightHandle()
                   }
                 }
 
                 setHandleTouchStartY(null)
               }
             }}
-            aria-label={isFilterCollapsed ? "Свайп вверх для раскрытия" : "Свайп вниз для скрытия"}
+            aria-label={isFilterCollapsed ? "Нажмите для раскрытия фильтра" : "Нажмите для скрытия фильтра"}
+            aria-expanded={!isFilterCollapsed}
           >
-            <div className="w-16 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
-          </div>
+            <div className="flex flex-col items-center gap-1">
+              <div className={`w-16 h-1.5 rounded-full transition-colors duration-300 ${isHandleHighlighted ? 'bg-[#D3DF3D]' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+              {isFilterCollapsed && (
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="text-gray-400 dark:text-gray-500 animate-bounce"
+                >
+                  <path d="M18 15L12 9L6 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </div>
+          </button>
         </div>
         {/* Size selectors - always visible part of the filter */}
         <div className="flex items-end gap-3 mb-3 mt-1">
