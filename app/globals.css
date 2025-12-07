@@ -187,3 +187,13 @@ body {
 .cart-pulse-effect img {
   filter: drop-shadow(0 0 8px #D3DF3D) drop-shadow(0 0 15px #D3DF3D);
 }
+
+/* Анимация shine для логотипа */
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) skewX(12deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(12deg);
+  }
+}

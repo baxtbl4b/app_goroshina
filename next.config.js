@@ -9,7 +9,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["api.fxcode.ru", "api.tirebase.ru"],
+    domains: ["api.fxcode.ru", "api.tirebase.ru", "hebbkx1anhila5yf.public.blob.vercel-storage.com"],
     remotePatterns: [
       {
         protocol: "https",
@@ -22,6 +22,12 @@ const nextConfig = {
         hostname: "api.tirebase.ru",
         port: "",
         pathname: "/assets/**",
+      },
+      {
+        protocol: "https",
+        hostname: "hebbkx1anhila5yf.public.blob.vercel-storage.com",
+        port: "",
+        pathname: "/**",
       },
     ],
   },

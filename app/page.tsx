@@ -279,16 +279,6 @@ export default function HomePage() {
       ) : (
         <>
           <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm h-[60px]">
-            <style jsx>{`
-              @keyframes shine {
-                0% {
-                  transform: translateX(-100%) skewX(12deg);
-                }
-                100% {
-                  transform: translateX(200%) skewX(12deg);
-                }
-              }
-            `}</style>
             <div className="h-full px-4 relative flex items-center justify-between">
               <div className="flex items-center">
                 <div className="relative overflow-hidden rounded-lg">
@@ -683,7 +673,7 @@ export default function HomePage() {
                   <Link href="/diski">
                     <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
-                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IFG42-Black-ltLo8DgOgWmvAv9qn8DDRw1n1598ox.pnghttps://hebbkx1anhila5yf.public.blob.vercel-storage.com/IFG42-Black-ltLo8DgOgWmvAv9qn8DDRw1n1598ox.png"
+                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IFG42-Black-ltLo8DgOgWmvAv9qn8DDRw1n1598ox.png"
                         alt="Диски"
                         width={300}
                         height={200}
