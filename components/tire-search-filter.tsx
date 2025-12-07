@@ -131,6 +131,20 @@ export default function TireSearchFilter({ season }: { season: Season }) {
   const [isHandleHighlighted, setIsHandleHighlighted] = useState(false)
   const handleHighlightTimeout = useRef<NodeJS.Timeout | null>(null)
 
+  // Состояние для отслеживания прокрутки гаража
+  const [showLeftGradient, setShowLeftGradient] = useState(false)
+  const [showRightGradient, setShowRightGradient] = useState(true)
+  const garageScrollRef = useRef<HTMLDivElement>(null)
+
+  // Обработчик прокрутки гаража
+  const handleGarageScroll = () => {
+    if (garageScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = garageScrollRef.current
+      setShowLeftGradient(scrollLeft > 5)
+      setShowRightGradient(scrollLeft < scrollWidth - clientWidth - 5)
+    }
+  }
+
   // Функция для подсветки полоски с задержкой затухания
   const highlightHandle = () => {
     setIsHandleHighlighted(true)
@@ -898,10 +912,18 @@ export default function TireSearchFilter({ season }: { season: Season }) {
         {/* Header section with filter title and buttons - all on one horizontal line */}
         <div className="flex flex-row items-center justify-between gap-3 mb-3">
           {/* My Garage section */}
-          <div className="flex-1 flex items-center gap-1 sm:gap-2 overflow-hidden">
+          <div className="flex-1 flex items-center gap-1 sm:gap-2 overflow-hidden min-w-0">
             <div className="flex flex-col w-full">
-              <div className="relative w-[70%]">
-                <div className="flex gap-1 overflow-x-auto scrollbar-hide mb-1">
+              <div className="relative w-full">
+                {/* Left gradient fade-out overlay */}
+                <div
+                  className={`absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-[#2A2A2A] to-transparent pointer-events-none z-10 transition-opacity duration-200 ${showLeftGradient ? 'opacity-100' : 'opacity-0'}`}
+                ></div>
+                <div
+                  ref={garageScrollRef}
+                  onScroll={handleGarageScroll}
+                  className="flex gap-1 overflow-x-auto scrollbar-hide mb-1 px-1"
+                >
                   {userVehicles.map((vehicle) => (
                     <button
                       key={vehicle.id}
@@ -916,8 +938,10 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                     </button>
                   ))}
                 </div>
-                {/* Gradient fade-out overlay */}
-                <div className="absolute top-0 right-0 bottom-0 w-12 bg-gradient-to-l from-white dark:from-[#2A2A2A] to-transparent pointer-events-none"></div>
+                {/* Right gradient fade-out overlay */}
+                <div
+                  className={`absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-[#2A2A2A] to-transparent pointer-events-none z-10 transition-opacity duration-200 ${showRightGradient ? 'opacity-100' : 'opacity-0'}`}
+                ></div>
               </div>
               <span className="text-xs text-gray-500 dark:text-gray-400 hidden">Мой гараж</span>
             </div>
