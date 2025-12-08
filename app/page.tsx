@@ -499,7 +499,7 @@ export default function HomePage() {
             )}
           </div>
 
-          <div className="flex-1 px-4 pb-28 space-y-4">
+          <div className="flex-1 px-4 pb-28 space-y-4" style={{ paddingBottom: 'max(7rem, calc(84px + env(safe-area-inset-bottom, 0px) + 28px))' }}>
             {/* Rest of the content remains the same */}
             {/* Loyalty System Information */}
             <div className="relative">

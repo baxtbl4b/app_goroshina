@@ -16,7 +16,9 @@
       "WebFetch(domain:api.tirebase.ru)",
       "Bash(curl:*)",
       "Bash(python -c:*)",
-      "Bash(pnpm add:*)"
+      "Bash(pnpm add:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(node -c:*)"
     ],
     "deny": [],
     "ask": []

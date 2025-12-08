@@ -49,7 +49,7 @@ export function BottomNavigation() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-10 pb-[env(safe-area-inset-bottom)]">
+    <div className="fixed bottom-0 left-0 right-0 z-10 pb-[env(safe-area-inset-bottom,0px)]" style={{ minHeight: '84px' }}>
       {/* SVG cutout shape with smooth rounded transitions */}
       <svg
         className="absolute bottom-0 left-0 right-0 w-full h-[84px] pointer-events-none"
@@ -65,7 +65,7 @@ export function BottomNavigation() {
       </svg>
 
       {/* Content container */}
-      <div className="relative h-[84px] py-3 px-4">
+      <div className="relative h-[84px] py-3 px-4" style={{ minHeight: '84px' }}>
         <div className="grid grid-cols-5 gap-1 relative z-10">
           <Link
             href="/"

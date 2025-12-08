@@ -696,10 +696,12 @@ export default function TireSearchFilter({ season }: { season: Season }) {
 
       <div
         ref={filterRef}
-        className={`bg-white dark:bg-[#2A2A2A] px-4 pt-2 pb-4 fixed left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)]`}
+        className={`px-4 pt-2 pb-4 fixed left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] bg-white dark:bg-[#2A2A2A]`}
         style={{
           bottom: '0',
           transform: isFilterCollapsed ? 'translateY(calc(100% - 50px))' : 'translateY(0)',
+          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%)',
+          maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%)',
         }}
         aria-label="Блок фильтра шин"
         data-testid="tire-filter-container"

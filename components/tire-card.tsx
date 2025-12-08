@@ -627,14 +627,24 @@ export default function TireCard({ tire }: TireCardProps) {
       </div>
 
       {/* Right side - Content */}
-      <div className="p-2.5 sm:p-3.5 md:p-5 flex-1 flex flex-col justify-between gap-2.5 sm:gap-3.5">
+      <div className="p-[11px] sm:p-[15.4px] md:p-[22px] flex-1 flex flex-col justify-between gap-[11px] sm:gap-[15.4px]">
         {/* Debug API Response */}
         {/* API Response section hidden as requested */}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-wrap">
-            <span className="text-[10px] sm:text-sm md:text-base font-medium px-1.5 sm:px-2 md:px-2.5 py-1 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white whitespace-nowrap">
-              {tire.width}/{tire.height} R{tire.diam}
-            </span>
+        <div className="flex flex-col gap-[8.8px]">
+          <div className="flex items-center gap-[4.4px] sm:gap-[8.8px] md:gap-[13.2px] flex-wrap">
+            {/* Срок доставки вместо размера шины */}
+            <div className="flex items-center gap-[4.4px] sm:gap-[6.6px] px-[6.6px] sm:px-[8.8px] md:px-[11px] py-[4.4px] bg-gray-100 dark:bg-[#3A3A3A] rounded">
+              <span className="flex items-center justify-center">
+                {React.cloneElement(stockStatus.icon as React.ReactElement, {
+                  className: `h-[13.2px] w-[13.2px] sm:h-[17.6px] sm:w-[17.6px] md:h-[19.8px] md:w-[19.8px] ${
+                    (stockStatus.icon as React.ReactElement).props.className
+                  }`,
+                })}
+              </span>
+              <span className={`text-[11px] sm:text-[15.4px] md:text-[17.6px] font-medium whitespace-nowrap ${stockStatus.className}`}>
+                {stockStatus.tooltip}
+              </span>
+            </div>
 
             {/* RunFlat badge - only shown for tires with runflat: true */}
             {(actualRunflat === true ||
@@ -651,13 +661,13 @@ export default function TireCard({ tire }: TireCardProps) {
 
             {/* Cargo icon - only shown for tires with cargo: true */}
             {(tire.cargo === true || tire.cargo === 1 || tire.cargo === "true" || tire.cargo === "1") && (
-              <div className="flex items-center justify-center relative h-[23px] w-[23px] sm:h-[28px] sm:w-[28px] md:h-[33px] md:w-[33px]">
+              <div className="flex items-center justify-center relative h-[25.3px] w-[25.3px] sm:h-[30.8px] sm:w-[30.8px] md:h-[36.3px] md:w-[36.3px]">
                 <Image
                   src="/images/cargo-truck-new.png"
                   alt="Cargo"
-                  width={33}
-                  height={33}
-                  className="h-[23px] w-[23px] sm:h-[28px] sm:w-[28px] md:h-[33px] md:w-[33px]"
+                  width={36.3}
+                  height={36.3}
+                  className="h-[25.3px] w-[25.3px] sm:h-[30.8px] sm:w-[30.8px] md:h-[36.3px] md:w-[36.3px]"
                   title="Грузовая шина"
                 />
               </div>
@@ -665,8 +675,8 @@ export default function TireCard({ tire }: TireCardProps) {
 
             {/* Проверка для отображения шипов, работает с булевыми значениями true/false */}
             {tire.spike && (
-              <span className="flex items-center justify-center relative h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] md:h-[30px] md:w-[30px]" title="Шипованная шина">
-                <Image src="/images/bykvaSH.png" alt="Шипы" width={30} height={30} className="h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] md:h-[30px] md:w-[30px]" />
+              <span className="flex items-center justify-center relative h-[23.1px] w-[23.1px] sm:h-[27.5px] sm:w-[27.5px] md:h-[33px] md:w-[33px]" title="Шипованная шина">
+                <Image src="/images/bykvaSH.png" alt="Шипы" width={33} height={33} className="h-[23.1px] w-[23.1px] sm:h-[27.5px] sm:w-[27.5px] md:h-[33px] md:w-[33px]" />
               </span>
             )}
             <span className="flex-grow"></span>
@@ -692,9 +702,6 @@ export default function TireCard({ tire }: TireCardProps) {
                   />
                 </div>
               )}
-              <span className="text-[9px] sm:text-[11px] md:text-sm text-gray-500 dark:text-gray-400 truncate max-w-[70px] sm:max-w-[90px]">
-                {tire.country || tire.model?.brand?.country?.name || "Страна не указана"}
-              </span>
             </div>
 
             <Button
@@ -719,7 +726,7 @@ export default function TireCard({ tire }: TireCardProps) {
               localStorage.setItem(`tire_${tire.id}`, JSON.stringify(tire))
             }}
           >
-            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-[13px] sm:text-[15px] md:text-[17px] lg:text-[20px] leading-tight">
+            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-[14.3px] sm:text-[16.5px] md:text-[18.7px] lg:text-[22px] leading-tight">
               {tire.name}
             </h3>
           </Link>
@@ -729,27 +736,12 @@ export default function TireCard({ tire }: TireCardProps) {
         </div>
 
         <div className="flex flex-col relative pb-8 sm:pb-9 md:pb-11 -mt-[10px]">
-          <div className="flex items-center justify-between w-full mb-1 sm:mb-1.5">
-            <div>
-              {/* Добавляем статус готовности к выдаче с использованием иконок из Lucide */}
-              <div className="flex items-center gap-1 sm:gap-1.5">
-                <span className="flex items-center justify-center">
-                  {React.cloneElement(stockStatus.icon as React.ReactElement, {
-                    className: `h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 ${
-                      (stockStatus.icon as React.ReactElement).props.className
-                    }`,
-                  })}
-                </span>
-                <span className={`text-[10px] sm:text-[11px] md:text-sm font-medium ${stockStatus.className}`}>
-                  {stockStatus.tooltip}
-                </span>
-              </div>
-            </div>
+          <div className="flex items-center justify-end w-full mb-1 sm:mb-1.5">
             <div className="flex flex-col items-end">
               {tire.stock > 0 ? (
                 <>
                   <span
-                    className={`text-base sm:text-lg md:text-xl font-medium opacity-80 ${
+                    className={`text-[17.6px] sm:text-[19.8px] md:text-[22px] font-medium opacity-80 ${
                       tire.stock > 10 ? "text-green-500" : tire.stock > 5 ? "text-yellow-500" : "text-orange-500"
                     }`}
                   >
@@ -757,16 +749,16 @@ export default function TireCard({ tire }: TireCardProps) {
                   </span>
                 </>
               ) : (
-                <span className="text-sm sm:text-base font-medium opacity-80 text-red-500">Нет в наличии</span>
+                <span className="text-[15.4px] sm:text-[17.6px] font-medium opacity-80 text-red-500">Нет в наличии</span>
               )}
             </div>
           </div>
           <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
             <div>
-              <p className="text-[10px] sm:text-[13px] md:text-[15px] text-gray-500 dark:text-gray-400 line-through">
+              <p className="text-[11px] sm:text-[14.3px] md:text-[16.5px] text-gray-500 dark:text-gray-400 line-through">
                 {formatPrice(tire.rrc)}
               </p>
-              <p className="text-[15px] sm:text-[17px] md:text-[21px] font-bold text-[#1F1F1F] dark:text-white">
+              <p className="text-[16.5px] sm:text-[18.7px] md:text-[23.1px] font-bold text-[#1F1F1F] dark:text-white">
                 {formatPrice(tire.price)}
               </p>
             </div>

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { ChevronLeft } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useSearchParams, usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -42,6 +42,10 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   const touchStartRef = useRef<number | null>(null)
   const touchEndRef = useRef<number | null>(null)
   const minSwipeDistance = 50
+  const [dragOffset, setDragOffset] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const activeTabRef = useRef<HTMLAnchorElement>(null)
+  const [highlightWidth, setHighlightWidth] = useState(0)
 
   const seasonsList = [
     { key: "s", path: "/category/summer" },
@@ -50,22 +54,55 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   ]
 
   const currentSeasonIndex = seasonsList.findIndex((s) => s.key === season)
+  const [targetSeasonIndex, setTargetSeasonIndex] = useState<number>(0)
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchEndRef.current = null
     touchStartRef.current = e.targetTouches[0].clientX
+    setIsDragging(true)
   }
 
   const onTouchMove = (e: React.TouchEvent) => {
     touchEndRef.current = e.targetTouches[0].clientX
+
+    // Update drag offset in real-time for visual feedback
+    if (touchStartRef.current !== null) {
+      const currentOffset = e.targetTouches[0].clientX - touchStartRef.current
+      // Ограничиваем протягивание плашки до 50 пикселей в каждую сторону
+      const maxDragOffset = 50
+      const limitedOffset = Math.max(-maxDragOffset, Math.min(maxDragOffset, currentOffset))
+      setDragOffset(limitedOffset)
+
+      // Determine target season based on current drag position
+      const switchThreshold = 60
+      let newTargetIndex = currentSeasonIndex
+
+      // Calculate prev and next indices based on visual position
+      const prevIndex = (currentSeasonIndex - 1 + seasonsList.length) % seasonsList.length
+      const nextIndex = (currentSeasonIndex + 1) % seasonsList.length
+
+      if (currentOffset < -switchThreshold) {
+        // Swiping left = carousel scrolls left, right item becomes active
+        newTargetIndex = nextIndex
+      } else if (currentOffset > switchThreshold) {
+        // Swiping right = carousel scrolls right, left item becomes active
+        newTargetIndex = prevIndex
+      }
+
+      setTargetSeasonIndex(newTargetIndex)
+    }
   }
 
   const onTouchEnd = () => {
-    if (!touchStartRef.current || !touchEndRef.current) return
+    setIsDragging(false)
 
-    const distance = touchStartRef.current - touchEndRef.current
-    const isLeftSwipe = distance > minSwipeDistance
-    const isRightSwipe = distance < -minSwipeDistance
+    if (!touchStartRef.current || !touchEndRef.current) {
+      setDragOffset(0)
+      setTargetSeasonIndex(currentSeasonIndex)
+      return
+    }
+
+    const offset = touchEndRef.current - touchStartRef.current
 
     // Remove spike param for non-winter seasons
     const getCleanParams = (seasonKey: string) => {
@@ -74,20 +111,55 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
       return p.toString()
     }
 
-    if (isLeftSwipe) {
-      // Swipe left = next season
-      const nextIndex = (currentSeasonIndex + 1) % seasonsList.length
-      router.push(`${seasonsList[nextIndex].path}?${getCleanParams(seasonsList[nextIndex].key)}`)
-    } else if (isRightSwipe) {
-      // Swipe right = previous season
-      const prevIndex = (currentSeasonIndex - 1 + seasonsList.length) % seasonsList.length
-      router.push(`${seasonsList[prevIndex].path}?${getCleanParams(seasonsList[prevIndex].key)}`)
+    // Use the targetSeasonIndex that was calculated during drag
+    const targetIndex = targetSeasonIndex
+
+    // Reset drag offset
+    setDragOffset(0)
+    setTargetSeasonIndex(currentSeasonIndex)
+
+    // Navigate to target season if different from current
+    if (targetIndex !== currentSeasonIndex) {
+      router.push(`${seasonsList[targetIndex].path}?${getCleanParams(seasonsList[targetIndex].key)}`)
     }
 
     touchStartRef.current = null
     touchEndRef.current = null
   }
+
+  const onTouchCancel = () => {
+    setIsDragging(false)
+    setDragOffset(0)
+    setTargetSeasonIndex(currentSeasonIndex)
+    touchStartRef.current = null
+    touchEndRef.current = null
+  }
+
   const [hoveredElement, setHoveredElement] = useState<{ name: string; x: number; y: number } | null>(null)
+
+  // Sync targetSeasonIndex with current season
+  useEffect(() => {
+    setTargetSeasonIndex(currentSeasonIndex)
+  }, [currentSeasonIndex])
+
+  // Clear selected brands when season changes
+  useEffect(() => {
+    setSelectedBrands([])
+  }, [season])
+
+  // Track active tab dimensions for highlight
+  useEffect(() => {
+    const updateHighlightSize = () => {
+      if (activeTabRef.current) {
+        const width = activeTabRef.current.offsetWidth
+        setHighlightWidth(width)
+      }
+    }
+
+    updateHighlightSize()
+    window.addEventListener("resize", updateHighlightSize)
+    return () => window.removeEventListener("resize", updateHighlightSize)
+  }, [season])
 
   // Track winter button coordinates
   useEffect(() => {
@@ -625,6 +697,19 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           }
 
+          .carousel-highlight {
+            position: absolute;
+            background: #D3DF3D;
+            border-radius: 22px;
+            box-shadow: 0 4px 20px rgba(211, 223, 61, 0.4);
+            z-index: 2;
+            pointer-events: none;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
           .carousel-item-center {
             padding: 10px 24px;
             background: #D3DF3D;
@@ -636,6 +721,16 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             z-index: 3;
           }
 
+          .carousel-item-center-text {
+            padding: 10px 24px;
+            background: transparent;
+            color: #1F1F1F;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 22px;
+            z-index: 3;
+          }
+
           .carousel-item-side {
             position: absolute;
             padding: 6px 12px;
@@ -644,7 +739,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             font-size: 12px;
             font-weight: 500;
             border-radius: 14px;
-            z-index: 1;
+            z-index: 4;
             opacity: 0.5;
           }
 
@@ -725,13 +820,14 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
       )}
 
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[60px]"
+        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[60px] overflow-visible"
         style={{ "--header-height": "60px" } as React.CSSProperties}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchCancel}
       >
-        <div className="container max-w-md flex items-center justify-center h-full relative overflow-hidden">
+        <div className="container max-w-md flex items-center justify-center h-full relative overflow-visible">
           <button
             onClick={() => router.push("/")}
             className="fixed left-0 top-[30px] -translate-y-1/2 p-2 transition-colors z-50"
@@ -768,26 +864,68 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
+                onTouchCancel={onTouchCancel}
               >
+                {/* Yellow highlight background - stretches with drag */}
+                <div
+                  className="carousel-highlight"
+                  style={{
+                    transform: `scaleX(${1 + Math.abs(dragOffset) / 100})`,
+                    transformOrigin: dragOffset > 0 ? 'left' : dragOffset < 0 ? 'right' : 'center',
+                    transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    width: highlightWidth > 0 ? `${highlightWidth}px` : 'auto',
+                  }}
+                />
+
+                {/* Static text labels - don't move */}
                 <div className="carousel-track">
                   {orderedTabs.map((tab) => {
                     const isCenter = tab.position === 'center'
+
+                    // Find tab index in seasonsList
+                    const tabIndex = seasonsList.findIndex(s => s.key === tab.key)
+
+                    // Check if this tab is the target during drag
+                    const isTarget = isDragging && tabIndex === targetSeasonIndex
 
                     // Remove spike filter for non-winter
                     const tabQueryParams = { ...queryParams }
                     if (tab.key !== 'w') delete tabQueryParams.spike
 
                     const positionClass = isCenter
-                      ? 'carousel-item-center'
+                      ? 'carousel-item-center-text'
                       : `carousel-item-side carousel-item-${tab.position}`
 
                     return (
                       <Link
                         key={tab.key}
+                        ref={isCenter ? activeTabRef : null}
                         href={{ pathname: tab.path, query: tabQueryParams }}
                         className={`carousel-item ${positionClass}`}
+                        style={{
+                          color: isTarget ? '#1F1F1F' : undefined,
+                          opacity: isTarget ? 1 : undefined,
+                        }}
                       >
-                        {tab.label}
+                        {isCenter ? (
+                          tab.label
+                        ) : tab.position === 'left' ? (
+                          <ChevronLeft
+                            className="w-4 h-4"
+                            style={{
+                              color: isTarget ? '#1F1F1F' : '#6B7280',
+                              opacity: isTarget ? 1 : 0.5,
+                            }}
+                          />
+                        ) : (
+                          <ChevronRight
+                            className="w-4 h-4"
+                            style={{
+                              color: isTarget ? '#1F1F1F' : '#6B7280',
+                              opacity: isTarget ? 1 : 0.5,
+                            }}
+                          />
+                        )}
                       </Link>
                     )
                   })}

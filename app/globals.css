@@ -13,11 +13,18 @@ body {
 
 html {
   overflow: hidden;
+  /* Fix for PWA viewport height calculation */
+  height: 100%;
+  height: -webkit-fill-available;
 }
 
 body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  /* Fix for PWA viewport */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  min-height: 100dvh;
 }
 
 body {

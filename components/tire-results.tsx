@@ -72,25 +72,30 @@ export default function TireResults({ season, selectedBrands = [] }: TireResults
   // Применяем клиентские фильтры
   const filteredTires = useMemo(() => {
     let result = tires
+    console.log(`[TireResults] Starting with ${result.length} tires`)
 
     // Фильтр "Сегодня" - только товары с provider === "tireshop"
     if (todayFilter === "true") {
       result = result.filter((tire) => tire.provider?.toLowerCase() === "tireshop")
+      console.log(`[TireResults] After today filter: ${result.length} tires`)
     }
 
     // Фильтр минимального количества на складе
     if (minStockFilter === "4") {
       result = result.filter((tire) => (tire.stock || 0) >= 4)
+      console.log(`[TireResults] After minStock filter: ${result.length} tires`)
     }
 
     // Фильтр по брендам
     if (selectedBrands.length > 0) {
+      console.log(`[TireResults] Applying brand filter:`, selectedBrands)
       result = result.filter((tire) => {
         const tireBrand = tire.model?.brand?.name || tire.brand
         return selectedBrands.some(brand =>
           tireBrand?.toLowerCase() === brand.toLowerCase()
         )
       })
+      console.log(`[TireResults] After brand filter: ${result.length} tires`)
     }
 
     // Сортировка по цене
