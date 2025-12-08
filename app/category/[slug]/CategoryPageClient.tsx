@@ -41,8 +41,10 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   // Swipe handling for season tabs
   const touchStartRef = useRef<number | null>(null)
   const touchEndRef = useRef<number | null>(null)
+  const touchStartYRef = useRef<number | null>(null)
   const minSwipeDistance = 50
   const [dragOffset, setDragOffset] = useState(0)
+  const [dragOffsetY, setDragOffsetY] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const activeTabRef = useRef<HTMLAnchorElement>(null)
   const [highlightWidth, setHighlightWidth] = useState(0)
@@ -59,6 +61,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   const onTouchStart = (e: React.TouchEvent) => {
     touchEndRef.current = null
     touchStartRef.current = e.targetTouches[0].clientX
+    touchStartYRef.current = e.targetTouches[0].clientY
     setIsDragging(true)
   }
 
@@ -66,12 +69,17 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
     touchEndRef.current = e.targetTouches[0].clientX
 
     // Update drag offset in real-time for visual feedback
-    if (touchStartRef.current !== null) {
+    if (touchStartRef.current !== null && touchStartYRef.current !== null) {
       const currentOffset = e.targetTouches[0].clientX - touchStartRef.current
+      const currentOffsetY = e.targetTouches[0].clientY - touchStartYRef.current
+
       // Ограничиваем протягивание плашки до 50 пикселей в каждую сторону
       const maxDragOffset = 50
       const limitedOffset = Math.max(-maxDragOffset, Math.min(maxDragOffset, currentOffset))
+      const limitedOffsetY = Math.max(-maxDragOffset, Math.min(maxDragOffset, currentOffsetY))
+
       setDragOffset(limitedOffset)
+      setDragOffsetY(limitedOffsetY)
 
       // Determine target season based on current drag position
       const switchThreshold = 60
@@ -98,6 +106,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
     if (!touchStartRef.current || !touchEndRef.current) {
       setDragOffset(0)
+      setDragOffsetY(0)
       setTargetSeasonIndex(currentSeasonIndex)
       return
     }
@@ -116,6 +125,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
     // Reset drag offset
     setDragOffset(0)
+    setDragOffsetY(0)
     setTargetSeasonIndex(currentSeasonIndex)
 
     // Navigate to target season if different from current
@@ -124,14 +134,17 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
     }
 
     touchStartRef.current = null
+    touchStartYRef.current = null
     touchEndRef.current = null
   }
 
   const onTouchCancel = () => {
     setIsDragging(false)
     setDragOffset(0)
+    setDragOffsetY(0)
     setTargetSeasonIndex(currentSeasonIndex)
     touchStartRef.current = null
+    touchStartYRef.current = null
     touchEndRef.current = null
   }
 
@@ -741,16 +754,17 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             border-radius: 14px;
             z-index: 4;
             opacity: 0.5;
+            top: 50%;
           }
 
           .carousel-item-left {
-            right: 100%;
-            margin-right: 8px;
+            right: calc(50% + 70px);
+            transform: translateY(-50%);
           }
 
           .carousel-item-right {
-            left: 100%;
-            margin-left: 8px;
+            left: calc(50% + 70px);
+            transform: translateY(-50%);
           }
 
           .dark .carousel-item-side {
@@ -866,16 +880,38 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                 onTouchEnd={onTouchEnd}
                 onTouchCancel={onTouchCancel}
               >
-                {/* Yellow highlight background - stretches with drag */}
+                {/* Yellow highlight background - stays in place with fixed width */}
                 <div
                   className="carousel-highlight"
                   style={{
-                    transform: `scaleX(${1 + Math.abs(dragOffset) / 100})`,
-                    transformOrigin: dragOffset > 0 ? 'left' : dragOffset < 0 ? 'right' : 'center',
-                    transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    width: highlightWidth > 0 ? `${highlightWidth}px` : 'auto',
+                    transition: isDragging ? 'none' : 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    width: '140px', // Fixed width based on longest label "Всесезонные"
+                    minWidth: '140px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
                   }}
-                />
+                >
+                  {/* Progress bar fill - shows progress towards switching */}
+                  {isDragging && Math.abs(dragOffset) > 5 && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: dragOffset > 0 ? 0 : 'auto',
+                        right: dragOffset < 0 ? 0 : 'auto',
+                        width: `${(Math.abs(dragOffset) / 60) * 100}%`,
+                        maxWidth: '100%',
+                        height: '100%',
+                        background: dragOffset > 0
+                          ? 'linear-gradient(to right, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1))'
+                          : 'linear-gradient(to left, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1))',
+                        borderRadius: '22px',
+                        pointerEvents: 'none',
+                        transition: 'none',
+                      }}
+                    />
+                  )}
+                </div>
 
                 {/* Static text labels - don't move */}
                 <div className="carousel-track">
@@ -911,7 +947,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                           tab.label
                         ) : tab.position === 'left' ? (
                           <ChevronLeft
-                            className="w-4 h-4"
+                            className="w-[18.4px] h-[18.4px]"
                             style={{
                               color: isTarget ? '#1F1F1F' : '#6B7280',
                               opacity: isTarget ? 1 : 0.5,
@@ -919,7 +955,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                           />
                         ) : (
                           <ChevronRight
-                            className="w-4 h-4"
+                            className="w-[18.4px] h-[18.4px]"
                             style={{
                               color: isTarget ? '#1F1F1F' : '#6B7280',
                               opacity: isTarget ? 1 : 0.5,
