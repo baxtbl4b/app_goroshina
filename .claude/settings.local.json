@@ -18,7 +18,10 @@
       "Bash(python -c:*)",
       "Bash(pnpm add:*)",
       "Bash(pnpm tsc:*)",
-      "Bash(node -c:*)"
+      "Bash(node -c:*)",
+      "Bash(Remove-Item -Recurse -Force \"C:\\app_goroshina\\.next\" 2)",
+      "Bash($null)",
+      "Bash(Write-Host \"Done\")"
     ],
     "deny": [],
     "ask": []

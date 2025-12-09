@@ -686,85 +686,110 @@ export default function TireSearchFilter({ season }: { season: Season }) {
         className={`px-4 pt-2 pb-4 fixed left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] bg-white dark:bg-[#2A2A2A]`}
         style={{
           bottom: '0',
-          transform: isFilterCollapsed ? 'translateY(calc(100% - 50px))' : 'translateY(0)',
+          transform: isFilterCollapsed ? 'translateY(calc(100% - 56px))' : 'translateY(0)',
           WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%)',
           maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%)',
+          touchAction: isFilterCollapsed ? 'none' : 'pan-x pinch-zoom',
+          WebkitOverflowScrolling: 'touch',
         }}
         aria-label="Блок фильтра шин"
         data-testid="tire-filter-container"
-        onTouchStart={(e) => {
-          setTouchStartY(e.touches[0].clientY)
-          setTouchEndY(null)
+onTouchStart={(e) => {
+          // Когда фильтр свёрнут - перехватываем все касания для предотвращения закрытия приложения
+          if (isFilterCollapsed) {
+            e.preventDefault()
+            setTouchStartY(e.touches[0].clientY)
+            setTouchEndY(null)
+          }
         }}
         onTouchMove={(e) => {
-          // Предотвращаем прокрутку страницы при свайпе на фильтре
-          if (touchStartY !== null) {
+          // Когда фильтр свёрнут - блокируем системный жест
+          if (isFilterCollapsed && touchStartY !== null) {
             e.preventDefault()
+            setTouchEndY(e.touches[0].clientY)
           }
         }}
-        onTouchEnd={(e) => {
-          if (touchStartY !== null) {
-            const endY = e.changedTouches[0].clientY
-            const swipeDistance = endY - touchStartY
-
-            // Свайп вверх (отрицательное расстояние) - раскрыть фильтр
-            if (swipeDistance < -30) {
-              if (isFilterCollapsed) {
-                setIsFilterCollapsed(false)
-                highlightHandle()
-              } else if (!isExpanded) {
-                setIsExpanded(true)
-              }
+        onTouchEnd={() => {
+          // Обработка свайпа когда фильтр свёрнут (вне кнопки handle)
+          if (isFilterCollapsed && touchStartY !== null && touchEndY !== null) {
+            const diff = touchEndY - touchStartY
+            // Свайп вверх - раскрыть
+            if (diff < -20) {
+              setIsFilterCollapsed(false)
+              highlightHandle()
             }
-            // Свайп вниз (положительное расстояние) - закрыть фильтр
-            else if (swipeDistance > 30) {
-              if (isExpanded) {
-                setIsExpanded(false)
-              } else if (!isFilterCollapsed) {
-                setIsFilterCollapsed(true)
-                highlightHandle()
-              }
-            }
-
-            setTouchStartY(null)
           }
+          setTouchStartY(null)
+          setTouchEndY(null)
         }}
       >
         {/* Swipe handle for collapse/expand - now also clickable */}
-        <div className="flex items-center justify-center mb-2 -mx-4 px-4">
+        <div
+          className="flex items-center justify-center mb-2 -mx-4 px-4"
+          data-swipe-handle
+          style={{
+            touchAction: 'none',
+            paddingTop: isFilterCollapsed ? '12px' : '0',
+            paddingBottom: isFilterCollapsed ? '12px' : '0',
+          }}
+        >
           <button
             className="flex items-center justify-center py-3 cursor-pointer w-full group"
+            style={{ touchAction: 'none' }}
             onClick={() => {
-              setIsFilterCollapsed(!isFilterCollapsed)
+              // Клик переключает состояние
+              if (isFilterCollapsed) {
+                setIsFilterCollapsed(false)
+              } else if (!isExpanded) {
+                setIsExpanded(true)
+              } else {
+                setIsExpanded(false)
+              }
               highlightHandle()
             }}
             onTouchStart={(e) => {
-              e.stopPropagation()
+              e.preventDefault()
               setHandleTouchStartY(e.touches[0].clientY)
             }}
             onTouchMove={(e) => {
+              e.preventDefault()
               if (handleTouchStartY !== null) {
-                e.preventDefault()
-                e.stopPropagation()
+                setTouchEndY(e.touches[0].clientY)
               }
             }}
             onTouchEnd={(e) => {
+              e.preventDefault()
+
               if (handleTouchStartY !== null) {
                 const endY = e.changedTouches[0].clientY
                 const diff = endY - handleTouchStartY
 
-                // Свайп вниз (diff > 0) - закрыть, свайп вверх (diff < 0) - открыть
+                // Порог свайпа
                 if (Math.abs(diff) > 20) {
-                  if (diff > 0 && !isFilterCollapsed) {
-                    setIsFilterCollapsed(true)
-                    highlightHandle()
-                  } else if (diff < 0 && isFilterCollapsed) {
-                    setIsFilterCollapsed(false)
-                    highlightHandle()
+                  // Свайп вверх (diff < 0)
+                  if (diff < 0) {
+                    if (isFilterCollapsed) {
+                      setIsFilterCollapsed(false)
+                      highlightHandle()
+                    } else if (!isExpanded) {
+                      setIsExpanded(true)
+                      highlightHandle()
+                    }
+                  }
+                  // Свайп вниз (diff > 0)
+                  else {
+                    if (isExpanded) {
+                      setIsExpanded(false)
+                      highlightHandle()
+                    } else if (!isFilterCollapsed) {
+                      setIsFilterCollapsed(true)
+                      highlightHandle()
+                    }
                   }
                 }
 
                 setHandleTouchStartY(null)
+                setTouchEndY(null)
               }
             }}
             aria-label={isFilterCollapsed ? "Нажмите для раскрытия фильтра" : "Нажмите для скрытия фильтра"}
