@@ -21,7 +21,10 @@
       "Bash(node -c:*)",
       "Bash(Remove-Item -Recurse -Force \"C:\\app_goroshina\\.next\" 2)",
       "Bash($null)",
-      "Bash(Write-Host \"Done\")"
+      "Bash(Write-Host \"Done\")",
+      "Bash(del \"C:\\app_goroshina\\app\\loading.tsx\")",
+      "Bash(rm:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

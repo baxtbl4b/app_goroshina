@@ -4,7 +4,6 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Rubik, PT_Sans } from "next/font/google"
 import FixedCartButton from "@/components/fixed-cart-button"
 import { Toaster } from "@/components/ui/toaster"
-import PWASplashScreen from "@/components/pwa-splash-screen"
 
 // Основной фирменный шрифт - Rubik (Bold, SemiBold, Regular)
 const rubik = Rubik({
@@ -60,7 +59,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {" "}
         {/* Добавлены классы h-full и overflow-y-auto */}
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <PWASplashScreen />
           <div className="bg-[#D9D9DD] dark:bg-[#1f1f1f] min-h-screen">
             {" "}
             {/* Удалены overflow-y-auto и flex-1, добавлен min-h-screen */}
