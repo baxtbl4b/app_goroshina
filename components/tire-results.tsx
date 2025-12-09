@@ -29,6 +29,8 @@ export default function TireResults({ season, selectedBrands = [] }: TireResults
   const cargoFilter = searchParams.get("cargo") // Добавляем извлечение параметра cargo
   const todayFilter = searchParams.get("today") // Добавляем извлечение параметра today
   const minStockFilter = searchParams.get("minStock") // Добавляем извлечение параметра minStock
+  const minPriceFilter = searchParams.get("minPrice") // Добавляем извлечение параметра minPrice
+  const maxPriceFilter = searchParams.get("maxPrice") // Добавляем извлечение параметра maxPrice
 
   // Создаем мемоизированный объект фильтров
   const filters = useMemo(() => {
@@ -98,6 +100,20 @@ export default function TireResults({ season, selectedBrands = [] }: TireResults
       console.log(`[TireResults] After brand filter: ${result.length} tires`)
     }
 
+    // Фильтр по минимальной цене
+    if (minPriceFilter) {
+      const minPrice = parseInt(minPriceFilter)
+      result = result.filter((tire) => (tire.price || 0) >= minPrice)
+      console.log(`[TireResults] After minPrice filter: ${result.length} tires`)
+    }
+
+    // Фильтр по максимальной цене
+    if (maxPriceFilter) {
+      const maxPrice = parseInt(maxPriceFilter)
+      result = result.filter((tire) => (tire.price || 0) <= maxPrice)
+      console.log(`[TireResults] After maxPrice filter: ${result.length} tires`)
+    }
+
     // Сортировка по цене
     result = [...result].sort((a, b) => {
       const priceA = a.price || 0
@@ -106,7 +122,7 @@ export default function TireResults({ season, selectedBrands = [] }: TireResults
     })
 
     return result
-  }, [tires, todayFilter, minStockFilter, selectedBrands, sortOrder])
+  }, [tires, todayFilter, minStockFilter, minPriceFilter, maxPriceFilter, selectedBrands, sortOrder])
 
   // Слушаем событие сортировки
   useEffect(() => {

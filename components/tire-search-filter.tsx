@@ -83,7 +83,14 @@ export default function TireSearchFilter({ season }: { season: Season }) {
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null)
 
   // Add these state variables inside the TireSearchFilter component, after the existing useState declarations
-  const [priceRange, setPriceRange] = useState<[number, number]>([3000, 30000])
+  const [priceRange, setPriceRange] = useState<[number, number]>(() => {
+    const minPriceParam = searchParams.get("minPrice")
+    const maxPriceParam = searchParams.get("maxPrice")
+    return [
+      minPriceParam ? parseInt(minPriceParam) : 3000,
+      maxPriceParam ? parseInt(maxPriceParam) : 30000
+    ]
+  })
   // Changed default value from "all" to "quarter"
   const [stockFilter, setStockFilter] = useState<"single" | "full">("single")
   const [isPriceFilterVisible, setIsPriceFilterVisible] = useState(true)
@@ -787,7 +794,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                 Ширина
               </Label>
               <Select value={width} onValueChange={handleWidthChange}>
-                <SelectTrigger id="width" className="w-full bg-[#333333] text-white border-0">
+                <SelectTrigger id="width" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -805,7 +812,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                 Высота
               </Label>
               <Select value={profile} onValueChange={handleProfileChange}>
-                <SelectTrigger id="profile" className="w-full bg-[#333333] text-white border-0">
+                <SelectTrigger id="profile" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -827,7 +834,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                 </Label>
               </div>
               <Select value={diameter} onValueChange={handleDiameterChange}>
-                <SelectTrigger id="diameter" className="w-full bg-[#333333] text-white border-0">
+                <SelectTrigger id="diameter" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -845,7 +852,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
             variant="outline"
             size="sm"
             onClick={clearAllDimensions}
-            className={`h-10 px-3 text-xs border-0 transition-all duration-300 ${
+            className={`h-10 px-3 text-xs border-0 rounded-xl transition-all duration-300 ${
               width || profile || diameter || priceRange[0] > 3000 || priceRange[1] < 30000 || stockFilter === "full" || runflat || cargo || secondAxis || todayOnly || spike !== null || selectedBrands.length > 0
                 ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 hover:scale-105 active:scale-95 shadow-md hover:shadow-red-500/30"
                 : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
@@ -865,7 +872,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                   Ширина (2 ось)
                 </Label>
                 <Select>
-                  <SelectTrigger id="width2" className="w-full bg-[#333333] text-white border-0">
+                  <SelectTrigger id="width2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
@@ -883,7 +890,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                   Высота (2 ось)
                 </Label>
                 <Select>
-                  <SelectTrigger id="profile2" className="w-full bg-[#333333] text-white border-0">
+                  <SelectTrigger id="profile2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
@@ -903,7 +910,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                   </Label>
                 </div>
                 <Select>
-                  <SelectTrigger id="diameter2" className="w-full bg-[#333333] text-white border-0">
+                  <SelectTrigger id="diameter2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
@@ -947,7 +954,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                     <button
                       key={vehicle.id}
                       onClick={() => selectVehicle(vehicle)}
-                      className={`text-xs px-2 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0 ${
+                      className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
                         selectedVehicle === vehicle.id
                           ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
                           : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
@@ -1081,7 +1088,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
 
         {/* Quick filter indicator - only show when filter is active and NOT on summer tab */}
         {quickFilterActive && season !== "s" && (
-          <div className="bg-[#D3DF3D]/20 dark:bg-[#D3DF3D]/10 rounded-md p-2 mb-4 flex items-center justify-between">
+          <div className="bg-[#D3DF3D]/20 dark:bg-[#D3DF3D]/10 rounded-xl p-2 mb-4 flex items-center justify-between">
             <span className="text-sm text-[#1F1F1F] dark:text-white">
               Быстрый фильтр активирован: популярный размер, только в наличии
             </span>
@@ -1099,7 +1106,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
               {/* More compact filters in a row */}
               <div className="flex flex-wrap gap-3 justify-between">
                 {/* RunFlat and Second Axis options as compact checkboxes */}
-                <div className="w-full md:flex-1 border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-md p-3 flex items-center justify-center">
+                <div className="w-full md:flex-1 border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-xl p-3 flex items-center justify-center">
                   <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 items-center justify-center">
                     <div className="flex items-center space-x-2">
                       <Checkbox
@@ -1151,7 +1158,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                 {/* Filters in a row: Stock Filter and Price Range */}
                 <div className="flex flex-wrap gap-3 w-full md:w-3/4">
                   {/* Stock Filter - Checkbox style button */}
-                  <div className="w-[45%] sm:w-[30%] bg-[#F5F5F5] dark:bg-[#333333] rounded-md p-2">
+                  <div className="w-[45%] sm:w-[30%]">
                     <button
                       onClick={() => {
                         const newStockFilter = stockFilter === "single" ? "full" : "single"
@@ -1166,42 +1173,18 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                         }
                         router.push(`${window.location.pathname}?${params.toString()}`)
                       }}
-                      className={`w-full h-16 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center px-2 ${
+                      className={`w-full h-16 rounded-xl text-xs font-medium transition-all duration-200 flex items-center justify-center px-2 ${
                         stockFilter === "full"
                           ? "bg-blue-500 text-white"
                           : "bg-white dark:bg-[#2A2A2A] text-[#1F1F1F] dark:text-white border border-gray-300 dark:border-gray-600"
                       }`}
                     >
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-5 h-5 flex items-center justify-center rounded border ${
-                            stockFilter === "full" ? "bg-white border-white" : "border-gray-400 dark:border-gray-500"
-                          }`}
-                        >
-                          {stockFilter === "full" && (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="text-blue-500"
-                            >
-                              <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                          )}
-                        </div>
-                        <span>Скрыть меньше 4шт</span>
-                      </div>
+                      Скрыть меньше 4шт
                     </button>
                   </div>
 
                   {/* Price range slider */}
-                  <div className="w-[50%] sm:w-[65%] bg-[#F5F5F5] dark:bg-[#333333] rounded-md p-2">
+                  <div className="w-[50%] sm:w-[65%] bg-[#F5F5F5] dark:bg-[#333333] rounded-xl p-2">
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="text-sm font-medium text-[#1F1F1F] dark:text-white">Цена</h4>
                       <div className="text-xs text-[#1F1F1F] dark:text-white">
@@ -1216,6 +1199,20 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                         step={1000}
                         value={priceRange}
                         onValueChange={(value) => setPriceRange(value as [number, number])}
+                        onValueCommit={(value) => {
+                          const params = new URLSearchParams(searchParams.toString())
+                          if (value[0] > 3000) {
+                            params.set("minPrice", value[0].toString())
+                          } else {
+                            params.delete("minPrice")
+                          }
+                          if (value[1] < 30000) {
+                            params.set("maxPrice", value[1].toString())
+                          } else {
+                            params.delete("maxPrice")
+                          }
+                          router.push(`${window.location.pathname}?${params.toString()}`)
+                        }}
                         className="w-full"
                       />
                     </div>

@@ -204,7 +204,7 @@ export default function QuickFilterButtons({
 
   return (
     <div
-      className="flex flex-col bg-white dark:bg-[#2A2A2A] rounded-lg p-1.5 shadow-sm w-full"
+      className="flex flex-col bg-white dark:bg-[#2A2A2A] rounded-2xl p-1.5 shadow-sm w-full"
       id="quick-filter-container"
       data-testid="quick-filter-panel"
     >
@@ -247,8 +247,8 @@ export default function QuickFilterButtons({
                 }
               }}
               placeholder={pathname?.includes("/krepezh") ? "Фильтр по модели авто" : "Введите бренд"}
-              className="flex-1 px-3 py-1 border-0 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-100 dark:bg-[#1A1A1A] dark:text-white mr-1.5"
-              style={{ fontSize: '14.1px' }}
+              className="flex-1 px-3 py-1 border-0 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-100 dark:bg-[#1A1A1A] dark:text-white mr-1.5 text-sm"
+              style={{ fontSize: '16px', transform: 'scale(0.85)', transformOrigin: 'left center' }}
             />
             {/* Clear button - показывается когда есть выбранные бренды или текст в поле */}
             {(selectedBrands.length > 0 || brandSearchInput.trim()) && (

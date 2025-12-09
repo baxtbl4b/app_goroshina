@@ -49,6 +49,24 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   const activeTabRef = useRef<HTMLAnchorElement>(null)
   const [highlightWidth, setHighlightWidth] = useState(0)
 
+  // Slide animation - get direction and previous season from sessionStorage
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(() => {
+    if (typeof window !== 'undefined') {
+      const dir = sessionStorage.getItem('seasonSlideDirection') as 'left' | 'right' | null
+      sessionStorage.removeItem('seasonSlideDirection')
+      return dir
+    }
+    return null
+  })
+  const [exitingSeason, setExitingSeason] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const prev = sessionStorage.getItem('seasonPrevious')
+      sessionStorage.removeItem('seasonPrevious')
+      return prev
+    }
+    return null
+  })
+
   const seasonsList = [
     { key: "s", path: "/category/summer" },
     { key: "w", path: "/category/winter" },
@@ -159,6 +177,24 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   useEffect(() => {
     setSelectedBrands([])
   }, [season])
+
+  // Clear slide direction after animation
+  useEffect(() => {
+    if (slideDirection) {
+      const timer = setTimeout(() => {
+        setSlideDirection(null)
+        setExitingSeason(null)
+      }, 400)
+      return () => clearTimeout(timer)
+    }
+  }, [slideDirection])
+
+  // Function to navigate with animation direction
+  const navigateToSeason = (targetPath: string, direction: 'left' | 'right') => {
+    sessionStorage.setItem('seasonSlideDirection', direction)
+    sessionStorage.setItem('seasonPrevious', season)
+    router.push(targetPath)
+  }
 
   // Track active tab dimensions for highlight
   useEffect(() => {
@@ -742,6 +778,118 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             z-index: 3;
           }
 
+          /* Slide animation for text inside pill */
+          .carousel-text-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .carousel-text {
+            position: absolute;
+            white-space: nowrap;
+          }
+
+          .carousel-text-current {
+            animation: none;
+          }
+
+          .carousel-text-exit-left {
+            animation: slideOutLeft 0.3s ease-out forwards;
+          }
+
+          .carousel-text-exit-right {
+            animation: slideOutRight 0.3s ease-out forwards;
+          }
+
+          .carousel-text-enter-left {
+            animation: slideInFromRight 0.3s ease-out forwards;
+          }
+
+          .carousel-text-enter-right {
+            animation: slideInFromLeft 0.3s ease-out forwards;
+          }
+
+          @keyframes slideOutLeft {
+            from {
+              transform: translateX(0);
+              opacity: 1;
+            }
+            to {
+              transform: translateX(-100%);
+              opacity: 0;
+            }
+          }
+
+          @keyframes slideOutRight {
+            from {
+              transform: translateX(0);
+              opacity: 1;
+            }
+            to {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+          }
+
+          @keyframes slideInFromRight {
+            from {
+              transform: translate(-50%, -50%) translateX(100%);
+            }
+            to {
+              transform: translate(-50%, -50%) translateX(0);
+            }
+          }
+
+          @keyframes slideInFromLeft {
+            from {
+              transform: translate(-50%, -50%) translateX(-100%);
+            }
+            to {
+              transform: translate(-50%, -50%) translateX(0);
+            }
+          }
+
+          @keyframes slideOutToLeft {
+            from {
+              transform: translate(-50%, -50%) translateX(0);
+            }
+            to {
+              transform: translate(-50%, -50%) translateX(-100%);
+            }
+          }
+
+          @keyframes slideOutToRight {
+            from {
+              transform: translate(-50%, -50%) translateX(0);
+            }
+            to {
+              transform: translate(-50%, -50%) translateX(100%);
+            }
+          }
+
+          @keyframes slideContainerLeft {
+            from {
+              transform: translate(-50%, -50%) translateX(0);
+            }
+            to {
+              transform: translate(-50%, -50%) translateX(-95px);
+            }
+          }
+
+          @keyframes slideContainerRight {
+            from {
+              transform: translate(-50%, -50%) translateX(-95px);
+            }
+            to {
+              transform: translate(-50%, -50%) translateX(0);
+            }
+          }
+
           .carousel-item-side {
             position: absolute;
             padding: 5px 10px;
@@ -930,20 +1078,65 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                       ? 'carousel-item-center-text'
                       : `carousel-item-side carousel-item-${tab.position}`
 
+                    // Get label for a season key
+                    const getSeasonLabel = (key: string) => {
+                      const labels: Record<string, string> = { s: 'Летние', w: 'Зимние', a: 'Всесезонные' }
+                      return labels[key] || ''
+                    }
+
+                    // Build URL with query params
+                    const queryString = new URLSearchParams(tabQueryParams).toString()
+                    const fullPath = queryString ? `${tab.path}?${queryString}` : tab.path
+
+                    if (isCenter) {
+                      return (
+                        <div
+                          key={tab.key}
+                          className={`carousel-item ${positionClass}`}
+                        >
+                          <div
+                            style={{
+                              position: 'relative',
+                              overflow: 'hidden',
+                              width: '110px',
+                              height: '20px',
+                            }}
+                          >
+                            <span
+                              key={`${season}-${slideDirection}`}
+                              style={{
+                                position: 'absolute',
+                                left: '50%',
+                                top: '50%',
+                                whiteSpace: 'nowrap',
+                                animation: slideDirection
+                                  ? `slideIn${slideDirection === 'left' ? 'FromRight' : 'FromLeft'} 0.35s ease-out forwards`
+                                  : 'none',
+                                transform: slideDirection ? undefined : 'translate(-50%, -50%)',
+                              }}
+                            >
+                              {getSeasonLabel(season)}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    // Side arrows - use button with navigateToSeason
                     return (
-                      <Link
+                      <button
                         key={tab.key}
-                        ref={isCenter ? activeTabRef : null}
-                        href={{ pathname: tab.path, query: tabQueryParams }}
+                        onClick={() => navigateToSeason(fullPath, tab.position === 'left' ? 'right' : 'left')}
                         className={`carousel-item ${positionClass}`}
                         style={{
                           color: isTarget ? '#1F1F1F' : undefined,
                           opacity: isTarget ? 1 : undefined,
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
                         }}
                       >
-                        {isCenter ? (
-                          tab.label
-                        ) : tab.position === 'left' ? (
+                        {tab.position === 'left' ? (
                           <ChevronLeft
                             className="w-[25px] h-[25px]"
                             style={{
@@ -960,7 +1153,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                             }}
                           />
                         )}
-                      </Link>
+                      </button>
                     )
                   })}
                 </div>
@@ -983,7 +1176,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
         }}
       >
         {/* Quick size links section */}
-        <div className="px-4 mb-4 mt-4 overflow-hidden">
+        <div className="px-4 mb-4 mt-4">
           <div className="flex gap-2 overflow-x-auto snap-x hide-scrollbar">
             {[
               { label: "195/65 R15", width: "195", profile: "65", diameter: "15" },
@@ -1002,7 +1195,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                   params.set("diameter", size.diameter)
                   router.push(`${pathname}?${params.toString()}`)
                 }}
-                className={`text-xs py-1.5 px-2.5 rounded-md border transition-all duration-200 whitespace-nowrap snap-start flex-shrink-0 ${
+                className={`text-xs py-1.5 px-2.5 rounded-xl border transition-all duration-200 whitespace-nowrap snap-start flex-shrink-0 ${
                   currentWidth === size.width && currentProfile === size.profile && currentDiameter === size.diameter
                     ? "bg-[#D3DF3D] text-[#1F1F1F] border-[#D3DF3D] font-medium"
                     : "border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white hover:border-[#D3DF3D] hover:bg-[#D3DF3D]/10"
