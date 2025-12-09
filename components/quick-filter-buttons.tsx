@@ -86,6 +86,20 @@ export default function QuickFilterButtons({
     }
   }, [])
 
+  // Add scroll handler to close brand selector
+  useEffect(() => {
+    const handleScroll = () => {
+      if (showBrandSelector) {
+        setShowBrandSelector(false)
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll, true)
+    return () => {
+      window.removeEventListener("scroll", handleScroll, true)
+    }
+  }, [showBrandSelector])
+
   // Список брендов дисков
   const wheelBrands = [
     "BBS",
@@ -225,8 +239,8 @@ export default function QuickFilterButtons({
       {/* Верхняя часть - два скруглённых прямоугольника */}
       <div className="flex gap-2 w-full items-center">
         {/* Левый блок - Введите бренд */}
-        <div className="relative brand-selector-container flex-1">
-          <div className="relative w-full">
+        <div className="relative brand-selector-container flex items-center gap-2 flex-1">
+          <div className="relative flex-1">
             <input
               type="text"
               value={brandSearchInput}
@@ -248,36 +262,37 @@ export default function QuickFilterButtons({
                 }
               }}
               placeholder={pathname?.includes("/krepezh") ? "Фильтр по модели авто" : "Введите бренд"}
-              className="w-full px-3 py-2.5 pr-8 rounded-2xl focus:outline-none bg-[#333333]/50 text-white text-xs placeholder-gray-400"
+              className="w-full px-3 py-2 rounded-2xl focus:outline-none bg-[#333333]/50 text-white placeholder-gray-400 placeholder:text-sm"
+              style={{ fontSize: '16px' }}
             />
-            {/* Clear button - всегда отображается, но неактивен если нет выбранных брендов или текста */}
-            <button
-              onClick={() => {
-                if (selectedBrands.length > 0 || brandSearchInput.trim()) {
-                  setBrandSearchInput("")
-                  setSelectedBrands([])
-                  if (onBrandSelect) {
-                    onBrandSelect([])
-                  }
-                  setShowBrandSelector(false)
-                }
-              }}
-              disabled={selectedBrands.length === 0 && !brandSearchInput.trim()}
-              className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors ${
-                selectedBrands.length > 0 || brandSearchInput.trim()
-                  ? "hover:bg-gray-600 cursor-pointer"
-                  : "cursor-not-allowed opacity-30"
-              }`}
-              aria-label="Очистить фильтр брендов"
-            >
-              <X className="h-3.5 w-3.5 text-gray-400" />
-            </button>
           </div>
+          {/* Clear button - вынесен за блок справа */}
+          <button
+            onClick={() => {
+              if (selectedBrands.length > 0 || brandSearchInput.trim()) {
+                setBrandSearchInput("")
+                setSelectedBrands([])
+                if (onBrandSelect) {
+                  onBrandSelect([])
+                }
+                setShowBrandSelector(false)
+              }
+            }}
+            disabled={selectedBrands.length === 0 && !brandSearchInput.trim()}
+            className={`p-1.5 rounded-full transition-colors flex-shrink-0 ${
+              selectedBrands.length > 0 || brandSearchInput.trim()
+                ? "hover:bg-gray-600 cursor-pointer bg-[#333333]/50"
+                : "cursor-not-allowed opacity-30 bg-[#333333]/30"
+            }`}
+            aria-label="Очистить фильтр брендов"
+          >
+            <X className="h-4 w-4 text-gray-400" />
+          </button>
 
           {/* Упрощенный селектор брендов */}
           {showBrandSelector && (
             <div
-              className="absolute top-full left-0 mt-1 bg-white dark:bg-[#2A2A2A] border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-md shadow-lg z-50 w-full sm:w-64 max-h-48 sm:max-h-60 overflow-y-auto"
+              className="absolute top-full left-0 mt-1 bg-white dark:bg-[#2A2A2A] border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-md shadow-lg z-50 w-48 max-h-48 sm:max-h-60 overflow-y-auto"
               id="brand-selector-dropdown"
             >
               <div className="p-1 sm:p-2">
@@ -302,7 +317,7 @@ export default function QuickFilterButtons({
                           }
                         }}
                       >
-                        <span className="text-xs sm:text-sm">{brand}</span>
+                        <span className="text-base">{brand}</span>
                         <div>
                           {isSelected ? (
                             <button

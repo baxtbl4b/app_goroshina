@@ -990,7 +990,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
         <div className="container max-w-md flex items-center justify-center h-full relative overflow-visible">
           <button
             onClick={() => router.push("/")}
-            className="fixed left-0 top-[30px] -translate-y-1/2 p-2 transition-colors z-50"
+            className="fixed left-2 top-[30px] -translate-y-1/2 p-2 transition-colors z-50"
             aria-label="На главную"
           >
             <ChevronLeft className="h-6 w-6 text-gray-700 dark:text-gray-300" />
@@ -1163,7 +1163,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
         </div>
         {/* Global cart button - outside container */}
-        <div style={{ position: 'fixed', right: '8px', top: '30px', transform: 'translateY(-50%) scale(1.035)', zIndex: 100 }}>
+        <div style={{ position: 'fixed', right: '16px', top: '30px', transform: 'translateY(-50%) scale(1.035)', zIndex: 100 }}>
           <CartButton />
         </div>
       </header>
