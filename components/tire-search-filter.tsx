@@ -1156,9 +1156,9 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                 </div>
 
                 {/* Filters in a row: Stock Filter and Price Range */}
-                <div className="flex flex-wrap gap-3 w-full md:w-3/4">
+                <div className="flex flex-wrap gap-3 w-full">
                   {/* Stock Filter - Checkbox style button */}
-                  <div className="w-[45%] sm:w-[30%]">
+                  <div className="w-[40%] sm:w-[33%]">
                     <button
                       onClick={() => {
                         const newStockFilter = stockFilter === "single" ? "full" : "single"
@@ -1173,10 +1173,10 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                         }
                         router.push(`${window.location.pathname}?${params.toString()}`)
                       }}
-                      className={`w-full h-16 rounded-xl text-xs font-medium transition-all duration-200 flex items-center justify-center px-2 ${
+                      className={`w-full h-16 rounded-t-xl rounded-bl-[28px] rounded-br-xl text-xs font-medium transition-all duration-200 flex items-center justify-center px-2 ${
                         stockFilter === "full"
                           ? "bg-blue-500 text-white"
-                          : "bg-white dark:bg-[#2A2A2A] text-[#1F1F1F] dark:text-white border border-gray-300 dark:border-gray-600"
+                          : "bg-[#F5F5F5] dark:bg-[#333333] text-[#1F1F1F] dark:text-white"
                       }`}
                     >
                       Скрыть меньше 4шт
@@ -1184,14 +1184,8 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                   </div>
 
                   {/* Price range slider */}
-                  <div className="w-[50%] sm:w-[65%] bg-[#F5F5F5] dark:bg-[#333333] rounded-xl p-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <h4 className="text-sm font-medium text-[#1F1F1F] dark:text-white">Цена</h4>
-                      <div className="text-xs text-[#1F1F1F] dark:text-white">
-                        {priceRange[0].toLocaleString()} ₽ - {priceRange[1].toLocaleString()} ₽
-                      </div>
-                    </div>
-                    <div className="px-1 py-2">
+                  <div className="flex-1 bg-[#F5F5F5] dark:bg-[#333333] rounded-t-xl rounded-bl-xl rounded-br-[28px] p-2">
+                    <div className="px-1 pt-2 pb-1">
                       <Slider
                         defaultValue={[3000, 30000]}
                         min={3000}
@@ -1215,6 +1209,9 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                         }}
                         className="w-full"
                       />
+                    </div>
+                    <div className="text-xs text-[#1F1F1F] dark:text-white text-center mt-2 pb-1">
+                      <span className="font-medium">Цена:</span> {priceRange[0].toLocaleString()} ₽ - {priceRange[1].toLocaleString()} ₽
                     </div>
                   </div>
                 </div>

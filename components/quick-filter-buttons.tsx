@@ -203,8 +203,9 @@ export default function QuickFilterButtons({
   if (!insideTireResults) return null
 
   return (
+    <>
     <div
-      className="flex flex-col bg-white dark:bg-[#2A2A2A] rounded-2xl p-1.5 shadow-sm w-full"
+      className="flex flex-col w-full"
       id="quick-filter-container"
       data-testid="quick-filter-panel"
     >
@@ -221,11 +222,11 @@ export default function QuickFilterButtons({
         </div>
       )}
 
-      {/* Верхняя часть с кнопкой выбора брендов и сортировкой */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-        {/* Кнопка выбора брендов */}
-        <div className="relative brand-selector-container w-full">
-          <div className="relative w-full p-1.5 flex items-center bg-white dark:bg-[#2A2A2A] rounded-lg">
+      {/* Верхняя часть - два скруглённых прямоугольника */}
+      <div className="flex gap-2 w-full items-center">
+        {/* Левый блок - Введите бренд */}
+        <div className="relative brand-selector-container flex-1">
+          <div className="relative w-full">
             <input
               type="text"
               value={brandSearchInput}
@@ -247,7 +248,7 @@ export default function QuickFilterButtons({
                 }
               }}
               placeholder={pathname?.includes("/krepezh") ? "Фильтр по модели авто" : "Введите бренд"}
-              className="flex-1 px-3 py-1 border-0 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-100 dark:bg-[#1A1A1A] dark:text-white mr-1.5 text-sm"
+              className="w-full px-3 py-2.5 pr-8 rounded-2xl focus:outline-none bg-[#333333] text-white text-sm placeholder-gray-400"
               style={{ fontSize: '16px', transform: 'scale(0.85)', transformOrigin: 'left center' }}
             />
             {/* Clear button - показывается когда есть выбранные бренды или текст в поле */}
@@ -261,51 +262,12 @@ export default function QuickFilterButtons({
                   }
                   setShowBrandSelector(false)
                 }}
-                className="mr-1.5 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors flex-shrink-0"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-600 rounded-full transition-colors"
                 aria-label="Очистить фильтр брендов"
               >
-                <X className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                <X className="h-3.5 w-3.5 text-gray-400" />
               </button>
             )}
-            <div
-              className="cursor-pointer hover:opacity-70 transition-opacity p-1 bg-gray-100 dark:bg-gray-800 rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0"
-              onClick={() => {
-                // Toggle the price filter
-                const newFilter = priceFilter === "cheaper" ? "expensive" : "cheaper"
-                setPriceFilter(newFilter)
-
-                // Apply the sorting to the catalog
-                if (onSortChange) {
-                  const sortValue = newFilter === "expensive" ? "price-desc" : "price-asc"
-                  onSortChange(sortValue)
-
-                  // Dispatch a custom event that the catalog can listen for
-                  window.dispatchEvent(
-                    new CustomEvent("applySorting", {
-                      detail: {
-                        type: "price",
-                        direction: newFilter,
-                        value: sortValue,
-                      },
-                    }),
-                  )
-
-                  // Add visual feedback
-                  console.log(
-                    `Сортировка применена: ${newFilter === "cheaper" ? "от дешевых к дорогим" : "от дорогих к дешевым"}`,
-                  )
-                }
-              }}
-              title={priceFilter === "cheaper" ? "Сортировать по возрастанию цены" : "Сортировать по убыванию цены"}
-            >
-              <Image
-                src="/images/icons8-sorting-arrows-96.png"
-                alt="Сортировка по цене"
-                width={20}
-                height={20}
-                className={`transform ${priceFilter === "expensive" ? "rotate-180" : ""} transition-transform`}
-              />
-            </div>
           </div>
 
           {/* Упрощенный селектор брендов */}
@@ -367,53 +329,72 @@ export default function QuickFilterButtons({
             </div>
           )}
         </div>
-      </div>
 
-      {/* Контейнер активных фильтров */}
-      {selectedBrands.length > 0 && (
-        <div className="flex flex-wrap gap-1 sm:gap-2 mt-1 sm:mt-2">
-          {selectedBrands.map((brand) => (
-            <div
-              key={brand}
-              className="flex items-center bg-[#E6F4FF] dark:bg-[#1E3A5F] text-[#009CFF] px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium"
-            >
-              {brand}
-              <button
-                onClick={() => removeBrand(brand)}
-                className="ml-1 sm:ml-2 text-[#009CFF] hover:text-[#0084d6] focus:outline-none"
-                aria-label={`Удалить фильтр ${brand}`}
-              >
-                ✕
-              </button>
-            </div>
-          ))}
+        {/* Правый блок - Сортировка по цене */}
+        <div className="flex items-center rounded-xl p-2">
+          <div
+            className="cursor-pointer hover:opacity-70 transition-opacity p-1.5 rounded-lg flex items-center justify-center"
+            onClick={() => {
+              // Toggle the price filter
+              const newFilter = priceFilter === "cheaper" ? "expensive" : "cheaper"
+              setPriceFilter(newFilter)
+
+              // Apply the sorting to the catalog
+              if (onSortChange) {
+                const sortValue = newFilter === "expensive" ? "price-desc" : "price-asc"
+                onSortChange(sortValue)
+
+                // Dispatch a custom event that the catalog can listen for
+                window.dispatchEvent(
+                  new CustomEvent("applySorting", {
+                    detail: {
+                      type: "price",
+                      direction: newFilter,
+                      value: sortValue,
+                    },
+                  }),
+                )
+
+                // Add visual feedback
+                console.log(
+                  `Сортировка применена: ${newFilter === "cheaper" ? "от дешевых к дорогим" : "от дорогих к дешевым"}`,
+                )
+              }
+            }}
+            title={priceFilter === "cheaper" ? "Сортировать по возрастанию цены" : "Сортировать по убыванию цены"}
+          >
+            <Image
+              src="/images/icons8-sorting-arrows-96.png"
+              alt="Сортировка по цене"
+              width={20}
+              height={20}
+              className={`transform ${priceFilter === "expensive" ? "rotate-180" : ""} transition-transform`}
+            />
+          </div>
         </div>
-      )}
-
-      {/* Дополнительные фильтры */}
-      <div className="hidden md:flex flex-wrap gap-1 sm:gap-2 mt-1 sm:mt-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-xs sm:text-sm border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
-        >
-          Цена до 10 000 ₽
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-xs sm:text-sm border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
-        >
-          Только в наличии
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-xs sm:text-sm border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
-        >
-          Michelin
-        </Button>
       </div>
     </div>
+
+    {/* Контейнер активных фильтров - ВНЕ основного блока */}
+    {selectedBrands.length > 0 && (
+      <div className="flex flex-wrap gap-1 sm:gap-2 mt-2">
+        {selectedBrands.map((brand) => (
+          <div
+            key={brand}
+            className="flex items-center bg-[#E6F4FF] dark:bg-[#1E3A5F] text-[#009CFF] px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium"
+          >
+            {brand}
+            <button
+              onClick={() => removeBrand(brand)}
+              className="ml-1 sm:ml-2 text-[#009CFF] hover:text-[#0084d6] focus:outline-none"
+              aria-label={`Удалить фильтр ${brand}`}
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+      </div>
+    )}
+    </>
   )
 }
