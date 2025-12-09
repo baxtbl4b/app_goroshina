@@ -212,26 +212,6 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     }
   }, [])
 
-  // Обновим useEffect для обработки свайпов в обоих направлениях
-  // Найдите существующий useEffect, который обрабатывает свайпы, и замените его на следующий:
-  useEffect(() => {
-    // Проверяем, был ли выполнен свайп
-    if (touchStartY && touchEndY) {
-      const swipeDistance = touchEndY - touchStartY
-      // Если свайп вверх (начальная точка ниже конечной) и фильтр свёрнут
-      if (swipeDistance < -50 && isFilterCollapsed) {
-        setIsFilterCollapsed(false)
-      }
-      // Если свайп вниз (начальная точка выше конечной) и фильтр развёрнут
-      else if (swipeDistance > 50 && !isFilterCollapsed) {
-        setIsFilterCollapsed(true)
-      }
-
-      // Сбрасываем значения после обработки
-      setTouchStartY(null)
-      setTouchEndY(null)
-    }
-  }, [touchEndY, touchStartY, isFilterCollapsed])
 
   // Add function to select vehicle and set tire sizes
   const selectVehicle = (vehicle: VehicleWithTires) => {
@@ -705,6 +685,43 @@ export default function TireSearchFilter({ season }: { season: Season }) {
         }}
         aria-label="Блок фильтра шин"
         data-testid="tire-filter-container"
+        onTouchStart={(e) => {
+          setTouchStartY(e.touches[0].clientY)
+          setTouchEndY(null)
+        }}
+        onTouchMove={(e) => {
+          // Предотвращаем прокрутку страницы при свайпе на фильтре
+          if (touchStartY !== null) {
+            e.preventDefault()
+          }
+        }}
+        onTouchEnd={(e) => {
+          if (touchStartY !== null) {
+            const endY = e.changedTouches[0].clientY
+            const swipeDistance = endY - touchStartY
+
+            // Свайп вверх (отрицательное расстояние) - раскрыть фильтр
+            if (swipeDistance < -30) {
+              if (isFilterCollapsed) {
+                setIsFilterCollapsed(false)
+                highlightHandle()
+              } else if (!isExpanded) {
+                setIsExpanded(true)
+              }
+            }
+            // Свайп вниз (положительное расстояние) - закрыть фильтр
+            else if (swipeDistance > 30) {
+              if (isExpanded) {
+                setIsExpanded(false)
+              } else if (!isFilterCollapsed) {
+                setIsFilterCollapsed(true)
+                highlightHandle()
+              }
+            }
+
+            setTouchStartY(null)
+          }
+        }}
       >
         {/* Swipe handle for collapse/expand - now also clickable */}
         <div className="flex items-center justify-center mb-2 -mx-4 px-4">

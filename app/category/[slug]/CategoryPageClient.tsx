@@ -427,7 +427,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   const quickFilterActive = searchParams.has("popularSize") && searchParams.has("stock")
 
   return (
-    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px]">
+    <main className="flex flex-col h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px] overflow-hidden">
       <style jsx global>
         {`
           /* Cart button animation */
@@ -680,13 +680,13 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             display: none;  /* Chrome, Safari and Opera */
           }
 
-          /* Season Horizontal Carousel styles */
+          /* Season Horizontal Carousel styles - Dynamic Island style */
           .carousel-container {
             position: fixed;
             left: 50%;
             top: 30px;
             transform: translateX(-50%) translateY(-50%);
-            height: 44px;
+            height: 34px;
             z-index: 51;
             -webkit-tap-highlight-color: transparent;
           }
@@ -713,57 +713,55 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
           .carousel-highlight {
             position: absolute;
             background: #D3DF3D;
-            border-radius: 22px;
-            box-shadow: 0 4px 20px rgba(211, 223, 61, 0.4);
+            border-radius: 50px;
             z-index: 2;
             pointer-events: none;
-            height: 44px;
+            height: 34px;
             display: flex;
             align-items: center;
             justify-content: center;
           }
 
           .carousel-item-center {
-            padding: 10px 24px;
+            padding: 7px 18px;
             background: #D3DF3D;
             color: #1F1F1F;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
-            border-radius: 22px;
-            box-shadow: 0 4px 20px rgba(211, 223, 61, 0.4);
+            border-radius: 50px;
             z-index: 3;
           }
 
           .carousel-item-center-text {
-            padding: 10px 24px;
+            padding: 7px 18px;
             background: transparent;
             color: #1F1F1F;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
-            border-radius: 22px;
+            border-radius: 50px;
             z-index: 3;
           }
 
           .carousel-item-side {
             position: absolute;
-            padding: 6px 12px;
+            padding: 5px 10px;
             background: transparent;
             color: #6B7280;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
-            border-radius: 14px;
+            border-radius: 50px;
             z-index: 4;
             opacity: 0.5;
             top: 50%;
           }
 
           .carousel-item-left {
-            right: calc(50% + 70px);
+            right: calc(50% + 60px);
             transform: translateY(-50%);
           }
 
           .carousel-item-right {
-            left: calc(50% + 70px);
+            left: calc(50% + 60px);
             transform: translateY(-50%);
           }
 
@@ -885,8 +883,8 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                   className="carousel-highlight"
                   style={{
                     transition: isDragging ? 'none' : 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    width: '140px', // Fixed width based on longest label "Всесезонные"
-                    minWidth: '140px',
+                    width: '120px',
+                    minWidth: '120px',
                     left: '50%',
                     transform: 'translateX(-50%)',
                   }}
@@ -903,9 +901,9 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                         maxWidth: '100%',
                         height: '100%',
                         background: dragOffset > 0
-                          ? 'linear-gradient(to right, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1))'
-                          : 'linear-gradient(to left, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1))',
-                        borderRadius: '22px',
+                          ? 'linear-gradient(to right, rgba(211, 223, 61, 0.4), rgba(211, 223, 61, 0.1))'
+                          : 'linear-gradient(to left, rgba(211, 223, 61, 0.4), rgba(211, 223, 61, 0.1))',
+                        borderRadius: '50px',
                         pointerEvents: 'none',
                         transition: 'none',
                       }}
@@ -947,18 +945,18 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                           tab.label
                         ) : tab.position === 'left' ? (
                           <ChevronLeft
-                            className="w-[18.4px] h-[18.4px]"
+                            className="w-[25px] h-[25px]"
                             style={{
-                              color: isTarget ? '#1F1F1F' : '#6B7280',
-                              opacity: isTarget ? 1 : 0.5,
+                              color: isTarget ? '#1F1F1F' : '#B0B5BD',
+                              opacity: isTarget ? 1 : 0.7,
                             }}
                           />
                         ) : (
                           <ChevronRight
-                            className="w-[18.4px] h-[18.4px]"
+                            className="w-[25px] h-[25px]"
                             style={{
-                              color: isTarget ? '#1F1F1F' : '#6B7280',
-                              opacity: isTarget ? 1 : 0.5,
+                              color: isTarget ? '#1F1F1F' : '#B0B5BD',
+                              opacity: isTarget ? 1 : 0.7,
                             }}
                           />
                         )}
@@ -977,53 +975,59 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
         </div>
       </header>
 
-      {/* Quick size links section */}
-      <div className="px-4 mb-4 mt-4 overflow-hidden">
-        <div className="flex gap-2 overflow-x-auto snap-x hide-scrollbar">
-          {[
-            { label: "195/65 R15", width: "195", profile: "65", diameter: "15" },
-            { label: "205/55 R16", width: "205", profile: "55", diameter: "16" },
-            { label: "225/45 R17", width: "225", profile: "45", diameter: "17" },
-            { label: "235/35 R19", width: "235", profile: "35", diameter: "19" },
-            { label: "215/60 R16", width: "215", profile: "60", diameter: "16" },
-            { label: "225/50 R17", width: "225", profile: "50", diameter: "17" },
-          ].map((size) => (
-            <button
-              key={size.label}
-              onClick={() => {
-                const params = new URLSearchParams(searchParams.toString())
-                params.set("width", size.width)
-                params.set("profile", size.profile)
-                params.set("diameter", size.diameter)
-                router.push(`${pathname}?${params.toString()}`)
-              }}
-              className={`text-xs py-1.5 px-2.5 rounded-md border transition-all duration-200 whitespace-nowrap snap-start flex-shrink-0 ${
-                currentWidth === size.width && currentProfile === size.profile && currentDiameter === size.diameter
-                  ? "bg-[#D3DF3D] text-[#1F1F1F] border-[#D3DF3D] font-medium"
-                  : "border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white hover:border-[#D3DF3D] hover:bg-[#D3DF3D]/10"
-              }`}
-            >
-              {size.label}
-            </button>
-          ))}
+      {/* Scrollable content area - between header and filter */}
+      <div
+        className="flex-1 overflow-y-auto overscroll-contain pb-[280px]"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {/* Quick size links section */}
+        <div className="px-4 mb-4 mt-4 overflow-hidden">
+          <div className="flex gap-2 overflow-x-auto snap-x hide-scrollbar">
+            {[
+              { label: "195/65 R15", width: "195", profile: "65", diameter: "15" },
+              { label: "205/55 R16", width: "205", profile: "55", diameter: "16" },
+              { label: "225/45 R17", width: "225", profile: "45", diameter: "17" },
+              { label: "235/35 R19", width: "235", profile: "35", diameter: "19" },
+              { label: "215/60 R16", width: "215", profile: "60", diameter: "16" },
+              { label: "225/50 R17", width: "225", profile: "50", diameter: "17" },
+            ].map((size) => (
+              <button
+                key={size.label}
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams.toString())
+                  params.set("width", size.width)
+                  params.set("profile", size.profile)
+                  params.set("diameter", size.diameter)
+                  router.push(`${pathname}?${params.toString()}`)
+                }}
+                className={`text-xs py-1.5 px-2.5 rounded-md border transition-all duration-200 whitespace-nowrap snap-start flex-shrink-0 ${
+                  currentWidth === size.width && currentProfile === size.profile && currentDiameter === size.diameter
+                    ? "bg-[#D3DF3D] text-[#1F1F1F] border-[#D3DF3D] font-medium"
+                    : "border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white hover:border-[#D3DF3D] hover:bg-[#D3DF3D]/10"
+                }`}
+              >
+                {size.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-4 pb-4 space-y-4">
+          <QuickFilterButtons
+            onSortChange={handleSortChange}
+            onFilterToggle={handleFilterToggle}
+            activeFiltersCount={activeFiltersCount}
+            insideTireResults={true}
+            onBrandSelect={handleBrandSelect}
+          />
+          <TireResults season={season} selectedBrands={selectedBrands} />
         </div>
       </div>
 
-      {/* Filter section below header */}
-      <div className="sticky top-[60px] z-40 w-full">
-        <TireSearchFilter season={season} />
-      </div>
-
-      <div className="flex-1 px-4 pb-4 space-y-4">
-        <QuickFilterButtons
-          onSortChange={handleSortChange}
-          onFilterToggle={handleFilterToggle}
-          activeFiltersCount={activeFiltersCount}
-          insideTireResults={true}
-          onBrandSelect={handleBrandSelect}
-        />
-        <TireResults season={season} selectedBrands={selectedBrands} />
-      </div>
+      {/* Filter section - fixed at bottom */}
+      <TireSearchFilter season={season} />
     </main>
   )
 }
