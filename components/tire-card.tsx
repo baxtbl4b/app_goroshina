@@ -524,7 +524,7 @@ export default function TireCard({ tire }: TireCardProps) {
   return (
     <div ref={cardRef} id={`tire-card-${tire.id}`} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
       {/* Left side - Image */}
-      <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[132px] sm:w-[173px] md:w-[213px] lg:w-[239px] overflow-hidden bg-white rounded-l-xl" style={{ maxHeight: "225px" }}>
+      <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[145px] sm:w-[190px] md:w-[234px] lg:w-[263px] overflow-hidden bg-white rounded-l-xl" style={{ maxHeight: "248px" }}>
         {tire.item_day && <Badge className="absolute left-2 top-2 z-10 bg-[#D3DF3D] text-[#1F1F1F]">Товар дня</Badge>}
         {/* Gift icon badge - only shown for specific tires */}
         {hasGiftPromotion && (
@@ -544,7 +544,7 @@ export default function TireCard({ tire }: TireCardProps) {
                   src="/images/tire-closeup.jpg"
                   alt={tire.name || "Tire"}
                   fill
-                  sizes="(max-width: 640px) 135px, (max-width: 768px) 177px, (max-width: 1024px) 217px, 244px"
+                  sizes="(max-width: 640px) 149px, (max-width: 768px) 195px, (max-width: 1024px) 239px, 268px"
                   className="object-contain cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={(e) => {
                     e.preventDefault()
@@ -564,7 +564,7 @@ export default function TireCard({ tire }: TireCardProps) {
                   src={`${getProcessedImageUrl(imageUrl) || "/placeholder.svg"}${imageRetryCount > 0 ? `&_retry=${imageRetryCount}` : ''}`}
                   alt={tire.name || "Tire"}
                   fill
-                  sizes="(max-width: 640px) 135px, (max-width: 768px) 177px, (max-width: 1024px) 217px, 244px"
+                  sizes="(max-width: 640px) 149px, (max-width: 768px) 195px, (max-width: 1024px) 239px, 268px"
                   className="object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
                   onClick={(e) => {
                     e.preventDefault()
@@ -728,7 +728,7 @@ export default function TireCard({ tire }: TireCardProps) {
         </div>
 
         <div className="flex flex-col relative pb-8 sm:pb-9 md:pb-11 -mt-[10px]">
-          <div className="flex items-center justify-end w-full mb-1 sm:mb-1.5">
+          <div className="flex items-center justify-end w-full mb-3 sm:mb-4">
             <div className="flex flex-row items-end gap-2">
               <p className="text-[11px] sm:text-[14.3px] md:text-[16.5px] text-gray-500 dark:text-gray-400 line-through">
                 {formatPrice(tire.rrc)}
@@ -761,37 +761,32 @@ export default function TireCard({ tire }: TireCardProps) {
                 }
               })()}
             </div>
-            <div className="flex items-center flex-1 justify-end ml-2">
-              {/* Новая кнопка корзины в стиле из изображения */}
-              <div className="flex h-[31px] sm:h-[34px] md:h-[40px] overflow-hidden w-full max-w-[152px] sm:max-w-[174px] md:max-w-[195px]" style={{ border: 'none', outline: 'none', borderRadius: '20px' }}>
-                {/* Кнопка минус */}
-                <button
-                  onClick={removeFromCart}
-                  disabled={cartCount <= 0 || tire.stock <= 0}
-                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px' }}
-                  aria-label="Уменьшить количество"
-                >
-                  <Minus className="w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] md:w-[22px] md:h-[22px]" />
-                </button>
+            <div className="flex items-center gap-1">
+              {/* Кнопка минус в стиле tire-mounting */}
+              <button
+                onClick={removeFromCart}
+                disabled={cartCount <= 0 || tire.stock <= 0}
+                className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#484b51] text-white rounded-lg flex items-center justify-center hover:bg-[#5A5D63] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Уменьшить количество"
+              >
+                <Minus className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
 
-                {/* Счетчик количества */}
-                <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2.2rem] sm:min-w-[2.75rem] md:min-w-[3.3rem]">
-                  <span className="text-[11px] sm:text-[13px] md:text-[15px] font-medium">{cartCount}</span>
-                </div>
-
-                {/* Кнопка плюс */}
-                <button
-                  ref={addButtonRef}
-                  onClick={addToCart}
-                  disabled={tire.stock <= 0 || cartCount >= tire.stock}
-                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopRightRadius: '20px', borderBottomRightRadius: '20px' }}
-                  aria-label="Увеличить количество"
-                >
-                  <Plus className="w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] md:w-[22px] md:h-[22px]" />
-                </button>
+              {/* Счетчик количества */}
+              <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#1A1A1A] text-white rounded-lg flex items-center justify-center">
+                <span className="text-base sm:text-lg font-medium">{cartCount}</span>
               </div>
+
+              {/* Кнопка плюс в стиле tire-mounting */}
+              <button
+                ref={addButtonRef}
+                onClick={addToCart}
+                disabled={tire.stock <= 0 || cartCount >= tire.stock}
+                className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#d3df3d] text-black rounded-lg flex items-center justify-center hover:bg-[#c5d135] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Увеличить количество"
+              >
+                <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
             </div>
           </div>
         </div>

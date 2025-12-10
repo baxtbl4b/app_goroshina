@@ -26,6 +26,8 @@ export default function ProductPage() {
   const [cartCount, setCartCount] = useState(0)
   const [isFavorite, setIsFavorite] = useState(false)
   const [flagError, setFlagError] = useState(false)
+  const [selectedWarehouse, setSelectedWarehouse] = useState<{ location: string; stock: number } | null>(null)
+  const [warehouseCartCounts, setWarehouseCartCounts] = useState<Record<string, number>>({})
 
   // Load tire data from localStorage or API
   useEffect(() => {
@@ -108,12 +110,111 @@ export default function ProductPage() {
     // Check if product is in favorites
     const favorites = JSON.parse(localStorage.getItem("favorites") || "[]")
     setIsFavorite(favorites.some((item: any) => item.id === tire.id))
-
-    // Check cart count for this product
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]")
-    const cartItem = cart.find((item: any) => item.id === tire.id)
-    setCartCount(cartItem ? cartItem.quantity : 0)
   }, [tire])
+
+  // Update cart count when warehouse selection changes
+  useEffect(() => {
+    if (!tire || !selectedWarehouse) {
+      setCartCount(0)
+      return
+    }
+
+    // Check cart count for this product from selected warehouse
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]")
+    const cartItem = cart.find((item: any) =>
+      item.id === tire.id && item.warehouse === selectedWarehouse.location
+    )
+    setCartCount(cartItem ? cartItem.quantity : 0)
+  }, [tire, selectedWarehouse])
+
+  // Load cart counts for all warehouses
+  const loadWarehouseCartCounts = () => {
+    if (!tire) return
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]")
+    const counts: Record<string, number> = {}
+    cart.forEach((item: any) => {
+      if (item.id === tire.id && item.warehouse) {
+        counts[item.warehouse] = item.quantity || 0
+      }
+    })
+    setWarehouseCartCounts(counts)
+  }
+
+  useEffect(() => {
+    loadWarehouseCartCounts()
+  }, [tire])
+
+  // Add to cart for specific warehouse
+  const addToCartForWarehouse = (warehouse: { location: string; stock: number }) => {
+    if (!tire) return
+
+    const currentCount = warehouseCartCounts[warehouse.location] || 0
+    if (currentCount >= warehouse.stock) return
+
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]")
+    const cartItemKey = `${tire.id}_${warehouse.location}`
+    const existingItemIndex = cart.findIndex((item: any) =>
+      item.id === tire.id && item.warehouse === warehouse.location
+    )
+
+    if (existingItemIndex >= 0) {
+      cart[existingItemIndex].quantity = (cart[existingItemIndex].quantity || 1) + 1
+    } else {
+      cart.push({
+        ...tire,
+        quantity: 1,
+        warehouse: warehouse.location,
+        warehouseStock: warehouse.stock,
+        cartItemKey
+      })
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart))
+    loadWarehouseCartCounts()
+
+    // Update selected warehouse cart count if it matches
+    if (selectedWarehouse?.location === warehouse.location) {
+      setCartCount(prev => prev + 1)
+    }
+
+    window.dispatchEvent(new Event("cartUpdated"))
+    window.dispatchEvent(new CustomEvent("cartItemAdded", {
+      detail: { totalItems: cart.reduce((total: number, item: any) => total + (item.quantity || 1), 0) }
+    }))
+  }
+
+  // Remove from cart for specific warehouse
+  const removeFromCartForWarehouse = (warehouse: { location: string; stock: number }) => {
+    if (!tire) return
+
+    const currentCount = warehouseCartCounts[warehouse.location] || 0
+    if (currentCount <= 0) return
+
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]")
+    const existingItemIndex = cart.findIndex((item: any) =>
+      item.id === tire.id && item.warehouse === warehouse.location
+    )
+
+    if (existingItemIndex >= 0) {
+      cart[existingItemIndex].quantity = Math.max(0, (cart[existingItemIndex].quantity || 1) - 1)
+      if (cart[existingItemIndex].quantity === 0) {
+        cart.splice(existingItemIndex, 1)
+      }
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart))
+    loadWarehouseCartCounts()
+
+    // Update selected warehouse cart count if it matches
+    if (selectedWarehouse?.location === warehouse.location) {
+      setCartCount(prev => Math.max(0, prev - 1))
+    }
+
+    window.dispatchEvent(new Event("cartUpdated"))
+    window.dispatchEvent(new CustomEvent("cartItemAdded", {
+      detail: { totalItems: cart.reduce((total: number, item: any) => total + (item.quantity || 1), 0) }
+    }))
+  }
 
   // Listen for cart reset events
   useEffect(() => {
@@ -134,10 +235,10 @@ export default function ProductPage() {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!tire) return
+    if (!tire || !selectedWarehouse) return
 
-    // Проверяем, не превышен ли лимит доступного товара
-    const stock = tire.stock || 0
+    // Проверяем, не превышен ли лимит доступного товара на выбранном складе
+    const stock = selectedWarehouse.stock || 0
     if (cartCount >= stock) {
       return
     }
@@ -148,15 +249,26 @@ export default function ProductPage() {
     // Get current cart from localStorage
     const cart = JSON.parse(localStorage.getItem("cart") || "[]")
 
-    // Check if product already exists in cart
-    const existingItemIndex = cart.findIndex((item: any) => item.id === tire.id)
+    // Уникальный ключ для товара с учетом склада
+    const cartItemKey = `${tire.id}_${selectedWarehouse.location}`
+
+    // Check if product already exists in cart (с учетом склада)
+    const existingItemIndex = cart.findIndex((item: any) =>
+      item.id === tire.id && item.warehouse === selectedWarehouse.location
+    )
 
     if (existingItemIndex >= 0) {
       // If product exists, increase quantity
       cart[existingItemIndex].quantity = (cart[existingItemIndex].quantity || 1) + 1
     } else {
-      // Add new product to cart
-      cart.push({ ...tire, quantity: 1 })
+      // Add new product to cart with warehouse info
+      cart.push({
+        ...tire,
+        quantity: 1,
+        warehouse: selectedWarehouse.location,
+        warehouseStock: selectedWarehouse.stock,
+        cartItemKey
+      })
     }
 
     // Save updated cart
@@ -178,7 +290,7 @@ export default function ProductPage() {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!tire || cartCount <= 0) return
+    if (!tire || !selectedWarehouse || cartCount <= 0) return
 
     // Decrease cart count
     setCartCount((prev) => Math.max(0, prev - 1))
@@ -186,8 +298,10 @@ export default function ProductPage() {
     // Get current cart from localStorage
     const cart = JSON.parse(localStorage.getItem("cart") || "[]")
 
-    // Find existing item
-    const existingItemIndex = cart.findIndex((item: any) => item.id === tire.id)
+    // Find existing item (с учетом склада)
+    const existingItemIndex = cart.findIndex((item: any) =>
+      item.id === tire.id && item.warehouse === selectedWarehouse.location
+    )
 
     if (existingItemIndex >= 0) {
       // Decrease quantity
@@ -351,7 +465,8 @@ export default function ProductPage() {
   const getStockLocationInfo = (): Array<{ location: string; stock: number }> => {
     if (!tire) return [{ location: "Уточняйте наличие", stock: 0 }]
 
-    const stockLocations: Array<{ location: string; stock: number }> = []
+    // Используем Map для группировки складов по названию
+    const stockMap = new Map<string, number>()
 
     // Проверяем наличие данных о складах
     if (!tire.storehouse || Object.keys(tire.storehouse).length === 0) {
@@ -360,12 +475,10 @@ export default function ProductPage() {
       const deliveryStatus = getDeliveryStatusByProvider(tire.provider)
 
       if (deliveryStatus === "Забрать сегодня") {
-        stockLocations.push({ location: "В наличии", stock: stock })
+        return [{ location: "В наличии", stock: stock }]
       } else {
-        stockLocations.push({ location: "Уточняйте наличие", stock: stock })
+        return [{ location: "Уточняйте наличие", stock: stock }]
       }
-
-      return stockLocations
     }
 
     let otherCitiesStock = 0
@@ -373,29 +486,40 @@ export default function ProductPage() {
     // Парсим storehouse объект
     Object.entries(tire.storehouse).forEach(([location, stock]) => {
       const locationLower = location.toLowerCase()
+      let normalizedLocation = ""
 
       // Таллинское шоссе
       if (locationLower.includes("таллинское")) {
-        stockLocations.push({ location: "Таллинское шоссе", stock })
+        normalizedLocation = "Таллинское шоссе"
       }
       // Пискаревский проспект
       else if (locationLower.includes("пискаревск")) {
-        stockLocations.push({ location: "Пискаревский проспект", stock })
+        normalizedLocation = "Пискаревский проспект"
       }
       // Санкт-Петербург (точное совпадение или содержит, но не ОХ)
       else if (location === "Санкт-Петербург" || (locationLower.includes("санкт-петербург") && !locationLower.includes("ох"))) {
-        stockLocations.push({ location: "Санкт-Петербург", stock })
+        normalizedLocation = "Санкт-Петербург"
       }
       // Все остальные города - суммируем для "Под заказ"
       else {
         otherCitiesStock += stock
+        return
       }
+
+      // Суммируем количество для одинаковых складов
+      stockMap.set(normalizedLocation, (stockMap.get(normalizedLocation) || 0) + stock)
     })
 
     // Добавляем "Под заказ" если есть товары в других городах
     if (otherCitiesStock > 0) {
-      stockLocations.push({ location: "Под заказ", stock: otherCitiesStock })
+      stockMap.set("Под заказ", otherCitiesStock)
     }
+
+    // Преобразуем Map в массив
+    const stockLocations = Array.from(stockMap.entries()).map(([location, stock]) => ({
+      location,
+      stock
+    }))
 
     // Если нет данных, показываем сообщение
     if (stockLocations.length === 0) {
@@ -529,7 +653,7 @@ export default function ProductPage() {
           {/* Image Gallery */}
           <div className="relative">
             {/* Rating overlay - bottom left */}
-            <div className="absolute bottom-2 left-2 z-10 bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
+            <div className="absolute bottom-2 left-2 z-[5] bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
               <div className="flex items-center gap-2">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -542,6 +666,67 @@ export default function ProductPage() {
                 <span className="text-xs text-white font-medium">4.0 (86)</span>
               </div>
             </div>
+
+            {/* Country/Flag overlay - top right */}
+            <div className="absolute top-2 right-2 z-[5] bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-white font-medium">
+                  {tire.country || tire.model?.brand?.country?.name || ""}
+                </span>
+                {flagError ? (
+                  <div
+                    className="rounded-sm w-[20px] h-[14px] bg-gray-700 flex items-center justify-center text-[7px] text-gray-400"
+                  >
+                    {tire.country_code || tire.model?.brand?.country?.id || "?"}
+                  </div>
+                ) : (
+                  <Image
+                    src={getCountryFlag()}
+                    alt={tire.country || tire.model?.brand?.country?.name || "Country"}
+                    width={20}
+                    height={14}
+                    className="rounded-sm w-[20px] h-[14px]"
+                    onError={() => setFlagError(true)}
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Icons overlay - bottom right (spike, runflat, cargo) */}
+            {(tire.spike || tire.runflat || tire.cargo) && (
+              <div className="absolute bottom-2 right-2 z-[5] bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
+                <div className="flex items-center gap-2">
+                  {/* Spike icon */}
+                  {tire.spike && (
+                    <Image
+                      src="/images/bykvaSH.png"
+                      alt="Шипы"
+                      width={20}
+                      height={20}
+                      className="h-5 w-5"
+                      title="Шипованная шина"
+                    />
+                  )}
+                  {/* RunFlat icon */}
+                  {(tire.runflat === true || tire.runflat === 1 || tire.runflat === "true" || tire.runflat === "1") && (
+                    <span className="text-xs font-bold text-white" title="RunFlat Technology">
+                      RFT
+                    </span>
+                  )}
+                  {/* Cargo icon */}
+                  {(tire.cargo === true || tire.cargo === 1 || tire.cargo === "true" || tire.cargo === "1") && (
+                    <Image
+                      src="/images/cargo-truck-new.png"
+                      alt="Грузовая"
+                      width={20}
+                      height={20}
+                      className="h-5 w-5"
+                      title="Грузовая шина"
+                    />
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="flex justify-center">
               <div className="relative w-full max-w-[400px]" style={{ maxHeight: '400px' }}>
@@ -559,104 +744,96 @@ export default function ProductPage() {
           </div>
         </div>
 
+        <div className="p-4 space-y-1 -mt-2">
+          <h2 className="text-xl font-bold text-white">{tire.name || tire.title || "—"}</h2>
+
+          {/* Price section */}
+          <div className="flex items-center justify-end gap-2">
+            <span className="text-xs text-gray-400 line-through">
+              {getTireProperty("rrc")} ₽
+            </span>
+            <span className="text-xl font-bold text-[#009CFF]">{getTireProperty("price")} ₽</span>
+          </div>
+        </div>
+
+        {/* Stock availability section - Full width */}
+        <div className="px-4 py-4 -mt-[30px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {getStockLocationInfo().map((locationInfo, index) => {
+              const warehouseCartCount = warehouseCartCounts[locationInfo.location] || 0
+              const availableStock = locationInfo.stock - warehouseCartCount
+              const stockColor = availableStock > 10
+                ? 'text-green-400'
+                : availableStock > 5
+                  ? 'text-yellow-400'
+                  : availableStock > 0
+                    ? 'text-orange-400'
+                    : 'text-red-400'
+
+              // Определяем срок поставки по складу
+              const getDeliveryTime = (location: string) => {
+                if (location === "Под заказ") return "3-7 дней"
+                return "Сегодня"
+              }
+
+              return (
+                <div
+                  key={index}
+                  className={`flex justify-between items-center p-4 rounded-xl transition-all ${
+                    locationInfo.stock > 0
+                      ? 'bg-[#2A2A2A]'
+                      : 'bg-[#2A2A2A] opacity-50'
+                  }`}
+                >
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-white">
+                      {locationInfo.location}
+                    </span>
+                    <span className="text-[10px] text-gray-400">
+                      {getDeliveryTime(locationInfo.location)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`text-sm font-medium ${stockColor} w-[70px] text-right`}>
+                      {availableStock > 20 ? ">20 шт" : availableStock > 0 ? `${availableStock} шт` : "Нет"}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        removeFromCartForWarehouse(locationInfo)
+                      }}
+                      disabled={warehouseCartCount <= 0}
+                      className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#484b51] text-white rounded-lg flex items-center justify-center hover:bg-[#5A5D63] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Minus className="w-5 h-5 sm:w-6 sm:h-6" />
+                    </button>
+                    <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#1A1A1A] border border-[#3A3A3A] text-white rounded-lg flex items-center justify-center text-base sm:text-lg font-medium">
+                      {warehouseCartCount}
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        addToCartForWarehouse(locationInfo)
+                      }}
+                      disabled={availableStock <= 0}
+                      className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#d3df3d] text-black rounded-lg flex items-center justify-center hover:bg-[#c5d135] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
         <div className="p-4 space-y-4">
-          <div>
-            <h2 className="text-xl font-bold text-white">{tire.name || tire.title || "—"}</h2>
-
-            {/* Article and Flag/Country on same line */}
-            <div className="flex items-center justify-between mt-1">
-              <p className="text-[10px] text-gray-400">Артикул: {getMid()}</p>
-
-              {/* Flag and Country */}
-              <div className="flex items-center gap-2">
-                {flagError ? (
-                  <div
-                    className="rounded-sm w-[24px] h-[16px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[8px] text-gray-500"
-                    title={`URL флага: ${getCountryFlag()}`}
-                  >
-                    {tire.country_code || tire.model?.brand?.country?.id || "?"}
-                  </div>
-                ) : (
-                  <div className="relative w-[24px] h-[16px]">
-                    <Image
-                      src={getCountryFlag()}
-                      alt={tire.country || tire.model?.brand?.country?.name || "Country"}
-                      width={24}
-                      height={16}
-                      className="rounded-sm w-[24px] h-[16px] border border-gray-200"
-                      onError={() => setFlagError(true)}
-                    />
-                  </div>
-                )}
-                <span className="text-sm text-gray-400">
-                  {tire.country || tire.model?.brand?.country?.name || "Страна не указана"}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Stock availability section */}
-          <div className="bg-[#2A2A2A] rounded-lg p-4 mt-4">
-            <h3 className="text-lg font-semibold text-white mb-3">Наличие</h3>
-            <div className="space-y-2">
-              {getStockLocationInfo().map((locationInfo, index) => (
-                <div key={index} className="flex justify-between items-center text-white">
-                  <span className="text-sm">{locationInfo.location}</span>
-                  <span className={`text-sm font-medium ${locationInfo.stock > 0 ? 'text-[#D3DF3D]' : 'text-gray-500'}`}>
-                    {locationInfo.stock > 0 ? `${locationInfo.stock} шт` : "0 шт"}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between mt-4">
-            <div>
-              <p className="text-sm text-gray-400 line-through">
-                {getTireProperty("rrc")} ₽
-              </p>
-              <span className="text-2xl font-bold text-[#009CFF]">{getTireProperty("price")} ₽</span>
-            </div>
-
-            {/* Cart controls matching other pages */}
-            <div className="flex items-center gap-0">
-              <div className="flex h-9 sm:h-10 md:h-11 lg:h-12 rounded-xl overflow-hidden">
-                {/* Minus button */}
-                <button
-                  onClick={removeFromCart}
-                  disabled={cartCount <= 0}
-                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full px-3 sm:px-4 md:px-5 lg:px-6 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
-                  style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
-                  aria-label="Уменьшить количество"
-                >
-                  <Minus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-                </button>
-
-                {/* Counter */}
-                <div className="bg-black/85 text-white h-full px-2 sm:px-3 md:px-4 flex items-center justify-center min-w-[2.5rem] sm:min-w-[3rem] md:min-w-[3.5rem] lg:min-w-[4rem] backdrop-blur-sm">
-                  <span className="text-[16px] sm:text-[20px] md:text-[24px] font-medium">{cartCount}</span>
-                </div>
-
-                {/* Plus button */}
-                <button
-                  onClick={addToCart}
-                  disabled={cartCount >= (tire?.stock || 0)}
-                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full px-3 sm:px-4 md:px-5 lg:px-6 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
-                  style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
-                  aria-label="Увеличить количество"
-                >
-                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3 mt-4">
+          <div className="flex flex-col gap-3">
             <div className="flex items-center gap-3 p-3 bg-[#2A2A2A] rounded-lg">
               <Truck className="h-5 w-5 text-[#009CFF]" />
               <div>
                 <p className="text-sm font-medium text-white">Бесплатная доставка</p>
-                <p className="text-xs text-gray-400">При заказе от 8 000 ₽</p>
+                <p className="text-xs text-gray-400">При оплате сейчас</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 bg-[#2A2A2A] rounded-lg">
@@ -664,6 +841,13 @@ export default function ProductPage() {
               <div>
                 <p className="text-sm font-medium text-white">Гарантия 1 год</p>
                 <p className="text-xs text-gray-400">Официальная гарантия производителя</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-[#2A2A2A] rounded-lg">
+              <span className="h-5 w-5 text-[#D3DF3D] font-bold text-sm flex items-center justify-center">%</span>
+              <div>
+                <p className="text-sm font-medium text-white">Скидка на шиномонтаж 20%</p>
+                <p className="text-xs text-gray-400">При покупке от 4 шин</p>
               </div>
             </div>
           </div>
@@ -691,6 +875,10 @@ export default function ProductPage() {
             </TabsList>
             <TabsContent value="specs" className="mt-4 space-y-3">
               <div className="bg-[#2A2A2A] rounded-lg p-4">
+                <div className="flex justify-between py-2 border-b border-gray-600">
+                  <span className="text-sm text-white">Артикул</span>
+                  <span className="text-sm font-medium text-white">{getMid()}</span>
+                </div>
                 <div className="flex justify-between py-2 border-b border-gray-600">
                   <span className="text-sm text-white">Бренд</span>
                   <span className="text-sm font-medium text-white">{getTireProperty("brand")}</span>
