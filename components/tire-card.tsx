@@ -633,7 +633,7 @@ export default function TireCard({ tire }: TireCardProps) {
                   }`,
                 })}
               </span>
-              <span className={`text-[11px] sm:text-[15.4px] md:text-[17.6px] font-medium whitespace-nowrap ${stockStatus.className}`}>
+              <span className={`text-[9px] sm:text-[11px] md:text-[13px] font-medium whitespace-nowrap ${stockStatus.className}`}>
                 {stockStatus.tooltip}
               </span>
             </div>
@@ -740,21 +740,26 @@ export default function TireCard({ tire }: TireCardProps) {
           </div>
           <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
             <div className="flex flex-col items-start">
-              {tire.stock > 0 ? (
-                <>
-                  <span
-                    className={`h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[17.6px] sm:text-[19.8px] md:text-[22px] font-medium px-3 rounded-full ${
-                      tire.stock > 10 ? "bg-green-500/20 text-green-600 dark:text-green-400" :
-                      tire.stock > 5 ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" :
-                      "bg-orange-500/20 text-orange-600 dark:text-orange-400"
-                    }`}
-                  >
-                    {tire.stock > 20 ? ">20 шт" : `${tire.stock} шт`}
-                  </span>
-                </>
-              ) : (
-                <span className="h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[15.4px] sm:text-[17.6px] font-medium px-3 rounded-full bg-red-500/20 text-red-600 dark:text-red-400">Нет в наличии</span>
-              )}
+              {(() => {
+                const availableStock = tire.stock - cartCount;
+                if (availableStock > 0) {
+                  return (
+                    <span
+                      className={`h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[12px] sm:text-[14px] md:text-[16px] font-medium px-3 rounded-full ${
+                        availableStock > 10 ? "bg-green-500/20 text-green-600 dark:text-green-400" :
+                        availableStock > 5 ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" :
+                        "bg-orange-500/20 text-orange-600 dark:text-orange-400"
+                      }`}
+                    >
+                      {availableStock > 20 ? ">20 шт" : `${availableStock} шт`}
+                    </span>
+                  );
+                } else {
+                  return (
+                    <span className="h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[12px] sm:text-[14px] md:text-[16px] font-medium px-3 rounded-full bg-red-500/20 text-red-600 dark:text-red-400">Нет в наличии</span>
+                  );
+                }
+              })()}
             </div>
             <div className="flex items-center flex-1 justify-end ml-2">
               {/* Новая кнопка корзины в стиле из изображения */}
@@ -772,7 +777,7 @@ export default function TireCard({ tire }: TireCardProps) {
 
                 {/* Счетчик количества */}
                 <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2.2rem] sm:min-w-[2.75rem] md:min-w-[3.3rem]">
-                  <span className="text-[13px] sm:text-[15px] md:text-[18px] font-medium">{cartCount}</span>
+                  <span className="text-[11px] sm:text-[13px] md:text-[15px] font-medium">{cartCount}</span>
                 </div>
 
                 {/* Кнопка плюс */}
