@@ -8,10 +8,32 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
+  overscroll-behavior-y: none;
+}
+
+html {
+  overflow: hidden;
+  /* Fix for PWA viewport height calculation */
+  height: 100%;
+  height: -webkit-fill-available;
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Fix for PWA viewport */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  min-height: 100dvh;
+}
+
+body {
+  font-family: var(--font-rubik), Arial, Helvetica, sans-serif;
+}
+
+/* Дополнительный шрифт PT Sans - используется там, где Rubik недоступен */
+.font-pt-sans {
+  font-family: var(--font-pt-sans), Arial, Helvetica, sans-serif;
 }
 
 @layer utilities {
@@ -186,4 +208,19 @@ body {
 
 .cart-pulse-effect img {
   filter: drop-shadow(0 0 8px #D3DF3D) drop-shadow(0 0 15px #D3DF3D);
+}
+
+/* Анимация shine для логотипа */
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) skewX(12deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(12deg);
+  }
+}
+
+/* Dialog overlay покрывает весь экран включая safe-area */
+[data-radix-dialog-overlay] {
+  z-index: 9999 !important;
 }

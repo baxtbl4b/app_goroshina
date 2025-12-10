@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -24,61 +23,6 @@ interface TireSearchFilterProps {
   season?: Season
 }
 
-// Mock API response for demonstration purposes
-const mockApiResponse = {
-  success: true,
-  count: 12,
-  items: [
-    {
-      id: "NT001",
-      brand: "Nokian",
-      model: "Hakkapeliitta 10",
-      width: 225,
-      height: 45,
-      diam: 17,
-      season: "winter",
-      spike: true,
-      runflat: false,
-      price: 12500,
-      stock: 8,
-      image: "https://example.com/images/nokian-hakka10.jpg",
-    },
-    {
-      id: "CT002",
-      brand: "Continental",
-      model: "IceContact 3",
-      width: 225,
-      height: 45,
-      diam: 17,
-      season: "winter",
-      spike: true,
-      runflat: false,
-      price: 13200,
-      stock: 4,
-      image: "https://example.com/images/continental-ice3.jpg",
-    },
-    {
-      id: "MC003",
-      brand: "Michelin",
-      model: "X-Ice North 4",
-      width: 225,
-      height: 45,
-      diam: 17,
-      season: "winter",
-      spike: true,
-      runflat: true,
-      price: 14800,
-      stock: 6,
-      image: "https://example.com/images/michelin-xice4.jpg",
-    },
-    // Additional items would be here in a real response
-  ],
-}
-
-// Опрделение стиля пульсации с использованием CSS animation
-const pulseAnimationStyle = {
-  animation: "pulse-filter 2s infinite",
-}
 
 export default function TireSearchFilter({ season }: { season: Season }) {
   const router = useRouter()
@@ -112,9 +56,6 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     ],
   )
 
-  // Add state for API response display
-  const [showApiResponse, setShowApiResponse] = useState(false)
-  const [apiResponseLoading, setApiResponseLoading] = useState(false)
 
   // Add mock data for user's vehicles
   const userVehicles: VehicleWithTires[] = [
@@ -142,13 +83,19 @@ export default function TireSearchFilter({ season }: { season: Season }) {
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null)
 
   // Add these state variables inside the TireSearchFilter component, after the existing useState declarations
-  const [priceRange, setPriceRange] = useState<[number, number]>([3000, 30000])
+  const [priceRange, setPriceRange] = useState<[number, number]>(() => {
+    const minPriceParam = searchParams.get("minPrice")
+    const maxPriceParam = searchParams.get("maxPrice")
+    return [
+      minPriceParam ? parseInt(minPriceParam) : 3000,
+      maxPriceParam ? parseInt(maxPriceParam) : 30000
+    ]
+  })
   // Changed default value from "all" to "quarter"
   const [stockFilter, setStockFilter] = useState<"single" | "full">("single")
   const [isPriceFilterVisible, setIsPriceFilterVisible] = useState(true)
   const [isStockFilterVisible, setIsStockFilterVisible] = useState(true)
   const [cargo, setCargo] = useState(false)
-  const [studs, setStuds] = useState(false)
 
   // Add state for the new round toggle button
   const [quickFilterActive, setQuickFilterActive] = useState(false)
@@ -183,6 +130,38 @@ export default function TireSearchFilter({ season }: { season: Season }) {
   // Добавьте новые состояния для отслеживания свайпа после других useState объявлений
   const [touchStartY, setTouchStartY] = useState<number | null>(null)
   const [touchEndY, setTouchEndY] = useState<number | null>(null)
+
+  // Отдельные состояния для свайпа на полоске
+  const [handleTouchStartY, setHandleTouchStartY] = useState<number | null>(null)
+
+  // Состояние для подсветки полоски
+  const [isHandleHighlighted, setIsHandleHighlighted] = useState(false)
+  const handleHighlightTimeout = useRef<NodeJS.Timeout | null>(null)
+
+  // Состояние для отслеживания прокрутки гаража
+  const [showLeftGradient, setShowLeftGradient] = useState(false)
+  const [showRightGradient, setShowRightGradient] = useState(true)
+  const garageScrollRef = useRef<HTMLDivElement>(null)
+
+  // Обработчик прокрутки гаража
+  const handleGarageScroll = () => {
+    if (garageScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = garageScrollRef.current
+      setShowLeftGradient(scrollLeft > 5)
+      setShowRightGradient(scrollLeft < scrollWidth - clientWidth - 5)
+    }
+  }
+
+  // Функция для подсветки полоски с задержкой затухания
+  const highlightHandle = () => {
+    setIsHandleHighlighted(true)
+    if (handleHighlightTimeout.current) {
+      clearTimeout(handleHighlightTimeout.current)
+    }
+    handleHighlightTimeout.current = setTimeout(() => {
+      setIsHandleHighlighted(false)
+    }, 1000)
+  }
 
   // Check if all dimensions are specified
   useEffect(() => {
@@ -240,26 +219,6 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     }
   }, [])
 
-  // Обновим useEffect для обработки свайпов в обоих направлениях
-  // Найдите существующий useEffect, который обрабатывает свайпы, и замените его на следующий:
-  useEffect(() => {
-    // Проверяем, был ли выполнен свайп
-    if (touchStartY && touchEndY) {
-      const swipeDistance = touchEndY - touchStartY
-      // Если свайп вверх (начальная точка ниже конечной) и фильтр свёрнут
-      if (swipeDistance < -50 && isFilterCollapsed) {
-        setIsFilterCollapsed(false)
-      }
-      // Если свайп вниз (начальная точка выше конечной) и фильтр развёрнут
-      else if (swipeDistance > 50 && !isFilterCollapsed) {
-        setIsFilterCollapsed(true)
-      }
-
-      // Сбрасываем значения после обработки
-      setTouchStartY(null)
-      setTouchEndY(null)
-    }
-  }, [touchEndY, touchStartY, isFilterCollapsed])
 
   // Add function to select vehicle and set tire sizes
   const selectVehicle = (vehicle: VehicleWithTires) => {
@@ -299,6 +258,21 @@ export default function TireSearchFilter({ season }: { season: Season }) {
 
   const [secondAxis, setSecondAxis] = useState(false)
   const [runflat, setRunflat] = useState(false)
+  const [todayOnly, setTodayOnly] = useState(false)
+
+  // Second axis dimensions
+  const [width2, setWidth2] = useState<string>(() => {
+    const width2Param = searchParams.get("width2")
+    return width2Param || ""
+  })
+  const [profile2, setProfile2] = useState<string>(() => {
+    const profile2Param = searchParams.get("profile2") || searchParams.get("height2")
+    return profile2Param || ""
+  })
+  const [diameter2, setDiameter2] = useState<string>(() => {
+    const diameter2Param = searchParams.get("diameter2") || searchParams.get("diam2")
+    return diameter2Param || ""
+  })
 
   // Function to toggle runflat parameter and update API request
   const toggleRunflatParameter = (checked: boolean) => {
@@ -352,6 +326,32 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     router.push(`${window.location.pathname}?${params.toString()}`)
   }
 
+  // Function to toggle today parameter and update API request
+  const toggleTodayParameter = (checked: boolean) => {
+    setTodayOnly(checked)
+
+    // Apply the filter immediately
+    const params = new URLSearchParams(searchParams.toString())
+
+    // Preserve existing parameters
+    if (width) params.set("width", width)
+    if (profile) params.set("profile", profile)
+    if (diameter) params.set("diameter", diameter)
+
+    // Update today parameter
+    if (checked) {
+      params.set("today", "true")
+    } else {
+      params.delete("today")
+    }
+
+    // Log the filter being applied for debugging
+    console.log(`Applying today filter: ${checked}`, params.toString())
+
+    // Navigate with the updated parameters - force a full navigation to ensure filter is applied
+    router.push(`${window.location.pathname}?${params.toString()}`)
+  }
+
   // Width options
   const widthOptions = [
     "145",
@@ -372,6 +372,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     "295",
     "305",
     "315",
+    "325",
   ]
 
   // Profile options
@@ -503,57 +504,6 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     router.push(`${window.location.pathname}?${params.toString()}`)
   }
 
-  const handleSearch = () => {
-    // Create URL parameters
-    const params = new URLSearchParams(searchParams.toString())
-
-    if (width) params.set("width", width)
-    else params.delete("width")
-
-    if (profile) params.set("profile", profile)
-    else params.delete("width")
-
-    if (diameter) params.set("profile", diameter)
-    else params.delete("profile")
-
-    if (diameter) params.set("diameter", diameter)
-    else params.delete("diameter")
-
-    // Add this to the handleSearch function, before the router.push call
-    if (priceRange[0] > 3000) params.set("minPrice", priceRange[0].toString())
-    else params.delete("minPrice")
-
-    if (priceRange[1] < 30000) params.set("maxPrice", priceRange[1].toString())
-    else params.delete("maxPrice")
-
-    // Map the UI states to API parameter values
-    const stockValue = stockFilter === "single" ? "low" : "in-stock"
-    params.set("stock", stockValue)
-
-    // Add the runflat parameter when checkbox is checked
-    if (runflat) {
-      params.set("runflat", "true")
-    }
-
-    // Добавляем параметр cargo, когда чекбокс активирован
-    if (cargo) {
-      params.set("cargo", "true")
-    }
-
-    // Add the spike parameter for winter tires
-    if (season === "w") {
-      if (spike !== null) {
-        params.set("spike", spike.toString())
-      } else {
-        params.delete("spike")
-      }
-    } else {
-      params.delete("spike")
-    }
-
-    // Navigate with the parameters
-    router.push(`${window.location.pathname}?${params.toString()}`)
-  }
 
   // Функция для применения быстрого фильтра по типоразмеру
   const applyQuickSizeFilter = (size: { width: string; profile: string; diameter: string }) => {
@@ -611,11 +561,69 @@ export default function TireSearchFilter({ season }: { season: Season }) {
       // If all dimensions are specified, apply filter
       applyDimensionFilter(width, profile, value)
     } else if (!value) {
-      // If diameter is cleared, update URL  profile, value)
-    } else if (!value) {
       // If diameter is cleared, update URL
       const params = new URLSearchParams(searchParams.toString())
       params.delete("diameter")
+      router.push(`${window.location.pathname}?${params.toString()}`)
+    }
+  }
+
+  // Function to apply second axis filter
+  const applySecondAxisFilter = (w2: string, p2: string, d2: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    if (w2) params.set("width2", w2)
+    else params.delete("width2")
+
+    if (p2) params.set("profile2", p2)
+    else params.delete("profile2")
+
+    if (d2) params.set("diameter2", d2)
+    else params.delete("diameter2")
+
+    // Set secondAxis flag
+    if (w2 && p2 && d2) {
+      params.set("secondAxis", "true")
+    }
+
+    router.push(`${window.location.pathname}?${params.toString()}`)
+  }
+
+  // Function to handle second axis width change
+  const handleWidth2Change = (value: string) => {
+    setWidth2(value)
+    if (value && profile2 && diameter2) {
+      applySecondAxisFilter(value, profile2, diameter2)
+    } else {
+      const params = new URLSearchParams(searchParams.toString())
+      if (value) params.set("width2", value)
+      else params.delete("width2")
+      router.push(`${window.location.pathname}?${params.toString()}`)
+    }
+  }
+
+  // Function to handle second axis profile change
+  const handleProfile2Change = (value: string) => {
+    setProfile2(value)
+    if (width2 && value && diameter2) {
+      applySecondAxisFilter(width2, value, diameter2)
+    } else {
+      const params = new URLSearchParams(searchParams.toString())
+      if (value) params.set("profile2", value)
+      else params.delete("profile2")
+      router.push(`${window.location.pathname}?${params.toString()}`)
+    }
+  }
+
+  // Function to handle second axis diameter change
+  const handleDiameter2Change = (value: string) => {
+    setDiameter2(value)
+    if (width2 && profile2 && value) {
+      applySecondAxisFilter(width2, profile2, value)
+    } else {
+      const params = new URLSearchParams(searchParams.toString())
+      if (value) params.set("diameter2", value)
+      else params.delete("diameter2")
       router.push(`${window.location.pathname}?${params.toString()}`)
     }
   }
@@ -625,8 +633,22 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     setWidth("")
     setProfile("")
     setDiameter("")
+    setWidth2("") // Reset second axis
+    setProfile2("")
+    setDiameter2("")
     setSelectedVehicle(null) // Reset the selected vehicle
-    clearDimensionFilter()
+    setPriceRange([3000, 30000]) // Reset price range
+    setStockFilter("single") // Reset stock filter
+    setRunflat(false) // Reset runflat
+    setCargo(false) // Reset cargo
+    setSecondAxis(false) // Reset second axis
+    setTodayOnly(false) // Reset today filter
+    setSpike(null) // Reset spike filter
+    setSelectedBrands([]) // Reset brands
+
+    // Clear all URL parameters
+    const params = new URLSearchParams()
+    router.push(`${window.location.pathname}?${params.toString()}`)
   }
 
   // Initialize from URL parameters
@@ -656,6 +678,35 @@ export default function TireSearchFilter({ season }: { season: Season }) {
       setRunflat(true)
     } else {
       setRunflat(false)
+    }
+
+    // Initialize todayOnly from URL parameter
+    const todayParam = searchParams.get("today")
+    if (todayParam === "true") {
+      setTodayOnly(true)
+    } else {
+      setTodayOnly(false)
+    }
+
+    // Initialize stock filter from URL parameter
+    const minStockParam = searchParams.get("minStock")
+    if (minStockParam === "4") {
+      setStockFilter("full")
+    } else {
+      setStockFilter("single")
+    }
+
+    // Initialize second axis from URL parameters
+    const secondAxisParam = searchParams.get("secondAxis")
+    const width2Param = searchParams.get("width2")
+    const profile2Param = searchParams.get("profile2")
+    const diameter2Param = searchParams.get("diameter2")
+
+    if (secondAxisParam === "true" || (width2Param && profile2Param && diameter2Param)) {
+      setSecondAxis(true)
+      if (width2Param) setWidth2(width2Param)
+      if (profile2Param) setProfile2(profile2Param)
+      if (diameter2Param) setDiameter2(diameter2Param)
     }
   }, [searchParams, season])
 
@@ -688,72 +739,6 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     }
   }, [])
 
-  // Function to fetch studded tires from external API
-  const fetchStuddedTiresFromExternalAPI = async () => {
-    try {
-      setApiResponseLoading(true)
-
-      // Create the URL with parameters
-      const params = new URLSearchParams({
-        width: width || "",
-        height: profile || "", // Changed from profile to height
-        diam: diameter || "", // Changed from diameter to diam
-        season: "winter", // Always winter for studded tires
-        spike: "true", // Always true for studded tires
-        ...(priceRange[0] > 3000 ? { priceMin: priceRange[0].toString() } : {}),
-        ...(priceRange[1] < 30000 ? { priceMax: priceRange[1].toString() } : {}),
-        inStock: stockFilter === "full" ? "true" : "",
-        ...(runflat ? { runflat: "true" } : {}),
-        ...(cargo ? { cargo: "true" } : {}),
-        apiKey: "API_TOKEN", // Replace with actual token in production
-      })
-
-      // Filter out empty parameters
-      const filteredParams = new URLSearchParams()
-      for (const [key, value] of params.entries()) {
-        if (value !== "") {
-          filteredParams.append(key, value)
-        }
-      }
-
-      const url = `https://api.fxcode.ru/v1/tires?${filteredParams.toString()}`
-
-      console.log("Fetching studded tires from external API:", url)
-
-      // Simulate API call with a delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // In a real implementation, you would make the actual fetch request here
-      // const response = await fetch(url);
-      // const data = await response.json();
-
-      // For demonstration, we'll use our mock data
-      setShowApiResponse(true)
-      setApiResponseLoading(false)
-
-      return {
-        success: true,
-        data: mockApiResponse,
-        url,
-      }
-    } catch (error) {
-      console.error("Error fetching from external API:", error)
-      setApiResponseLoading(false)
-      return { error: "Failed to fetch from external API" }
-    }
-  }
-
-  // Function to test API and show response
-  const testApiRequest = async () => {
-    setApiResponseLoading(true)
-    setShowApiResponse(false)
-
-    // Simulate API call with a delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    setShowApiResponse(true)
-    setApiResponseLoading(false)
-  }
 
   const [isOpen, setIsOpen] = useState(true)
   const [selectedWidths, setSelectedWidths] = useState<string[]>([])
@@ -787,39 +772,143 @@ export default function TireSearchFilter({ season }: { season: Season }) {
 
       <div
         ref={filterRef}
-        className={`bg-white dark:bg-[#2A2A2A] p-4 fixed bottom-0 left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] ${
-          isFilterCollapsed ? "max-h-[120px] overflow-hidden" : ""
-        } pb-[calc(env(safe-area-inset-bottom)_+_1rem)]`}
+        className={`px-4 pt-2 pb-4 fixed left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] bg-white dark:bg-[#2A2A2A] backdrop-blur-md`}
+        style={{
+          bottom: '0',
+          transform: isFilterCollapsed ? 'translateY(calc(100% - 56px))' : 'translateY(0)',
+          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%)',
+          maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%)',
+          touchAction: isFilterCollapsed ? 'none' : 'pan-x pinch-zoom',
+          WebkitOverflowScrolling: 'touch',
+        }}
         aria-label="Блок фильтра шин"
         data-testid="tire-filter-container"
-        onTouchStart={(e) => setTouchStartY(e.touches[0].clientY)}
-        onTouchMove={(e) => {
-          if (touchStartY) {
-            const currentY = e.touches[0].clientY
-            const diff = touchStartY - currentY
-
-            // Предотвращаем прокрутку страницы при свайпе вверх на свёрнутом фильтре
-            if (isFilterCollapsed && diff > 0) {
-              e.preventDefault()
-            }
-            // Предотвращаем прокрутку страницы при свайпе вниз на развёрнутом фильтре
-            else if (!isFilterCollapsed && diff < 0) {
-              e.preventDefault()
-            }
+onTouchStart={(e) => {
+          // Когда фильтр свёрнут - перехватываем все касания для предотвращения закрытия приложения
+          if (isFilterCollapsed) {
+            e.preventDefault()
+            setTouchStartY(e.touches[0].clientY)
+            setTouchEndY(null)
           }
         }}
-        onTouchEnd={(e) => setTouchEndY(e.changedTouches[0].clientY)}
+        onTouchMove={(e) => {
+          // Когда фильтр свёрнут - блокируем системный жест
+          if (isFilterCollapsed && touchStartY !== null) {
+            e.preventDefault()
+            setTouchEndY(e.touches[0].clientY)
+          }
+        }}
+        onTouchEnd={() => {
+          // Обработка свайпа когда фильтр свёрнут (вне кнопки handle)
+          if (isFilterCollapsed && touchStartY !== null && touchEndY !== null) {
+            const diff = touchEndY - touchStartY
+            // Свайп вверх - раскрыть
+            if (diff < -20) {
+              setIsFilterCollapsed(false)
+              highlightHandle()
+            }
+          }
+          setTouchStartY(null)
+          setTouchEndY(null)
+        }}
       >
-        {/* Collapse toggle button */}
+        {/* Swipe handle for collapse/expand - now also clickable */}
+        <div
+          className="flex items-center justify-center mb-2 -mx-4 px-4"
+          data-swipe-handle
+          style={{
+            touchAction: 'none',
+            paddingTop: isFilterCollapsed ? '12px' : '0',
+            paddingBottom: isFilterCollapsed ? '12px' : '0',
+          }}
+        >
+          <button
+            className="flex items-center justify-center py-3 cursor-pointer w-full group"
+            style={{ touchAction: 'none' }}
+            onClick={() => {
+              // Клик переключает состояние
+              if (isFilterCollapsed) {
+                setIsFilterCollapsed(false)
+              } else if (!isExpanded) {
+                setIsExpanded(true)
+              } else {
+                setIsExpanded(false)
+              }
+              highlightHandle()
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault()
+              setHandleTouchStartY(e.touches[0].clientY)
+            }}
+            onTouchMove={(e) => {
+              e.preventDefault()
+              if (handleTouchStartY !== null) {
+                setTouchEndY(e.touches[0].clientY)
+              }
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault()
+
+              if (handleTouchStartY !== null) {
+                const endY = e.changedTouches[0].clientY
+                const diff = endY - handleTouchStartY
+
+                // Порог свайпа
+                if (Math.abs(diff) > 20) {
+                  // Свайп вверх (diff < 0)
+                  if (diff < 0) {
+                    if (isFilterCollapsed) {
+                      setIsFilterCollapsed(false)
+                      highlightHandle()
+                    } else if (!isExpanded) {
+                      setIsExpanded(true)
+                      highlightHandle()
+                    }
+                  }
+                  // Свайп вниз (diff > 0)
+                  else {
+                    if (isExpanded) {
+                      setIsExpanded(false)
+                      highlightHandle()
+                    } else if (!isFilterCollapsed) {
+                      setIsFilterCollapsed(true)
+                      highlightHandle()
+                    }
+                  }
+                }
+
+                setHandleTouchStartY(null)
+                setTouchEndY(null)
+              }
+            }}
+            aria-label={isFilterCollapsed ? "Нажмите для раскрытия фильтра" : "Нажмите для скрытия фильтра"}
+            aria-expanded={!isFilterCollapsed}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <div className={`w-16 h-1.5 rounded-full transition-colors duration-300 ${isHandleHighlighted ? 'bg-[#D3DF3D]' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+              {isFilterCollapsed && (
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="text-gray-400 dark:text-gray-500 animate-bounce"
+                >
+                  <path d="M18 15L12 9L6 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </div>
+          </button>
+        </div>
         {/* Size selectors - always visible part of the filter */}
-        <div className="flex items-end gap-3 mb-4">
+        <div className="flex items-end gap-3 mb-3 mt-1">
           <div className="grid grid-cols-3 gap-3 flex-1">
             <div>
               <Label htmlFor="width" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                 Ширина
               </Label>
               <Select value={width} onValueChange={handleWidthChange}>
-                <SelectTrigger id="width" className="w-full bg-[#333333] text-white border-0">
+                <SelectTrigger id="width" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -834,10 +923,10 @@ export default function TireSearchFilter({ season }: { season: Season }) {
 
             <div>
               <Label htmlFor="profile" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
-                Профиль
+                Высота
               </Label>
               <Select value={profile} onValueChange={handleProfileChange}>
-                <SelectTrigger id="profile" className="w-full bg-[#333333] text-white border-0">
+                <SelectTrigger id="profile" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -859,7 +948,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                 </Label>
               </div>
               <Select value={diameter} onValueChange={handleDiameterChange}>
-                <SelectTrigger id="diameter" className="w-full bg-[#333333] text-white border-0">
+                <SelectTrigger id="diameter" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -877,36 +966,122 @@ export default function TireSearchFilter({ season }: { season: Season }) {
             variant="outline"
             size="sm"
             onClick={clearAllDimensions}
-            className={`h-10 px-3 text-xs border-0 transition-all duration-300 ${
-              width || profile || diameter
+            className={`h-10 px-3 text-xs border-0 rounded-xl transition-all duration-300 ${
+              width || profile || diameter || priceRange[0] > 3000 || priceRange[1] < 30000 || stockFilter === "full" || runflat || cargo || secondAxis || todayOnly || spike !== null || selectedBrands.length > 0
                 ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 hover:scale-105 active:scale-95 shadow-md hover:shadow-red-500/30"
                 : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
             }`}
-            disabled={!width && !profile && !diameter}
+            disabled={!width && !profile && !diameter && priceRange[0] === 3000 && priceRange[1] === 30000 && stockFilter === "single" && !runflat && !cargo && !secondAxis && !todayOnly && spike === null && selectedBrands.length === 0}
           >
             Сбросить
           </Button>
         </div>
 
+        {/* Second axis selectors (conditional) */}
+        {secondAxis && (
+          <div className="flex items-end gap-3 mb-3 mt-1">
+            <div className="grid grid-cols-3 gap-3 flex-1">
+              <div>
+                <Label htmlFor="width2" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                  Ширина (2 ось)
+                </Label>
+                <Select value={width2} onValueChange={handleWidth2Change}>
+                  <SelectTrigger id="width2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                    <SelectValue placeholder="~" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {widthOptions.map((w) => (
+                      <SelectItem key={w} value={w}>
+                        {w}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="profile2" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                  Высота (2 ось)
+                </Label>
+                <Select value={profile2} onValueChange={handleProfile2Change}>
+                  <SelectTrigger id="profile2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                    <SelectValue placeholder="~" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {profileOptions.map((p) => (
+                      <SelectItem key={p} value={p}>
+                        {p}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-center mb-1 w-full">
+                  <Label htmlFor="diameter2" className="text-xs text-[#1F1F1F] dark:text-gray-300 text-center">
+                    Диаметр (2 ось)
+                  </Label>
+                </div>
+                <Select value={diameter2} onValueChange={handleDiameter2Change}>
+                  <SelectTrigger id="diameter2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                    <SelectValue placeholder="~" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {diameterOptions.map((d) => (
+                      <SelectItem key={d} value={d}>
+                        R{d}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-10 px-3 text-xs border-0 invisible"
+              disabled
+            >
+              Сбросить
+            </Button>
+          </div>
+        )}
+
         {/* Header section with filter title and buttons - all on one horizontal line */}
-        <div className="flex flex-row items-center justify-between gap-3 mb-4">
+        <div className="flex flex-row items-center justify-between gap-3 mb-3">
           {/* My Garage section */}
-          <div className="flex-1 flex items-center gap-1 sm:gap-2 overflow-hidden">
+          <div className="flex-1 flex items-center gap-1 sm:gap-2 overflow-hidden min-w-0">
             <div className="flex flex-col w-full">
-              <div className="flex gap-1 overflow-x-auto scrollbar-hide mb-1 w-[70%]">
-                {userVehicles.map((vehicle) => (
-                  <button
-                    key={vehicle.id}
-                    onClick={() => selectVehicle(vehicle)}
-                    className={`text-xs px-2 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0 ${
-                      selectedVehicle === vehicle.id
-                        ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
-                        : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
-                    }`}
-                  >
-                    {vehicle.name}
-                  </button>
-                ))}
+              <div className="relative w-full">
+                {/* Left gradient fade-out overlay */}
+                <div
+                  className={`absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-[#2A2A2A] to-transparent pointer-events-none z-10 transition-opacity duration-200 ${showLeftGradient ? 'opacity-100' : 'opacity-0'}`}
+                ></div>
+                <div
+                  ref={garageScrollRef}
+                  onScroll={handleGarageScroll}
+                  className="flex gap-1 overflow-x-auto scrollbar-hide mb-1 px-1"
+                >
+                  {userVehicles.map((vehicle) => (
+                    <button
+                      key={vehicle.id}
+                      onClick={() => selectVehicle(vehicle)}
+                      className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
+                        selectedVehicle === vehicle.id
+                          ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
+                          : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                      }`}
+                    >
+                      {vehicle.name}
+                    </button>
+                  ))}
+                </div>
+                {/* Right gradient fade-out overlay */}
+                <div
+                  className={`absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-[#2A2A2A] to-transparent pointer-events-none z-10 transition-opacity duration-200 ${showRightGradient ? 'opacity-100' : 'opacity-0'}`}
+                ></div>
               </div>
               <span className="text-xs text-gray-500 dark:text-gray-400 hidden">Мой гараж</span>
             </div>
@@ -1027,7 +1202,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
 
         {/* Quick filter indicator - only show when filter is active and NOT on summer tab */}
         {quickFilterActive && season !== "s" && (
-          <div className="bg-[#D3DF3D]/20 dark:bg-[#D3DF3D]/10 rounded-md p-2 mb-4 flex items-center justify-between">
+          <div className="bg-[#D3DF3D]/20 dark:bg-[#D3DF3D]/10 rounded-xl p-2 mb-4 flex items-center justify-between">
             <span className="text-sm text-[#1F1F1F] dark:text-white">
               Быстрый фильтр активирован: популярный размер, только в наличии
             </span>
@@ -1041,71 +1216,11 @@ export default function TireSearchFilter({ season }: { season: Season }) {
           }`}
         >
           <div className="space-y-4">
-            {/* Second axis selectors (conditional) */}
-            {secondAxis && (
-              <div className="grid grid-cols-3 gap-3 pt-2 border-t border-[#D9D9DD] dark:border-[#3A3A3A]">
-                <div>
-                  <Label htmlFor="width2" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block">
-                    Ширина (2 ось)
-                  </Label>
-                  <Select>
-                    <SelectTrigger id="width2" className="w-full bg-[#333333] text-white border-0">
-                      <SelectValue placeholder="~" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {widthOptions.map((width) => (
-                        <SelectItem key={width} value={width}>
-                          {width}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  {" "}
-                  <Label htmlFor="profile2" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block">
-                    Профиль (2 ось)
-                  </Label>
-                  <Select>
-                    <SelectTrigger id="profile2" className="w-full bg-[#333333] text-white border-0">
-                      <SelectValue placeholder="~" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {profileOptions.map((profile) => (
-                        <SelectItem key={profile} value={profile}>
-                          {profile}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="diameter2" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block">
-                    Диаметр (2 ось)
-                  </Label>
-                  <Select>
-                    <SelectTrigger id="diameter2" className="w-full bg-[#333333] text-white border-0">
-                      <SelectValue placeholder="~" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {diameterOptions.map((diameter) => (
-                        <SelectItem key={diameter} value={diameter}>
-                          R{diameter}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
-
             <div className="space-y-3">
               {/* More compact filters in a row */}
               <div className="flex flex-wrap gap-3 justify-between">
                 {/* RunFlat and Second Axis options as compact checkboxes */}
-                <div className="w-full md:flex-1 border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-md p-3 flex items-center justify-center">
+                <div className="w-full md:flex-1 border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-xl p-3 flex items-center justify-center">
                   <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 items-center justify-center">
                     <div className="flex items-center space-x-2">
                       <Checkbox
@@ -1122,7 +1237,24 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                       <Checkbox
                         id="second-axis"
                         checked={secondAxis}
-                        onCheckedChange={(checked) => setSecondAxis(!!checked)}
+                        onCheckedChange={(checked) => {
+                          const isChecked = !!checked
+                          setSecondAxis(isChecked)
+
+                          const params = new URLSearchParams(searchParams.toString())
+                          if (isChecked) {
+                            params.set("secondAxis", "true")
+                          } else {
+                            params.delete("secondAxis")
+                            params.delete("width2")
+                            params.delete("profile2")
+                            params.delete("diameter2")
+                            setWidth2("")
+                            setProfile2("")
+                            setDiameter2("")
+                          }
+                          router.push(`${window.location.pathname}?${params.toString()}`)
+                        }}
                         className="h-4 w-4"
                       />
                       <Label htmlFor="second-axis" className="text-xs text-[#1F1F1F] dark:text-gray-300">
@@ -1142,67 +1274,49 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="studs"
-                        checked={studs}
-                        onCheckedChange={(checked) => setStuds(!!checked)}
+                        id="today"
+                        checked={todayOnly}
+                        onCheckedChange={(checked) => toggleTodayParameter(!!checked)}
                         className="h-4 w-4"
                       />
-                      <Label htmlFor="studs" className="text-xs text-[#1F1F1F] dark:text-gray-300">
-                        Б/У
+                      <Label htmlFor="today" className="text-xs text-[#1F1F1F] dark:text-gray-300">
+                        Сегодня
                       </Label>
                     </div>
                   </div>
                 </div>
 
                 {/* Filters in a row: Stock Filter and Price Range */}
-                <div className="flex flex-wrap gap-3 w-full md:w-3/4">
+                <div className="flex flex-wrap gap-3 w-full">
                   {/* Stock Filter - Checkbox style button */}
-                  <div className="w-[45%] sm:w-[30%] bg-[#F5F5F5] dark:bg-[#333333] rounded-md p-2">
+                  <div className="w-[40%] sm:w-[33%]">
                     <button
-                      onClick={() => setStockFilter(stockFilter === "single" ? "full" : "single")}
-                      className={`w-full h-16 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center px-2 ${
+                      onClick={() => {
+                        const newStockFilter = stockFilter === "single" ? "full" : "single"
+                        setStockFilter(newStockFilter)
+
+                        // Apply to URL parameters
+                        const params = new URLSearchParams(searchParams.toString())
+                        if (newStockFilter === "full") {
+                          params.set("minStock", "4")
+                        } else {
+                          params.delete("minStock")
+                        }
+                        router.push(`${window.location.pathname}?${params.toString()}`)
+                      }}
+                      className={`w-full h-16 rounded-t-xl rounded-bl-[28px] rounded-br-xl text-xs font-medium transition-all duration-200 flex items-center justify-center px-2 ${
                         stockFilter === "full"
                           ? "bg-blue-500 text-white"
-                          : "bg-white dark:bg-[#2A2A2A] text-[#1F1F1F] dark:text-white border border-gray-300 dark:border-gray-600"
+                          : "bg-[#F5F5F5] dark:bg-[#333333] text-[#1F1F1F] dark:text-white"
                       }`}
                     >
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-5 h-5 flex items-center justify-center rounded border ${
-                            stockFilter === "full" ? "bg-white border-white" : "border-gray-400 dark:border-gray-500"
-                          }`}
-                        >
-                          {stockFilter === "full" && (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="text-blue-500"
-                            >
-                              <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                          )}
-                        </div>
-                        <span>Скрыть меньше 4шт</span>
-                      </div>
+                      Скрыть меньше 4шт
                     </button>
                   </div>
 
                   {/* Price range slider */}
-                  <div className="w-[50%] sm:w-[65%] bg-[#F5F5F5] dark:bg-[#333333] rounded-md p-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <h4 className="text-sm font-medium text-[#1F1F1F] dark:text-white">Цена</h4>
-                      <div className="text-xs text-[#1F1F1F] dark:text-white">
-                        {priceRange[0].toLocaleString()} ₽ - {priceRange[1].toLocaleString()} ₽
-                      </div>
-                    </div>
-                    <div className="px-1 py-2">
+                  <div className="flex-1 bg-[#F5F5F5] dark:bg-[#333333] rounded-t-xl rounded-bl-xl rounded-br-[28px] p-2">
+                    <div className="px-1 pt-2 pb-1">
                       <Slider
                         defaultValue={[3000, 30000]}
                         min={3000}
@@ -1210,172 +1324,33 @@ export default function TireSearchFilter({ season }: { season: Season }) {
                         step={1000}
                         value={priceRange}
                         onValueChange={(value) => setPriceRange(value as [number, number])}
+                        onValueCommit={(value) => {
+                          const params = new URLSearchParams(searchParams.toString())
+                          if (value[0] > 3000) {
+                            params.set("minPrice", value[0].toString())
+                          } else {
+                            params.delete("minPrice")
+                          }
+                          if (value[1] < 30000) {
+                            params.set("maxPrice", value[1].toString())
+                          } else {
+                            params.delete("maxPrice")
+                          }
+                          router.push(`${window.location.pathname}?${params.toString()}`)
+                        }}
                         className="w-full"
                       />
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Search button (completely hidden) */}
-            <Button
-              className="w-full bg-[#1F1F1F] hover:bg-[#1F1F1F]/90 text-white font-bold mt-2 hidden"
-              onClick={handleSearch}
-              hidden
-            >
-              <Search className="h-4 w-4 mr-2" />
-              ПОДОБРАТЬ
-            </Button>
-          </div>
-        </div>
-        {/* API Request Debug Section - Hidden */}
-        <div className="hidden">
-          <h4 className="font-bold mb-2 text-[#1F1F1F] dark:text-white">API Request Debug:</h4>
-          {/* Rest of the debug content remains the same but will be hidden */}
-          <div className="space-y-2">
-            <div>
-              <span className="font-medium text-[#1F1F1F] dark:text-white">Endpoint:</span>
-              <code className="ml-2 p-1 bg-white dark:bg-gray-900 rounded text-[#1F1F1F] dark:text-white">
-                GET https://api.fxcode.ru/v1/tires
-              </code>
-            </div>
-            <div>
-              <span className="font-medium text-[#1F1F1F] dark:text-white">Query Parameters:</span>
-              <pre className="mt-1 p-2 bg-white dark:bg-gray-900 rounded overflow-x-auto text-[#1F1F1F] dark:text-white">
-                {JSON.stringify(
-                  {
-                    width: width || undefined,
-                    height: profile || undefined, // Changed from profile to height
-                    diam: diameter || undefined, // Changed from diameter to diam
-                    season,
-                    spike: season === "w" ? spike : undefined,
-                    minPrice: priceRange[0] > 3000 ? priceRange[0] : undefined,
-                    maxPrice: priceRange[1] < 30000 ? priceRange[1] : undefined,
-                    stock: stockFilter === "single" ? "low" : "in-stock",
-                    runflat: runflat ? true : undefined, // Explicitly show as true boolean
-                    cargo: cargo || undefined,
-                    secondAxis: secondAxis || undefined,
-                    brands: selectedBrands.length > 0 ? selectedBrands.join(",") : undefined,
-                  },
-                  null,
-                  2,
-                )}
-              </pre>
-            </div>
-            <div>
-              <span className="font-medium text-[#1F1F1F] dark:text-white">API Request:</span>
-              <div className="mt-1 space-y-2">
-                <div>
-                  <span className="text-xs font-semibold text-[#1F1F1F] dark:text-white">
-                    FXCode API {season === "w" && spike === true && "(Searching for studded tires)"}:
-                  </span>
-                  <div className="mt-1 p-2 bg-white dark:bg-gray-900 rounded overflow-x-auto text-[#1F1F1F] dark:text-white break-all">
-                    {`https://api.fxcode.ru/v1/tires?${new URLSearchParams(
-                      Object.entries({
-                        width: width || "",
-                        height: profile || "", // Changed from profile to height
-                        diam: diameter || "", // Changed from diameter to diam
-                        season: season === "s" ? "summer" : season === "w" ? "winter" : "all-season",
-                        spike:
-                          season === "w" && spike === true ? "true" : season === "w" && spike === false ? "false" : "",
-                        priceMin: priceRange[0] > 3000 ? priceRange[0].toString() : "",
-                        priceMax: priceRange[1] < 30000 ? priceRange[1].toString() : "",
-                        inStock: stockFilter === "full" ? "true" : "",
-                        runflat: runflat ? "true" : "", // Ensure runflat is included
-                        cargo: cargo ? "true" : "",
-                        brands: selectedBrands.length > 0 ? selectedBrands.join(",") : "",
-                        apiKey: "${API_TOKEN}",
-                      }).filter(([_, v]) => v !== ""),
-                    ).toString()}`}
-                  </div>
-                  {season === "w" && spike === true && (
-                    <div className="mt-1 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-xs text-green-800 dark:text-green-400">
-                      Активно: поиск шипованных шин в API FXCode
+                    <div className="text-xs text-[#1F1F1F] dark:text-white text-center mt-2 pb-1">
+                      <span className="font-medium">Цена:</span> {priceRange[0].toLocaleString()} ₽ - {priceRange[1].toLocaleString()} ₽
                     </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* API Response Section */}
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-[#1F1F1F] dark:text-white">API Response:</span>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      // Создаем URL с текущими параметрами фильтра
-                      const params = new URLSearchParams()
-                      if (width) params.set("width", width)
-                      if (profile) params.set("height", profile)
-                      if (diameter) params.set("diam", diameter)
-                      params.set("season", season === "s" ? "summer" : season === "w" ? "winter" : "all-season")
-                      if (season === "w" && spike !== null) params.set("spike", spike.toString())
-                      if (priceRange[0] > 3000) params.set("priceMin", priceRange[0].toString())
-                      if (priceRange[1] < 30000) params.set("priceMax", priceRange[1].toString())
-                      if (stockFilter === "full") params.set("inStock", "true")
-                      if (runflat) params.set("runflat", "true")
-                      if (cargo) params.set("cargo", "true")
-                      params.set("apiKey", "API_TOKEN")
-
-                      // Обновляем запрос в API
-                      setApiResponseLoading(true)
-                      setShowApiResponse(false)
-
-                      console.log("Обновление запроса в API:", `https://api.fxcode.ru/v1/tires?${params.toString()}`)
-
-                      // Симулируем задержку API
-                      setTimeout(() => {
-                        setApiResponseLoading(false)
-                        setShowApiResponse(true)
-                      }, 1000)
-                    }}
-                    className="text-xs h-6 px-2"
-                  >
-                    Обновить запрос в API
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={testApiRequest}
-                    disabled={apiResponseLoading}
-                    className="text-xs h-6 px-2"
-                  >
-                    {apiResponseLoading ? "Загрузка..." : "Тест API"}
-                  </Button>
-                </div>
-              </div>
-
-              {apiResponseLoading && (
-                <div className="mt-2 p-4 bg-white dark:bg-gray-900 rounded flex items-center justify-center">
-                  <div className="animate-spin h-4 w-4 border-2 border-blue-500 rounded-full border-t-transparent"></div>
-                  <span className="ml-2 text-xs text-gray-500">Загрузка данных...</span>
-                </div>
-              )}
-
-              {showApiResponse && !apiResponseLoading && (
-                <div className="mt-2">
-                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded text-xs text-blue-800 dark:text-blue-400 mb-2">
-                    Симуляция ответа API для URL:
-                    https://api.fxcode.ru/v1/tires?width=225&height=45&diam=17&season=winter&spike=true&apiKey=API_TOKEN
                   </div>
-                  <pre className="mt-1 p-2 bg-white dark:bg-gray-900 rounded overflow-x-auto text-[#1F1F1F] dark:text-white max-h-60">
-                    {JSON.stringify(mockApiResponse, null, 2)}
-                  </pre>
                 </div>
-              )}
+              </div>
             </div>
+
           </div>
         </div>
-        {/* Indicator when filter is collapsed */}
-        {isFilterCollapsed && (
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-[#2A2A2A] to-transparent pointer-events-none flex items-end justify-center pb-1">
-            <span className="text-xs text-gray-500 dark:text-gray-400">Нажмите, чтобы развернуть фильтр</span>
-          </div>
-        )}
       </div>
     </>
   )

@@ -272,23 +272,13 @@ export default function HomePage() {
   }, [])
 
   return (
-    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px]">
+    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[calc(60px+env(safe-area-inset-top))]">
       {/* Show loading screen if isLoading is true */}
       {isLoading ? (
         <LoadingScreen onLoadingComplete={handleLoadingComplete} />
       ) : (
         <>
-          <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm h-[60px]">
-            <style jsx>{`
-              @keyframes shine {
-                0% {
-                  transform: translateX(-100%) skewX(12deg);
-                }
-                100% {
-                  transform: translateX(200%) skewX(12deg);
-                }
-              }
-            `}</style>
+          <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
             <div className="h-full px-4 relative flex items-center justify-between">
               <div className="flex items-center">
                 <div className="relative overflow-hidden rounded-lg">
@@ -509,7 +499,7 @@ export default function HomePage() {
             )}
           </div>
 
-          <div className="flex-1 px-4 pb-28 space-y-4">
+          <div className="flex-1 px-4 pb-28 space-y-4" style={{ paddingBottom: 'max(7rem, calc(84px + env(safe-area-inset-bottom, 0px) + 28px))' }}>
             {/* Rest of the content remains the same */}
             {/* Loyalty System Information */}
             <div className="relative">
@@ -603,7 +593,7 @@ export default function HomePage() {
             {/* Category Buttons - Moved here from TabsContent */}
             <div className="grid grid-cols-3 gap-5 overflow-hidden">
               <Link href="/category/all-season">
-                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-lg overflow-hidden group transition-all hover:shadow-md h-[160px]">
                   <Image
                     src="/images/allseason2-new.png"
                     alt="Всесезонные шины"
@@ -620,7 +610,7 @@ export default function HomePage() {
               </Link>
 
               <Link href="/category/winter">
-                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-lg overflow-hidden group transition-all hover:shadow-md h-[160px]">
                   <Image
                     src="/images/winter-tire-new.png"
                     alt="Зимние шины"
@@ -641,7 +631,7 @@ export default function HomePage() {
               </Link>
 
               <Link href="/category/summer">
-                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-lg overflow-hidden group transition-all hover:shadow-md h-[160px]">
                   <Image
                     src="/images/summer-tire-new.png"
                     alt="Летние шины"
@@ -683,7 +673,7 @@ export default function HomePage() {
                   <Link href="/diski">
                     <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
-                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IFG42-Black-ltLo8DgOgWmvAv9qn8DDRw1n1598ox.pnghttps://hebbkx1anhila5yf.public.blob.vercel-storage.com/IFG42-Black-ltLo8DgOgWmvAv9qn8DDRw1n1598ox.png"
+                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IFG42-Black-ltLo8DgOgWmvAv9qn8DDRw1n1598ox.png"
                         alt="Диски"
                         width={300}
                         height={200}

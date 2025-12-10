@@ -4,6 +4,7 @@ import React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Heart, Gift, Calendar, CheckCircle, Clock, Plus, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +17,19 @@ const API_TOKEN = "KYf-JMMTweMWASr-zktunkLwnPKfzeIO"
 // Функция для получения URL флага из API
 function getCountryFlag(tire: Tire): string {
   try {
-    // Проверяем наличие полного пути к флагу
+    // Проверяем наличие прямого поля flag из Tirebase API
+    if (tire.flag) {
+      // Если флаг уже полный URL, возвращаем его
+      if (typeof tire.flag === "string" && tire.flag.startsWith("http")) {
+        return tire.flag
+      }
+      // Если это ID, формируем URL
+      if (typeof tire.flag === "string") {
+        return `https://api.fxcode.ru/assets/${tire.flag}?access_token=${API_TOKEN}`
+      }
+    }
+
+    // Проверяем наличие полного пути к флагу (старый формат)
     if (
       tire.model &&
       typeof tire.model === "object" &&
@@ -97,10 +110,13 @@ export default function TireCard({ tire }: TireCardProps) {
   const [imageModalOpen, setImageModalOpen] = useState(false)
   const [cartCount, setCartCount] = useState(0)
   const [imageError, setImageError] = useState(false)
+  const [imageRetryCount, setImageRetryCount] = useState(0)
+  const [imageKey, setImageKey] = useState(0) // Ключ для принудительной перезагрузки изображения
   const [flagError, setFlagError] = useState(false)
   const [isButtonPulsing, setIsButtonPulsing] = useState(false)
   const [floatingNumber, setFloatingNumber] = useState<{ x: number; y: number; count: number } | null>(null)
   const addButtonRef = useRef<HTMLButtonElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
 
   // Специальная проверка для проблемных товаров с RunFlat
   const isKnownRunflatTire =
@@ -155,6 +171,54 @@ export default function TireCard({ tire }: TireCardProps) {
     }
   }, [])
 
+  // Сбрасываем состояние ошибки изображения при изменении товара
+  useEffect(() => {
+    setImageError(false)
+    setImageRetryCount(0)
+    setImageKey(prev => prev + 1)
+    setFlagError(false)
+  }, [tire.id])
+
+  // Функция для повторной попытки загрузки изображения
+  const handleImageError = () => {
+    const maxRetries = 3
+    if (imageRetryCount < maxRetries) {
+      // Добавляем небольшую задержку перед повторной попыткой
+      setTimeout(() => {
+        setImageRetryCount(prev => prev + 1)
+        setImageKey(prev => prev + 1) // Меняем ключ для перезагрузки изображения
+      }, 500 * (imageRetryCount + 1)) // Увеличиваем задержку с каждой попыткой
+    } else {
+      console.log(`Image failed to load after ${maxRetries} retries: ${imageUrl}, falling back to default image`)
+      setImageError(true)
+    }
+  }
+
+  // IntersectionObserver для повторной загрузки изображений при возвращении в область видимости
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && imageError) {
+            // Если карточка вернулась в область видимости и изображение было с ошибкой, пробуем снова
+            setImageError(false)
+            setImageRetryCount(0)
+            setImageKey(prev => prev + 1)
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: '50px' }
+    )
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current)
+    }
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [imageError])
+
   // Удалено отладочный код
 
   // Функция для добавления/удаления из избранного
@@ -188,25 +252,16 @@ export default function TireCard({ tire }: TireCardProps) {
     e.preventDefault()
     e.stopPropagation()
 
-    // Запускаем анимацию числа
-    const newCount = cartCount + 1
-    if (addButtonRef.current) {
-      const buttonRect = addButtonRef.current.getBoundingClientRect()
-      setFloatingNumber({
-        x: buttonRect.left + buttonRect.width / 2,
-        y: buttonRect.top + buttonRect.height / 2,
-        count: newCount,
-      })
+    // Проверяем, не превышен ли лимит доступного товара
+    if (cartCount >= tire.stock) {
+      return
+    }
 
-      // Убираем число после анимации
-      setTimeout(() => setFloatingNumber(null), 700)
-
-      // Добавляем пульсацию корзине
-      const cartButton = document.querySelector('.global-cart-button')
-      if (cartButton) {
-        cartButton.classList.add('cart-pulse-effect')
-        setTimeout(() => cartButton.classList.remove('cart-pulse-effect'), 600)
-      }
+    // Добавляем пульсацию корзине
+    const cartButton = document.querySelector('.global-cart-button')
+    if (cartButton) {
+      cartButton.classList.add('cart-pulse-effect')
+      setTimeout(() => cartButton.classList.remove('cart-pulse-effect'), 600)
     }
 
     // Запускаем анимацию пульсации
@@ -287,26 +342,79 @@ export default function TireCard({ tire }: TireCardProps) {
     window.dispatchEvent(cartUpdateEvent)
   }
 
-  // Обновим функцию getStockStatus, чтобы она возвращала тип статуса
+  // Функция для определения статуса доставки на основе поставщика
+  const getDeliveryStatusByProvider = (provider: string | null | undefined): string => {
+    if (!provider) return "Уточняйте наличие"
+
+    const providerLower = provider.toLowerCase()
+
+    // TireShop - Забрать сегодня
+    if (providerLower === "tireshop") {
+      return "Забрать сегодня"
+    }
+
+    // Доставка 1-2 дня
+    if (["brinex", "exclusive", "fourtochki", "shinservice", "yst"].includes(providerLower)) {
+      return "Доставка 1-2 дня"
+    }
+
+    // Доставка 2-3 дня
+    if (providerLower === "severauto") {
+      return "Доставка 2-3 дня"
+    }
+
+    // Доставка 2-4 дня
+    if (providerLower === "ikon") {
+      return "Доставка 2-4 дня"
+    }
+
+    // Доставка 3-6 дней
+    if (providerLower === "mosautoshina") {
+      return "Доставка 3-6 дней"
+    }
+
+    // Доставка 5-7 дней
+    if (["bagoria", "severautodist"].includes(providerLower)) {
+      return "Доставка 5-7 дней"
+    }
+
+    // Доставка 5-9 дней
+    if (providerLower === "vels") {
+      return "Доставка 5-9 дней"
+    }
+
+    // Доставка 7-10 дней
+    if (providerLower === "sibzapaska") {
+      return "Доставка 7-10 дней"
+    }
+
+    // По умолчанию
+    return "Уточняйте наличие"
+  }
+
+  // Обновим функцию getStockStatus, чтобы она возвращала тип статуса на основе поставщика
   const getStockStatus = (): { type: StockStatusType; tooltip: string; className: string; icon: React.ReactNode } => {
-    if (tire.stock > 10) {
+    const deliveryStatus = getDeliveryStatusByProvider(tire.provider)
+
+    // Определяем тип и иконку на основе текста статуса
+    if (deliveryStatus === "Забрать сегодня") {
       return {
         type: "today",
-        tooltip: "Сегодня",
+        tooltip: deliveryStatus,
         className: "text-green-500",
         icon: <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />,
       }
-    } else if (tire.stock > 0) {
+    } else if (deliveryStatus.includes("1-2") || deliveryStatus.includes("2-3") || deliveryStatus.includes("2-4")) {
       return {
         type: "oneday",
-        tooltip: "Доставка 1-2 дня",
+        tooltip: deliveryStatus,
         className: "text-blue-500",
         icon: <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />,
       }
     } else {
       return {
         type: "moredays",
-        tooltip: "Доставка 3 и более дня",
+        tooltip: deliveryStatus,
         className: "text-orange-500",
         icon: <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />,
       }
@@ -346,16 +454,8 @@ export default function TireCard({ tire }: TireCardProps) {
 
   // Function to process image and remove background
   const getProcessedImageUrl = (originalUrl: string): string => {
-    if (!originalUrl || originalUrl.includes("placeholder.svg")) {
-      return originalUrl
-    }
-
-    // Check if the URL already contains query parameters
-    const separator = originalUrl.includes("?") ? "&" : "?"
-
-    // Add specific parameters to remove white background
-    // This assumes the API supports these parameters for white color removal
-    return `${originalUrl}${separator}remove_white=true&chroma_key=white&alpha_channel=true`
+    // Просто возвращаем оригинальный URL без дополнительных параметров
+    return originalUrl
   }
 
   // Get the image URL once to use in multiple places
@@ -422,9 +522,9 @@ export default function TireCard({ tire }: TireCardProps) {
   }, [tire.id, tire.runflat, actualRunflat, isKnownRunflatTire])
 
   return (
-    <div id={`tire-card-${tire.id}`} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
+    <div ref={cardRef} id={`tire-card-${tire.id}`} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
       {/* Left side - Image */}
-      <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[123px] sm:w-[161px] md:w-[197px] lg:w-[222px] overflow-hidden bg-white rounded-l-xl" style={{ maxHeight: "209px" }}>
+      <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[145px] sm:w-[190px] md:w-[234px] lg:w-[263px] overflow-hidden bg-white rounded-l-xl" style={{ maxHeight: "248px" }}>
         {tire.item_day && <Badge className="absolute left-2 top-2 z-10 bg-[#D3DF3D] text-[#1F1F1F]">Товар дня</Badge>}
         {/* Gift icon badge - only shown for specific tires */}
         {hasGiftPromotion && (
@@ -440,15 +540,18 @@ export default function TireCard({ tire }: TireCardProps) {
             // Fallback image if there's an error loading the API image
             <div className="relative w-full h-full flex items-center justify-center">
               <div className="w-full h-0 pb-[100%] relative">
-                <img
+                <Image
                   src="/images/tire-closeup.jpg"
                   alt={tire.name || "Tire"}
-                  className="absolute inset-0 w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                  fill
+                  sizes="(max-width: 640px) 149px, (max-width: 768px) 195px, (max-width: 1024px) 239px, 268px"
+                  className="object-contain cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
                     setImageModalOpen(true)
                   }}
+                  priority
                 />
               </div>
             </div>
@@ -456,23 +559,24 @@ export default function TireCard({ tire }: TireCardProps) {
             // Try to load the image from the API first
             <div className="relative w-full h-full flex items-center justify-center">
               <div className="w-full h-0 pb-[100%] relative">
-                <img
-                  src={getProcessedImageUrl(imageUrl) || "/placeholder.svg"}
+                <Image
+                  key={`tire-image-${tire.id}-${imageKey}`}
+                  src={`${getProcessedImageUrl(imageUrl) || "/placeholder.svg"}${imageRetryCount > 0 ? `&_retry=${imageRetryCount}` : ''}`}
                   alt={tire.name || "Tire"}
-                  className="absolute inset-0 w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                  fill
+                  sizes="(max-width: 640px) 149px, (max-width: 768px) 195px, (max-width: 1024px) 239px, 268px"
+                  className="object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
                     setImageModalOpen(true)
                   }}
-                  onError={(e) => {
-                    console.log(`Image failed to load: ${imageUrl}, falling back to default image`)
-                    setImageError(true)
-                  }}
+                  onError={handleImageError}
                   style={{
                     filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
                     backgroundColor: "transparent",
                   }}
+                  loading="lazy"
                 />
               </div>
             </div>
@@ -480,21 +584,34 @@ export default function TireCard({ tire }: TireCardProps) {
         </div>
 
         <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
-          <DialogContent className="sm:max-w-[600px] flex items-center justify-center p-1" style={{ zIndex: 50 }}>
-            <div className="relative w-full h-full max-h-[80vh] flex items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-[#2a2a2a] dark:to-[#1a1a1a] rounded-lg">
+          <DialogContent className="max-w-fit max-h-fit p-0 border-0 bg-transparent shadow-none [&>button]:hidden">
+            <div className="relative flex items-center justify-center">
               {imageError ? (
-                <img src="/images/tire-closeup.jpg" alt={tire.name || "Tire"} className="object-contain max-h-[80vh]" />
+                <div className="relative w-auto h-auto max-w-[90vw] max-h-[90vh]">
+                  <Image
+                    src="/images/tire-closeup.jpg"
+                    alt={tire.name || "Tire"}
+                    width={600}
+                    height={600}
+                    className="object-contain w-auto h-auto max-w-[90vw] max-h-[90vh]"
+                  />
+                </div>
               ) : (
-                <img
-                  src={getProcessedImageUrl(imageUrl) || "/placeholder.svg"}
-                  alt={tire.name || "Tire"}
-                  className="object-contain max-h-[80vh]"
-                  onError={() => setImageError(true)}
-                  style={{
-                    filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
-                    backgroundColor: "transparent",
-                  }}
-                />
+                <div className="relative w-auto h-auto max-w-[90vw] max-h-[90vh]">
+                  <Image
+                    key={`tire-modal-image-${tire.id}-${imageKey}`}
+                    src={`${getProcessedImageUrl(imageUrl) || "/placeholder.svg"}${imageRetryCount > 0 ? `&_retry=${imageRetryCount}` : ''}`}
+                    alt={tire.name || "Tire"}
+                    width={600}
+                    height={600}
+                    className="object-contain w-auto h-auto max-w-[90vw] max-h-[90vh]"
+                    onError={handleImageError}
+                    style={{
+                      filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
+                      backgroundColor: "transparent",
+                    }}
+                  />
+                </div>
               )}
             </div>
           </DialogContent>
@@ -502,38 +619,47 @@ export default function TireCard({ tire }: TireCardProps) {
       </div>
 
       {/* Right side - Content */}
-      <div className="p-2 sm:p-3 md:p-4 flex-1 flex flex-col justify-between">
+      <div className="p-[11px] sm:p-[15.4px] md:p-[22px] flex-1 flex flex-col justify-between gap-[11px] sm:gap-[15.4px]">
         {/* Debug API Response */}
         {/* API Response section hidden as requested */}
-        <div>
-          <div className="mt-0.5 sm:mt-1 md:mt-2 flex items-center gap-1 sm:gap-2 md:gap-3 flex-wrap">
-            <span className="text-[9px] sm:text-xs md:text-sm font-medium px-1 sm:px-1.5 md:px-2 py-0.5 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white whitespace-nowrap">
-              {tire.width}/{tire.height} R{tire.diam}
-            </span>
+        <div className="flex flex-col gap-[8.8px]">
+          <div className="flex items-center gap-[4.4px] sm:gap-[8.8px] md:gap-[13.2px] flex-wrap">
+            {/* Срок доставки вместо размера шины */}
+            <div className="flex items-center gap-[4.4px] sm:gap-[6.6px] px-[6.6px] sm:px-[8.8px] md:px-[11px] py-[4.4px] bg-gray-100 dark:bg-[#3A3A3A] rounded-full">
+              <span className="flex items-center justify-center">
+                {React.cloneElement(stockStatus.icon as React.ReactElement, {
+                  className: `h-[13.2px] w-[13.2px] sm:h-[17.6px] sm:w-[17.6px] md:h-[19.8px] md:w-[19.8px] ${
+                    (stockStatus.icon as React.ReactElement).props.className
+                  }`,
+                })}
+              </span>
+              <span className={`text-[9px] sm:text-[11px] md:text-[13px] font-medium whitespace-nowrap ${stockStatus.className}`}>
+                {stockStatus.tooltip}
+              </span>
+            </div>
 
-            {/* RunFlat icon - only shown for tires with runflat: true */}
+            {/* RunFlat badge - only shown for tires with runflat: true */}
             {(actualRunflat === true ||
               actualRunflat === 1 ||
               actualRunflat === "true" ||
               actualRunflat === "1" ||
               isKnownRunflatTire) && (
               <div className="flex items-center justify-center">
-                <img
-                  src="/images/rft-icon.png"
-                  alt="RunFlat"
-                  className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6"
-                  title="RunFlat Technology"
-                />
+                <span className="text-sm font-bold text-[#1F1F1F] dark:text-white" title="RunFlat Technology">
+                  RFT
+                </span>
               </div>
             )}
 
             {/* Cargo icon - only shown for tires with cargo: true */}
             {(tire.cargo === true || tire.cargo === 1 || tire.cargo === "true" || tire.cargo === "1") && (
-              <div className="flex items-center justify-center">
-                <img
+              <div className="flex items-center justify-center relative h-[25.3px] w-[25.3px] sm:h-[30.8px] sm:w-[30.8px] md:h-[36.3px] md:w-[36.3px]">
+                <Image
                   src="/images/cargo-truck-new.png"
                   alt="Cargo"
-                  className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6"
+                  width={36.3}
+                  height={36.3}
+                  className="h-[25.3px] w-[25.3px] sm:h-[30.8px] sm:w-[30.8px] md:h-[36.3px] md:w-[36.3px]"
                   title="Грузовая шина"
                 />
               </div>
@@ -541,131 +667,126 @@ export default function TireCard({ tire }: TireCardProps) {
 
             {/* Проверка для отображения шипов, работает с булевыми значениями true/false */}
             {tire.spike && (
-              <span className="flex items-center justify-center" title="Шипованная шина">
-                <img src="/images/bykvaSH.png" alt="Шипы" className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
+              <span className="flex items-center justify-center relative h-[23.1px] w-[23.1px] sm:h-[27.5px] sm:w-[27.5px] md:h-[33px] md:w-[33px]" title="Шипованная шина">
+                <Image src="/images/bykvaSH.png" alt="Шипы" width={33} height={33} className="h-[23.1px] w-[23.1px] sm:h-[27.5px] sm:w-[27.5px] md:h-[33px] md:w-[33px]" />
               </span>
             )}
             <span className="flex-grow"></span>
+
+            {/* Flag and Country */}
+            <div className="flex items-center gap-1.5">
+              {flagError ? (
+                <div
+                  className="rounded-sm w-[18px] h-[13px] sm:w-[23px] sm:h-[16px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[7px] sm:text-[9px] text-gray-500"
+                  title={`URL флага: ${flagUrl}`}
+                >
+                  {tire.country_code || tire.model?.brand?.country?.id || "?"}
+                </div>
+              ) : (
+                <div className="relative w-[18px] h-[13px] sm:w-[23px] sm:h-[16px]">
+                  <Image
+                    src={flagUrl || "/placeholder.svg"}
+                    alt={tire.country || tire.model?.brand?.country?.name || "Country"}
+                    width={23}
+                    height={16}
+                    className="rounded-sm w-[18px] h-[13px] sm:w-[23px] sm:h-[16px] border border-gray-200"
+                    onError={() => setFlagError(true)}
+                  />
+                </div>
+              )}
+            </div>
+
             <Button
               variant="ghost"
               size="icon"
-              className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 ml-auto p-0"
+              className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 p-0"
               onClick={toggleFavorite}
               aria-label={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
             >
               <Heart
-                className={`h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-colors ${
+                className={`h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 transition-colors ${
                   isFavorite ? "text-red-500 fill-red-500" : "text-gray-400 hover:text-red-500"
                 }`}
               />
             </Button>
           </div>
 
-          <Link href={`/product/${tire.id}`}>
-            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-[10px] sm:text-xs md:text-sm lg:text-base leading-tight">
+          <Link
+            href={`/product/${tire.id}`}
+            onClick={() => {
+              // Store tire data in localStorage for product page
+              localStorage.setItem(`tire_${tire.id}`, JSON.stringify(tire))
+            }}
+          >
+            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-[14.3px] sm:text-[16.5px] md:text-[18.7px] lg:text-[22px] leading-tight">
               {tire.name}
             </h3>
           </Link>
 
           {/* Add article number display - временно скрыто */}
           {/* <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">артикул: {article}</p> */}
-
-          <div className="mt-0.5 sm:mt-1 flex items-center gap-1 sm:gap-1.5">
-            {flagError ? (
-              <div
-                className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[6px] sm:text-[8px] text-gray-500"
-                title={`URL флага: ${flagUrl}`}
-              >
-                {tire.model?.brand?.country?.id || "?"}
-              </div>
-            ) : (
-              <img
-                src={flagUrl || "/placeholder.svg"}
-                alt={tire.model?.brand?.country?.name || "Country"}
-                className="rounded-sm w-[16px] h-[11px] sm:w-[20px] sm:h-[14px] border border-gray-200"
-                onError={() => setFlagError(true)}
-              />
-            )}
-            <span className="text-[8px] sm:text-[10px] md:text-xs text-gray-500 dark:text-gray-400 truncate">
-              {tire.model?.brand?.country?.name || "Страна не указана"}
-            </span>
-          </div>
         </div>
 
-        <div className="mt-0.5 sm:mt-1 flex flex-col relative pb-7 sm:pb-8 md:pb-10">
-          <div className="flex items-center justify-between w-full mb-0.5 sm:mb-1">
-            <div>
-              {/* Добавляем статус готовности к выдаче с использованием иконок из Lucide */}
-              <div className="flex items-center gap-0.5 sm:gap-1">
-                <span className="flex items-center justify-center">
-                  {React.cloneElement(stockStatus.icon as React.ReactElement, {
-                    className: `h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 ${
-                      (stockStatus.icon as React.ReactElement).props.className
-                    }`,
-                  })}
-                </span>
-                <span className={`text-[9px] sm:text-[10px] md:text-xs font-medium ${stockStatus.className}`}>
-                  {stockStatus.tooltip}
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-col items-end">
-              {tire.stock > 0 ? (
-                <>
-                  <span
-                    className={`text-sm sm:text-base md:text-lg font-medium opacity-80 ${
-                      tire.stock > 10 ? "text-green-500" : tire.stock > 5 ? "text-yellow-500" : "text-orange-500"
-                    }`}
-                  >
-                    {tire.stock} шт
-                  </span>
-                  <span className="text-[8px] sm:text-[9px] md:text-[10px] text-gray-500 dark:text-gray-400">
-                    Количество:
-                  </span>
-                </>
-              ) : (
-                <span className="text-xs sm:text-sm font-medium opacity-80 text-red-500">Нет в наличии</span>
-              )}
-            </div>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
-            <div>
-              <p className="text-[8px] sm:text-[10px] md:text-xs text-gray-500 dark:text-gray-400 line-through">
+        <div className="flex flex-col relative pb-8 sm:pb-9 md:pb-11 -mt-[10px]">
+          <div className="flex items-center justify-end w-full mb-3 sm:mb-4">
+            <div className="flex flex-row items-end gap-2">
+              <p className="text-[11px] sm:text-[14.3px] md:text-[16.5px] text-gray-500 dark:text-gray-400 line-through">
                 {formatPrice(tire.rrc)}
               </p>
-              <p className="text-xs sm:text-sm md:text-base font-bold text-[#1F1F1F] dark:text-white">
+              <p className="text-[16.5px] sm:text-[18.7px] md:text-[23.1px] font-bold text-[#1F1F1F] dark:text-white">
                 {formatPrice(tire.price)}
               </p>
             </div>
-            <div className="flex items-center flex-1 justify-end ml-2">
-              {/* Новая кнопка корзины в стиле из изображения */}
-              <div className="flex h-7 sm:h-8 md:h-9 rounded-lg overflow-hidden w-full max-w-[140px] sm:max-w-[160px] md:max-w-[180px]">
-                {/* Кнопка минус */}
-                <button
-                  onClick={removeFromCart}
-                  disabled={cartCount <= 0 || tire.stock <= 0}
-                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  aria-label="Уменьшить количество"
-                >
-                  <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                </button>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
+            <div className="flex flex-col items-start">
+              {(() => {
+                const availableStock = tire.stock - cartCount;
+                if (availableStock > 0) {
+                  return (
+                    <span
+                      className={`h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[12px] sm:text-[14px] md:text-[16px] font-medium px-3 rounded-full ${
+                        availableStock > 10 ? "bg-green-500/20 text-green-600 dark:text-green-400" :
+                        availableStock > 5 ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" :
+                        "bg-orange-500/20 text-orange-600 dark:text-orange-400"
+                      }`}
+                    >
+                      {availableStock > 20 ? ">20 шт" : `${availableStock} шт`}
+                    </span>
+                  );
+                } else {
+                  return (
+                    <span className="h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[12px] sm:text-[14px] md:text-[16px] font-medium px-3 rounded-full bg-red-500/20 text-red-600 dark:text-red-400">Нет в наличии</span>
+                  );
+                }
+              })()}
+            </div>
+            <div className="flex items-center gap-1">
+              {/* Кнопка минус в стиле tire-mounting */}
+              <button
+                onClick={removeFromCart}
+                disabled={cartCount <= 0 || tire.stock <= 0}
+                className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#484b51] text-white rounded-lg flex items-center justify-center hover:bg-[#5A5D63] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Уменьшить количество"
+              >
+                <Minus className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
 
-                {/* Счетчик количества */}
-                <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2rem] sm:min-w-[2.5rem] md:min-w-[3rem]">
-                  <span className="text-xs sm:text-sm md:text-base font-medium">{cartCount}</span>
-                </div>
-
-                {/* Кнопка плюс */}
-                <button
-                  ref={addButtonRef}
-                  onClick={addToCart}
-                  disabled={tire.stock <= 0}
-                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  aria-label="Увеличить количество"
-                >
-                  <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                </button>
+              {/* Счетчик количества */}
+              <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#1A1A1A] text-white rounded-lg flex items-center justify-center">
+                <span className="text-base sm:text-lg font-medium">{cartCount}</span>
               </div>
+
+              {/* Кнопка плюс в стиле tire-mounting */}
+              <button
+                ref={addButtonRef}
+                onClick={addToCart}
+                disabled={tire.stock <= 0 || cartCount >= tire.stock}
+                className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#d3df3d] text-black rounded-lg flex items-center justify-center hover:bg-[#c5d135] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Увеличить количество"
+              >
+                <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
             </div>
           </div>
         </div>
@@ -727,18 +848,6 @@ export default function TireCard({ tire }: TireCardProps) {
         </div>
       )}
 
-      {/* Эффект +N при добавлении в корзину */}
-      {floatingNumber && (
-        <div
-          className="fixed pointer-events-none z-[9999] floating-plus-one"
-          style={{
-            left: floatingNumber.x,
-            top: floatingNumber.y,
-          }}
-        >
-          <span className="text-xl font-bold text-[#D3DF3D]">+{floatingNumber.count}</span>
-        </div>
-      )}
     </div>
   )
 }

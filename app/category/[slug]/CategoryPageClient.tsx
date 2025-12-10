@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { ChevronLeft } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useSearchParams, usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -35,10 +35,37 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   // Inspector mode state
   const [inspectorMode, setInspectorMode] = useState(false)
 
+  // Brand filter state
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([])
+
   // Swipe handling for season tabs
   const touchStartRef = useRef<number | null>(null)
   const touchEndRef = useRef<number | null>(null)
+  const touchStartYRef = useRef<number | null>(null)
   const minSwipeDistance = 50
+  const [dragOffset, setDragOffset] = useState(0)
+  const [dragOffsetY, setDragOffsetY] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const activeTabRef = useRef<HTMLAnchorElement>(null)
+  const [highlightWidth, setHighlightWidth] = useState(0)
+
+  // Slide animation - get direction and previous season from sessionStorage
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(() => {
+    if (typeof window !== 'undefined') {
+      const dir = sessionStorage.getItem('seasonSlideDirection') as 'left' | 'right' | null
+      sessionStorage.removeItem('seasonSlideDirection')
+      return dir
+    }
+    return null
+  })
+  const [exitingSeason, setExitingSeason] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const prev = sessionStorage.getItem('seasonPrevious')
+      sessionStorage.removeItem('seasonPrevious')
+      return prev
+    }
+    return null
+  })
 
   const seasonsList = [
     { key: "s", path: "/category/summer" },
@@ -47,39 +74,141 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   ]
 
   const currentSeasonIndex = seasonsList.findIndex((s) => s.key === season)
+  const [targetSeasonIndex, setTargetSeasonIndex] = useState<number>(0)
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchEndRef.current = null
     touchStartRef.current = e.targetTouches[0].clientX
+    touchStartYRef.current = e.targetTouches[0].clientY
+    setIsDragging(true)
   }
 
   const onTouchMove = (e: React.TouchEvent) => {
     touchEndRef.current = e.targetTouches[0].clientX
+
+    // Update drag offset in real-time for visual feedback
+    if (touchStartRef.current !== null && touchStartYRef.current !== null) {
+      const currentOffset = e.targetTouches[0].clientX - touchStartRef.current
+      const currentOffsetY = e.targetTouches[0].clientY - touchStartYRef.current
+
+      // Ограничиваем протягивание плашки до 50 пикселей в каждую сторону
+      const maxDragOffset = 50
+      const limitedOffset = Math.max(-maxDragOffset, Math.min(maxDragOffset, currentOffset))
+      const limitedOffsetY = Math.max(-maxDragOffset, Math.min(maxDragOffset, currentOffsetY))
+
+      setDragOffset(limitedOffset)
+      setDragOffsetY(limitedOffsetY)
+
+      // Determine target season based on current drag position
+      const switchThreshold = 60
+      let newTargetIndex = currentSeasonIndex
+
+      // Calculate prev and next indices based on visual position
+      const prevIndex = (currentSeasonIndex - 1 + seasonsList.length) % seasonsList.length
+      const nextIndex = (currentSeasonIndex + 1) % seasonsList.length
+
+      if (currentOffset < -switchThreshold) {
+        // Swiping left = carousel scrolls left, right item becomes active
+        newTargetIndex = nextIndex
+      } else if (currentOffset > switchThreshold) {
+        // Swiping right = carousel scrolls right, left item becomes active
+        newTargetIndex = prevIndex
+      }
+
+      setTargetSeasonIndex(newTargetIndex)
+    }
   }
 
   const onTouchEnd = () => {
-    if (!touchStartRef.current || !touchEndRef.current) return
+    setIsDragging(false)
 
-    const distance = touchStartRef.current - touchEndRef.current
-    const isLeftSwipe = distance > minSwipeDistance
-    const isRightSwipe = distance < -minSwipeDistance
+    if (!touchStartRef.current || !touchEndRef.current) {
+      setDragOffset(0)
+      setDragOffsetY(0)
+      setTargetSeasonIndex(currentSeasonIndex)
+      return
+    }
 
-    const params = new URLSearchParams(searchParams.toString())
+    const offset = touchEndRef.current - touchStartRef.current
 
-    if (isLeftSwipe) {
-      // Swipe left = next season (circular)
-      const nextIndex = (currentSeasonIndex + 1) % seasonsList.length
-      router.push(`${seasonsList[nextIndex].path}?${params.toString()}`)
-    } else if (isRightSwipe) {
-      // Swipe right = previous season (circular)
-      const prevIndex = (currentSeasonIndex - 1 + seasonsList.length) % seasonsList.length
-      router.push(`${seasonsList[prevIndex].path}?${params.toString()}`)
+    // Remove spike param for non-winter seasons
+    const getCleanParams = (seasonKey: string) => {
+      const p = new URLSearchParams(searchParams.toString())
+      if (seasonKey !== 'w') p.delete('spike')
+      return p.toString()
+    }
+
+    // Use the targetSeasonIndex that was calculated during drag
+    const targetIndex = targetSeasonIndex
+
+    // Reset drag offset
+    setDragOffset(0)
+    setDragOffsetY(0)
+    setTargetSeasonIndex(currentSeasonIndex)
+
+    // Navigate to target season if different from current
+    if (targetIndex !== currentSeasonIndex) {
+      router.push(`${seasonsList[targetIndex].path}?${getCleanParams(seasonsList[targetIndex].key)}`)
     }
 
     touchStartRef.current = null
+    touchStartYRef.current = null
     touchEndRef.current = null
   }
+
+  const onTouchCancel = () => {
+    setIsDragging(false)
+    setDragOffset(0)
+    setDragOffsetY(0)
+    setTargetSeasonIndex(currentSeasonIndex)
+    touchStartRef.current = null
+    touchStartYRef.current = null
+    touchEndRef.current = null
+  }
+
   const [hoveredElement, setHoveredElement] = useState<{ name: string; x: number; y: number } | null>(null)
+
+  // Sync targetSeasonIndex with current season
+  useEffect(() => {
+    setTargetSeasonIndex(currentSeasonIndex)
+  }, [currentSeasonIndex])
+
+  // Clear selected brands when season changes
+  useEffect(() => {
+    setSelectedBrands([])
+  }, [season])
+
+  // Clear slide direction after animation
+  useEffect(() => {
+    if (slideDirection) {
+      const timer = setTimeout(() => {
+        setSlideDirection(null)
+        setExitingSeason(null)
+      }, 400)
+      return () => clearTimeout(timer)
+    }
+  }, [slideDirection])
+
+  // Function to navigate with animation direction
+  const navigateToSeason = (targetPath: string, direction: 'left' | 'right') => {
+    sessionStorage.setItem('seasonSlideDirection', direction)
+    sessionStorage.setItem('seasonPrevious', season)
+    router.push(targetPath)
+  }
+
+  // Track active tab dimensions for highlight
+  useEffect(() => {
+    const updateHighlightSize = () => {
+      if (activeTabRef.current) {
+        const width = activeTabRef.current.offsetWidth
+        setHighlightWidth(width)
+      }
+    }
+
+    updateHighlightSize()
+    window.addEventListener("resize", updateHighlightSize)
+    return () => window.removeEventListener("resize", updateHighlightSize)
+  }, [season])
 
   // Track winter button coordinates
   useEffect(() => {
@@ -140,6 +269,12 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   // Inspector mode event handlers
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input or textarea
+      const target = e.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        return
+      }
+
       if (e.key === "i") {
         setInspectorMode((prev) => !prev)
         if (!inspectorMode) {
@@ -290,6 +425,11 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
     }
   }
 
+  const handleBrandSelect = (brands: string[]) => {
+    setSelectedBrands(brands)
+    console.log("Brands selected:", brands)
+  }
+
   // Function to clear dimension filter
   const clearDimensionFilter = () => {
     const params = new URLSearchParams(searchParams.toString())
@@ -323,7 +463,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   const quickFilterActive = searchParams.has("popularSize") && searchParams.has("stock")
 
   return (
-    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px]">
+    <main className="flex flex-col h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px] overflow-hidden">
       <style jsx global>
         {`
           /* Cart button animation */
@@ -576,75 +716,212 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             display: none;  /* Chrome, Safari and Opera */
           }
 
-          /* Season tabs styles */
-          .season-tabs-container {
+          /* Season Horizontal Carousel styles - Dynamic Island style */
+          .carousel-container {
             position: fixed;
             left: 50%;
             top: 30px;
             transform: translateX(-50%) translateY(-50%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            touch-action: pan-y pinch-zoom;
-            user-select: none;
-            -webkit-user-select: none;
-            cursor: grab;
+            height: 34px;
             z-index: 51;
+            -webkit-tap-highlight-color: transparent;
           }
 
-          .season-tab {
+          .carousel-track {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 6px 8px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
-            text-align: center;
-            width: 95px;
+            height: 100%;
           }
 
-          .season-tab-active {
+          .carousel-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+
+          .carousel-highlight {
+            position: absolute;
+            background: #D3DF3D;
+            border-radius: 50px;
+            z-index: 2;
+            pointer-events: none;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .carousel-item-center {
+            padding: 7px 18px;
+            background: #D3DF3D;
+            color: #1F1F1F;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 50px;
+            z-index: 3;
+          }
+
+          .carousel-item-center-text {
+            padding: 7px 18px;
+            background: transparent;
+            color: #1F1F1F;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 50px;
+            z-index: 3;
+          }
+
+          /* Slide animation for text inside pill */
+          .carousel-text-container {
             position: relative;
             overflow: hidden;
-            transform: scale(1.1);
-            background: var(--tab-color);
-            border: none;
-            color: #1F1F1F;
-            font-size: 13px;
-            font-weight: 600;
-            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
 
-          .season-tab-inactive {
-            transform: scale(0.85);
-            background: rgba(128, 128, 128, 0.1);
-            border: 1px solid transparent;
+          .carousel-text {
+            position: absolute;
+            white-space: nowrap;
+          }
+
+          .carousel-text-current {
+            animation: none;
+          }
+
+          .carousel-text-exit-left {
+            animation: slideOutLeft 0.3s ease-out forwards;
+          }
+
+          .carousel-text-exit-right {
+            animation: slideOutRight 0.3s ease-out forwards;
+          }
+
+          .carousel-text-enter-left {
+            animation: slideInFromRight 0.3s ease-out forwards;
+          }
+
+          .carousel-text-enter-right {
+            animation: slideInFromLeft 0.3s ease-out forwards;
+          }
+
+          @keyframes slideOutLeft {
+            from {
+              transform: translateX(0);
+              opacity: 1;
+            }
+            to {
+              transform: translateX(-100%);
+              opacity: 0;
+            }
+          }
+
+          @keyframes slideOutRight {
+            from {
+              transform: translateX(0);
+              opacity: 1;
+            }
+            to {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+          }
+
+          @keyframes slideInFromRight {
+            from {
+              transform: translate(-50%, -50%) translateX(100%);
+            }
+            to {
+              transform: translate(-50%, -50%) translateX(0);
+            }
+          }
+
+          @keyframes slideInFromLeft {
+            from {
+              transform: translate(-50%, -50%) translateX(-100%);
+            }
+            to {
+              transform: translate(-50%, -50%) translateX(0);
+            }
+          }
+
+          @keyframes slideOutToLeft {
+            from {
+              transform: translate(-50%, -50%) translateX(0);
+            }
+            to {
+              transform: translate(-50%, -50%) translateX(-100%);
+            }
+          }
+
+          @keyframes slideOutToRight {
+            from {
+              transform: translate(-50%, -50%) translateX(0);
+            }
+            to {
+              transform: translate(-50%, -50%) translateX(100%);
+            }
+          }
+
+          @keyframes slideContainerLeft {
+            from {
+              transform: translate(-50%, -50%) translateX(0);
+            }
+            to {
+              transform: translate(-50%, -50%) translateX(-95px);
+            }
+          }
+
+          @keyframes slideContainerRight {
+            from {
+              transform: translate(-50%, -50%) translateX(-95px);
+            }
+            to {
+              transform: translate(-50%, -50%) translateX(0);
+            }
+          }
+
+          .carousel-item-side {
+            position: absolute;
+            padding: 5px 10px;
+            background: transparent;
             color: #6B7280;
             font-size: 11px;
-            opacity: 0.8;
-            backdrop-filter: blur(4px);
+            font-weight: 500;
+            border-radius: 50px;
+            z-index: 4;
+            opacity: 0.5;
+            top: 50%;
           }
 
-          .season-tab-inactive:hover {
-            opacity: 1;
-            background: rgba(211, 223, 61, 0.1);
-            border-color: rgba(211, 223, 61, 0.3);
-            transform: scale(0.88);
+          .carousel-item-left {
+            right: calc(50% + 60px);
+            transform: translateY(-50%);
           }
 
-          .dark .season-tab-inactive {
+          .carousel-item-right {
+            left: calc(50% + 60px);
+            transform: translateY(-50%);
+          }
+
+          .dark .carousel-item-side {
             color: #9CA3AF;
-            background: rgba(255, 255, 255, 0.05);
           }
 
-          .dark .season-tab-inactive:hover {
-            color: white;
-            background: rgba(211, 223, 61, 0.15);
-            border-color: rgba(211, 223, 61, 0.3);
+          @media (hover: hover) {
+            .carousel-item-side:hover {
+              opacity: 0.8;
+              background: rgba(128, 128, 128, 0.1);
+            }
           }
 
           /* Cart pulsation when has items */
@@ -703,125 +980,247 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
       )}
 
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[60px]"
+        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[60px] overflow-visible"
         style={{ "--header-height": "60px" } as React.CSSProperties}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchCancel}
       >
-        <div className="container max-w-md flex items-center justify-center h-full relative overflow-hidden">
+        <div className="container max-w-md flex items-center justify-center h-full relative overflow-visible">
           <button
             onClick={() => router.push("/")}
-            className="fixed left-0 top-[30px] -translate-y-1/2 p-2 rounded-tr-md rounded-br-md hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors z-50"
+            className="fixed left-2 top-[30px] -translate-y-1/2 p-2 transition-colors z-50"
             aria-label="На главную"
           >
-            <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+            <ChevronLeft className="h-6 w-6 text-gray-700 dark:text-gray-300" />
           </button>
 
-          {/* Season tabs with centered active element */}
-          <div
-            className="season-tabs-container"
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
-          >
-            {[
-              { key: "s", label: "Летние", path: "/category/summer", color: "#D3DF3D" },
-              { key: "w", label: "Зимние", path: "/category/winter", color: "#D3DF3D" },
-              { key: "a", label: "Всесезонные", path: "/category/all-season", color: "#D3DF3D" },
-            ].map((tab) => {
-              const isActive = season === tab.key
-              const activeIndex = season === "s" ? 0 : season === "w" ? 1 : 2
-              const tabIndex = tab.key === "s" ? 0 : tab.key === "w" ? 1 : 2
+          {/* Season Horizontal Carousel */}
+          {(() => {
+            const tabs = [
+              { key: "s", label: "Летние", path: "/category/summer" },
+              { key: "w", label: "Зимние", path: "/category/winter" },
+              { key: "a", label: "Всесезонные", path: "/category/all-season" },
+            ]
 
-              // Calculate order for circular carousel (prev - active - next)
-              // Order: s(0) -> w(1) -> a(2) -> s(0) ...
-              let order = tabIndex
-              if (activeIndex === 0) {
-                // s active: a(prev), s(center), w(next)
-                if (tabIndex === 0) order = 1      // s -> center
-                else if (tabIndex === 1) order = 2 // w -> right (next)
-                else order = 0                      // a -> left (prev)
-              } else if (activeIndex === 1) {
-                // w active: s(prev), w(center), a(next)
-                if (tabIndex === 0) order = 0      // s -> left (prev)
-                else if (tabIndex === 1) order = 1 // w -> center
-                else order = 2                      // a -> right (next)
-              } else if (activeIndex === 2) {
-                // a active: w(prev), a(center), s(next)
-                if (tabIndex === 0) order = 2      // s -> right (next)
-                else if (tabIndex === 1) order = 0 // w -> left (prev)
-                else order = 1                      // a -> center
-              }
+            // Current active index
+            const activeIndex = season === "s" ? 0 : season === "w" ? 1 : 2
 
-              return (
-                <Link
-                  key={tab.key}
-                  href={{ pathname: tab.path, query: queryParams }}
-                  className={`season-tab ${isActive ? "season-tab-active" : "season-tab-inactive"}`}
+            // Get prev and next indices (circular)
+            const prevIndex = (activeIndex - 1 + 3) % 3
+            const nextIndex = (activeIndex + 1) % 3
+
+            // Order: [prev, active, next]
+            const orderedTabs = [
+              { ...tabs[prevIndex], position: 'left' },
+              { ...tabs[activeIndex], position: 'center' },
+              { ...tabs[nextIndex], position: 'right' },
+            ]
+
+            return (
+              <div
+                className="carousel-container"
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+                onTouchCancel={onTouchCancel}
+              >
+                {/* Yellow highlight background - stays in place with fixed width */}
+                <div
+                  className="carousel-highlight"
                   style={{
-                    order,
-                    "--tab-color": tab.color,
-                  } as React.CSSProperties}
+                    transition: isDragging ? 'none' : 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    width: '120px',
+                    minWidth: '120px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                  }}
                 >
-                  <span>{tab.label}</span>
-                </Link>
-              )
-            })}
-          </div>
+                  {/* Progress bar fill - shows progress towards switching */}
+                  {isDragging && Math.abs(dragOffset) > 5 && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: dragOffset > 0 ? 0 : 'auto',
+                        right: dragOffset < 0 ? 0 : 'auto',
+                        width: `${(Math.abs(dragOffset) / 60) * 100}%`,
+                        maxWidth: '100%',
+                        height: '100%',
+                        background: dragOffset > 0
+                          ? 'linear-gradient(to right, rgba(211, 223, 61, 0.4), rgba(211, 223, 61, 0.1))'
+                          : 'linear-gradient(to left, rgba(211, 223, 61, 0.4), rgba(211, 223, 61, 0.1))',
+                        borderRadius: '50px',
+                        pointerEvents: 'none',
+                        transition: 'none',
+                      }}
+                    />
+                  )}
+                </div>
+
+                {/* Static text labels - don't move */}
+                <div className="carousel-track">
+                  {orderedTabs.map((tab) => {
+                    const isCenter = tab.position === 'center'
+
+                    // Find tab index in seasonsList
+                    const tabIndex = seasonsList.findIndex(s => s.key === tab.key)
+
+                    // Check if this tab is the target during drag
+                    const isTarget = isDragging && tabIndex === targetSeasonIndex
+
+                    // Remove spike filter for non-winter
+                    const tabQueryParams = { ...queryParams }
+                    if (tab.key !== 'w') delete tabQueryParams.spike
+
+                    const positionClass = isCenter
+                      ? 'carousel-item-center-text'
+                      : `carousel-item-side carousel-item-${tab.position}`
+
+                    // Get label for a season key
+                    const getSeasonLabel = (key: string) => {
+                      const labels: Record<string, string> = { s: 'Летние', w: 'Зимние', a: 'Всесезонные' }
+                      return labels[key] || ''
+                    }
+
+                    // Build URL with query params
+                    const queryString = new URLSearchParams(tabQueryParams).toString()
+                    const fullPath = queryString ? `${tab.path}?${queryString}` : tab.path
+
+                    if (isCenter) {
+                      return (
+                        <div
+                          key={tab.key}
+                          className={`carousel-item ${positionClass}`}
+                        >
+                          <div
+                            style={{
+                              position: 'relative',
+                              overflow: 'hidden',
+                              width: '110px',
+                              height: '20px',
+                            }}
+                          >
+                            <span
+                              key={`${season}-${slideDirection}`}
+                              style={{
+                                position: 'absolute',
+                                left: '50%',
+                                top: '50%',
+                                whiteSpace: 'nowrap',
+                                animation: slideDirection
+                                  ? `slideIn${slideDirection === 'left' ? 'FromRight' : 'FromLeft'} 0.35s ease-out forwards`
+                                  : 'none',
+                                transform: slideDirection ? undefined : 'translate(-50%, -50%)',
+                              }}
+                            >
+                              {getSeasonLabel(season)}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    // Side arrows - use button with navigateToSeason
+                    return (
+                      <button
+                        key={tab.key}
+                        onClick={() => navigateToSeason(fullPath, tab.position === 'left' ? 'right' : 'left')}
+                        className={`carousel-item ${positionClass}`}
+                        style={{
+                          color: isTarget ? '#1F1F1F' : undefined,
+                          opacity: isTarget ? 1 : undefined,
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {tab.position === 'left' ? (
+                          <ChevronLeft
+                            className="w-[25px] h-[25px]"
+                            style={{
+                              color: isTarget ? '#1F1F1F' : '#B0B5BD',
+                              opacity: isTarget ? 1 : 0.7,
+                            }}
+                          />
+                        ) : (
+                          <ChevronRight
+                            className="w-[25px] h-[25px]"
+                            style={{
+                              color: isTarget ? '#1F1F1F' : '#B0B5BD',
+                              opacity: isTarget ? 1 : 0.7,
+                            }}
+                          />
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })()}
 
         </div>
         {/* Global cart button - outside container */}
-        <div style={{ position: 'fixed', right: '8px', top: '30px', transform: 'translateY(-50%)', zIndex: 100 }}>
+        <div style={{ position: 'fixed', right: '16px', top: '30px', transform: 'translateY(-50%) scale(1.035)', zIndex: 100 }}>
           <CartButton />
         </div>
       </header>
 
-      {/* Quick size links section */}
-      <div className="bg-white dark:bg-[#2A2A2A] p-3 mx-4 rounded-lg shadow-sm mb-4 mt-4 overflow-hidden">
-        <div className="flex gap-2 overflow-x-auto snap-x hide-scrollbar">
-          {[
-            { label: "195/65 R15", width: "195", profile: "65", diameter: "15" },
-            { label: "205/55 R16", width: "205", profile: "55", diameter: "16" },
-            { label: "225/45 R17", width: "225", profile: "45", diameter: "17" },
-            { label: "235/35 R19", width: "235", profile: "35", diameter: "19" },
-            { label: "215/60 R16", width: "215", profile: "60", diameter: "16" },
-            { label: "225/50 R17", width: "225", profile: "50", diameter: "17" },
-          ].map((size) => (
-            <button
-              key={size.label}
-              onClick={() => {
-                const params = new URLSearchParams(searchParams.toString())
-                params.set("width", size.width)
-                params.set("profile", size.profile)
-                params.set("diameter", size.diameter)
-                router.push(`${pathname}?${params.toString()}`)
-              }}
-              className={`text-xs py-1.5 px-2.5 rounded-md border transition-all duration-200 whitespace-nowrap snap-start flex-shrink-0 ${
-                currentWidth === size.width && currentProfile === size.profile && currentDiameter === size.diameter
-                  ? "bg-[#D3DF3D] text-[#1F1F1F] border-[#D3DF3D] font-medium"
-                  : "border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white hover:border-[#D3DF3D] hover:bg-[#D3DF3D]/10"
-              }`}
-            >
-              {size.label}
-            </button>
-          ))}
+      {/* Scrollable content area - between header and filter */}
+      <div
+        className="flex-1 overflow-y-auto overscroll-contain pb-[280px]"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {/* Quick size links section */}
+        <div className="px-4 mb-4 mt-4">
+          <div className="flex gap-2 overflow-x-auto snap-x hide-scrollbar">
+            {[
+              { label: "195/65 R15", width: "195", profile: "65", diameter: "15" },
+              { label: "205/55 R16", width: "205", profile: "55", diameter: "16" },
+              { label: "225/45 R17", width: "225", profile: "45", diameter: "17" },
+              { label: "235/35 R19", width: "235", profile: "35", diameter: "19" },
+              { label: "215/60 R16", width: "215", profile: "60", diameter: "16" },
+              { label: "225/50 R17", width: "225", profile: "50", diameter: "17" },
+            ].map((size) => (
+              <button
+                key={size.label}
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams.toString())
+                  params.set("width", size.width)
+                  params.set("profile", size.profile)
+                  params.set("diameter", size.diameter)
+                  router.push(`${pathname}?${params.toString()}`)
+                }}
+                className={`text-xs py-1.5 px-2.5 rounded-xl border transition-all duration-200 whitespace-nowrap snap-start flex-shrink-0 ${
+                  currentWidth === size.width && currentProfile === size.profile && currentDiameter === size.diameter
+                    ? "bg-[#D3DF3D] text-[#1F1F1F] border-[#D3DF3D] font-medium"
+                    : "border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white hover:border-[#D3DF3D] hover:bg-[#D3DF3D]/10"
+                }`}
+              >
+                {size.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-4 pb-4 space-y-4">
+          <QuickFilterButtons
+            onSortChange={handleSortChange}
+            onFilterToggle={handleFilterToggle}
+            activeFiltersCount={activeFiltersCount}
+            insideTireResults={true}
+            onBrandSelect={handleBrandSelect}
+          />
+          <TireResults season={season} selectedBrands={selectedBrands} />
         </div>
       </div>
 
-      {/* Filter section below header */}
-      <div className="sticky top-[60px] z-40 w-full">
-        <TireSearchFilter season={season} />
-      </div>
-
-      <div className="flex-1 px-4 pb-4 space-y-4">
-        <QuickFilterButtons
-          onSortChange={handleSortChange}
-          onFilterToggle={handleFilterToggle}
-          activeFiltersCount={activeFiltersCount}
-        />
-        <TireResults season={season} />
-      </div>
+      {/* Filter section - fixed at bottom */}
+      <TireSearchFilter season={season} />
     </main>
   )
 }
