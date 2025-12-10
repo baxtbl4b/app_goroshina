@@ -260,6 +260,20 @@ export default function TireSearchFilter({ season }: { season: Season }) {
   const [runflat, setRunflat] = useState(false)
   const [todayOnly, setTodayOnly] = useState(false)
 
+  // Second axis dimensions
+  const [width2, setWidth2] = useState<string>(() => {
+    const width2Param = searchParams.get("width2")
+    return width2Param || ""
+  })
+  const [profile2, setProfile2] = useState<string>(() => {
+    const profile2Param = searchParams.get("profile2") || searchParams.get("height2")
+    return profile2Param || ""
+  })
+  const [diameter2, setDiameter2] = useState<string>(() => {
+    const diameter2Param = searchParams.get("diameter2") || searchParams.get("diam2")
+    return diameter2Param || ""
+  })
+
   // Function to toggle runflat parameter and update API request
   const toggleRunflatParameter = (checked: boolean) => {
     setRunflat(checked)
@@ -358,6 +372,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     "295",
     "305",
     "315",
+    "325",
   ]
 
   // Profile options
@@ -546,11 +561,69 @@ export default function TireSearchFilter({ season }: { season: Season }) {
       // If all dimensions are specified, apply filter
       applyDimensionFilter(width, profile, value)
     } else if (!value) {
-      // If diameter is cleared, update URL  profile, value)
-    } else if (!value) {
       // If diameter is cleared, update URL
       const params = new URLSearchParams(searchParams.toString())
       params.delete("diameter")
+      router.push(`${window.location.pathname}?${params.toString()}`)
+    }
+  }
+
+  // Function to apply second axis filter
+  const applySecondAxisFilter = (w2: string, p2: string, d2: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    if (w2) params.set("width2", w2)
+    else params.delete("width2")
+
+    if (p2) params.set("profile2", p2)
+    else params.delete("profile2")
+
+    if (d2) params.set("diameter2", d2)
+    else params.delete("diameter2")
+
+    // Set secondAxis flag
+    if (w2 && p2 && d2) {
+      params.set("secondAxis", "true")
+    }
+
+    router.push(`${window.location.pathname}?${params.toString()}`)
+  }
+
+  // Function to handle second axis width change
+  const handleWidth2Change = (value: string) => {
+    setWidth2(value)
+    if (value && profile2 && diameter2) {
+      applySecondAxisFilter(value, profile2, diameter2)
+    } else {
+      const params = new URLSearchParams(searchParams.toString())
+      if (value) params.set("width2", value)
+      else params.delete("width2")
+      router.push(`${window.location.pathname}?${params.toString()}`)
+    }
+  }
+
+  // Function to handle second axis profile change
+  const handleProfile2Change = (value: string) => {
+    setProfile2(value)
+    if (width2 && value && diameter2) {
+      applySecondAxisFilter(width2, value, diameter2)
+    } else {
+      const params = new URLSearchParams(searchParams.toString())
+      if (value) params.set("profile2", value)
+      else params.delete("profile2")
+      router.push(`${window.location.pathname}?${params.toString()}`)
+    }
+  }
+
+  // Function to handle second axis diameter change
+  const handleDiameter2Change = (value: string) => {
+    setDiameter2(value)
+    if (width2 && profile2 && value) {
+      applySecondAxisFilter(width2, profile2, value)
+    } else {
+      const params = new URLSearchParams(searchParams.toString())
+      if (value) params.set("diameter2", value)
+      else params.delete("diameter2")
       router.push(`${window.location.pathname}?${params.toString()}`)
     }
   }
@@ -560,6 +633,9 @@ export default function TireSearchFilter({ season }: { season: Season }) {
     setWidth("")
     setProfile("")
     setDiameter("")
+    setWidth2("") // Reset second axis
+    setProfile2("")
+    setDiameter2("")
     setSelectedVehicle(null) // Reset the selected vehicle
     setPriceRange([3000, 30000]) // Reset price range
     setStockFilter("single") // Reset stock filter
@@ -618,6 +694,19 @@ export default function TireSearchFilter({ season }: { season: Season }) {
       setStockFilter("full")
     } else {
       setStockFilter("single")
+    }
+
+    // Initialize second axis from URL parameters
+    const secondAxisParam = searchParams.get("secondAxis")
+    const width2Param = searchParams.get("width2")
+    const profile2Param = searchParams.get("profile2")
+    const diameter2Param = searchParams.get("diameter2")
+
+    if (secondAxisParam === "true" || (width2Param && profile2Param && diameter2Param)) {
+      setSecondAxis(true)
+      if (width2Param) setWidth2(width2Param)
+      if (profile2Param) setProfile2(profile2Param)
+      if (diameter2Param) setDiameter2(diameter2Param)
     }
   }, [searchParams, season])
 
@@ -896,14 +985,14 @@ onTouchStart={(e) => {
                 <Label htmlFor="width2" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                   Ширина (2 ось)
                 </Label>
-                <Select>
+                <Select value={width2} onValueChange={handleWidth2Change}>
                   <SelectTrigger id="width2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
-                    {widthOptions.map((width) => (
-                      <SelectItem key={width} value={width}>
-                        {width}
+                    {widthOptions.map((w) => (
+                      <SelectItem key={w} value={w}>
+                        {w}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -914,14 +1003,14 @@ onTouchStart={(e) => {
                 <Label htmlFor="profile2" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                   Высота (2 ось)
                 </Label>
-                <Select>
+                <Select value={profile2} onValueChange={handleProfile2Change}>
                   <SelectTrigger id="profile2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
-                    {profileOptions.map((profile) => (
-                      <SelectItem key={profile} value={profile}>
-                        {profile}
+                    {profileOptions.map((p) => (
+                      <SelectItem key={p} value={p}>
+                        {p}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -934,14 +1023,14 @@ onTouchStart={(e) => {
                     Диаметр (2 ось)
                   </Label>
                 </div>
-                <Select>
+                <Select value={diameter2} onValueChange={handleDiameter2Change}>
                   <SelectTrigger id="diameter2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
-                    {diameterOptions.map((diameter) => (
-                      <SelectItem key={diameter} value={diameter}>
-                        R{diameter}
+                    {diameterOptions.map((d) => (
+                      <SelectItem key={d} value={d}>
+                        R{d}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1148,7 +1237,24 @@ onTouchStart={(e) => {
                       <Checkbox
                         id="second-axis"
                         checked={secondAxis}
-                        onCheckedChange={(checked) => setSecondAxis(!!checked)}
+                        onCheckedChange={(checked) => {
+                          const isChecked = !!checked
+                          setSecondAxis(isChecked)
+
+                          const params = new URLSearchParams(searchParams.toString())
+                          if (isChecked) {
+                            params.set("secondAxis", "true")
+                          } else {
+                            params.delete("secondAxis")
+                            params.delete("width2")
+                            params.delete("profile2")
+                            params.delete("diameter2")
+                            setWidth2("")
+                            setProfile2("")
+                            setDiameter2("")
+                          }
+                          router.push(`${window.location.pathname}?${params.toString()}`)
+                        }}
                         className="h-4 w-4"
                       />
                       <Label htmlFor="second-axis" className="text-xs text-[#1F1F1F] dark:text-gray-300">
