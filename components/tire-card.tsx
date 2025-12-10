@@ -454,16 +454,8 @@ export default function TireCard({ tire }: TireCardProps) {
 
   // Function to process image and remove background
   const getProcessedImageUrl = (originalUrl: string): string => {
-    if (!originalUrl || originalUrl.includes("placeholder.svg")) {
-      return originalUrl
-    }
-
-    // Check if the URL already contains query parameters
-    const separator = originalUrl.includes("?") ? "&" : "?"
-
-    // Add specific parameters to remove white background
-    // This assumes the API supports these parameters for white color removal
-    return `${originalUrl}${separator}remove_white=true&chroma_key=white&alpha_channel=true`
+    // Просто возвращаем оригинальный URL без дополнительных параметров
+    return originalUrl
   }
 
   // Get the image URL once to use in multiple places
@@ -592,32 +584,32 @@ export default function TireCard({ tire }: TireCardProps) {
         </div>
 
         <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
-          <DialogContent className="sm:max-w-[600px] flex items-center justify-center p-1" style={{ zIndex: 50 }}>
-            <div className="relative w-full h-full max-h-[80vh] flex items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-[#2a2a2a] dark:to-[#1a1a1a] rounded-lg">
+          <DialogContent className="max-w-fit max-h-fit p-0 border-0 bg-transparent shadow-none [&>button]:hidden">
+            <div className="relative flex items-center justify-center">
               {imageError ? (
-                <div className="relative w-full h-[80vh]">
+                <div className="relative w-auto h-auto max-w-[90vw] max-h-[90vh]">
                   <Image
                     src="/images/tire-closeup.jpg"
                     alt={tire.name || "Tire"}
-                    fill
-                    className="object-contain"
-                    sizes="600px"
+                    width={600}
+                    height={600}
+                    className="object-contain w-auto h-auto max-w-[90vw] max-h-[90vh]"
                   />
                 </div>
               ) : (
-                <div className="relative w-full h-[80vh]">
+                <div className="relative w-auto h-auto max-w-[90vw] max-h-[90vh]">
                   <Image
                     key={`tire-modal-image-${tire.id}-${imageKey}`}
                     src={`${getProcessedImageUrl(imageUrl) || "/placeholder.svg"}${imageRetryCount > 0 ? `&_retry=${imageRetryCount}` : ''}`}
                     alt={tire.name || "Tire"}
-                    fill
-                    className="object-contain"
+                    width={600}
+                    height={600}
+                    className="object-contain w-auto h-auto max-w-[90vw] max-h-[90vh]"
                     onError={handleImageError}
                     style={{
                       filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
                       backgroundColor: "transparent",
                     }}
-                    sizes="600px"
                   />
                 </div>
               )}
@@ -633,7 +625,7 @@ export default function TireCard({ tire }: TireCardProps) {
         <div className="flex flex-col gap-[8.8px]">
           <div className="flex items-center gap-[4.4px] sm:gap-[8.8px] md:gap-[13.2px] flex-wrap">
             {/* Срок доставки вместо размера шины */}
-            <div className="flex items-center gap-[4.4px] sm:gap-[6.6px] px-[6.6px] sm:px-[8.8px] md:px-[11px] py-[4.4px] bg-gray-100 dark:bg-[#3A3A3A] rounded">
+            <div className="flex items-center gap-[4.4px] sm:gap-[6.6px] px-[6.6px] sm:px-[8.8px] md:px-[11px] py-[4.4px] bg-gray-100 dark:bg-[#3A3A3A] rounded-full">
               <span className="flex items-center justify-center">
                 {React.cloneElement(stockStatus.icon as React.ReactElement, {
                   className: `h-[13.2px] w-[13.2px] sm:h-[17.6px] sm:w-[17.6px] md:h-[19.8px] md:w-[19.8px] ${
@@ -737,30 +729,32 @@ export default function TireCard({ tire }: TireCardProps) {
 
         <div className="flex flex-col relative pb-8 sm:pb-9 md:pb-11 -mt-[10px]">
           <div className="flex items-center justify-end w-full mb-1 sm:mb-1.5">
-            <div className="flex flex-col items-end">
-              {tire.stock > 0 ? (
-                <>
-                  <span
-                    className={`text-[17.6px] sm:text-[19.8px] md:text-[22px] font-medium opacity-80 ${
-                      tire.stock > 10 ? "text-green-500" : tire.stock > 5 ? "text-yellow-500" : "text-orange-500"
-                    }`}
-                  >
-                    {tire.stock > 20 ? ">20 шт" : `${tire.stock} шт`}
-                  </span>
-                </>
-              ) : (
-                <span className="text-[15.4px] sm:text-[17.6px] font-medium opacity-80 text-red-500">Нет в наличии</span>
-              )}
-            </div>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
-            <div>
+            <div className="flex flex-row items-end gap-2">
               <p className="text-[11px] sm:text-[14.3px] md:text-[16.5px] text-gray-500 dark:text-gray-400 line-through">
                 {formatPrice(tire.rrc)}
               </p>
               <p className="text-[16.5px] sm:text-[18.7px] md:text-[23.1px] font-bold text-[#1F1F1F] dark:text-white">
                 {formatPrice(tire.price)}
               </p>
+            </div>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
+            <div className="flex flex-col items-start">
+              {tire.stock > 0 ? (
+                <>
+                  <span
+                    className={`h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[17.6px] sm:text-[19.8px] md:text-[22px] font-medium px-3 rounded-full ${
+                      tire.stock > 10 ? "bg-green-500/20 text-green-600 dark:text-green-400" :
+                      tire.stock > 5 ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" :
+                      "bg-orange-500/20 text-orange-600 dark:text-orange-400"
+                    }`}
+                  >
+                    {tire.stock > 20 ? ">20 шт" : `${tire.stock} шт`}
+                  </span>
+                </>
+              ) : (
+                <span className="h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[15.4px] sm:text-[17.6px] font-medium px-3 rounded-full bg-red-500/20 text-red-600 dark:text-red-400">Нет в наличии</span>
+              )}
             </div>
             <div className="flex items-center flex-1 justify-end ml-2">
               {/* Новая кнопка корзины в стиле из изображения */}

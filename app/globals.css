@@ -219,3 +219,8 @@ body {
     transform: translateX(200%) skewX(12deg);
   }
 }
+
+/* Dialog overlay покрывает весь экран включая safe-area */
+[data-radix-dialog-overlay] {
+  z-index: 9999 !important;
+}
