@@ -238,8 +238,8 @@ export default function ProductPage() {
   // Show loading state
   if (loading) {
     return (
-      <main className="flex flex-col min-h-screen bg-[#1F1F1F] items-center justify-center">
-        <div className="text-white text-xl">Загрузка...</div>
+      <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] items-center justify-center">
+        <div className="text-[#1F1F1F] dark:text-white text-xl">Загрузка...</div>
       </main>
     )
   }
@@ -247,8 +247,8 @@ export default function ProductPage() {
   // Show error state
   if (error || !tire) {
     return (
-      <main className="flex flex-col min-h-screen bg-[#1F1F1F] items-center justify-center p-4">
-        <div className="text-white text-xl mb-4">Товар не найден</div>
+      <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] items-center justify-center p-4">
+        <div className="text-[#1F1F1F] dark:text-white text-xl mb-4">Товар не найден</div>
         <Link href="/">
           <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
             Вернуться на главную
@@ -493,8 +493,8 @@ export default function ProductPage() {
   }
 
   return (
-    <main className="flex flex-col min-h-screen bg-black">
-      <header className="sticky top-0 z-10 bg-[#1F1F1F] pr-4 shadow-sm h-[60px] flex items-center">
+    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
+      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] pr-4 shadow-sm h-[60px] flex items-center">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <button
@@ -634,7 +634,7 @@ export default function ProductPage() {
 
                 {/* Counter */}
                 <div className="bg-black/85 text-white h-full px-2 sm:px-3 md:px-4 flex items-center justify-center min-w-[2.5rem] sm:min-w-[3rem] md:min-w-[3.5rem] lg:min-w-[4rem] backdrop-blur-sm">
-                  <span className="text-sm sm:text-base md:text-lg lg:text-xl font-medium">{cartCount}</span>
+                  <span className="text-[16px] sm:text-[20px] md:text-[24px] font-medium">{cartCount}</span>
                 </div>
 
                 {/* Plus button */}

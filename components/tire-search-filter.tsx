@@ -772,7 +772,7 @@ export default function TireSearchFilter({ season }: { season: Season }) {
 
       <div
         ref={filterRef}
-        className={`px-4 pt-2 pb-4 fixed left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] bg-white dark:bg-[#2A2A2A]`}
+        className={`px-4 pt-2 pb-4 fixed left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] bg-white dark:bg-[#2A2A2A] backdrop-blur-md`}
         style={{
           bottom: '0',
           transform: isFilterCollapsed ? 'translateY(calc(100% - 56px))' : 'translateY(0)',

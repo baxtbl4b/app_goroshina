@@ -424,20 +424,21 @@ export default function DiskCard({ disk }: DiskCardProps) {
             </div>
             <div className="flex items-center flex-1 justify-end ml-2">
               {/* Кнопки корзины */}
-              <div className="flex h-7 sm:h-8 md:h-9 rounded-lg overflow-hidden w-full max-w-[140px] sm:max-w-[160px] md:max-w-[180px]">
+              <div className="flex h-[31px] sm:h-[34px] md:h-[40px] overflow-hidden w-full max-w-[152px] sm:max-w-[174px] md:max-w-[195px]" style={{ border: 'none', outline: 'none', borderRadius: '20px' }}>
                 {/* Кнопка минус */}
                 <button
                   onClick={removeFromCart}
                   disabled={cartCount <= 0 || disk.stock <= 0}
                   className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px' }}
                   aria-label="Уменьшить количество"
                 >
-                  <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                  <Minus className="w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] md:w-[22px] md:h-[22px]" />
                 </button>
 
                 {/* Счетчик количества */}
-                <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2rem] sm:min-w-[2.5rem] md:min-w-[3rem]">
-                  <span className="text-xs sm:text-sm md:text-base font-medium">{cartCount}</span>
+                <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2.2rem] sm:min-w-[2.75rem] md:min-w-[3.3rem]">
+                  <span className="text-[15px] sm:text-[18px] md:text-[22px] font-medium">{cartCount}</span>
                 </div>
 
                 {/* Кнопка плюс */}
@@ -446,9 +447,10 @@ export default function DiskCard({ disk }: DiskCardProps) {
                   onClick={addToCart}
                   disabled={disk.stock <= 0 || cartCount + 4 > disk.stock}
                   className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopRightRadius: '20px', borderBottomRightRadius: '20px' }}
                   aria-label="Увеличить количество"
                 >
-                  <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                  <Plus className="w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] md:w-[22px] md:h-[22px]" />
                 </button>
               </div>
             </div>

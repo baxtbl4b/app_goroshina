@@ -368,30 +368,32 @@ export default function DiskProductPage() {
 
             {/* Cart controls for wheel sets */}
             <div className="flex items-center gap-0">
-              <div className="flex h-9 sm:h-10 md:h-11 lg:h-12 rounded-xl overflow-hidden border border-white/20">
+              <div className="flex h-[31px] sm:h-[34px] md:h-[40px] overflow-hidden w-full max-w-[152px] sm:max-w-[174px] md:max-w-[195px]" style={{ border: 'none', outline: 'none', borderRadius: '20px' }}>
                 {/* Minus button */}
                 <button
                   onClick={removeFromCart}
                   disabled={cartCount <= 0 || product.stock <= 0}
-                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full px-3 sm:px-4 md:px-5 lg:px-6 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
+                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px' }}
                   aria-label="Уменьшить количество"
                 >
-                  <Minus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                  <Minus className="w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] md:w-[22px] md:h-[22px]" />
                 </button>
 
                 {/* Counter */}
-                <div className="bg-black/85 text-white h-full px-2 sm:px-3 md:px-4 flex items-center justify-center min-w-[2.5rem] sm:min-w-[3rem] md:min-w-[3.5rem] lg:min-w-[4rem] backdrop-blur-sm">
-                  <span className="text-sm sm:text-base md:text-lg lg:text-xl font-medium">{cartCount}</span>
+                <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2.2rem] sm:min-w-[2.75rem] md:min-w-[3.3rem]">
+                  <span className="text-[15px] sm:text-[18px] md:text-[22px] font-medium">{cartCount}</span>
                 </div>
 
                 {/* Plus button */}
                 <button
                   onClick={addToCart}
                   disabled={product.stock <= 0}
-                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full px-3 sm:px-4 md:px-5 lg:px-6 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
+                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopRightRadius: '20px', borderBottomRightRadius: '20px' }}
                   aria-label="Увеличить количество"
                 >
-                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                  <Plus className="w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] md:w-[22px] md:h-[22px]" />
                 </button>
               </div>
             </div>

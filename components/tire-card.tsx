@@ -772,7 +772,7 @@ export default function TireCard({ tire }: TireCardProps) {
 
                 {/* Счетчик количества */}
                 <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2.2rem] sm:min-w-[2.75rem] md:min-w-[3.3rem]">
-                  <span className="text-[15px] sm:text-[18px] md:text-[22px] font-medium">{cartCount}</span>
+                  <span className="text-[13px] sm:text-[15px] md:text-[18px] font-medium">{cartCount}</span>
                 </div>
 
                 {/* Кнопка плюс */}
