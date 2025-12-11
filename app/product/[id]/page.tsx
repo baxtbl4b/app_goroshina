@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { ChevronLeft, Heart, Share2, Truck, ShieldCheck, Info, Star, Plus, Minus } from "lucide-react"
+import { ChevronLeft, Heart, Truck, ShieldCheck, Info, Star, Plus, Minus } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -28,6 +28,7 @@ export default function ProductPage() {
   const [flagError, setFlagError] = useState(false)
   const [selectedWarehouse, setSelectedWarehouse] = useState<{ location: string; stock: number } | null>(null)
   const [warehouseCartCounts, setWarehouseCartCounts] = useState<Record<string, number>>({})
+  const [showShareMenu, setShowShareMenu] = useState(false)
 
   // Load tire data from localStorage or API
   useEffect(() => {
@@ -51,15 +52,26 @@ export default function ProductPage() {
           }
         }
 
-        // If not in localStorage, try API (though it likely won't work)
+        // If not in localStorage, try API
+        console.log(`Fetching tire from API: /api/tires/${tireId}`)
         const response = await fetch(`/api/tires/${tireId}`)
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch tire: ${response.status}`)
+          const errorData = await response.json().catch(() => ({}))
+          console.error("API error:", response.status, errorData)
+          throw new Error(errorData.error || `Товар не найден (${response.status})`)
         }
 
         const data = await response.json()
-        setTire(data.tire)
+        console.log("Tire data from API:", data)
+
+        if (data.tire) {
+          setTire(data.tire)
+          // Cache for future use
+          localStorage.setItem(`tire_${tireId}`, JSON.stringify(data.tire))
+        } else {
+          throw new Error("Данные о товаре не получены")
+        }
       } catch (err) {
         console.error("Error loading tire:", err)
         setError(err instanceof Error ? err.message : "Failed to load tire")
@@ -327,6 +339,77 @@ export default function ProductPage() {
     window.dispatchEvent(cartUpdateEvent)
   }
 
+  // Share function
+  const handleShare = async () => {
+    if (!tire) return
+
+    const productName = tire.name || tire.title || "Шина"
+    const productPrice = tire.price || ""
+    const shareUrl = window.location.href
+    const shareText = `${productName} - ${productPrice} ₽`
+
+    // Пробуем Web Share API
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: productName,
+          text: shareText,
+          url: shareUrl
+        })
+        return
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return
+      }
+    }
+
+    // Fallback: показываем кастомное меню
+    setShowShareMenu(true)
+  }
+
+  // Функция для шаринга в конкретное приложение
+  const shareToApp = async (app: string) => {
+    if (!tire) return
+
+    const productName = tire.name || tire.title || "Шина"
+    const productPrice = tire.price || ""
+    const shareUrl = window.location.href
+    const shareText = `${productName} - ${productPrice} ₽`
+    const encodedUrl = encodeURIComponent(shareUrl)
+    const encodedText = encodeURIComponent(`${shareText}\n${shareUrl}`)
+
+    switch (app) {
+      case "whatsapp":
+        window.open(`https://wa.me/?text=${encodedText}`, "_blank")
+        break
+      case "telegram":
+        window.open(`https://t.me/share/url?url=${encodedUrl}&text=${encodeURIComponent(shareText)}`, "_blank")
+        break
+      case "viber":
+        window.open(`viber://forward?text=${encodedText}`, "_blank")
+        break
+      case "sms":
+        window.open(`sms:&body=${encodedText}`, "_blank")
+        break
+      case "email":
+        window.open(`mailto:?subject=${encodeURIComponent(productName)}&body=${encodedText}`, "_blank")
+        break
+      case "copy":
+        try {
+          await navigator.clipboard.writeText(shareUrl)
+        } catch {
+          // Fallback для старых браузеров
+          const textArea = document.createElement("textarea")
+          textArea.value = shareUrl
+          document.body.appendChild(textArea)
+          textArea.select()
+          document.execCommand("copy")
+          document.body.removeChild(textArea)
+        }
+        break
+    }
+    setShowShareMenu(false)
+  }
+
   // Toggle favorite function
   const toggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -362,12 +445,25 @@ export default function ProductPage() {
   if (error || !tire) {
     return (
       <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] items-center justify-center p-4">
-        <div className="text-[#1F1F1F] dark:text-white text-xl mb-4">Товар не найден</div>
-        <Link href="/">
-          <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
-            Вернуться на главную
-          </Button>
-        </Link>
+        <div className="text-center">
+          <div className="text-6xl mb-4">🔍</div>
+          <div className="text-[#1F1F1F] dark:text-white text-xl mb-2">Товар не найден</div>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-xs">
+            {error || "Возможно, товар был удалён или ссылка устарела"}
+          </p>
+          <div className="flex flex-col gap-3">
+            <Link href="/category/tires">
+              <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] w-full">
+                Перейти в каталог шин
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button variant="outline" className="border-gray-600 text-white bg-transparent w-full">
+                На главную
+              </Button>
+            </Link>
+          </div>
+        </div>
       </main>
     )
   }
@@ -641,8 +737,14 @@ export default function ProductPage() {
                 }`}
               />
             </Button>
-            <Button variant="ghost" size="icon">
-              <Share2 className="h-5 w-5 text-white" />
+            <Button variant="ghost" size="icon" onClick={handleShare}>
+              <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
             </Button>
           </div>
         </div>
@@ -977,6 +1079,91 @@ export default function ProductPage() {
       </div>
 
       <BottomNavigation />
+
+      {/* Share Menu Modal */}
+      {showShareMenu && (
+        <div
+          className="fixed top-0 left-0 right-0 bottom-0 z-[100] flex items-end justify-center"
+          onClick={() => setShowShareMenu(false)}
+        >
+          {/* Backdrop */}
+          <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50" />
+
+          {/* Share Sheet */}
+          <div
+            className="relative w-full max-w-lg bg-[#2A2A2A] rounded-t-3xl p-4 pb-8 animate-in slide-in-from-bottom duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle */}
+            <div className="w-10 h-1 bg-gray-500 rounded-full mx-auto mb-4" />
+
+            <h3 className="text-lg font-semibold text-white text-center mb-4">Поделиться</h3>
+
+            {/* Share Options Grid */}
+            <div className="grid grid-cols-4 gap-4 mb-4">
+              <button
+                onClick={() => shareToApp("whatsapp")}
+                className="flex flex-col items-center gap-2"
+              >
+                <div className="w-14 h-14 bg-[#25D366] rounded-2xl flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" className="w-8 h-8 fill-white">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                </div>
+                <span className="text-xs text-white">WhatsApp</span>
+              </button>
+
+              <button
+                onClick={() => shareToApp("telegram")}
+                className="flex flex-col items-center gap-2"
+              >
+                <div className="w-14 h-14 bg-[#0088cc] rounded-2xl flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" className="w-8 h-8 fill-white">
+                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                  </svg>
+                </div>
+                <span className="text-xs text-white">Telegram</span>
+              </button>
+
+              <button
+                onClick={() => shareToApp("sms")}
+                className="flex flex-col items-center gap-2"
+              >
+                <div className="w-14 h-14 bg-[#34C759] rounded-2xl flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" className="w-8 h-8 fill-white">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12zM7 9h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
+                  </svg>
+                </div>
+                <span className="text-xs text-white">SMS</span>
+              </button>
+
+              <button
+                onClick={() => shareToApp("email")}
+                className="flex flex-col items-center gap-2"
+              >
+                <div className="w-14 h-14 bg-[#007AFF] rounded-2xl flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" className="w-8 h-8 fill-white">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  </svg>
+                </div>
+                <span className="text-xs text-white">Почта</span>
+              </button>
+            </div>
+
+            {/* Copy Link Button */}
+            <button
+              onClick={() => shareToApp("copy")}
+              className="w-full py-3 bg-[#3A3A3A] rounded-xl text-white font-medium flex items-center justify-center gap-2"
+            >
+              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
+                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+              </svg>
+              Скопировать ссылку
+            </button>
+
+          </div>
+        </div>
+      )}
     </main>
   )
 }

@@ -13,33 +13,48 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: "Tire ID is required" }, { status: 400 })
     }
 
-    // Construct the API URL
-    const apiUrl = `${API_BASE_URL}/${API_VERSION}/tires/${id}?access_token=${API_TOKEN}&fields=image,flag,country,provider`
+    console.log(`Fetching tire by ID: ${id}`)
 
-    console.log(`Fetching tire from API: ${apiUrl}`)
+    // Try to fetch using ID filter from Tirebase API
+    const apiUrl = `${API_BASE_URL}/${API_VERSION}/tires?access_token=${API_TOKEN}&id=${id}&fields=image,flag,country,provider,storehouse`
 
-    // Make the request to the API
+    console.log(`API URL: ${apiUrl}`)
+
     const response = await fetch(apiUrl, {
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      next: { revalidate: 3600 },
     })
 
-    // Check if the response is OK
     if (!response.ok) {
-      console.error(`API request failed with status ${response.status}`)
-      return NextResponse.json({ error: `API request failed with status ${response.status}` }, { status: response.status })
+      console.error(`API error: ${response.status}`)
+      return NextResponse.json({ error: "Товар не найден" }, { status: 404 })
     }
 
-    // Parse the response
-    const data = await response.json()
+    const responseData = await response.json()
+    console.log("API response:", JSON.stringify(responseData).substring(0, 500))
 
-    console.log(`Tire data received:`, data)
+    // Extract tires array
+    const tiresData = responseData.tires || responseData
 
-    // Return the tire data
-    return NextResponse.json({
-      tire: data,
-    })
+    if (!Array.isArray(tiresData) || tiresData.length === 0) {
+      return NextResponse.json({ error: "Товар не найден" }, { status: 404 })
+    }
+
+    // Find the tire with matching ID
+    const tire = tiresData.find((t: any) => t.id === id) || tiresData[0]
+
+    // Generate name if not present
+    const tireName = tire.title || tire.name || `${tire.brand || ""} ${tire.model || ""} ${tire.width || ""}/${tire.height || ""} R${tire.diam || ""}`
+
+    const transformedTire = {
+      ...tire,
+      name: tireName,
+    }
+
+    console.log(`Tire found:`, transformedTire.id, transformedTire.name)
+
+    return NextResponse.json({ tire: transformedTire })
   } catch (error) {
     console.error("Error fetching tire from API:", error)
-    return NextResponse.json({ error: "Failed to fetch tire data" }, { status: 500 })
+    return NextResponse.json({ error: "Ошибка при загрузке товара" }, { status: 500 })
   }
 }

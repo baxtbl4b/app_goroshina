@@ -10,6 +10,27 @@
   "scope": "/",
   "lang": "ru",
   "categories": ["shopping", "automotive"],
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "url_handlers": [
+    {
+      "origin": "https://goroshina.ru"
+    },
+    {
+      "origin": "https://*.goroshina.ru"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "icons": [
     {
       "src": "/icons/new-logo-512x512.png",
