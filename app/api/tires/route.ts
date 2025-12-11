@@ -95,8 +95,8 @@ export async function GET(request: NextRequest) {
     // Add access token
     apiParams.append("access_token", API_TOKEN)
 
-    // Add fields parameter to get additional data including images, flags, country, provider and storehouse
-    apiParams.append("fields", "image,flag,country,provider,storehouse")
+    // Add fields parameter to get additional data including images, flags, country, provider, providers and storehouse
+    apiParams.append("fields", "image,flag,country,provider,providers,storehouse")
 
     // Construct the API URL
     const apiUrl = `${API_BASE_URL}/${API_VERSION}/tires?${apiParams.toString()}`
@@ -216,6 +216,7 @@ export async function GET(request: NextRequest) {
           year: tire.year,
           now: tire.now,
           provider: tire.provider || null,
+          providers: tire.providers || {},
           storehouse: tire.storehouse || {},
         }
       })

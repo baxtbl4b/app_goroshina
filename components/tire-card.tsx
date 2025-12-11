@@ -5,11 +5,13 @@ import React from "react"
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Heart, Gift, Calendar, CheckCircle, Clock, Plus, Minus } from "lucide-react"
+import { Heart, Gift, Calendar, CheckCircle, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { type Tire, formatPrice } from "@/lib/api"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
+import CartQuantityButtons from "@/components/cart-quantity-buttons"
+import { getDeliveryForCategory, getDeliveryColorClass } from "@/lib/delivery-time"
 
 // Константа для токена доступа
 const API_TOKEN = "KYf-JMMTweMWASr-zktunkLwnPKfzeIO"
@@ -342,79 +344,31 @@ export default function TireCard({ tire }: TireCardProps) {
     window.dispatchEvent(cartUpdateEvent)
   }
 
-  // Функция для определения статуса доставки на основе поставщика
-  const getDeliveryStatusByProvider = (provider: string | null | undefined): string => {
-    if (!provider) return "Уточняйте наличие"
+  // Получаем информацию о доставке из утилиты (с учётом складов)
+  const deliveryInfo = getDeliveryForCategory(tire.provider, tire.storehouse)
 
-    const providerLower = provider.toLowerCase()
-
-    // TireShop - Забрать сегодня
-    if (providerLower === "tireshop") {
-      return "Забрать сегодня"
-    }
-
-    // Доставка 1-2 дня
-    if (["brinex", "exclusive", "fourtochki", "shinservice", "yst"].includes(providerLower)) {
-      return "Доставка 1-2 дня"
-    }
-
-    // Доставка 2-3 дня
-    if (providerLower === "severauto") {
-      return "Доставка 2-3 дня"
-    }
-
-    // Доставка 2-4 дня
-    if (providerLower === "ikon") {
-      return "Доставка 2-4 дня"
-    }
-
-    // Доставка 3-6 дней
-    if (providerLower === "mosautoshina") {
-      return "Доставка 3-6 дней"
-    }
-
-    // Доставка 5-7 дней
-    if (["bagoria", "severautodist"].includes(providerLower)) {
-      return "Доставка 5-7 дней"
-    }
-
-    // Доставка 5-9 дней
-    if (providerLower === "vels") {
-      return "Доставка 5-9 дней"
-    }
-
-    // Доставка 7-10 дней
-    if (providerLower === "sibzapaska") {
-      return "Доставка 7-10 дней"
-    }
-
-    // По умолчанию
-    return "Уточняйте наличие"
-  }
-
-  // Обновим функцию getStockStatus, чтобы она возвращала тип статуса на основе поставщика
+  // Функция для получения статуса с иконкой
   const getStockStatus = (): { type: StockStatusType; tooltip: string; className: string; icon: React.ReactNode } => {
-    const deliveryStatus = getDeliveryStatusByProvider(tire.provider)
+    const colorClass = getDeliveryColorClass(deliveryInfo.type)
 
-    // Определяем тип и иконку на основе текста статуса
-    if (deliveryStatus === "Забрать сегодня") {
+    if (deliveryInfo.type === "today") {
       return {
         type: "today",
-        tooltip: deliveryStatus,
-        className: "text-green-500",
-        icon: <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />,
+        tooltip: deliveryInfo.text,
+        className: colorClass,
+        icon: <CheckCircle className={`h-5 w-5 sm:h-6 sm:w-6 ${colorClass}`} />,
       }
-    } else if (deliveryStatus.includes("1-2") || deliveryStatus.includes("2-3") || deliveryStatus.includes("2-4")) {
+    } else if (deliveryInfo.type === "fast") {
       return {
         type: "oneday",
-        tooltip: deliveryStatus,
-        className: "text-blue-500",
-        icon: <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />,
+        tooltip: deliveryInfo.text,
+        className: colorClass,
+        icon: <Clock className={`h-5 w-5 sm:h-6 sm:w-6 ${colorClass}`} />,
       }
     } else {
       return {
         type: "moredays",
-        tooltip: deliveryStatus,
+        tooltip: deliveryInfo.text,
         className: "text-orange-500",
         icon: <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />,
       }
@@ -761,33 +715,13 @@ export default function TireCard({ tire }: TireCardProps) {
                 }
               })()}
             </div>
-            <div className="flex items-center gap-1">
-              {/* Кнопка минус в стиле tire-mounting */}
-              <button
-                onClick={removeFromCart}
-                disabled={cartCount <= 0 || tire.stock <= 0}
-                className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#484b51] text-white rounded-lg flex items-center justify-center hover:bg-[#5A5D63] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Уменьшить количество"
-              >
-                <Minus className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-
-              {/* Счетчик количества */}
-              <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#1A1A1A] text-white rounded-lg flex items-center justify-center">
-                <span className="text-base sm:text-lg font-medium">{cartCount}</span>
-              </div>
-
-              {/* Кнопка плюс в стиле tire-mounting */}
-              <button
-                ref={addButtonRef}
-                onClick={addToCart}
-                disabled={tire.stock <= 0 || cartCount >= tire.stock}
-                className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#d3df3d] text-black rounded-lg flex items-center justify-center hover:bg-[#c5d135] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Увеличить количество"
-              >
-                <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-            </div>
+            <CartQuantityButtons
+              ref={addButtonRef}
+              count={cartCount}
+              maxStock={tire.stock}
+              onAdd={addToCart}
+              onRemove={removeFromCart}
+            />
           </div>
         </div>
       </div>

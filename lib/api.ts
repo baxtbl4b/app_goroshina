@@ -28,6 +28,8 @@ export interface Tire {
   truck?: boolean
   cargo?: boolean
   storehouse?: Record<string, number>
+  providers?: Record<string, { id?: string; quantity?: number; price?: number; rrc?: number; opt?: number; purchase?: number }>
+  provider?: string
 }
 
 export interface TireDimensions {

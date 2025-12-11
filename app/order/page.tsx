@@ -4,13 +4,14 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Check, ChevronLeft, MapPin, Plus, Minus, Truck, Trash2, User, Phone, Mail, Globe, Heart } from "lucide-react"
+import { Check, ChevronLeft, MapPin, Plus, Truck, Trash2, User, Phone, Mail, Globe, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { formatPrice } from "@/lib/api"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
+import CartQuantityButtons from "@/components/cart-quantity-buttons"
 
 // Mock data
 const orderData = {
@@ -401,24 +402,14 @@ export default function OrderPage() {
                             className="object-contain"
                           />
                         </div>
-                        <div className="flex items-center mt-3">
-                          <div className="flex items-center bg-muted dark:bg-[#3A3A3A] rounded ml-[10px]">
-                            <button
-                              onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
-                              className="h-6 w-6 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                              aria-label="Уменьшить количество"
-                            >
-                              <Minus className="h-3 w-3" />
-                            </button>
-                            <span className="text-sm px-2">{item.quantity} шт.</span>
-                            <button
-                              onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
-                              className="h-6 w-6 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                              aria-label="Увеличить количество"
-                            >
-                              <Plus className="h-3 w-3" />
-                            </button>
-                          </div>
+                        <div className="flex items-center mt-3 ml-[10px]">
+                          <CartQuantityButtons
+                            count={item.quantity}
+                            onAdd={() => updateItemQuantity(item.id, item.quantity + 1)}
+                            onRemove={() => updateItemQuantity(item.id, item.quantity - 1)}
+                            variant="inline"
+                            showUnit
+                          />
                         </div>
                       </div>
 

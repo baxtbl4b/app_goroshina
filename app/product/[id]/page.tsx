@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { ChevronLeft, Heart, Truck, ShieldCheck, Info, Star, Plus, Minus } from "lucide-react"
+import { ChevronLeft, Heart, Truck, ShieldCheck, Info, Star } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,8 @@ import CartButton from "@/components/cart-button"
 import { useParams, useRouter } from "next/navigation"
 import type { Tire } from "@/lib/api"
 import CryptoJS from "crypto-js"
+import CartQuantityButtons from "@/components/cart-quantity-buttons"
+import { getDeliveryByWarehouse, getDeliveryColorClass } from "@/lib/delivery-time"
 
 export default function ProductPage() {
   const params = useParams()
@@ -558,7 +560,7 @@ export default function ProductPage() {
   }
 
   // Get stock location info from storehouse
-  const getStockLocationInfo = (): Array<{ location: string; stock: number }> => {
+  const getStockLocationInfo = (): Array<{ location: string; stock: number; provider?: string }> => {
     if (!tire) return [{ location: "Уточняйте наличие", stock: 0 }]
 
     // Используем Map для группировки складов по названию
@@ -568,9 +570,9 @@ export default function ProductPage() {
     if (!tire.storehouse || Object.keys(tire.storehouse).length === 0) {
       // Если нет данных о складах, используем общий stock
       const stock = getTireProperty("stock", 0) as number
-      const deliveryStatus = getDeliveryStatusByProvider(tire.provider)
+      const providerLower = (tire.provider || "").toLowerCase()
 
-      if (deliveryStatus === "Забрать сегодня") {
+      if (providerLower === "tireshop") {
         return [{ location: "В наличии", stock: stock }]
       } else {
         return [{ location: "Уточняйте наличие", stock: stock }]
@@ -578,6 +580,12 @@ export default function ProductPage() {
     }
 
     let otherCitiesStock = 0
+    let hasDavydovo = false
+
+    // Проверяем, есть ли sibzapaska среди провайдеров
+    const providers = tire.providers as Record<string, { quantity?: number }> | undefined
+    const sibzapaskaQuantity = providers?.sibzapaska?.quantity || 0
+    const hasSibzapaska = sibzapaskaQuantity > 0
 
     // Парсим storehouse объект
     Object.entries(tire.storehouse).forEach(([location, stock]) => {
@@ -593,11 +601,21 @@ export default function ProductPage() {
         normalizedLocation = "Пискаревский проспект"
       }
       // Санкт-Петербург (точное совпадение или содержит, но не ОХ)
+      // Для tireshop пропускаем этот склад - товары уже есть на Таллинское/Пискаревский
       else if (location === "Санкт-Петербург" || (locationLower.includes("санкт-петербург") && !locationLower.includes("ох"))) {
+        const providerLower = (tire.provider || "").toLowerCase()
+        if (providerLower === "tireshop") {
+          // Пропускаем Санкт-Петербург для tireshop
+          return
+        }
         normalizedLocation = "Санкт-Петербург"
       }
-      // Все остальные города - суммируем для "Под заказ"
+      // Все остальные города - в "Под заказ"
       else {
+        // Отмечаем если есть товары из Давыдово
+        if (locationLower.includes("давыдово")) {
+          hasDavydovo = true
+        }
         otherCitiesStock += stock
         return
       }
@@ -607,14 +625,32 @@ export default function ProductPage() {
     })
 
     // Добавляем "Под заказ" если есть товары в других городах
+    // Если есть sibzapaska - выделяем его отдельно
     if (otherCitiesStock > 0) {
-      stockMap.set("Под заказ", otherCitiesStock)
+      if (hasSibzapaska && sibzapaskaQuantity < otherCitiesStock) {
+        // Есть и sibzapaska и другие провайдеры - разделяем
+        const otherStock = otherCitiesStock - sibzapaskaQuantity
+        if (otherStock > 0) {
+          // Если все остальные товары из Давыдово - помечаем
+          stockMap.set(hasDavydovo ? "Под заказ (Давыдово)" : "Под заказ", otherStock)
+        }
+        stockMap.set("Удаленный склад", sibzapaskaQuantity)
+      } else if (hasSibzapaska && sibzapaskaQuantity >= otherCitiesStock) {
+        // Все товары от sibzapaska
+        stockMap.set("Удаленный склад", otherCitiesStock)
+      } else {
+        // Нет sibzapaska - всё в "Под заказ"
+        // Если товары из Давыдово - помечаем
+        stockMap.set(hasDavydovo ? "Под заказ (Давыдово)" : "Под заказ", otherCitiesStock)
+      }
     }
 
     // Преобразуем Map в массив
     const stockLocations = Array.from(stockMap.entries()).map(([location, stock]) => ({
-      location,
-      stock
+      location: location.replace(" (Давыдово)", ""), // Убираем метку из отображения
+      stock,
+      provider: location === "Удаленный склад" ? "sibzapaska" : undefined,
+      fromDavydovo: location.includes("Давыдово")
     }))
 
     // Если нет данных, показываем сообщение
@@ -872,52 +908,11 @@ export default function ProductPage() {
                     ? 'text-orange-400'
                     : 'text-red-400'
 
-              // Определяем срок поставки по складу
-              const getDeliveryTime = (location: string) => {
-                // Используем провайдера для определения срока
-                const provider = tire.provider?.toLowerCase() || ""
-
-                if (location === "Таллинское шоссе" || location === "Пискаревский проспект") {
-                  return "Забрать сегодня"
-                }
-
-                // Специальная обработка для склада "Санкт-Петербург"
-                if (location === "Санкт-Петербург") {
-                  if (provider === "tireshop") return "Доставка 1 день"
-                  if (["brinex", "exclusive", "fourtochki", "shinservice", "yst"].includes(provider)) return "Доставка 1-2 дня"
-                  if (provider === "severauto") return "Доставка 2-3 дня"
-                  if (provider === "ikon") return "Доставка 2-4 дня"
-                  if (provider === "mosautoshina") return "Доставка 3-6 дней"
-                  if (["bagoria", "severautodist"].includes(provider)) return "Доставка 5-7 дней"
-                  if (provider === "vels") return "Доставка 5-9 дней"
-                  if (provider === "sibzapaska") return "Доставка 7-10 дней"
-                  return "Уточняйте наличие"
-                }
-
-                // Специальная обработка для склада "Под заказ"
-                if (location === "Под заказ") {
-                  if (provider === "yst") return "Доставка 2-3 дня"
-                  if (provider === "severauto") return "Доставка 3-4 дня"
-                  if (provider === "ikon") return "Доставка 3-5 дней"
-                  if (provider === "mosautoshina") return "Доставка 4-7 дней"
-                  if (["bagoria", "severautodist"].includes(provider)) return "Доставка 6-8 дней"
-                  if (provider === "vels") return "Доставка 6-10 дней"
-                  if (provider === "sibzapaska") return "Доставка 8-12 дней"
-                  return "Уточняйте наличие"
-                }
-
-                // Для остальных складов - по провайдеру (не должно срабатывать, но на всякий случай)
-                if (provider === "tireshop") return "Доставка 1 день"
-                if (["brinex", "exclusive", "fourtochki", "shinservice", "yst"].includes(provider)) return "Доставка 1-2 дня"
-                if (provider === "severauto") return "Доставка 2-3 дня"
-                if (provider === "ikon") return "Доставка 2-4 дня"
-                if (provider === "mosautoshina") return "Доставка 3-6 дней"
-                if (["bagoria", "severautodist"].includes(provider)) return "Доставка 5-7 дней"
-                if (provider === "vels") return "Доставка 5-9 дней"
-                if (provider === "sibzapaska") return "Доставка 7-10 дней"
-
-                return "Уточняйте наличие"
-              }
+              // Получаем информацию о доставке
+              // Если товар из Давыдово - 5-7 дней
+              const deliveryInfo = (locationInfo as any).fromDavydovo
+                ? { text: "Доставка 5-7 дней", type: "medium" as const }
+                : getDeliveryByWarehouse(locationInfo.location, tire.provider)
 
               return (
                 <div
@@ -932,37 +927,27 @@ export default function ProductPage() {
                     <span className="text-sm font-medium text-white">
                       {locationInfo.location}
                     </span>
-                    <span className="text-[10px] text-gray-400">
-                      {getDeliveryTime(locationInfo.location)}
+                    <span className={`text-[10px] ${getDeliveryColorClass(deliveryInfo.type)}`}>
+                      {deliveryInfo.text}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className={`text-sm font-medium ${stockColor} w-[70px] text-right`}>
                       {availableStock > 20 ? ">20 шт" : availableStock > 0 ? `${availableStock} шт` : "Нет"}
                     </span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        removeFromCartForWarehouse(locationInfo)
-                      }}
-                      disabled={warehouseCartCount <= 0}
-                      className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#484b51] text-white rounded-lg flex items-center justify-center hover:bg-[#5A5D63] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Minus className="w-5 h-5 sm:w-6 sm:h-6" />
-                    </button>
-                    <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#1A1A1A] border border-[#3A3A3A] text-white rounded-lg flex items-center justify-center text-base sm:text-lg font-medium">
-                      {warehouseCartCount}
-                    </div>
-                    <button
-                      onClick={(e) => {
+                    <CartQuantityButtons
+                      count={warehouseCartCount}
+                      maxStock={locationInfo.stock}
+                      onAdd={(e) => {
                         e.stopPropagation()
                         addToCartForWarehouse(locationInfo)
                       }}
-                      disabled={availableStock <= 0}
-                      className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-[#d3df3d] text-black rounded-lg flex items-center justify-center hover:bg-[#c5d135] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
-                    </button>
+                      onRemove={(e) => {
+                        e.stopPropagation()
+                        removeFromCartForWarehouse(locationInfo)
+                      }}
+                      showBorder
+                    />
                   </div>
                 </div>
               )

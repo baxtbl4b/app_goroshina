@@ -16,7 +16,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     console.log(`Fetching tire by ID: ${id}`)
 
     // Try to fetch using ID filter from Tirebase API
-    const apiUrl = `${API_BASE_URL}/${API_VERSION}/tires?access_token=${API_TOKEN}&id=${id}&fields=image,flag,country,provider,storehouse`
+    const apiUrl = `${API_BASE_URL}/${API_VERSION}/tires?access_token=${API_TOKEN}&id=${id}&fields=image,flag,country,provider,providers,storehouse`
 
     console.log(`API URL: ${apiUrl}`)
 
