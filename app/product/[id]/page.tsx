@@ -874,8 +874,49 @@ export default function ProductPage() {
 
               // Определяем срок поставки по складу
               const getDeliveryTime = (location: string) => {
-                if (location === "Под заказ") return "3-7 дней"
-                return "Сегодня"
+                // Используем провайдера для определения срока
+                const provider = tire.provider?.toLowerCase() || ""
+
+                if (location === "Таллинское шоссе" || location === "Пискаревский проспект") {
+                  return "Забрать сегодня"
+                }
+
+                // Специальная обработка для склада "Санкт-Петербург"
+                if (location === "Санкт-Петербург") {
+                  if (provider === "tireshop") return "Доставка 1 день"
+                  if (["brinex", "exclusive", "fourtochki", "shinservice", "yst"].includes(provider)) return "Доставка 1-2 дня"
+                  if (provider === "severauto") return "Доставка 2-3 дня"
+                  if (provider === "ikon") return "Доставка 2-4 дня"
+                  if (provider === "mosautoshina") return "Доставка 3-6 дней"
+                  if (["bagoria", "severautodist"].includes(provider)) return "Доставка 5-7 дней"
+                  if (provider === "vels") return "Доставка 5-9 дней"
+                  if (provider === "sibzapaska") return "Доставка 7-10 дней"
+                  return "Уточняйте наличие"
+                }
+
+                // Специальная обработка для склада "Под заказ"
+                if (location === "Под заказ") {
+                  if (provider === "yst") return "Доставка 2-3 дня"
+                  if (provider === "severauto") return "Доставка 3-4 дня"
+                  if (provider === "ikon") return "Доставка 3-5 дней"
+                  if (provider === "mosautoshina") return "Доставка 4-7 дней"
+                  if (["bagoria", "severautodist"].includes(provider)) return "Доставка 6-8 дней"
+                  if (provider === "vels") return "Доставка 6-10 дней"
+                  if (provider === "sibzapaska") return "Доставка 8-12 дней"
+                  return "Уточняйте наличие"
+                }
+
+                // Для остальных складов - по провайдеру (не должно срабатывать, но на всякий случай)
+                if (provider === "tireshop") return "Доставка 1 день"
+                if (["brinex", "exclusive", "fourtochki", "shinservice", "yst"].includes(provider)) return "Доставка 1-2 дня"
+                if (provider === "severauto") return "Доставка 2-3 дня"
+                if (provider === "ikon") return "Доставка 2-4 дня"
+                if (provider === "mosautoshina") return "Доставка 3-6 дней"
+                if (["bagoria", "severautodist"].includes(provider)) return "Доставка 5-7 дней"
+                if (provider === "vels") return "Доставка 5-9 дней"
+                if (provider === "sibzapaska") return "Доставка 7-10 дней"
+
+                return "Уточняйте наличие"
               }
 
               return (
