@@ -398,7 +398,7 @@ export default function OrderPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-[#1F1F1F] pr-4 shadow-sm h-[60px] flex items-center">
+      <header className="sticky top-0 z-50 bg-[#1F1F1F] pr-4 shadow-sm h-[60px] flex items-center relative before:content-[''] before:absolute before:top-[-50px] before:left-0 before:right-0 before:h-[50px] before:bg-[#1F1F1F]">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <button
@@ -443,6 +443,32 @@ export default function OrderPage() {
                         key={item.id}
                         className="flex items-start gap-4 p-4 bg-[#1F1F1F] rounded-2xl relative"
                       >
+                        {/* Иконки: грузовая, шипы - абсолютное позиционирование относительно карточки */}
+                        {(item.spike || item.cargo) && (
+                          <div className="absolute bottom-4 left-[120px] flex items-center gap-1">
+                            {(item.cargo === true || item.cargo === 1 || item.cargo === "true" || item.cargo === "1") && (
+                              <Image
+                                src="/images/cargo-truck-new.png"
+                                alt="Грузовая"
+                                width={28}
+                                height={28}
+                                className="h-[28px] w-[28px]"
+                                title="Грузовая шина"
+                              />
+                            )}
+                            {item.spike && (
+                              <Image
+                                src="/images/bykvaSH.png"
+                                alt="Шипы"
+                                width={23}
+                                height={23}
+                                className="h-[23px] w-[23px]"
+                                title="Шипованная шина"
+                              />
+                            )}
+                          </div>
+                        )}
+
                         {/* Левая колонка: Изображение и кнопки количества */}
                         <div className="flex flex-col items-center gap-3">
                           <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex-shrink-0 bg-white rounded-xl overflow-hidden">
@@ -471,50 +497,23 @@ export default function OrderPage() {
                               </span>
                             </div>
                             <div className="flex items-start gap-2">
+                              {(item.runflat === true || item.runflat === 1 || item.runflat === "true" || item.runflat === "1") && (
+                                <span className="text-xs font-bold text-sky-400 px-2 py-1 rounded-lg" title="RunFlat Technology">
+                                  RFT
+                                </span>
+                              )}
                               {seasonName && (
                                 <span className="text-xs text-gray-400 bg-[#2A2A2A] px-2 py-1 rounded-lg">
                                   {seasonName}
                                 </span>
                               )}
-                              <div className="flex flex-col items-center gap-1">
-                                <button
-                                  onClick={() => removeItem(item.id)}
-                                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
-                                  aria-label="Удалить товар"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                                {/* Иконки: шипы, ранфлет, грузовая */}
-                                {(item.spike || item.runflat || item.cargo) && (
-                                  <div className="flex items-center justify-center gap-1">
-                                    {item.spike && (
-                                      <Image
-                                        src="/images/bykvaSH.png"
-                                        alt="Шипы"
-                                        width={16}
-                                        height={16}
-                                        className="h-4 w-4"
-                                        title="Шипованная шина"
-                                      />
-                                    )}
-                                    {(item.runflat === true || item.runflat === 1 || item.runflat === "true" || item.runflat === "1") && (
-                                      <span className="text-[10px] font-bold text-white" title="RunFlat Technology">
-                                        RFT
-                                      </span>
-                                    )}
-                                    {(item.cargo === true || item.cargo === 1 || item.cargo === "true" || item.cargo === "1") && (
-                                      <Image
-                                        src="/images/cargo-truck-new.png"
-                                        alt="Грузовая"
-                                        width={16}
-                                        height={16}
-                                        className="h-4 w-4"
-                                        title="Грузовая шина"
-                                      />
-                                    )}
-                                  </div>
-                                )}
-                              </div>
+                              <button
+                                onClick={() => removeItem(item.id)}
+                                className="p-1.5 -mt-0.5 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                aria-label="Удалить товар"
+                              >
+                                <Trash2 className="h-[18px] w-[18px]" />
+                              </button>
                             </div>
                           </div>
 
@@ -522,18 +521,16 @@ export default function OrderPage() {
                             {item.name || `${item.brand || ""} ${item.model || ""}`}
                           </h3>
 
-                          <div className="flex justify-between items-end mt-auto pt-2">
-                            <div>
-                              {item.stock !== undefined && item.stock <= 4 && (
-                                <p className="text-xs text-orange-400 bg-orange-400/10 px-2 py-1 rounded-lg inline-block w-fit">
-                                  {item.stock === 1 ? "Последний!" : `Осталось ${item.stock} шт`}
-                                </p>
-                              )}
-                            </div>
-                            <span className="text-sm font-semibold text-white">
-                              Всего: {formatPrice(itemPrice * item.quantity)}
-                            </span>
-                          </div>
+                          {item.stock !== undefined && item.stock <= 4 && (
+                            <p className="text-xs text-orange-400 bg-orange-400/10 px-2 py-1 rounded-lg inline-block w-fit mt-auto">
+                              {item.stock === 1 ? "Последний!" : `Осталось ${item.stock} шт`}
+                            </p>
+                          )}
+
+                        {/* Сумма "Всего" - абсолютное позиционирование в правый нижний угол */}
+                        <span className="absolute bottom-4 right-4 text-sm font-semibold text-white">
+                          Всего: {formatPrice(itemPrice * item.quantity)}
+                        </span>
                         </div>
                       </div>
                     )
@@ -565,9 +562,6 @@ export default function OrderPage() {
                         +{formatPrice(cashbackAmount)}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500">
-                      5% от суммы заказа будет начислено на ваш бонусный счет
-                    </p>
                   </div>
 
                   {/* Списать баллы */}
@@ -588,11 +582,14 @@ export default function OrderPage() {
                           <input
                             type="range"
                             min="0"
-                            max={Math.min(userPoints, subtotal)}
+                            max={Math.min(userPoints, Math.round(subtotal * 0.1))}
                             step="100"
                             value={pointsToUse}
                             onChange={(e) => setPointsToUse(Number(e.target.value))}
-                            className="flex-1 h-2 bg-[#2A2A2A] rounded-lg appearance-none cursor-pointer accent-[#D3DF3D]"
+                            className="flex-1 h-2 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#D3DF3D] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#D3DF3D] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+                            style={{
+                              background: `linear-gradient(to right, #D3DF3D ${(pointsToUse / Math.min(userPoints, Math.round(subtotal * 0.1))) * 100}%, #2A2A2A ${(pointsToUse / Math.min(userPoints, Math.round(subtotal * 0.1))) * 100}%)`
+                            }}
                           />
                           <span className="text-sm font-medium text-white min-w-[80px] text-right">
                             {formatPrice(pointsToUse)}
@@ -603,7 +600,7 @@ export default function OrderPage() {
                             {[500, 1000, userPoints].map((amount) => (
                               <button
                                 key={amount}
-                                onClick={() => setPointsToUse(Math.min(amount, subtotal))}
+                                onClick={() => setPointsToUse(Math.min(amount, Math.round(subtotal * 0.1)))}
                                 className={`px-3 py-1.5 text-xs rounded-lg transition-all ${
                                   pointsToUse === amount
                                     ? "bg-[#D3DF3D] text-black font-medium"
@@ -1133,11 +1130,11 @@ export default function OrderPage() {
 
               {/* Кнопка оформления */}
               <Button
-                className="w-full py-4 text-base bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black font-semibold rounded-2xl shadow-lg"
+                className="w-full py-5 text-lg bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black font-bold rounded-2xl shadow-lg"
                 onClick={handleProceedToCheckout}
                 disabled={!hasItems}
               >
-                Оформить заказ · {formatPrice(total + deliveryCost)}
+                Оформить заказ
               </Button>
             </>
           )}

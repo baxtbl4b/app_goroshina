@@ -598,11 +598,9 @@ export default function TireCard({ tire }: TireCardProps) {
               actualRunflat === "true" ||
               actualRunflat === "1" ||
               isKnownRunflatTire) && (
-              <div className="flex items-center justify-center">
-                <span className="text-sm font-bold text-[#1F1F1F] dark:text-white" title="RunFlat Technology">
-                  RFT
-                </span>
-              </div>
+              <span className="text-xs font-bold text-sky-400 bg-[#2A2A2A] px-2 py-1 rounded-lg" title="RunFlat Technology">
+                RFT
+              </span>
             )}
 
             {/* Cargo icon - only shown for tires with cargo: true */}
