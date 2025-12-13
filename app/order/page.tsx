@@ -32,6 +32,9 @@ interface CartItem {
   season?: string
   stock?: number
   provider?: string
+  spike?: boolean | number | string
+  runflat?: boolean | number | string
+  cargo?: boolean | number | string
 }
 
 // Данные покупателя по умолчанию
@@ -149,9 +152,9 @@ export default function OrderPage() {
   })
   const [paymentType, setPaymentType] = useState("online")
   const [selectedDeliveryCompany, setSelectedDeliveryCompany] = useState<number>(1) // Default to first company
-  const [promoCode, setPromoCode] = useState("")
-  const [appliedPromoDiscount, setAppliedPromoDiscount] = useState(0) // Новое состояние для скидки по промокоду
-  const [showPromoCodeInput, setShowPromoCodeInput] = useState(true) // Новое состояние для отображения поля промокода
+  const [userPoints, setUserPoints] = useState(2500) // Баллы пользователя (mock)
+  const [pointsToUse, setPointsToUse] = useState(0) // Сколько баллов списать
+  const [isPointsApplied, setIsPointsApplied] = useState(false) // Применены ли баллы
 
   const [recipientInfo, setRecipientInfo] = useState({
     name: "",
@@ -310,8 +313,9 @@ export default function OrderPage() {
   const getItemPrice = (item: CartItem) => item.price || item.rrc || 0
   const subtotal = items.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0)
   const cashbackAmount = Math.round(subtotal * 0.05)
-  const totalDiscount = cashbackAmount + appliedPromoDiscount
-  const total = subtotal - appliedPromoDiscount
+  const appliedPointsDiscount = isPointsApplied ? pointsToUse : 0
+  const totalDiscount = cashbackAmount + appliedPointsDiscount
+  const total = subtotal - appliedPointsDiscount
 
   // Проверяем, есть ли товары в заказе
   const hasItems = items.length > 0
@@ -441,7 +445,7 @@ export default function OrderPage() {
                       >
                         {/* Левая колонка: Изображение и кнопки количества */}
                         <div className="flex flex-col items-center gap-3">
-                          <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex-shrink-0 bg-[#2A2A2A] rounded-xl overflow-hidden">
+                          <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex-shrink-0 bg-white rounded-xl overflow-hidden">
                             <Image
                               src={imageUrl}
                               alt={item.name || "Товар"}
@@ -454,40 +458,63 @@ export default function OrderPage() {
                             maxStock={item.stock}
                             onAdd={(e) => { e.preventDefault(); updateItemQuantity(item.id, item.quantity + 1) }}
                             onRemove={(e) => { e.preventDefault(); updateItemQuantity(item.id, item.quantity - 1) }}
-                            variant="inline"
-                            showUnit
+                            size="xs"
                           />
                         </div>
 
                         {/* Правая колонка: Детали товара */}
                         <div className="flex-1 min-w-0 flex flex-col">
-                          <div className="flex justify-between items-start mb-2">
+                          <div className="flex justify-between items-start mb-1">
                             <div>
                               <span className="font-bold text-lg text-[#D3DF3D]">
                                 {formatPrice(itemPrice)}
                               </span>
-                              {tireSize && (
-                                <p className="text-sm text-gray-400 mt-0.5">
-                                  {tireSize}
-                                  {loadSpeedIndex && (
-                                    <span className="ml-1 text-gray-500">{loadSpeedIndex}</span>
-                                  )}
-                                </p>
-                              )}
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-start gap-2">
                               {seasonName && (
                                 <span className="text-xs text-gray-400 bg-[#2A2A2A] px-2 py-1 rounded-lg">
                                   {seasonName}
                                 </span>
                               )}
-                              <button
-                                onClick={() => removeItem(item.id)}
-                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
-                                aria-label="Удалить товар"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
+                              <div className="flex flex-col items-center gap-1">
+                                <button
+                                  onClick={() => removeItem(item.id)}
+                                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                  aria-label="Удалить товар"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                                {/* Иконки: шипы, ранфлет, грузовая */}
+                                {(item.spike || item.runflat || item.cargo) && (
+                                  <div className="flex items-center justify-center gap-1">
+                                    {item.spike && (
+                                      <Image
+                                        src="/images/bykvaSH.png"
+                                        alt="Шипы"
+                                        width={16}
+                                        height={16}
+                                        className="h-4 w-4"
+                                        title="Шипованная шина"
+                                      />
+                                    )}
+                                    {(item.runflat === true || item.runflat === 1 || item.runflat === "true" || item.runflat === "1") && (
+                                      <span className="text-[10px] font-bold text-white" title="RunFlat Technology">
+                                        RFT
+                                      </span>
+                                    )}
+                                    {(item.cargo === true || item.cargo === 1 || item.cargo === "true" || item.cargo === "1") && (
+                                      <Image
+                                        src="/images/cargo-truck-new.png"
+                                        alt="Грузовая"
+                                        width={16}
+                                        height={16}
+                                        className="h-4 w-4"
+                                        title="Грузовая шина"
+                                      />
+                                    )}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
 
@@ -495,11 +522,18 @@ export default function OrderPage() {
                             {item.name || `${item.brand || ""} ${item.model || ""}`}
                           </h3>
 
-                          {item.stock !== undefined && item.stock <= 4 && (
-                            <p className="text-xs text-orange-400 mt-2 bg-orange-400/10 px-2 py-1 rounded-lg inline-block w-fit">
-                              {item.stock === 1 ? "Последний!" : `Осталось ${item.stock} шт`}
-                            </p>
-                          )}
+                          <div className="flex justify-between items-end mt-auto pt-2">
+                            <div>
+                              {item.stock !== undefined && item.stock <= 4 && (
+                                <p className="text-xs text-orange-400 bg-orange-400/10 px-2 py-1 rounded-lg inline-block w-fit">
+                                  {item.stock === 1 ? "Последний!" : `Осталось ${item.stock} шт`}
+                                </p>
+                              )}
+                            </div>
+                            <span className="text-sm font-semibold text-white">
+                              Всего: {formatPrice(itemPrice * item.quantity)}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     )
@@ -509,16 +543,21 @@ export default function OrderPage() {
                   <div className="bg-[#1F1F1F] rounded-2xl p-4 space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400">Сумма заказа:</span>
-                      <span className="font-medium text-lg">
-                        {appliedPromoDiscount > 0 && (
-                          <span className="text-gray-500 line-through mr-2 text-base">
-                            {formatPrice(subtotal)}
-                          </span>
+                      <div className="flex items-center gap-2">
+                        {appliedPointsDiscount > 0 && (
+                          <span className="text-lg animate-bounce">👍</span>
                         )}
-                        <span className={appliedPromoDiscount > 0 ? "text-green-400" : "text-white"}>
-                          {formatPrice(total)}
+                        <span className="font-medium text-lg">
+                          {appliedPointsDiscount > 0 && (
+                            <span className="text-gray-500 line-through mr-2 text-base">
+                              {formatPrice(subtotal)}
+                            </span>
+                          )}
+                          <span className={appliedPointsDiscount > 0 ? "text-green-400" : "text-white"}>
+                            {formatPrice(total)}
+                          </span>
                         </span>
-                      </span>
+                      </div>
                     </div>
                     <div className="flex justify-between items-center pt-2 border-t border-[#3A3A3A]">
                       <span className="text-[#D3DF3D]">Баллы за покупку:</span>
@@ -531,59 +570,79 @@ export default function OrderPage() {
                     </p>
                   </div>
 
-                  {/* Промокод блок */}
+                  {/* Списать баллы */}
                   <div className="bg-[#1F1F1F] rounded-2xl p-4">
-                    <h2 className="text-sm font-medium mb-3 text-gray-300">Промокод</h2>
-                    {showPromoCodeInput ? (
-                      <div className="flex gap-2">
-                        <Input
-                          type="text"
-                          placeholder="Введите промокод"
-                          value={promoCode}
-                          onChange={(e) => setPromoCode(e.target.value)}
-                          className="flex-1 px-4 py-2.5 text-sm rounded-xl border-0 bg-[#2A2A2A] text-white focus:outline-none focus:ring-2 focus:ring-[#D3DF3D]/50"
-                        />
-                        <Button
-                          className="bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black text-sm font-medium py-2.5 px-5 rounded-xl"
-                          onClick={() => {
-                            if (promoCode === "2025") {
-                              setAppliedPromoDiscount(1000)
-                              setShowPromoCodeInput(false)
-                              toast({
-                                title: "Промокод применен!",
-                                description: "Скидка 1000 ₽ успешно активирована.",
-                                variant: "promoSuccess",
-                              })
-                            } else {
-                              setAppliedPromoDiscount(0)
-                              toast({
-                                title: "Неверный промокод",
-                                description: "Пожалуйста, проверьте введенный промокод.",
-                                variant: "destructive",
-                              })
-                            }
-                          }}
-                        >
-                          Применить
-                        </Button>
+                    <div className="flex justify-between items-center mb-3">
+                      <h2 className="text-sm font-medium text-gray-300">Списать баллы</h2>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-5 h-5 rounded-full bg-[#D3DF3D] flex items-center justify-center">
+                          <span className="text-[10px] font-bold text-black">₽</span>
+                        </div>
+                        <span className="text-sm font-medium text-[#D3DF3D]">{userPoints} баллов</span>
+                      </div>
+                    </div>
+
+                    {!isPointsApplied ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="range"
+                            min="0"
+                            max={Math.min(userPoints, subtotal)}
+                            step="100"
+                            value={pointsToUse}
+                            onChange={(e) => setPointsToUse(Number(e.target.value))}
+                            className="flex-1 h-2 bg-[#2A2A2A] rounded-lg appearance-none cursor-pointer accent-[#D3DF3D]"
+                          />
+                          <span className="text-sm font-medium text-white min-w-[80px] text-right">
+                            {formatPrice(pointsToUse)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <div className="flex gap-2">
+                            {[500, 1000, userPoints].map((amount) => (
+                              <button
+                                key={amount}
+                                onClick={() => setPointsToUse(Math.min(amount, subtotal))}
+                                className={`px-3 py-1.5 text-xs rounded-lg transition-all ${
+                                  pointsToUse === amount
+                                    ? "bg-[#D3DF3D] text-black font-medium"
+                                    : "bg-[#2A2A2A] text-gray-400 hover:bg-[#3A3A3A]"
+                                }`}
+                              >
+                                {amount === userPoints ? "Все" : formatPrice(amount)}
+                              </button>
+                            ))}
+                          </div>
+                          <Button
+                            className="bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black text-sm font-medium py-2 px-4 rounded-xl"
+                            onClick={() => {
+                              if (pointsToUse > 0) {
+                                setIsPointsApplied(true)
+                              }
+                            }}
+                            disabled={pointsToUse === 0}
+                          >
+                            Списать
+                          </Button>
+                        </div>
                       </div>
                     ) : (
                       <div className="flex justify-between items-center bg-[#D3DF3D]/10 p-3 rounded-xl border border-[#D3DF3D]/30">
                         <div className="flex items-center gap-2">
                           <Check className="h-4 w-4 text-[#D3DF3D]" />
-                          <span className="text-sm text-[#D3DF3D]">Промокод 2025 применен</span>
+                          <span className="text-sm text-[#D3DF3D]">Списано {formatPrice(pointsToUse)}</span>
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
                           className="h-8 text-xs px-3 text-gray-400 hover:text-white hover:bg-[#3A3A3A] rounded-lg"
                           onClick={() => {
-                            setShowPromoCodeInput(true)
-                            setPromoCode("")
-                            setAppliedPromoDiscount(0)
+                            setIsPointsApplied(false)
+                            setPointsToUse(0)
                           }}
                         >
-                          Изменить
+                          Отменить
                         </Button>
                       </div>
                     )}
