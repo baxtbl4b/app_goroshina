@@ -4,5 +4,5 @@ export default function OrderLayout({
 }: {
   children: React.ReactNode
 }) {
-  return <main className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-[var(--header-height,60px)]">{children}</main>
+  return <main className="min-h-screen bg-[#121212]">{children}</main>
 }

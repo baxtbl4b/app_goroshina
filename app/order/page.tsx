@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -13,47 +13,32 @@ import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 import CartQuantityButtons from "@/components/cart-quantity-buttons"
 
-// Mock data
-const orderData = {
-  orderNumber: "Р0038655",
-  status: "на сборке", // Варианты: "на сборке", "оплачено", "выдано"
-  items: [
-    {
-      id: 1,
-      name: "Michelin Pilot Sport 4",
-      size: "225/60 R17",
-      quantity: 4,
-      price: 12500,
-      salePrice: 10000, // Added salePrice
-      image: "/images/michelin-pilot-sport-4-wheel.png",
-      loadSpeedIndex: "96Y", // Added loadSpeedIndex
-      stockStatus: "Последний комплект", // Added stockStatus
-      deliveryTime: "Срок поставки 5 дней", // Added deliveryTime
-      weight: 10, // Added weight
-      season: "Лето", // Added season
-    },
-    {
-      id: 2,
-      name: "Continental PremiumContact 6",
-      size: "205/55 R16",
-      quantity: 2,
-      price: 9800,
-      image: "/images/continental-premiumcontact-wheel.png",
-      loadSpeedIndex: "91V", // Added loadSpeedIndex
-      stockStatus: "Осталось мало", // Added stockStatus
-      deliveryTime: "Срок поставки 3 дня", // Added stockStatus
-      weight: 9, // Added weight
-      season: "Лето", // Added season
-    },
-  ],
-  subtotal: 69600,
-  discount: 3480,
-  total: 66120,
-  customer: {
-    name: "Иванов Иван Иванович",
-    phone: "+7 (999) 123-45-67",
-    email: "ivanov@example.com",
-  },
+// Интерфейс для товара в корзине
+interface CartItem {
+  id: string
+  name: string
+  brand?: string
+  model?: string
+  width?: string | number
+  height?: string | number
+  diam?: string | number
+  diameter?: string
+  quantity: number
+  price?: number
+  rrc?: number
+  image?: string
+  load_index?: string | number
+  speed_index?: string
+  season?: string
+  stock?: number
+  provider?: string
+}
+
+// Данные покупателя по умолчанию
+const defaultCustomer = {
+  name: "",
+  phone: "",
+  email: "",
 }
 
 // Mock saved cards data
@@ -162,7 +147,6 @@ export default function OrderPage() {
     zipCode: "",
     isDefault: savedAddresses.length === 0, // Make default if it's the first address
   })
-  const statusBadge = getStatusBadge(orderData.status)
   const [paymentType, setPaymentType] = useState("online")
   const [selectedDeliveryCompany, setSelectedDeliveryCompany] = useState<number>(1) // Default to first company
   const [promoCode, setPromoCode] = useState("")
@@ -175,6 +159,40 @@ export default function OrderPage() {
     email: "",
   })
   const [useCustomerAsRecipient, setUseCustomerAsRecipient] = useState(false)
+
+  // Состояние для товаров корзины (загружается из localStorage)
+  const [items, setItems] = useState<CartItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Данные покупателя
+  const [customer, setCustomer] = useState(defaultCustomer)
+
+  // Загрузка корзины из localStorage при монтировании
+  useEffect(() => {
+    const loadCart = () => {
+      try {
+        const cartData = localStorage.getItem("cart")
+        if (cartData) {
+          const parsedCart = JSON.parse(cartData) as CartItem[]
+          setItems(parsedCart)
+        }
+      } catch (error) {
+        console.error("Ошибка загрузки корзины:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadCart()
+
+    // Слушаем изменения корзины
+    const handleCartUpdate = () => loadCart()
+    window.addEventListener("cartUpdated", handleCartUpdate)
+
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate)
+    }
+  }, [])
 
   // Get the coordinates of the selected location
   const selectedLocationCoordinates =
@@ -222,9 +240,9 @@ export default function OrderPage() {
     setUseCustomerAsRecipient(checked)
     if (checked) {
       setRecipientInfo({
-        name: orderData.customer.name,
-        phone: orderData.customer.phone,
-        email: orderData.customer.email,
+        name: customer.name,
+        phone: customer.phone,
+        email: customer.email,
       })
     }
   }
@@ -251,11 +269,8 @@ export default function OrderPage() {
     router.push("/order/complete")
   }
 
-  const [items, setItems] = useState(orderData.items)
-  const [forceUpdate, setForceUpdate] = useState(false)
-
   // Функция для обновления количества товара
-  const updateItemQuantity = (itemId: number, newQuantity: number) => {
+  const updateItemQuantity = (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return // Не позволяем установить количество меньше 1
 
     // Обновляем количество товара
@@ -266,46 +281,69 @@ export default function OrderPage() {
       return item
     })
 
-    // В реальном приложении здесь был бы API-запрос для обновления заказа
-    console.log(`Обновлено количество товара ID:${itemId} на ${newQuantity}`)
+    // Сохраняем в localStorage
+    localStorage.setItem("cart", JSON.stringify(updatedItems))
 
-    // Обновляем данные заказа
+    // Обновляем состояние
     setItems(updatedItems)
-    updateOrderTotals(updatedItems, appliedPromoDiscount) // Передаем текущую скидку промокода
+
+    // Отправляем событие для обновления других компонентов
+    window.dispatchEvent(new Event("cartUpdated"))
   }
 
   // Функция для удаления товара
-  const removeItem = (itemId: number) => {
+  const removeItem = (itemId: string) => {
     // Удаляем товар из списка
     const updatedItems = items.filter((item) => item.id !== itemId)
 
-    // В реальном приложении здесь был бы API-запрос для удаления товара
-    console.log(`Удален товар ID:${itemId}`)
+    // Сохраняем в localStorage
+    localStorage.setItem("cart", JSON.stringify(updatedItems))
 
-    // Обновляем данные заказа
+    // Обновляем состояние
     setItems(updatedItems)
-    updateOrderTotals(updatedItems, appliedPromoDiscount) // Передаем текущую скидку промокода
+
+    // Отправляем событие для обновления других компонентов
+    window.dispatchEvent(new Event("cartUpdated"))
   }
 
-  // Функция для пересчета итоговых сумм заказа
-  const updateOrderTotals = (updatedItems: typeof items, promoDiscountAmount: number) => {
-    const currentSubtotal = updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    const cashbackDiscount = Math.round(currentSubtotal * 0.05)
-    const totalDiscount = cashbackDiscount + promoDiscountAmount // Суммируем все скидки
-    const finalTotal = currentSubtotal - totalDiscount
-
-    orderData.items = updatedItems
-    orderData.subtotal = currentSubtotal // Это базовая сумма до всех скидок
-    orderData.discount = totalDiscount // Это общая сумма скидок (кэшбэк + промокод)
-    orderData.total = finalTotal // Это итоговая сумма после всех скидок
-
-    setForceUpdate((prev) => !prev)
-  }
+  // Вычисляемые значения для итогов
+  const getItemPrice = (item: CartItem) => item.price || item.rrc || 0
+  const subtotal = items.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0)
+  const cashbackAmount = Math.round(subtotal * 0.05)
+  const totalDiscount = cashbackAmount + appliedPromoDiscount
+  const total = subtotal - appliedPromoDiscount
 
   // Проверяем, есть ли товары в заказе
   const hasItems = items.length > 0
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0)
-  const totalWeight = items.reduce((sum, item) => sum + item.quantity * (item.weight || 0), 0) // Use 0 if weight is undefined
+  const totalWeight = totalQuantity * 10 // Примерный вес шины ~10 кг
+
+  // Хелпер для получения размера шины
+  const getTireSize = (item: CartItem) => {
+    if (item.width && item.height && (item.diam || item.diameter)) {
+      return `${item.width}/${item.height} R${item.diam || item.diameter}`
+    }
+    return ""
+  }
+
+  // Хелпер для получения названия сезона
+  const getSeasonName = (season?: string) => {
+    switch (season) {
+      case "w": return "Зима"
+      case "s": return "Лето"
+      case "a": return "Всесезонные"
+      default: return ""
+    }
+  }
+
+  // Хелпер для получения изображения по умолчанию
+  const getDefaultImage = (season?: string) => {
+    switch (season) {
+      case "w": return "/images/winter-tire-new.png"
+      case "a": return "/images/all-season-new.png"
+      default: return "/images/summer-tire-new.png"
+    }
+  }
 
   // Calculate delivery cost based on selected method
   const getDeliveryCost = () => {
@@ -322,9 +360,9 @@ export default function OrderPage() {
 
   const [isEditingCustomer, setIsEditingCustomer] = useState(false)
   const [editedCustomer, setEditedCustomer] = useState({
-    name: orderData.customer.name,
-    phone: orderData.customer.phone,
-    email: orderData.customer.email,
+    name: customer.name,
+    phone: customer.phone,
+    email: customer.email,
   })
 
   // Обработчик изменений в полях данных покупателя
@@ -337,8 +375,8 @@ export default function OrderPage() {
 
   // Функция для сохранения изменений данных покупателя
   const saveCustomerChanges = () => {
-    // В реальном приложении здесь был бы API-запрос для обновления данных
-    orderData.customer = editedCustomer
+    // Обновляем данные покупателя
+    setCustomer(editedCustomer)
     setIsEditingCustomer(false)
   }
 
@@ -350,149 +388,152 @@ export default function OrderPage() {
     setShowNewAddressForm(true)
   }
 
-  // Calculate total before promo discount (but after cashback)
-  const totalBeforePromo = orderData.subtotal - Math.round(orderData.subtotal * 0.05)
+  // Calculate total before promo discount
+  const totalBeforePromo = subtotal
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#222222] dark:bg-[#1A1A1A]">
+    <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background dark:bg-[#1A1A1A] border-b border-border/0 dark:border-border/0">
-        <div className="container px-4 py-5 flex items-center justify-between -mt-1 bg-[#1f1f1f]">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] pr-4 shadow-sm h-[60px] flex items-center">
+        <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
-            <Link href="/" className="mr-2">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-            </Link>
-            <h1 className="text-xl font-bold">Оформление заказа</h1>
+            <button
+              onClick={() => router.push("/")}
+              className="p-2 transition-colors"
+              aria-label="Назад"
+            >
+              <ChevronLeft className="h-5 w-5 text-white" />
+            </button>
+            <span className="text-xl font-bold text-white">Оформление заказа</span>
           </div>
-          <div className="flex items-center">{/* Элементы с номером заказа и статусом удалены */}</div>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="flex-1 container mx-auto px-2 sm:px-4 overflow-y-auto pb-[25px] flex flex-col bg-[#222222] bg-[rgba(18,18,18,1)] pt-[10px]">
-        <div className="grid grid-cols-1 gap-[8px] auto-rows-min">
-          <Card className="border border-border/40 dark:border-border/20 shadow-sm bg-card dark:bg-[#2A2A2A] md:row-span-2 h-auto">
-            <CardHeader className="pb-1 sm:pb-2 pt-2 sm:pt-3 flex items-center justify-between">
-              <div className="flex items-center">
-                <h3 className="font-semibold text-lg">Ваша корзина</h3>
-              </div>
+      <main className="flex-1 container mx-auto px-3 sm:px-4 pt-4 pb-6">
+        <div className="flex flex-col gap-4">
+          {/* Корзина */}
+          <Card className="border-0 shadow-lg bg-[#2A2A2A] rounded-2xl overflow-hidden">
+            <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center justify-between">
+              <h3 className="font-semibold text-lg">Ваша корзина</h3>
               {hasItems && (
-                <span className="text-sm text-muted-foreground">
-                  {totalQuantity} товаров / {totalWeight} кг
+                <span className="text-sm text-muted-foreground bg-[#3A3A3A] px-3 py-1 rounded-full">
+                  {totalQuantity} шт / {totalWeight} кг
                 </span>
               )}
             </CardHeader>
-            <CardContent className="space-y-1 pt-0 overflow-auto max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-150px)]">
+            <CardContent className="px-4 pb-4 space-y-3">
               {hasItems ? (
                 <>
-                  {items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-start gap-4 p-3 border border-gray-500/30 rounded-md mb-2 group relative"
-                    >
-                      {/* Левая колонка: Изображение, Корзина и Элементы управления количеством */}
-                      <div className="flex flex-col items-center justify-between h-full">
-                        <div className="w-24 h-24 relative flex-shrink-0 bg-background dark:bg-[#1F1F1F] rounded-md overflow-hidden mx-auto sm:mx-0">
-                          <Image
-                            src={item.image || "/placeholder.svg"}
-                            alt={item.name}
-                            fill
-                            className="object-contain"
-                          />
-                        </div>
-                        <div className="flex items-center mt-3 ml-[10px]">
+                  {items.map((item) => {
+                    const itemPrice = getItemPrice(item)
+                    const tireSize = getTireSize(item)
+                    const seasonName = getSeasonName(item.season)
+                    const imageUrl = item.image || getDefaultImage(item.season)
+                    const loadSpeedIndex = item.load_index && item.speed_index
+                      ? `${item.load_index}${item.speed_index}`
+                      : ""
+
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-start gap-4 p-4 bg-[#1F1F1F] rounded-2xl relative"
+                      >
+                        {/* Левая колонка: Изображение и кнопки количества */}
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex-shrink-0 bg-[#2A2A2A] rounded-xl overflow-hidden">
+                            <Image
+                              src={imageUrl}
+                              alt={item.name || "Товар"}
+                              fill
+                              className="object-contain p-2"
+                            />
+                          </div>
                           <CartQuantityButtons
                             count={item.quantity}
-                            onAdd={() => updateItemQuantity(item.id, item.quantity + 1)}
-                            onRemove={() => updateItemQuantity(item.id, item.quantity - 1)}
+                            maxStock={item.stock}
+                            onAdd={(e) => { e.preventDefault(); updateItemQuantity(item.id, item.quantity + 1) }}
+                            onRemove={(e) => { e.preventDefault(); updateItemQuantity(item.id, item.quantity - 1) }}
                             variant="inline"
                             showUnit
                           />
                         </div>
-                      </div>
 
-                      {/* Правая колонка: Детали товара (Цена, Размер, Название) */}
-                      <div className="flex-1 min-w-0 flex flex-col relative">
-                        <div className="absolute top-0 right-0 flex flex-col items-end space-y-4">
-                          {item.season && <span className="text-xs text-gray-400">{item.season}</span>}
-                          <button
-                            className="text-muted-foreground hover:text-red-500 transition-colors"
-                            aria-label="Добавить в избранное"
-                          >
-                            <Heart className="h-5 w-5" />
-                          </button>
-                          <button
-                            onClick={() => removeItem(item.id)}
-                            className="text-muted-foreground hover:text-red-500 transition-colors"
-                            aria-label="Удалить товар"
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </button>
-                        </div>
-
-                        <div className="pr-12">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-base">
-                              {item.salePrice ? (
-                                <span className="text-muted-foreground line-through mr-2">
-                                  {formatPrice(item.price)}
-                                </span>
-                              ) : null}
-                              <span className={item.salePrice ? "text-green-500" : ""}>
-                                {formatPrice(item.salePrice || item.price)}
+                        {/* Правая колонка: Детали товара */}
+                        <div className="flex-1 min-w-0 flex flex-col">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <span className="font-bold text-lg text-[#D3DF3D]">
+                                {formatPrice(itemPrice)}
                               </span>
-                            </span>
+                              {tireSize && (
+                                <p className="text-sm text-gray-400 mt-0.5">
+                                  {tireSize}
+                                  {loadSpeedIndex && (
+                                    <span className="ml-1 text-gray-500">{loadSpeedIndex}</span>
+                                  )}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {seasonName && (
+                                <span className="text-xs text-gray-400 bg-[#2A2A2A] px-2 py-1 rounded-lg">
+                                  {seasonName}
+                                </span>
+                              )}
+                              <button
+                                onClick={() => removeItem(item.id)}
+                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                aria-label="Удалить товар"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {item.size} <span className="ml-1 font-medium text-gray-500">{item.loadSpeedIndex}</span>
-                          </p>
-                          <h3 className="font-medium text-sm mt-1">{item.name}</h3>
-                          {item.stockStatus && <p className="text-xs text-red-400 mt-0.5">{item.stockStatus}</p>}
-                          {item.deliveryTime && <p className="text-xs text-green-500 mt-0.5">Забрать сегодня</p>}
+
+                          <h3 className="font-medium text-sm text-white leading-tight">
+                            {item.name || `${item.brand || ""} ${item.model || ""}`}
+                          </h3>
+
+                          {item.stock !== undefined && item.stock <= 4 && (
+                            <p className="text-xs text-orange-400 mt-2 bg-orange-400/10 px-2 py-1 rounded-lg inline-block w-fit">
+                              {item.stock === 1 ? "Последний!" : `Осталось ${item.stock} шт`}
+                            </p>
+                          )}
                         </div>
                       </div>
-                      {item.salePrice && (
-                        <Badge variant="sale" className="absolute bottom-2 right-3 text-black">
-                          Распродажа
-                        </Badge>
-                      )}
-                    </div>
-                  ))}
+                    )
+                  })}
 
-                  {/* Добавляем разделитель и информацию о сумме и кешбеке */}
-                  <div className="pt-1 mt-1 border-t border-border/30 dark:border-border/20">
+                  {/* Итоги */}
+                  <div className="bg-[#1F1F1F] rounded-2xl p-4 space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Общая сумма:</span>
-                      {/* Обновленное отображение общей суммы */}
-                      <span className="font-medium text-base">
+                      <span className="text-gray-400">Сумма заказа:</span>
+                      <span className="font-medium text-lg">
                         {appliedPromoDiscount > 0 && (
-                          <span className="text-muted-foreground line-through mr-2">
-                            {formatPrice(totalBeforePromo)}
+                          <span className="text-gray-500 line-through mr-2 text-base">
+                            {formatPrice(subtotal)}
                           </span>
                         )}
-                        <span className={appliedPromoDiscount > 0 ? "text-green-500" : ""}>
-                          {formatPrice(orderData.total)}
+                        <span className={appliedPromoDiscount > 0 ? "text-green-400" : "text-white"}>
+                          {formatPrice(total)}
                         </span>
                       </span>
                     </div>
-                    <div className="flex justify-between items-center mt-1">
-                      <div className="flex items-center text-white">
-                        <span className="text-sm text-[#D3DF3D] text-foreground">Баллы за покупку:</span>
-                      </div>
-                      <span className="font-medium text-sm text-green-500">
-                        +{formatPrice(Math.round(orderData.subtotal * 0.05))}
+                    <div className="flex justify-between items-center pt-2 border-t border-[#3A3A3A]">
+                      <span className="text-[#D3DF3D]">Баллы за покупку:</span>
+                      <span className="font-medium text-[#D3DF3D]">
+                        +{formatPrice(cashbackAmount)}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-xs text-gray-500">
                       5% от суммы заказа будет начислено на ваш бонусный счет
                     </p>
                   </div>
 
                   {/* Промокод блок */}
-                  <div className="pt-4 mt-4 border-t border-border/30 dark:border-border/20">
-                    <h2 className="text-sm sm:text-base md:text-lg font-medium mb-3">Промокод</h2>
+                  <div className="bg-[#1F1F1F] rounded-2xl p-4">
+                    <h2 className="text-sm font-medium mb-3 text-gray-300">Промокод</h2>
                     {showPromoCodeInput ? (
                       <div className="flex gap-2">
                         <Input
@@ -500,23 +541,21 @@ export default function OrderPage() {
                           placeholder="Введите промокод"
                           value={promoCode}
                           onChange={(e) => setPromoCode(e.target.value)}
-                          className="flex-1 px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#D3DF3D] focus:border-[#D3DF3D]"
+                          className="flex-1 px-4 py-2.5 text-sm rounded-xl border-0 bg-[#2A2A2A] text-white focus:outline-none focus:ring-2 focus:ring-[#D3DF3D]/50"
                         />
                         <Button
-                          className="bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black text-xs py-1 px-4"
+                          className="bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black text-sm font-medium py-2.5 px-5 rounded-xl"
                           onClick={() => {
                             if (promoCode === "2025") {
-                              setAppliedPromoDiscount(1000) // Устанавливаем скидку промокода
-                              updateOrderTotals(items, 1000) // Пересчитываем итоги с новой скидкой
-                              setShowPromoCodeInput(false) // Скрываем поле ввода
+                              setAppliedPromoDiscount(1000)
+                              setShowPromoCodeInput(false)
                               toast({
                                 title: "Промокод применен!",
                                 description: "Скидка 1000 ₽ успешно активирована.",
-                                variant: "promoSuccess", // Изменено на новый вариант
+                                variant: "promoSuccess",
                               })
                             } else {
-                              setAppliedPromoDiscount(0) // Сбрасываем скидку промокода
-                              updateOrderTotals(items, 0) // Пересчитываем итоги без скидки промокода
+                              setAppliedPromoDiscount(0)
                               toast({
                                 title: "Неверный промокод",
                                 description: "Пожалуйста, проверьте введенный промокод.",
@@ -529,17 +568,19 @@ export default function OrderPage() {
                         </Button>
                       </div>
                     ) : (
-                      <div className="flex justify-between items-center bg-[#D3DF3D]/20 p-3 rounded-md">
-                        <span className="text-sm text-[#D3DF3D]">Промокод применен: 2025</span>
+                      <div className="flex justify-between items-center bg-[#D3DF3D]/10 p-3 rounded-xl border border-[#D3DF3D]/30">
+                        <div className="flex items-center gap-2">
+                          <Check className="h-4 w-4 text-[#D3DF3D]" />
+                          <span className="text-sm text-[#D3DF3D]">Промокод 2025 применен</span>
+                        </div>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 text-xs px-2 text-muted-foreground hover:text-foreground"
+                          className="h-8 text-xs px-3 text-gray-400 hover:text-white hover:bg-[#3A3A3A] rounded-lg"
                           onClick={() => {
-                            setShowPromoCodeInput(true) // Показываем поле ввода
-                            setPromoCode("") // Очищаем промокод
-                            setAppliedPromoDiscount(0) // Сбрасываем скидку
-                            updateOrderTotals(items, 0) // Пересчитываем итоги без скидки промокода
+                            setShowPromoCodeInput(true)
+                            setPromoCode("")
+                            setAppliedPromoDiscount(0)
                           }}
                         >
                           Изменить
@@ -549,28 +590,29 @@ export default function OrderPage() {
                   </div>
                 </>
               ) : (
-                <div className="py-4 text-center">
-                  <div className="mx-auto w-12 h-12 mb-2 text-muted-foreground flex items-center justify-center">
+                <div className="py-12 text-center">
+                  <div className="mx-auto w-20 h-20 mb-4 bg-[#1F1F1F] rounded-2xl flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="32"
-                      height="32"
+                      width="40"
+                      height="40"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="1.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      className="text-gray-500"
                     >
                       <circle cx="8" cy="21" r="1" />
                       <circle cx="19" cy="21" r="1" />
                       <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
                     </svg>
                   </div>
-                  <h3 className="text-sm font-medium mb-1">Ваша корзина пуста</h3>
-                  <p className="text-xs text-muted-foreground mb-2">Добавьте товары в корзину, чтобы оформить заказ</p>
+                  <h3 className="text-lg font-medium mb-2 text-white">Корзина пуста</h3>
+                  <p className="text-sm text-gray-400 mb-6">Добавьте товары в корзину, чтобы оформить заказ</p>
                   <Link href="/category/tires">
-                    <Button className="bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black text-xs py-1">
+                    <Button className="bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black font-medium px-6 py-2.5 rounded-xl">
                       Перейти к каталогу
                     </Button>
                   </Link>
@@ -580,70 +622,56 @@ export default function OrderPage() {
           </Card>
           {hasItems && (
             <>
-              <Card className="border border-border/40 dark:border-border/20 shadow-sm bg-card dark:bg-[#2A2A2A] h-auto">
-                <CardHeader className="pb-1 sm:pb-2 pt-2 sm:pt-3">
-                  <h2 className="text-sm sm:text-base md:text-lg font-medium">Способ получения</h2>
+              {/* Способ получения */}
+              <Card className="border-0 shadow-lg bg-[#2A2A2A] rounded-2xl overflow-hidden">
+                <CardHeader className="pb-3 pt-4 px-4">
+                  <h2 className="font-semibold text-lg">Способ получения</h2>
                 </CardHeader>
-                <CardContent className="pt-0 pb-2 overflow-auto max-h-[calc(100vh-200px)]">
-                  <div className="flex flex-wrap gap-2 justify-center">
+                <CardContent className="px-4 pb-4">
+                  <div className="grid grid-cols-3 gap-2">
                     <button
                       type="button"
                       onClick={() => setDeliveryMethod("pickup")}
-                      className={`flex-1 flex items-center justify-center space-x-1 border rounded-lg p-2 cursor-pointer bg-[#1F1F1F] ${
+                      className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all ${
                         deliveryMethod === "pickup"
                           ? "bg-[#D3DF3D] text-black"
-                          : "border-border/30 dark:border-border/20 text-white"
+                          : "bg-[#1F1F1F] text-white hover:bg-[#3A3A3A]"
                       }`}
                     >
-                      <div className="flex items-center justify-center">
-                        <MapPin
-                          className={`h-3 w-3 mr-1 ${deliveryMethod === "pickup" ? "text-black" : "text-white"}`}
-                        />
-                        <span className="font-medium text-xs text-center">Самовывоз</span>
-                      </div>
-                      {deliveryMethod === "pickup" && <Check className="h-3 w-3 text-black ml-1" />}
+                      <MapPin className="h-5 w-5" />
+                      <span className="font-medium text-xs">Самовывоз</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setDeliveryMethod("delivery")}
-                      className={`flex-1 flex items-center justify-center space-x-1 border rounded-lg p-2 cursor-pointer bg-[#1F1F1F] ${
+                      className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all ${
                         deliveryMethod === "delivery"
                           ? "bg-[#D3DF3D] text-black"
-                          : "border-border/30 dark:border-border/20 text-white"
+                          : "bg-[#1F1F1F] text-white hover:bg-[#3A3A3A]"
                       }`}
                     >
-                      <div className="flex items-center justify-center">
-                        <Truck
-                          className={`h-3 w-3 mr-1 ${deliveryMethod === "delivery" ? "text-black" : "text-white"}`}
-                        />
-                        <span className="font-medium text-xs text-center">Доставка</span>
-                      </div>
-                      {deliveryMethod === "delivery" && <Check className="h-3 w-3 text-black ml-1" />}
+                      <Truck className="h-5 w-5" />
+                      <span className="font-medium text-xs">Доставка</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setDeliveryMethod("russia")}
-                      className={`flex-1 flex items-center justify-center space-x-1 border rounded-lg p-2 cursor-pointer bg-[#1F1F1F] ${
+                      className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all ${
                         deliveryMethod === "russia"
                           ? "bg-[#D3DF3D] text-black"
-                          : "border-border/30 dark:border-border/20 text-white"
+                          : "bg-[#1F1F1F] text-white hover:bg-[#3A3A3A]"
                       }`}
                     >
-                      <div className="flex items-center justify-center">
-                        <Globe
-                          className={`h-3 w-3 mr-1 ${deliveryMethod === "russia" ? "text-black" : "text-white"}`}
-                        />
-                        <span className="font-medium text-xs text-center">Доставка по России</span>
-                      </div>
-                      {deliveryMethod === "russia" && <Check className="h-3 w-3 text-black ml-1" />}
+                      <Globe className="h-5 w-5" />
+                      <span className="font-medium text-xs text-center">По России</span>
                     </button>
                   </div>
 
                   {deliveryMethod === "pickup" && (
-                    <div className="bg-[#2A2A2A] rounded-lg p-4">
-                      <h2 className="text-lg font-bold mb-4">Выберите магазин</h2>
+                    <div className="mt-4 bg-[#1F1F1F] rounded-xl p-4">
+                      <h3 className="text-base font-medium mb-3">Выберите магазин</h3>
                       <div className="space-y-4">
                         {selectedStore ? (
                           <>
@@ -865,7 +893,7 @@ export default function OrderPage() {
                             <div className="flex justify-between items-center">
                               <span className="text-sm font-medium text-white">Итого к оплате:</span>
                               <span className="text-lg font-bold text-[#D3DF3D]">
-                                {formatPrice(orderData.total + 500)}
+                                {formatPrice(total + 500)}
                               </span>
                             </div>
                           </div>
@@ -1031,7 +1059,7 @@ export default function OrderPage() {
                                 <div className="flex justify-between items-center">
                                   <span className="text-sm font-medium text-white">Итого к оплате:</span>
                                   <span className="text-lg font-bold text-[#D3DF3D]">
-                                    {formatPrice(orderData.total + selectedCompany.price)}
+                                    {formatPrice(total + selectedCompany.price)}
                                   </span>
                                 </div>
                               </div>
@@ -1044,58 +1072,34 @@ export default function OrderPage() {
                 </CardContent>
               </Card>
 
-              {/* Order Summary */}
-              <Card className="border border-border/40 dark:border-border/20 shadow-sm bg-card dark:bg-[#2A2A2A]">
-                <CardFooter className="pt-2">
-                  <Button
-                    className="w-full py-1.5 sm:py-2 text-xs sm:text-sm bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black font-medium"
-                    onClick={handleProceedToCheckout}
-                    disabled={!hasItems}
-                  >
-                    Завершить оформление
-                  </Button>
-                </CardFooter>
-              </Card>
+              {/* Кнопка оформления */}
+              <Button
+                className="w-full py-4 text-base bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black font-semibold rounded-2xl shadow-lg"
+                onClick={handleProceedToCheckout}
+                disabled={!hasItems}
+              >
+                Оформить заказ · {formatPrice(total + deliveryCost)}
+              </Button>
             </>
           )}
         </div>
-        <Card className="border border-border/40 dark:border-border/20 shadow-sm bg-card dark:bg-[#2A2A2A] h-auto overflow-visible z-10 mt-[25px]">
-          <CardHeader className="pb-1 sm:pb-2 pt-2 sm:pt-3 flex flex-row items-center justify-between">
-            <div className="flex items-center">
-              <h2 className="text-sm sm:text-base md:text-lg font-medium">Данные покупателя</h2>
+
+        {/* Данные покупателя */}
+        <Card className="border-0 shadow-lg bg-[#2A2A2A] rounded-2xl overflow-hidden mt-4">
+          <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h2 className="font-semibold text-lg">Данные покупателя</h2>
               <button
                 onClick={() => setIsCustomerCardCollapsed(!isCustomerCardCollapsed)}
-                className="ml-2 text-muted-foreground hover:text-foreground"
+                className="p-1.5 text-gray-400 hover:text-white hover:bg-[#3A3A3A] rounded-lg transition-all"
                 aria-label={isCustomerCardCollapsed ? "Развернуть" : "Свернуть"}
               >
                 {isCustomerCardCollapsed ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-chevron-down"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m6 9 6 6 6-6" />
                   </svg>
                 ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-chevron-up"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m18 15-6-6-6 6" />
                   </svg>
                 )}
@@ -1105,32 +1109,31 @@ export default function OrderPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 text-xs px-2 text-muted-foreground hover:text-foreground"
+                className="h-8 text-xs px-3 text-gray-400 hover:text-white hover:bg-[#3A3A3A] rounded-lg"
                 onClick={() => setIsEditingCustomer(true)}
               >
                 Изменить
               </Button>
             ) : !isCustomerCardCollapsed && isEditingCustomer ? (
-              <div className="flex space-x-1">
+              <div className="flex gap-2">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 text-xs px-2 text-muted-foreground hover:text-foreground"
+                  className="h-8 text-xs px-3 text-gray-400 hover:text-white hover:bg-[#3A3A3A] rounded-lg"
                   onClick={() => {
                     setIsEditingCustomer(false)
                     setEditedCustomer({
-                      name: orderData.customer.name,
-                      phone: orderData.customer.phone,
-                      email: orderData.customer.email,
+                      name: customer.name,
+                      phone: customer.phone,
+                      email: customer.email,
                     })
                   }}
                 >
                   Отмена
                 </Button>
                 <Button
-                  variant="ghost"
                   size="sm"
-                  className="h-7 text-xs px-2 text-[#D3DF3D] hover:text-[#C4CF2E]"
+                  className="h-8 text-xs px-3 bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black rounded-lg"
                   onClick={saveCustomerChanges}
                 >
                   Сохранить
@@ -1138,84 +1141,79 @@ export default function OrderPage() {
               </div>
             ) : null}
           </CardHeader>
-          <CardContent className="space-y-1 pt-0 pb-2">
+          <CardContent className="px-4 pb-4 pt-0">
             {isCustomerCardCollapsed ? (
-              <div className="flex items-center">
-                <div className="w-6 h-6 flex items-center justify-center rounded-full bg-transparent mr-2">
-                  <User className="h-3 w-3 text-muted-foreground" />
+              <div className="flex items-center gap-3 bg-[#1F1F1F] rounded-xl p-3">
+                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#2A2A2A]">
+                  <User className="h-5 w-5 text-gray-400" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium">{orderData.customer.name}</p>
-                </div>
+                <p className="text-sm font-medium">{customer.name || "Не указано"}</p>
               </div>
             ) : !isEditingCustomer ? (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1">
-                <div className="flex items-center">
-                  <div className="w-6 h-6 flex items-center justify-center rounded-full bg-transparent mr-2">
-                    <User className="h-3 w-3 text-muted-foreground" />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="flex items-center gap-3 bg-[#1F1F1F] rounded-xl p-3">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#2A2A2A]">
+                    <User className="h-5 w-5 text-gray-400" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">ФИО</p>
-                    <p className="text-sm font-medium">{orderData.customer.name}</p>
+                    <p className="text-xs text-gray-500">ФИО</p>
+                    <p className="text-sm font-medium text-white">{customer.name || "Не указано"}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center">
-                  <div className="w-6 h-6 flex items-center justify-center rounded-full bg-transparent mr-2">
-                    <Phone className="h-3 w-3 text-muted-foreground" />
+                <div className="flex items-center gap-3 bg-[#1F1F1F] rounded-xl p-3">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#2A2A2A]">
+                    <Phone className="h-5 w-5 text-gray-400" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Телефон</p>
-                    <p className="text-sm font-medium">{orderData.customer.phone}</p>
+                    <p className="text-xs text-gray-500">Телефон</p>
+                    <p className="text-sm font-medium text-white">{customer.phone || "Не указан"}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center">
-                  <div className="w-6 h-6 flex items-center justify-center rounded-full bg-transparent mr-2">
-                    <Mail className="h-3 w-3 text-muted-foreground" />
+                <div className="flex items-center gap-3 bg-[#1F1F1F] rounded-xl p-3">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#2A2A2A]">
+                    <Mail className="h-5 w-5 text-gray-400" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Email</p>
-                    <p className="text-sm font-medium">{orderData.customer.email}</p>
+                    <p className="text-xs text-gray-500">Email</p>
+                    <p className="text-sm font-medium text-white">{customer.email || "Не указан"}</p>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="space-y-2">
-                <div className="space-y-1">
-                  <label htmlFor="customer-name" className="text-xs text-muted-foreground flex items-center">
-                    <User className="h-3 w-3 mr-1" /> ФИО
-                  </label>
+              <div className="space-y-3">
+                <div>
+                  <label htmlFor="customer-name" className="text-xs text-gray-400 mb-1.5 block">ФИО</label>
                   <input
                     id="customer-name"
                     type="text"
                     value={editedCustomer.name}
                     onChange={(e) => handleCustomerChange("name", e.target.value)}
-                    className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded-md border border-border/30 dark:border-border/20 bg-background dark:bg-[#1F1F1F] focus:outline-none focus:ring-1 focus:ring-[#D3DF3D] focus:border-[#D3DF3D]"
+                    placeholder="Введите ФИО"
+                    className="w-full px-4 py-2.5 text-sm rounded-xl border-0 bg-[#1F1F1F] text-white focus:outline-none focus:ring-2 focus:ring-[#D3DF3D]/50"
                   />
                 </div>
-                <div className="space-y-1">
-                  <label htmlFor="customer-phone" className="text-xs text-muted-foreground flex items-center">
-                    <Phone className="h-3 w-3 mr-1" /> Телефон
-                  </label>
+                <div>
+                  <label htmlFor="customer-phone" className="text-xs text-gray-400 mb-1.5 block">Телефон</label>
                   <input
                     id="customer-phone"
                     type="tel"
                     value={editedCustomer.phone}
                     onChange={(e) => handleCustomerChange("phone", e.target.value)}
-                    className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded-md border border-border/30 dark:border-border/20 bg-background dark:bg-[#1F1F1F] focus:outline-none focus:ring-1 focus:ring-[#D3DF3D] focus:border-[#D3DF3D]"
+                    placeholder="+7 (999) 123-45-67"
+                    className="w-full px-4 py-2.5 text-sm rounded-xl border-0 bg-[#1F1F1F] text-white focus:outline-none focus:ring-2 focus:ring-[#D3DF3D]/50"
                   />
                 </div>
-                <div className="space-y-1">
-                  <label htmlFor="customer-email" className="text-xs text-muted-foreground flex items-center">
-                    <Mail className="h-3 w-3 mr-1" /> Email
-                  </label>
+                <div>
+                  <label htmlFor="customer-email" className="text-xs text-gray-400 mb-1.5 block">Email</label>
                   <input
                     id="customer-email"
                     type="email"
                     value={editedCustomer.email}
                     onChange={(e) => handleCustomerChange("email", e.target.value)}
-                    className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded-md border border-border/30 dark:border-border/20 bg-background dark:bg-[#1F1F1F] focus:outline-none focus:ring-1 focus:ring-[#D3DF3D] focus:border-[#D3DF3D]"
+                    placeholder="example@mail.com"
+                    className="w-full px-4 py-2.5 text-sm rounded-xl border-0 bg-[#1F1F1F] text-white focus:outline-none focus:ring-2 focus:ring-[#D3DF3D]/50"
                   />
                 </div>
               </div>
