@@ -24,11 +24,6 @@ interface Model {
   model_slug: string
 }
 
-interface Trim {
-  trim: string
-  trim_slug: string
-}
-
 interface TireSize {
   width: string
   height: string
@@ -40,13 +35,10 @@ export default function AddCarPage() {
   const router = useRouter()
 
   const [formData, setFormData] = useState({
-    carName: "",
     brand: "",
     brandSlug: "",
     model: "",
     modelSlug: "",
-    trim: "",
-    trimSlug: "",
     year: "",
     plate: "",
     mileage: "",
@@ -58,30 +50,25 @@ export default function AddCarPage() {
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isProcessingWithAI, setIsProcessingWithAI] = useState(false)
-  const [isAIProcessed, setIsAIProcessed] = useState(false)
 
   // API data states
   const [brands, setBrands] = useState<Brand[]>([])
   const [models, setModels] = useState<Model[]>([])
-  const [trims, setTrims] = useState<Trim[]>([])
+  const [years, setYears] = useState<number[]>([])
   const [tireSizes, setTireSizes] = useState<TireSize[]>([])
   const [loadingBrands, setLoadingBrands] = useState(true)
   const [loadingModels, setLoadingModels] = useState(false)
-  const [loadingTrims, setLoadingTrims] = useState(false)
+  const [loadingYears, setLoadingYears] = useState(false)
   const [loadingTireSizes, setLoadingTireSizes] = useState(false)
 
   // Search states
   const [brandSearch, setBrandSearch] = useState("")
   const [modelSearch, setModelSearch] = useState("")
-  const [trimSearch, setTrimSearch] = useState("")
   const [showBrandDropdown, setShowBrandDropdown] = useState(false)
   const [showModelDropdown, setShowModelDropdown] = useState(false)
-  const [showTrimDropdown, setShowTrimDropdown] = useState(false)
 
   const brandRef = useRef<HTMLDivElement>(null)
   const modelRef = useRef<HTMLDivElement>(null)
-  const trimRef = useRef<HTMLDivElement>(null)
 
   // Load brands on mount
   useEffect(() => {
@@ -105,7 +92,7 @@ export default function AddCarPage() {
   useEffect(() => {
     if (!formData.brandSlug) {
       setModels([])
-      setTrims([])
+      setYears([])
       return
     }
 
@@ -126,35 +113,90 @@ export default function AddCarPage() {
     fetchModels()
   }, [formData.brandSlug])
 
-  // Load trims when model changes
+  // Load available years when model changes
   useEffect(() => {
     if (!formData.brandSlug || !formData.modelSlug) {
-      setTrims([])
+      setYears([])
       return
     }
 
-    const fetchTrims = async () => {
-      setLoadingTrims(true)
+    const fetchYears = async () => {
+      setLoadingYears(true)
       try {
-        const response = await fetch(`${API_BASE_URL}/fitment/trims?access_token=${API_TOKEN}&brand_slug=${formData.brandSlug}&model_slug=${formData.modelSlug}`)
+        // Запрашиваем fitment для модели без указания года
+        const response = await fetch(`${API_BASE_URL}/fitment?access_token=${API_TOKEN}&brand_slug=${formData.brandSlug}&model_slug=${formData.modelSlug}`)
+        console.log("📅 Fetching available years for model")
+
         if (response.ok) {
           const data = await response.json()
-          // Фильтруем "All trims" варианты
-          const filtered = data.filter((t: Trim) => !t.trim.toLowerCase().startsWith("all trims"))
-          setTrims(filtered)
+          console.log("✅ Fitment data for years:", data)
+
+          // Логируем первый элемент для понимания структуры
+          if (Array.isArray(data) && data.length > 0) {
+            console.log("🔍 First fitment item structure:", data[0])
+          }
+
+          // Извлекаем уникальные года из ответа
+          if (Array.isArray(data)) {
+            const uniqueYears = new Set<number>()
+            data.forEach((fitment: any) => {
+              // Пробуем разные возможные поля для года
+              const startYear = fitment.start_year || fitment.startYear || fitment.year_from || fitment.yearFrom
+              const endYear = fitment.end_year || fitment.endYear || fitment.year_to || fitment.yearTo
+
+              if (startYear) uniqueYears.add(Number(startYear))
+              if (endYear) uniqueYears.add(Number(endYear))
+
+              // Добавляем все года в диапазоне
+              if (startYear && endYear) {
+                for (let year = Number(startYear); year <= Number(endYear); year++) {
+                  uniqueYears.add(year)
+                }
+              }
+            })
+
+            // Преобразуем в массив и сортируем от нового к старому
+            const yearsList = Array.from(uniqueYears).sort((a, b) => b - a)
+            console.log("🎯 Extracted years:", yearsList)
+            console.log("🎯 Years count:", yearsList.length)
+
+            if (yearsList.length > 0) {
+              setYears(yearsList)
+            } else {
+              console.warn("⚠️ No years found in API data, using fallback")
+              setYears(Array.from({ length: 26 }, (_, i) => 2025 - i))
+            }
+          } else {
+            console.warn("⚠️ Data is not an array, using fallback")
+            setYears(Array.from({ length: 26 }, (_, i) => 2025 - i))
+          }
+        } else {
+          console.error("❌ Failed to fetch years, using fallback")
+          // Fallback на статичный список
+          setYears(Array.from({ length: 26 }, (_, i) => 2025 - i))
         }
       } catch (error) {
-        console.error("Error fetching trims:", error)
+        console.error("❌ Error fetching years:", error)
+        // Fallback на статичный список
+        setYears(Array.from({ length: 26 }, (_, i) => 2025 - i))
       } finally {
-        setLoadingTrims(false)
+        setLoadingYears(false)
       }
     }
-    fetchTrims()
+
+    fetchYears()
   }, [formData.brandSlug, formData.modelSlug])
 
-  // Load tire sizes when brand, model, trim, and year are selected
+  // Load tire sizes when brand, model, and year are selected (ignore trim)
   useEffect(() => {
+    console.log("🔍 Tire sizes effect triggered:", {
+      brandSlug: formData.brandSlug,
+      modelSlug: formData.modelSlug,
+      year: formData.year
+    })
+
     if (!formData.brandSlug || !formData.modelSlug || !formData.year) {
+      console.log("⚠️ Missing required data for tire sizes")
       setTireSizes([])
       return
     }
@@ -162,18 +204,16 @@ export default function AddCarPage() {
     const fetchTireSizes = async () => {
       setLoadingTireSizes(true)
       try {
+        // Игнорируем модификацию, загружаем размеры для всех модификаций модели
         let url = `${API_BASE_URL}/fitment?access_token=${API_TOKEN}&brand_slug=${formData.brandSlug}&model_slug=${formData.modelSlug}&year=${formData.year}`
 
-        // Добавляем trim_slug если выбрана модификация
-        if (formData.trimSlug) {
-          url += `&trim_slug=${formData.trimSlug}`
-        }
-
+        console.log("📡 Fetching tire sizes from:", url)
         const response = await fetch(url)
+        console.log("📥 Response status:", response.status)
 
         if (response.ok) {
           const data = await response.json()
-          console.log("Tire sizes data:", data)
+          console.log("✅ Tire sizes data:", data)
 
           let sizes: TireSize[] = []
 
@@ -206,18 +246,22 @@ export default function AddCarPage() {
             })
           }
 
+          console.log("🎯 Extracted tire sizes:", sizes)
           setTireSizes(sizes)
+        } else {
+          console.error("❌ Response not OK:", response.status, response.statusText)
         }
       } catch (error) {
-        console.error("Error fetching tire sizes:", error)
+        console.error("❌ Error fetching tire sizes:", error)
         setTireSizes([])
       } finally {
         setLoadingTireSizes(false)
+        console.log("✔️ Loading finished")
       }
     }
 
     fetchTireSizes()
-  }, [formData.brandSlug, formData.modelSlug, formData.trimSlug, formData.year])
+  }, [formData.brandSlug, formData.modelSlug, formData.year])
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -227,9 +271,6 @@ export default function AddCarPage() {
       }
       if (modelRef.current && !modelRef.current.contains(event.target as Node)) {
         setShowModelDropdown(false)
-      }
-      if (trimRef.current && !trimRef.current.contains(event.target as Node)) {
-        setShowTrimDropdown(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -246,90 +287,6 @@ export default function AddCarPage() {
     m.model.toLowerCase().includes(modelSearch.toLowerCase())
   )
 
-  // Filter trims by search
-  const filteredTrims = trims.filter(t =>
-    t.trim.toLowerCase().includes(trimSearch.toLowerCase())
-  )
-
-  const processWithGoroshinaAI = async () => {
-    if (!formData.carName.trim()) {
-      alert("Пожалуйста, введите наименование автомобиля")
-      return
-    }
-
-    setIsProcessingWithAI(true)
-
-    try {
-      // Симуляция обработки ИИ
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      // Улучшенная логика парсинга наименования
-      const carName = formData.carName.toLowerCase()
-      console.log("Обрабатываем:", carName)
-
-      let brand = ""
-      let model = ""
-      let year = ""
-
-      // Более точное определение марки
-      if (carName.includes("toyota") || carName.includes("тойота")) {
-        brand = "toyota"
-        if (carName.includes("camry") || carName.includes("камри")) model = "camry"
-        else if (carName.includes("corolla") || carName.includes("корола")) model = "corolla"
-        else if (carName.includes("rav4") || carName.includes("рав4")) model = "rav4"
-        else if (carName.includes("highlander") || carName.includes("хайлендер")) model = "highlander"
-      } else if (carName.includes("bmw") || carName.includes("бмв")) {
-        brand = "bmw"
-      } else if (carName.includes("mercedes") || carName.includes("мерседес")) {
-        brand = "mercedes"
-      } else if (carName.includes("audi") || carName.includes("ауди")) {
-        brand = "audi"
-      } else if (carName.includes("volkswagen") || carName.includes("фольксваген")) {
-        brand = "volkswagen"
-      }
-
-      // Поиск года в строке (более широкий диапазон)
-      const yearMatch = carName.match(/(19|20)\d{2}/)
-      if (yearMatch) {
-        const foundYear = yearMatch[0]
-        // Проверяем, что год в допустимом диапазоне
-        const yearNum = Number.parseInt(foundYear)
-        if (yearNum >= 2014 && yearNum <= 2023) {
-          year = foundYear
-        }
-      }
-
-      console.log("Найдено:", { brand, model, year })
-
-      // Обновляем данные
-      setFormData((prev) => ({
-        ...prev,
-        brand: brand || prev.brand,
-        model: model || prev.model,
-        year: year || prev.year,
-      }))
-
-      setIsAIProcessed(true)
-
-      // Показываем результат пользователю
-      const results = []
-      if (brand) results.push(`Марка: ${brand}`)
-      if (model) results.push(`Модель: ${model}`)
-      if (year) results.push(`Год: ${year}`)
-
-      if (results.length > 0) {
-        alert(`Умная помощница Горошина обработала информацию!\n\nНайдено:\n${results.join("\n")}`)
-      } else {
-        alert("Умная помощница Горошина не смогла распознать данные. Попробуйте ввести более подробную информацию.")
-        setIsAIProcessed(false)
-      }
-    } catch (error) {
-      console.error("Ошибка при обработке с ИИ:", error)
-      alert("Произошла ошибка при обработке")
-    } finally {
-      setIsProcessingWithAI(false)
-    }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -348,13 +305,11 @@ export default function AddCarPage() {
       // Создаем новый автомобиль
       const newCar = {
         id: Date.now().toString(),
-        name: formData.carName || `${formData.brand} ${formData.model}${formData.trim ? ` ${formData.trim}` : ""}`,
+        name: `${formData.brand} ${formData.model}`,
         brand: formData.brand,
         brandSlug: formData.brandSlug,
         model: formData.model,
         modelSlug: formData.modelSlug,
-        trim: formData.trim,
-        trimSlug: formData.trimSlug,
         year: formData.year,
         plate: formData.plate,
         mileage: formData.mileage ? `${formData.mileage} км` : "0 км",
@@ -412,27 +367,6 @@ export default function AddCarPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="carName">Наименование автомобиля</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="carName"
-                  placeholder="Например: Toyota Camry 2020"
-                  className="flex-1"
-                  value={formData.carName}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, carName: e.target.value }))}
-                />
-                <Button
-                  type="button"
-                  onClick={processWithGoroshinaAI}
-                  disabled={isProcessingWithAI || !formData.carName.trim() || isAIProcessed}
-                  className={`px-3 ${isAIProcessed ? "bg-green-500 hover:bg-green-600" : "bg-[#009CFF] hover:bg-[#009CFF]/80"} text-white`}
-                >
-                  {isProcessingWithAI ? "🤖" : isAIProcessed ? "✅" : "🧠"}
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500">Умная помощница Горошина поможет заполнить поля автоматически</p>
-            </div>
 
             <div className="space-y-2" ref={brandRef}>
               <Label htmlFor="brand">Марка *</Label>
@@ -450,7 +384,7 @@ export default function AddCarPage() {
                       setShowBrandDropdown(true)
                     }}
                     onFocus={() => setShowBrandDropdown(true)}
-                    disabled={isAIProcessed || loadingBrands}
+                    disabled={loadingBrands}
                   />
                   {loadingBrands && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />}
                 </div>
@@ -492,7 +426,7 @@ export default function AddCarPage() {
                       setShowModelDropdown(true)
                     }}
                     onFocus={() => formData.brandSlug && setShowModelDropdown(true)}
-                    disabled={isAIProcessed || !formData.brandSlug || loadingModels}
+                    disabled={!formData.brandSlug || loadingModels}
                   />
                   {loadingModels && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />}
                 </div>
@@ -504,54 +438,12 @@ export default function AddCarPage() {
                         type="button"
                         className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-[#1F1F1F] dark:text-white"
                         onClick={() => {
-                          setFormData(prev => ({ ...prev, model: m.model, modelSlug: m.model_slug, trim: "", trimSlug: "" }))
+                          setFormData(prev => ({ ...prev, model: m.model, modelSlug: m.model_slug }))
                           setModelSearch("")
-                          setTrimSearch("")
                           setShowModelDropdown(false)
                         }}
                       >
                         {m.model}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-2" ref={trimRef}>
-              <Label htmlFor="trim">Модификация</Label>
-              <div className="relative">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="trim"
-                    placeholder={!formData.modelSlug ? "Сначала выберите модель" : loadingTrims ? "Загрузка модификаций..." : "Поиск модификации..."}
-                    className="pl-9 w-full"
-                    value={formData.trim || trimSearch}
-                    onChange={(e) => {
-                      setTrimSearch(e.target.value)
-                      setFormData(prev => ({ ...prev, trim: "", trimSlug: "" }))
-                      setShowTrimDropdown(true)
-                    }}
-                    onFocus={() => formData.modelSlug && setShowTrimDropdown(true)}
-                    disabled={isAIProcessed || !formData.modelSlug || loadingTrims}
-                  />
-                  {loadingTrims && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />}
-                </div>
-                {showTrimDropdown && filteredTrims.length > 0 && (
-                  <div className="absolute z-50 w-full mt-1 max-h-60 overflow-auto bg-white dark:bg-[#2A2A2A] border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-                    {filteredTrims.slice(0, 50).map((t) => (
-                      <button
-                        key={t.trim_slug}
-                        type="button"
-                        className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-[#1F1F1F] dark:text-white"
-                        onClick={() => {
-                          setFormData(prev => ({ ...prev, trim: t.trim, trimSlug: t.trim_slug }))
-                          setTrimSearch("")
-                          setShowTrimDropdown(false)
-                        }}
-                      >
-                        {t.trim}
                       </button>
                     ))}
                   </div>
@@ -564,38 +456,30 @@ export default function AddCarPage() {
               <Select
                 value={formData.year}
                 onValueChange={(value) => {
-                  console.log("Выбран год:", value)
+                  console.log("📅 Выбран год:", value)
+                  console.log("📋 Current formData before year update:", formData)
                   setFormData((prev) => ({ ...prev, year: value }))
                 }}
-                disabled={isAIProcessed}
+                disabled={!formData.modelSlug || loadingYears}
               >
                 <SelectTrigger id="year" className="w-full">
-                  <SelectValue placeholder="Выберите год" />
+                  <SelectValue placeholder={!formData.modelSlug ? "Сначала выберите модель" : loadingYears ? "Загрузка годов..." : "Выберите год"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {Array.from({ length: 10 }, (_, i) => 2023 - i).map((year) => (
-                    <SelectItem key={year} value={year.toString()}>
-                      {year}
+                  {years.length > 0 ? (
+                    years.map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-years" disabled>
+                      Нет доступных годов
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
             </div>
-
-            {isAIProcessed && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setIsAIProcessed(false)
-                  setFormData((prev) => ({ ...prev, brand: "", model: "", year: "" }))
-                }}
-                className="mt-2"
-              >
-                Изменить данные
-              </Button>
-            )}
 
             <div className="space-y-2">
               <Label htmlFor="plate">Гос. номер</Label>
