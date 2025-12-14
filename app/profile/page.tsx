@@ -1,28 +1,88 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronRight, Settings, Heart, ShoppingBag, Clock, HelpCircle, LogOut } from "lucide-react"
+import { ChevronRight, Settings, Heart, ShoppingBag, Clock, HelpCircle, LogOut, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { BottomNavigation } from "@/components/bottom-navigation"
 import SafeAreaHeader from "@/components/safe-area-header"
+import { getUser, updateUserAvatar, imageToBase64, type User } from "@/lib/user"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function ProfilePage() {
-  const [user] = useState({
-    name: "Александр Петров",
-    email: "alex.petrov@example.com",
-    phone: "+7 (999) 123-45-67",
-    loyaltyPoints: 1250,
-    loyaltyLevel: "Золотой",
-    avatar: "/avatars/01.png",
-  })
+  const [user, setUser] = useState<User>(getUser())
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
+  const { toast } = useToast()
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Проверка типа файла
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Ошибка",
+        description: "Пожалуйста, выберите изображение",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Проверка размера (макс 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Ошибка",
+        description: "Размер изображения не должен превышать 5MB",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsUploadingAvatar(true)
+
+    try {
+      const base64 = await imageToBase64(file)
+      updateUserAvatar(base64)
+
+      toast({
+        title: "Успешно",
+        description: "Аватар обновлен",
+        variant: "default",
+      })
+    } catch (error) {
+      console.error("Ошибка при загрузке аватара:", error)
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить изображение",
+        variant: "destructive",
+      })
+    } finally {
+      setIsUploadingAvatar(false)
+    }
+  }
+
+  useEffect(() => {
+    // Загружаем данные пользователя
+    const currentUser = getUser()
+    setUser(currentUser)
+
+    // Слушаем изменения данных пользователя
+    const handleUserUpdate = (event: CustomEvent) => {
+      setUser(event.detail)
+    }
+    window.addEventListener("userUpdated", handleUserUpdate as EventListener)
+
+    return () => {
+      window.removeEventListener("userUpdated", handleUserUpdate as EventListener)
+    }
+  }, [])
 
   return (
-    <div className="min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
+    <div className="min-h-screen bg-[#121212]">
       <SafeAreaHeader title="Профиль" />
 
       {/* Main content with top padding to account for fixed header */}
@@ -31,18 +91,41 @@ export default function ProfilePage() {
         <Card className="mb-6 bg-white dark:bg-[#2A2A2A] border-0 shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center space-x-4">
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
-                <AvatarFallback className="bg-[#D3DF3D] text-[#1F1F1F] text-lg font-bold">
-                  {user.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="h-16 w-16">
+                  <AvatarImage
+                    src={user.avatar && user.avatar.startsWith('data:') ? user.avatar : (user.avatar || "/placeholder.svg")}
+                    alt={user.name}
+                  />
+                  <AvatarFallback className="bg-[#D3DF3D] text-[#1F1F1F] text-lg font-bold">
+                    {user.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <input
+                  type="file"
+                  id="avatar-upload-profile"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                  disabled={isUploadingAvatar}
+                />
+                <label
+                  htmlFor="avatar-upload-profile"
+                  className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#D3DF3D] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#C4CF2E] transition-colors shadow-md active:scale-95"
+                >
+                  {isUploadingAvatar ? (
+                    <div className="w-3.5 h-3.5 border-2 border-[#1F1F1F] border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Camera className="w-4 h-4 text-[#1F1F1F]" />
+                  )}
+                </label>
+              </div>
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-[#1F1F1F] dark:text-white">{user.name}</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
+                {user.email && <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>}
                 <p className="text-sm text-gray-600 dark:text-gray-400">{user.phone}</p>
                 <div className="flex items-center mt-2 space-x-2">
                   <Badge variant="secondary" className="bg-[#D3DF3D] text-[#1F1F1F]">
@@ -191,8 +274,6 @@ export default function ProfilePage() {
           </Card>
         </div>
       </div>
-
-      <BottomNavigation />
     </div>
   )
 }

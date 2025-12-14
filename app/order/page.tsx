@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 import CartQuantityButtons from "@/components/cart-quantity-buttons"
+import { getUser, deductUserPoints, addUserPoints } from "@/lib/user"
 
 // Интерфейс для товара в корзине
 interface CartItem {
@@ -145,7 +146,7 @@ export default function OrderPage() {
   })
   const [paymentType, setPaymentType] = useState("online")
   const [selectedDeliveryCompany, setSelectedDeliveryCompany] = useState<number>(1) // Default to first company
-  const [userPoints, setUserPoints] = useState(2500) // Баллы пользователя (mock)
+  const [userPoints, setUserPoints] = useState(0) // Баллы пользователя из localStorage
   const [pointsToUse, setPointsToUse] = useState(0) // Сколько баллов списать
   const [isPointsApplied, setIsPointsApplied] = useState(false) // Применены ли баллы
 
@@ -187,6 +188,26 @@ export default function OrderPage() {
 
     return () => {
       window.removeEventListener("cartUpdated", handleCartUpdate)
+    }
+  }, [])
+
+  // Загрузка баллов пользователя
+  useEffect(() => {
+    const loadUserPoints = () => {
+      const user = getUser()
+      setUserPoints(user.loyaltyPoints)
+    }
+
+    loadUserPoints()
+
+    // Слушаем изменения данных пользователя
+    const handleUserUpdate = (event: CustomEvent) => {
+      setUserPoints(event.detail.loyaltyPoints)
+    }
+    window.addEventListener("userUpdated", handleUserUpdate as EventListener)
+
+    return () => {
+      window.removeEventListener("userUpdated", handleUserUpdate as EventListener)
     }
   }, [])
 
@@ -325,6 +346,18 @@ export default function OrderPage() {
       deliveryAddress,
       selectedDeliveryCompany: deliveryMethod === "russia" ? deliveryCompanies.find(c => c.id === selectedDeliveryCompany)?.name : null,
       recipientInfo: deliveryMethod === "russia" ? recipientInfo : null,
+    }
+
+    // Списываем баллы, если они были применены
+    if (isPointsApplied && pointsToUse > 0) {
+      const success = deductUserPoints(pointsToUse)
+      if (success) {
+        toast({
+          title: "Баллы списаны",
+          description: `Списано ${pointsToUse} баллов`,
+          variant: "default",
+        })
+      }
     }
 
     // Сохраняем заказ в localStorage

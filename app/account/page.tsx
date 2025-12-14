@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useFormStatus } from "react-dom"
-import { Award, ChevronRight, Plus, ShoppingBag, Settings, Car, Heart, Clock, Star, LogOut, User, Phone } from "lucide-react"
+import { Award, ChevronRight, Plus, ShoppingBag, Settings, Car, Heart, Clock, Star, LogOut, User, Phone, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "@/components/ui/use-toast"
@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { sendSmsCodeForAuth, verifySmsCodeAndLogin } from "@/app/auth-actions"
 import SafeAreaHeader from "@/components/safe-area-header"
 import BottomNavigation from "@/components/bottom-navigation"
+import { getUser, saveUser, updateUserAvatar, imageToBase64, type User } from "@/lib/user"
 
 // Helper component for submit button state
 function SubmitButton({ text }: { text: string }) {
@@ -41,11 +42,7 @@ export default function AccountPage() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  const [user] = useState({
-    name: "Александр Петров",
-    loyaltyPoints: 1250,
-    loyaltyLevel: "Золотой",
-  })
+  const [user, setUser] = useState<User>(getUser())
 
 
   const [orders, setOrders] = useState<any[]>([])
@@ -63,6 +60,54 @@ export default function AccountPage() {
 
   const [userCars, setUserCars] = useState<any[]>([])
   const [carsLoaded, setCarsLoaded] = useState(false)
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Проверка типа файла
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Ошибка",
+        description: "Пожалуйста, выберите изображение",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Проверка размера (макс 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Ошибка",
+        description: "Размер изображения не должен превышать 5MB",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsUploadingAvatar(true)
+
+    try {
+      const base64 = await imageToBase64(file)
+      updateUserAvatar(base64)
+
+      toast({
+        title: "Успешно",
+        description: "Аватар обновлен",
+        variant: "default",
+      })
+    } catch (error) {
+      console.error("Ошибка при загрузке аватара:", error)
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить изображение",
+        variant: "destructive",
+      })
+    } finally {
+      setIsUploadingAvatar(false)
+    }
+  }
 
   const toggleCarExpansion = (carId: string) => {
     setExpandedCars((prev) => ({
@@ -100,56 +145,21 @@ export default function AccountPage() {
   }
 
   useEffect(() => {
-    // Simulate checking if user is logged in.
-    // In a real app, this would involve checking a session cookie or auth context.
-    // For this demo, we'll assume if we're on /account and haven't been redirected,
-    // the user is "logged in".
-    const checkLoginStatus = () => {
-      // This is a very basic simulation. A real app would check for a valid session.
-      // For now, if we are on /account and haven't started the login flow, assume logged in.
-      // This is a hack for the demo. In real app, check actual auth state.
-      if (typeof window !== "undefined" && window.location.pathname === "/account" && step === "enterPhone") {
-        // If we are on /account and haven't started the login flow, assume logged in.
-        // This is a hack for the demo. In real app, check actual auth state.
-        setIsLoggedIn(true)
-      }
+    // Загружаем данные пользователя и автоматически логиним тестового пользователя
+    const currentUser = getUser()
+    setUser(currentUser)
+    setIsLoggedIn(true) // Автоматически логиним тестового пользователя
+
+    // Слушаем изменения данных пользователя
+    const handleUserUpdate = (event: CustomEvent) => {
+      setUser(event.detail)
     }
-    checkLoginStatus()
+    window.addEventListener("userUpdated", handleUserUpdate as EventListener)
 
     const loadCars = () => {
       try {
         const storedCars = JSON.parse(localStorage.getItem("userCars") || "[]")
-
-        if (storedCars.length === 0) {
-          const defaultCars = [
-            {
-              id: "1",
-              brand: "Toyota",
-              model: "Camry",
-              year: "2019",
-              plate: "А123БВ777",
-              mileage: "45 320 км",
-              tires: "Michelin Pilot Sport 4",
-              isPrimary: true,
-              hasStorage: true,
-            },
-            {
-              id: "2",
-              brand: "Volkswagen",
-              model: "Tiguan",
-              year: "2020",
-              plate: "Е456ЖЗ777",
-              mileage: "32 150 км",
-              tires: "Continental PremiumContact 6",
-              isPrimary: false,
-              hasStorage: false,
-            },
-          ]
-          localStorage.setItem("userCars", JSON.stringify(defaultCars))
-          setUserCars(defaultCars)
-        } else {
-          setUserCars(storedCars)
-        }
+        setUserCars(storedCars)
       } catch (error) {
         console.error("Ошибка при загрузке автомобилей:", error)
       } finally {
@@ -168,20 +178,21 @@ export default function AccountPage() {
       }
     }
 
-    if (isLoggedIn) {
-      // Only load data if user is "logged in"
+    // Загружаем данные пользователя
+    loadCars()
+    loadOrders()
+
+    const handleFocus = () => {
       loadCars()
       loadOrders()
-      const handleFocus = () => {
-        loadCars()
-        loadOrders()
-      }
-      window.addEventListener("focus", handleFocus)
-      return () => {
-        window.removeEventListener("focus", handleFocus)
-      }
     }
-  }, [isLoggedIn, step]) // Re-run if isLoggedIn or step changes
+    window.addEventListener("focus", handleFocus)
+
+    return () => {
+      window.removeEventListener("userUpdated", handleUserUpdate as EventListener)
+      window.removeEventListener("focus", handleFocus)
+    }
+  }, []) // Запускаем один раз при монтировании
   // --- End Existing Account Page State & Handlers ---
 
   // --- New Login/Registration Logic ---
@@ -304,9 +315,9 @@ export default function AccountPage() {
 
   // --- Render Account Details if Logged In ---
   return (
-    <div className="min-h-screen bg-[#1F1F1F]">
+    <div className="min-h-screen bg-[#121212]">
       {/* Custom Header */}
-      <header className="sticky top-0 z-50 bg-[#1F1F1F]/95 backdrop-blur-lg border-b border-white/5">
+      <header className="sticky top-0 z-50 bg-[#121212]/95 backdrop-blur-lg">
         <div className="flex items-center justify-between px-4 py-3 pt-[calc(env(safe-area-inset-top)+12px)]">
           <h1 className="text-xl font-bold text-white">Профиль</h1>
           <Link href="/settings">
@@ -325,19 +336,45 @@ export default function AccountPage() {
             <div className="flex items-center gap-4">
               {/* Avatar */}
               <div className="relative">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#D3DF3D] to-[#009CFF] flex items-center justify-center">
-                  <span className="text-2xl font-bold text-[#1F1F1F]">
-                    {user.name.charAt(0)}
-                  </span>
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#D3DF3D] to-[#009CFF] flex items-center justify-center overflow-hidden">
+                  {user.avatar && user.avatar.startsWith('data:') ? (
+                    <Image
+                      src={user.avatar}
+                      alt={user.name}
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <span className="text-2xl font-bold text-[#1F1F1F]">
+                      {user.name.charAt(0)}
+                    </span>
+                  )}
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#D3DF3D] rounded-lg flex items-center justify-center">
-                  <Star className="w-3.5 h-3.5 text-[#1F1F1F]" />
-                </div>
+                <input
+                  type="file"
+                  id="avatar-upload"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                  disabled={isUploadingAvatar}
+                />
+                <label
+                  htmlFor="avatar-upload"
+                  className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#D3DF3D] rounded-lg flex items-center justify-center cursor-pointer hover:bg-[#C4CF2E] transition-colors active:scale-95"
+                >
+                  {isUploadingAvatar ? (
+                    <div className="w-3 h-3 border-2 border-[#1F1F1F] border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Camera className="w-3.5 h-3.5 text-[#1F1F1F]" />
+                  )}
+                </label>
               </div>
               {/* User Info */}
               <div className="flex-1">
                 <h2 className="text-lg font-bold text-white">{user.name}</h2>
-                <p className="text-gray-400 text-sm">+7 (999) ***-**-99</p>
+                <p className="text-gray-400 text-sm">{user.phone}</p>
               </div>
             </div>
 
@@ -582,8 +619,6 @@ export default function AccountPage() {
           Горошина v1.0.0
         </p>
       </div>
-
-      <BottomNavigation />
     </div>
   )
 }

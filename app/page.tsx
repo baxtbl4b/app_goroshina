@@ -21,7 +21,6 @@ import { Progress } from "@/components/ui/progress"
 import { BottomNavigation } from "@/components/bottom-navigation"
 import { useRouter } from "next/navigation"
 import { useState, useEffect, useRef } from "react"
-import LoadingScreen from "@/components/loading-screen"
 import TireCard from "@/components/tire-card"
 import CartButton from "@/components/cart-button"
 import type { Tire } from "@/lib/api"
@@ -34,6 +33,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { useToast } from "@/components/ui/use-toast"
+import { getUser, type User } from "@/lib/user"
 
 // Компонент для отображения избранных товаров
 function FavoritesList() {
@@ -92,29 +92,10 @@ function FavoritesList() {
 
 export default function HomePage() {
   const router = useRouter()
+  const [user, setUser] = useState<User>(getUser())
   const [isLoyaltyVisible, setIsLoyaltyVisible] = useState(false)
   const [isStatusBlockVisible, setIsStatusBlockVisible] = useState(true)
   const [isTooltipVisible, setIsTooltipVisible] = useState(false)
-  // Add a new state for loading
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    // Check if this is the first launch
-    const hasLaunchedBefore = localStorage.getItem("hasLaunchedBefore")
-
-    if (!hasLaunchedBefore) {
-      // First launch - show loading screen
-      setIsLoading(true)
-      const timer = setTimeout(() => {
-        setIsLoading(false)
-        // Mark that the app has been launched before
-        localStorage.setItem("hasLaunchedBefore", "true")
-      }, 1500) // 1.5 second delay
-
-      return () => clearTimeout(timer)
-    }
-    // If not first launch, don't show loading screen
-  }, [])
   const [isLoyaltyConfirmed, setIsLoyaltyConfirmed] = useState(false)
   const [isLoyaltyModalOpen, setIsLoyaltyModalOpen] = useState(false)
   const [boltImageLoaded, setBoltImageLoaded] = useState(false)
@@ -142,11 +123,6 @@ export default function HomePage() {
 
   const handleMenuClick = () => {
     router.push("/settings")
-  }
-
-  // Function to handle when loading is complete
-  const handleLoadingComplete = () => {
-    setIsLoading(false)
   }
 
   const sendChatMessage = async (message: string) => {
@@ -271,14 +247,25 @@ export default function HomePage() {
     setChatSessionId(newSessionId)
   }, [])
 
+  useEffect(() => {
+    // Загружаем данные пользователя
+    const currentUser = getUser()
+    setUser(currentUser)
+
+    // Слушаем изменения данных пользователя
+    const handleUserUpdate = (event: CustomEvent) => {
+      setUser(event.detail)
+    }
+    window.addEventListener("userUpdated", handleUserUpdate as EventListener)
+
+    return () => {
+      window.removeEventListener("userUpdated", handleUserUpdate as EventListener)
+    }
+  }, [])
+
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[calc(60px+env(safe-area-inset-top))]">
-      {/* Show loading screen if isLoading is true */}
-      {isLoading ? (
-        <LoadingScreen onLoadingComplete={handleLoadingComplete} />
-      ) : (
-        <>
-          <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
             <div className="h-full px-4 relative flex items-center justify-between">
               <div className="flex items-center">
                 <div className="relative overflow-hidden rounded-lg">
@@ -514,11 +501,11 @@ export default function HomePage() {
                     <div className="flex items-center gap-2">
                       <Award className="h-5 w-5 text-[#D3DF3D]" />
                       <div className="flex items-center">
-                        <span className="text-lg font-bold text-[#D3DF3D]">350 баллов</span>
+                        <span className="text-lg font-bold text-[#D3DF3D]">{user.loyaltyPoints} баллов</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">Серебрянный</span>
+                      <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">{user.loyaltyLevel}</span>
                       {isLoyaltyVisible ? (
                         <ChevronUp className="h-4 w-4 text-[#1F1F1F] dark:text-white" />
                       ) : (
@@ -1285,9 +1272,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <BottomNavigation />
-        </>
-      )}
+      <BottomNavigation />
       {isLoyaltyModalOpen && (
         <Dialog open={isLoyaltyModalOpen} onOpenChange={setIsLoyaltyModalOpen}>
           <DialogContent className="sm:max-w-[425px]">

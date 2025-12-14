@@ -15,32 +15,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-// Initial cars data
-const initialCars = [
-  {
-    id: "1",
-    brand: "Toyota",
-    model: "Camry",
-    year: "2019",
-    plate: "А123БВ777",
-    mileage: "45 320 км",
-    tires: "Michelin Pilot Sport 4",
-    isPrimary: true,
-    hasStorage: true,
-  },
-  {
-    id: "2",
-    brand: "Volkswagen",
-    model: "Tiguan",
-    year: "2020",
-    plate: "Е456ЖЗ777",
-    mileage: "32 150 км",
-    tires: "Continental PremiumContact 6",
-    isPrimary: false,
-    hasStorage: false,
-  },
-]
-
 export default function CarsListPage() {
   const [cars, setCars] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -51,38 +25,7 @@ export default function CarsListPage() {
     const loadCars = () => {
       try {
         const storedCars = JSON.parse(localStorage.getItem("userCars") || "[]")
-
-        // Если нет сохраненных автомобилей, используем начальные данные
-        if (storedCars.length === 0) {
-          const defaultCars = [
-            {
-              id: "1",
-              brand: "Toyota",
-              model: "Camry",
-              year: "2019",
-              plate: "А123БВ777",
-              mileage: "45 320 км",
-              tires: "Michelin Pilot Sport 4",
-              isPrimary: true,
-              hasStorage: true,
-            },
-            {
-              id: "2",
-              brand: "Volkswagen",
-              model: "Tiguan",
-              year: "2020",
-              plate: "Е456ЖЗ777",
-              mileage: "32 150 км",
-              tires: "Continental PremiumContact 6",
-              isPrimary: false,
-              hasStorage: false,
-            },
-          ]
-          localStorage.setItem("userCars", JSON.stringify(defaultCars))
-          setCars(defaultCars)
-        } else {
-          setCars(storedCars)
-        }
+        setCars(storedCars)
       } catch (error) {
         console.error("Ошибка при загрузке автомобилей:", error)
         setCars([])
@@ -159,14 +102,6 @@ export default function CarsListPage() {
       </header>
 
       <div className="flex-1 p-4 space-y-6 pb-20">
-        <div className="flex justify-end">
-          <Link href="/account/cars/add">
-            <Button size="sm" className="h-8 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
-              <Plus className="h-4 w-4 mr-1" /> Добавить
-            </Button>
-          </Link>
-        </div>
-
         <div className="space-y-4">
           {cars.length > 0 ? (
             cars.map((car) => (
@@ -220,7 +155,9 @@ export default function CarsListPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Шины:</span>
-                      <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">{car.tires}</span>
+                      <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">
+                        {car.tires} {car.tireSeason && `(${car.tireSeason})`}
+                      </span>
                     </div>
                   </div>
                 </Link>
@@ -228,10 +165,12 @@ export default function CarsListPage() {
             ))
           ) : (
             <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-6 shadow-sm text-center">
-              <p className="text-[#1F1F1F] dark:text-white mb-4">У вас пока нет добавленных автомобилей</p>
+              <Car className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+              <p className="text-[#1F1F1F] dark:text-white mb-2 font-semibold">У вас пока нет автомобилей</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Добавьте свой первый автомобиль</p>
               <Link href="/account/cars/add">
                 <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
-                  <Plus className="h-4 w-4 mr-1" /> Добавить автомобиль
+                  <Plus className="h-4 w-4 mr-2" /> Добавить автомобиль
                 </Button>
               </Link>
             </div>

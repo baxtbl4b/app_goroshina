@@ -29,6 +29,13 @@ interface Trim {
   trim_slug: string
 }
 
+interface TireSize {
+  width: string
+  height: string
+  diameter: string
+  is_optional?: boolean
+}
+
 export default function AddCarPage() {
   const router = useRouter()
 
@@ -43,11 +50,10 @@ export default function AddCarPage() {
     year: "",
     plate: "",
     mileage: "",
-    storageItem: "",
+    tireSeason: "summer", // summer или winter
     tireWidth: "",
     tireProfile: "",
     tireDiameter: "",
-    rimType: "",
     isPrimary: false,
   })
 
@@ -59,9 +65,11 @@ export default function AddCarPage() {
   const [brands, setBrands] = useState<Brand[]>([])
   const [models, setModels] = useState<Model[]>([])
   const [trims, setTrims] = useState<Trim[]>([])
+  const [tireSizes, setTireSizes] = useState<TireSize[]>([])
   const [loadingBrands, setLoadingBrands] = useState(true)
   const [loadingModels, setLoadingModels] = useState(false)
   const [loadingTrims, setLoadingTrims] = useState(false)
+  const [loadingTireSizes, setLoadingTireSizes] = useState(false)
 
   // Search states
   const [brandSearch, setBrandSearch] = useState("")
@@ -143,6 +151,73 @@ export default function AddCarPage() {
     }
     fetchTrims()
   }, [formData.brandSlug, formData.modelSlug])
+
+  // Load tire sizes when brand, model, trim, and year are selected
+  useEffect(() => {
+    if (!formData.brandSlug || !formData.modelSlug || !formData.year) {
+      setTireSizes([])
+      return
+    }
+
+    const fetchTireSizes = async () => {
+      setLoadingTireSizes(true)
+      try {
+        let url = `${API_BASE_URL}/fitment?access_token=${API_TOKEN}&brand_slug=${formData.brandSlug}&model_slug=${formData.modelSlug}&year=${formData.year}`
+
+        // Добавляем trim_slug если выбрана модификация
+        if (formData.trimSlug) {
+          url += `&trim_slug=${formData.trimSlug}`
+        }
+
+        const response = await fetch(url)
+
+        if (response.ok) {
+          const data = await response.json()
+          console.log("Tire sizes data:", data)
+
+          let sizes: TireSize[] = []
+
+          // API возвращает массив объектов fitment
+          if (Array.isArray(data)) {
+            // Собираем все уникальные размеры из всех модификаций
+            const allTires = new Set<string>()
+
+            data.forEach((fitment: any) => {
+              if (fitment.oem_tires && Array.isArray(fitment.oem_tires)) {
+                fitment.oem_tires.forEach((tire: any) => {
+                  if (tire.width && tire.height && tire.diam) {
+                    // Создаем уникальный ключ для размера
+                    const key = `${tire.width}/${tire.height}/${tire.diam}`
+                    allTires.add(key)
+                  }
+                })
+              }
+            })
+
+            // Преобразуем Set обратно в массив объектов
+            sizes = Array.from(allTires).map(key => {
+              const [width, height, diameter] = key.split('/')
+              return {
+                width,
+                height,
+                diameter,
+                is_optional: false
+              }
+            })
+          }
+
+          setTireSizes(sizes)
+        }
+      } catch (error) {
+        console.error("Error fetching tire sizes:", error)
+        setTireSizes([])
+      } finally {
+        setLoadingTireSizes(false)
+      }
+    }
+
+    fetchTireSizes()
+  }, [formData.brandSlug, formData.modelSlug, formData.trimSlug, formData.year])
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -283,7 +358,13 @@ export default function AddCarPage() {
         year: formData.year,
         plate: formData.plate,
         mileage: formData.mileage ? `${formData.mileage} км` : "0 км",
-        tires: formData.storageItem || "Не указано",
+        tires: formData.tireWidth && formData.tireProfile && formData.tireDiameter
+          ? `${formData.tireWidth}/${formData.tireProfile} R${formData.tireDiameter}`
+          : "Не указано",
+        tireSeason: formData.tireSeason === "winter" ? "Зима" : "Лето",
+        tireWidth: formData.tireWidth,
+        tireProfile: formData.tireProfile,
+        tireDiameter: formData.tireDiameter,
         isPrimary: formData.isPrimary,
         hasStorage: false,
         createdAt: new Date().toISOString(),
@@ -561,92 +642,140 @@ export default function AddCarPage() {
           </div>
 
           <form className="space-y-4">
+            {/* Выбор сезона шин */}
             <div className="space-y-2">
-              <Label htmlFor="storage-item">Наименование предмета хранения</Label>
-              <Input
-                id="storage-item"
-                placeholder="Например: Зимние шины Michelin 225/60 R16"
-                className="w-full"
-                value={formData.storageItem}
-                onChange={(e) => setFormData((prev) => ({ ...prev, storageItem: e.target.value }))}
-              />
+              <Label className="text-sm font-medium text-[#1F1F1F] dark:text-white">Сезон шин</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, tireSeason: "summer" }))}
+                  className={`p-4 rounded-xl border-2 transition-all ${
+                    formData.tireSeason === "summer"
+                      ? 'border-[#D3DF3D] bg-[#D3DF3D]/10'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-[#D3DF3D]/50'
+                  }`}
+                >
+                  <span className="font-semibold text-[#1F1F1F] dark:text-white">Лето</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, tireSeason: "winter" }))}
+                  className={`p-4 rounded-xl border-2 transition-all ${
+                    formData.tireSeason === "winter"
+                      ? 'border-[#009CFF] bg-[#009CFF]/10'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-[#009CFF]/50'
+                  }`}
+                >
+                  <span className="font-semibold text-[#1F1F1F] dark:text-white">Зима</span>
+                </button>
+              </div>
             </div>
+
+            {/* Рекомендуемые размеры шин */}
+            {(loadingTireSizes || tireSizes.length > 0) && (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-[#1F1F1F] dark:text-white">
+                  Рекомендуемые размеры шин
+                </Label>
+                {loadingTireSizes ? (
+                  <div className="flex items-center justify-center p-4 bg-gray-50 dark:bg-[#1F1F1F] rounded-lg">
+                    <Loader2 className="h-5 w-5 animate-spin text-[#009CFF] mr-2" />
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Загрузка подходящих размеров...</span>
+                  </div>
+                ) : tireSizes.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    {tireSizes.map((size, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => {
+                          setFormData(prev => ({
+                            ...prev,
+                            tireWidth: size.width,
+                            tireProfile: size.height,
+                            tireDiameter: size.diameter,
+                          }))
+                        }}
+                        className={`p-3 rounded-lg border-2 transition-all text-left ${
+                          formData.tireWidth === size.width &&
+                          formData.tireProfile === size.height &&
+                          formData.tireDiameter === size.diameter
+                            ? 'border-[#D3DF3D] bg-[#D3DF3D]/10'
+                            : 'border-gray-200 dark:border-gray-700 hover:border-[#009CFF] hover:bg-[#009CFF]/5'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-[#1F1F1F] dark:text-white">
+                            {size.width}/{size.height} R{size.diameter}
+                          </span>
+                          {size.is_optional && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">опц.</span>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {size.is_optional ? 'Опциональный' : 'Базовый'}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {tireSizes.length > 0 ? 'Нажмите на размер для быстрого выбора' : 'Заполните данные об автомобиле для получения рекомендаций'}
+                </p>
+              </div>
+            )}
+
+            {tireSizes.length > 0 && (
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-300 dark:border-gray-700" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white dark:bg-[#2A2A2A] px-2 text-gray-500 dark:text-gray-400">
+                    или выберите вручную
+                  </span>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="tire-width">Ширина</Label>
-                <Select
+                <Input
+                  id="tire-width"
+                  type="number"
+                  placeholder="185"
+                  className="w-full"
                   value={formData.tireWidth}
-                  onValueChange={(value) => setFormData((prev) => ({ ...prev, tireWidth: value }))}
-                >
-                  <SelectTrigger id="tire-width" className="w-full">
-                    <SelectValue placeholder="Ширина" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[195, 205, 215, 225, 235, 245, 255].map((width) => (
-                      <SelectItem key={width} value={width.toString()}>
-                        {width}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  onChange={(e) => setFormData((prev) => ({ ...prev, tireWidth: e.target.value }))}
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="tire-profile">Профиль</Label>
-                <Select
+                <Input
+                  id="tire-profile"
+                  type="number"
+                  placeholder="65"
+                  className="w-full"
                   value={formData.tireProfile}
-                  onValueChange={(value) => setFormData((prev) => ({ ...prev, tireProfile: value }))}
-                >
-                  <SelectTrigger id="tire-profile" className="w-full">
-                    <SelectValue placeholder="Профиль" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[40, 45, 50, 55, 60, 65, 70].map((profile) => (
-                      <SelectItem key={profile} value={profile.toString()}>
-                        {profile}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  onChange={(e) => setFormData((prev) => ({ ...prev, tireProfile: e.target.value }))}
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="tire-diameter">Диаметр</Label>
-                <Select
+                <Input
+                  id="tire-diameter"
+                  type="number"
+                  placeholder="15"
+                  className="w-full"
                   value={formData.tireDiameter}
-                  onValueChange={(value) => setFormData((prev) => ({ ...prev, tireDiameter: value }))}
-                >
-                  <SelectTrigger id="tire-diameter" className="w-full">
-                    <SelectValue placeholder="R" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[15, 16, 17, 18, 19, 20, 21].map((diameter) => (
-                      <SelectItem key={diameter} value={diameter.toString()}>
-                        R{diameter}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  onChange={(e) => setFormData((prev) => ({ ...prev, tireDiameter: e.target.value }))}
+                />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="rim-type">Тип дисков</Label>
-              <Select
-                value={formData.rimType}
-                onValueChange={(value) => setFormData((prev) => ({ ...prev, rimType: value }))}
-              >
-                <SelectTrigger id="rim-type" className="w-full">
-                  <SelectValue placeholder="Выберите тип" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="alloy">Литые</SelectItem>
-                  <SelectItem value="steel">Штампованные</SelectItem>
-                  <SelectItem value="forged">Кованые</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </form>
         </div>
 
