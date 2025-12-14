@@ -29,6 +29,21 @@ interface TireSize {
   height: string
   diameter: string
   is_optional?: boolean
+  position?: "front" | "rear" | "both"
+}
+
+interface StaggeredTireSize {
+  front: {
+    width: string
+    height: string
+    diameter: string
+  }
+  rear: {
+    width: string
+    height: string
+    diameter: string
+  }
+  is_optional?: boolean
 }
 
 export default function AddCarPage() {
@@ -43,9 +58,22 @@ export default function AddCarPage() {
     plate: "",
     mileage: "",
     tireSeason: "summer", // summer или winter
-    tireWidth: "",
-    tireProfile: "",
-    tireDiameter: "",
+    // Летние шины
+    summerTireWidth: "",
+    summerTireProfile: "",
+    summerTireDiameter: "",
+    summerRearTireWidth: "",
+    summerRearTireProfile: "",
+    summerRearTireDiameter: "",
+    summerIsStaggered: false,
+    // Зимние шины
+    winterTireWidth: "",
+    winterTireProfile: "",
+    winterTireDiameter: "",
+    winterRearTireWidth: "",
+    winterRearTireProfile: "",
+    winterRearTireDiameter: "",
+    winterIsStaggered: false,
     isPrimary: false,
   })
 
@@ -56,6 +84,7 @@ export default function AddCarPage() {
   const [models, setModels] = useState<Model[]>([])
   const [years, setYears] = useState<number[]>([])
   const [tireSizes, setTireSizes] = useState<TireSize[]>([])
+  const [staggeredTireSizes, setStaggeredTireSizes] = useState<StaggeredTireSize[]>([])
   const [loadingBrands, setLoadingBrands] = useState(true)
   const [loadingModels, setLoadingModels] = useState(false)
   const [loadingYears, setLoadingYears] = useState(false)
@@ -214,40 +243,86 @@ export default function AddCarPage() {
         if (response.ok) {
           const data = await response.json()
           console.log("✅ Tire sizes data:", data)
+          console.log("✅ Data length:", data.length)
+          console.log("✅ Is array:", Array.isArray(data))
 
           let sizes: TireSize[] = []
 
           // API возвращает массив объектов fitment
           if (Array.isArray(data)) {
-            // Собираем все уникальные размеры из всех модификаций
-            const allTires = new Set<string>()
+            console.log(`✅ Processing ${data.length} fitment items`)
+            if (data.length === 0) {
+              console.warn("⚠️ API returned empty array - no tire data for this vehicle")
+            }
+            // Собираем базовые размеры и пары разноширокий
+            const bothTires = new Set<string>()
+            const staggeredPairs = new Map<string, StaggeredTireSize>()
 
-            data.forEach((fitment: any) => {
+            data.forEach((fitment: any, idx: number) => {
+              console.log(`📦 Fitment #${idx + 1}:`, fitment)
+              console.log(`  - Trim: ${fitment.trim_original || 'N/A'}`)
+              console.log(`  - Has oem_tires:`, fitment.oem_tires)
+              console.log(`  - Has plus_sizes_tires:`, fitment.plus_sizes_tires)
+
+              // Обрабатываем базовые размеры (одинаковые на все колеса)
               if (fitment.oem_tires && Array.isArray(fitment.oem_tires)) {
                 fitment.oem_tires.forEach((tire: any) => {
                   if (tire.width && tire.height && tire.diam) {
-                    // Создаем уникальный ключ для размера
                     const key = `${tire.width}/${tire.height}/${tire.diam}`
-                    allTires.add(key)
+                    bothTires.add(key)
+                  }
+                })
+              }
+
+              // Обрабатываем разноширокие размеры из plus_sizes_tires как пары
+              if (fitment.plus_sizes_tires && Array.isArray(fitment.plus_sizes_tires)) {
+                fitment.plus_sizes_tires.forEach((plusSize: any) => {
+                  if (plusSize.front && plusSize.front.width && plusSize.front.height && plusSize.front.diam &&
+                      plusSize.back && plusSize.back.width && plusSize.back.height && plusSize.back.diam) {
+                    // Создаем уникальный ключ для пары
+                    const pairKey = `${plusSize.front.width}/${plusSize.front.height}/${plusSize.front.diam}|${plusSize.back.width}/${plusSize.back.height}/${plusSize.back.diam}`
+
+                    if (!staggeredPairs.has(pairKey)) {
+                      staggeredPairs.set(pairKey, {
+                        front: {
+                          width: String(plusSize.front.width),
+                          height: String(plusSize.front.height),
+                          diameter: String(plusSize.front.diam)
+                        },
+                        rear: {
+                          width: String(plusSize.back.width),
+                          height: String(plusSize.back.height),
+                          diameter: String(plusSize.back.diam)
+                        },
+                        is_optional: true
+                      })
+                    }
                   }
                 })
               }
             })
 
-            // Преобразуем Set обратно в массив объектов
-            sizes = Array.from(allTires).map(key => {
+            // Преобразуем базовые размеры в массив
+            const bothSizes = Array.from(bothTires).map(key => {
               const [width, height, diameter] = key.split('/')
-              return {
-                width,
-                height,
-                diameter,
-                is_optional: false
-              }
+              return { width, height, diameter, is_optional: false, position: "both" as const }
             })
-          }
 
-          console.log("🎯 Extracted tire sizes:", sizes)
-          setTireSizes(sizes)
+            // Получаем массив пар разноширокий
+            const staggeredSizes = Array.from(staggeredPairs.values())
+
+            sizes = bothSizes
+
+            console.log("🎯 Base tire sizes (both):", bothSizes)
+            console.log("🎯 Staggered tire pairs:", staggeredSizes)
+
+            setTireSizes(sizes)
+            setStaggeredTireSizes(staggeredSizes)
+          } else {
+            console.log("🎯 All extracted tire sizes:", sizes)
+            setTireSizes(sizes)
+            setStaggeredTireSizes([])
+          }
         } else {
           console.error("❌ Response not OK:", response.status, response.statusText)
         }
@@ -302,6 +377,30 @@ export default function AddCarPage() {
       // Получаем существующие автомобили из localStorage
       const existingCars = JSON.parse(localStorage.getItem("userCars") || "[]")
 
+      // Формируем строки с размерами шин для обоих сезонов
+      let summerTiresString = "Не указано"
+      let winterTiresString = "Не указано"
+
+      const hasSummerFrontTires = formData.summerTireWidth && formData.summerTireProfile && formData.summerTireDiameter
+      const hasSummerRearTires = formData.summerRearTireWidth && formData.summerRearTireProfile && formData.summerRearTireDiameter
+
+      const hasWinterFrontTires = formData.winterTireWidth && formData.winterTireProfile && formData.winterTireDiameter
+      const hasWinterRearTires = formData.winterRearTireWidth && formData.winterRearTireProfile && formData.winterRearTireDiameter
+
+      // Летние шины
+      if (hasSummerFrontTires && hasSummerRearTires) {
+        summerTiresString = `П: ${formData.summerTireWidth}/${formData.summerTireProfile} R${formData.summerTireDiameter} / З: ${formData.summerRearTireWidth}/${formData.summerRearTireProfile} R${formData.summerRearTireDiameter}`
+      } else if (hasSummerFrontTires) {
+        summerTiresString = `${formData.summerTireWidth}/${formData.summerTireProfile} R${formData.summerTireDiameter}`
+      }
+
+      // Зимние шины
+      if (hasWinterFrontTires && hasWinterRearTires) {
+        winterTiresString = `П: ${formData.winterTireWidth}/${formData.winterTireProfile} R${formData.winterTireDiameter} / З: ${formData.winterRearTireWidth}/${formData.winterRearTireProfile} R${formData.winterRearTireDiameter}`
+      } else if (hasWinterFrontTires) {
+        winterTiresString = `${formData.winterTireWidth}/${formData.winterTireProfile} R${formData.winterTireDiameter}`
+      }
+
       // Создаем новый автомобиль
       const newCar = {
         id: Date.now().toString(),
@@ -313,13 +412,25 @@ export default function AddCarPage() {
         year: formData.year,
         plate: formData.plate,
         mileage: formData.mileage ? `${formData.mileage} км` : "0 км",
-        tires: formData.tireWidth && formData.tireProfile && formData.tireDiameter
-          ? `${formData.tireWidth}/${formData.tireProfile} R${formData.tireDiameter}`
-          : "Не указано",
-        tireSeason: formData.tireSeason === "winter" ? "Зима" : "Лето",
-        tireWidth: formData.tireWidth,
-        tireProfile: formData.tireProfile,
-        tireDiameter: formData.tireDiameter,
+        // Летние шины
+        summerTires: summerTiresString,
+        summerTireWidth: formData.summerTireWidth,
+        summerTireProfile: formData.summerTireProfile,
+        summerTireDiameter: formData.summerTireDiameter,
+        summerRearTireWidth: formData.summerRearTireWidth || "",
+        summerRearTireProfile: formData.summerRearTireProfile || "",
+        summerRearTireDiameter: formData.summerRearTireDiameter || "",
+        summerHasStaggered: hasSummerRearTires,
+        // Зимние шины
+        winterTires: winterTiresString,
+        winterTireWidth: formData.winterTireWidth,
+        winterTireProfile: formData.winterTireProfile,
+        winterTireDiameter: formData.winterTireDiameter,
+        winterRearTireWidth: formData.winterRearTireWidth || "",
+        winterRearTireProfile: formData.winterRearTireProfile || "",
+        winterRearTireDiameter: formData.winterRearTireDiameter || "",
+        winterHasStaggered: hasWinterRearTires,
+        // Общие поля
         isPrimary: formData.isPrimary,
         hasStorage: false,
         createdAt: new Date().toISOString(),
@@ -522,7 +633,7 @@ export default function AddCarPage() {
         <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
             <Car className="h-6 w-6 text-[#009CFF]" />
-            <h3 className="font-bold text-[#1F1F1F] dark:text-white">Информация о шинах и дисках</h3>
+            <h3 className="font-bold text-[#1F1F1F] dark:text-white">Информация о шинах</h3>
           </div>
 
           <form className="space-y-4">
@@ -556,52 +667,154 @@ export default function AddCarPage() {
             </div>
 
             {/* Рекомендуемые размеры шин */}
-            {(loadingTireSizes || tireSizes.length > 0) && (
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-[#1F1F1F] dark:text-white">
-                  Рекомендуемые размеры шин
-                </Label>
+            {(loadingTireSizes || tireSizes.length > 0 || staggeredTireSizes.length > 0) && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm font-medium text-[#1F1F1F] dark:text-white">
+                    Информация о шинах
+                  </Label>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    formData.tireSeason === "summer"
+                      ? "bg-[#D3DF3D]/20 text-[#1F1F1F] dark:text-white"
+                      : "bg-[#009CFF]/20 text-[#009CFF]"
+                  }`}>
+                    {formData.tireSeason === "summer" ? "Летние" : "Зимние"}
+                  </span>
+                </div>
                 {loadingTireSizes ? (
                   <div className="flex items-center justify-center p-4 bg-gray-50 dark:bg-[#1F1F1F] rounded-lg">
                     <Loader2 className="h-5 w-5 animate-spin text-[#009CFF] mr-2" />
                     <span className="text-sm text-gray-600 dark:text-gray-400">Загрузка подходящих размеров...</span>
                   </div>
-                ) : tireSizes.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-2">
-                    {tireSizes.map((size, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => {
-                          setFormData(prev => ({
-                            ...prev,
-                            tireWidth: size.width,
-                            tireProfile: size.height,
-                            tireDiameter: size.diameter,
-                          }))
-                        }}
-                        className={`p-3 rounded-lg border-2 transition-all text-left ${
-                          formData.tireWidth === size.width &&
-                          formData.tireProfile === size.height &&
-                          formData.tireDiameter === size.diameter
-                            ? 'border-[#D3DF3D] bg-[#D3DF3D]/10'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-[#009CFF] hover:bg-[#009CFF]/5'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-[#1F1F1F] dark:text-white">
-                            {size.width}/{size.height} R{size.diameter}
-                          </span>
-                          {size.is_optional && (
-                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">опц.</span>
-                          )}
+                ) : (tireSizes.length > 0 || staggeredTireSizes.length > 0) ? (
+                  <>
+                    {/* Базовые размеры (одинаковые на все колеса) */}
+                    {tireSizes.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase mb-2">Базовые размеры</div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {tireSizes.map((size, index) => (
+                            <button
+                              key={`both-${index}`}
+                              type="button"
+                              onClick={() => {
+                                const isSummer = formData.tireSeason === "summer"
+                                setFormData(prev => ({
+                                  ...prev,
+                                  ...(isSummer ? {
+                                    summerTireWidth: size.width,
+                                    summerTireProfile: size.height,
+                                    summerTireDiameter: size.diameter,
+                                    summerRearTireWidth: "",
+                                    summerRearTireProfile: "",
+                                    summerRearTireDiameter: "",
+                                    summerIsStaggered: false,
+                                  } : {
+                                    winterTireWidth: size.width,
+                                    winterTireProfile: size.height,
+                                    winterTireDiameter: size.diameter,
+                                    winterRearTireWidth: "",
+                                    winterRearTireProfile: "",
+                                    winterRearTireDiameter: "",
+                                    winterIsStaggered: false,
+                                  })
+                                }))
+                              }}
+                              className={`p-3 rounded-lg border-2 transition-all text-left ${
+                                (formData.tireSeason === "summer"
+                                  ? (formData.summerTireWidth === size.width &&
+                                     formData.summerTireProfile === size.height &&
+                                     formData.summerTireDiameter === size.diameter &&
+                                     !formData.summerIsStaggered)
+                                  : (formData.winterTireWidth === size.width &&
+                                     formData.winterTireProfile === size.height &&
+                                     formData.winterTireDiameter === size.diameter &&
+                                     !formData.winterIsStaggered))
+                                  ? 'border-[#D3DF3D] bg-[#D3DF3D]/10'
+                                  : 'border-gray-200 dark:border-gray-700 hover:border-[#009CFF] hover:bg-[#009CFF]/5'
+                              }`}
+                            >
+                              <span className="font-semibold text-[#1F1F1F] dark:text-white">
+                                {size.width}/{size.height} R{size.diameter}
+                              </span>
+                            </button>
+                          ))}
                         </div>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {size.is_optional ? 'Опциональный' : 'Базовый'}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
+                      </div>
+                    )}
+
+                    {/* Разноширокие размеры (пары) */}
+                    {staggeredTireSizes.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase mb-2">Разноширокие варианты</div>
+                        <div className="space-y-2">
+                          {staggeredTireSizes.map((pair, index) => (
+                            <button
+                              key={`staggered-${index}`}
+                              type="button"
+                              onClick={() => {
+                                const isSummer = formData.tireSeason === "summer"
+                                setFormData(prev => ({
+                                  ...prev,
+                                  ...(isSummer ? {
+                                    summerTireWidth: pair.front.width,
+                                    summerTireProfile: pair.front.height,
+                                    summerTireDiameter: pair.front.diameter,
+                                    summerRearTireWidth: pair.rear.width,
+                                    summerRearTireProfile: pair.rear.height,
+                                    summerRearTireDiameter: pair.rear.diameter,
+                                    summerIsStaggered: true,
+                                  } : {
+                                    winterTireWidth: pair.front.width,
+                                    winterTireProfile: pair.front.height,
+                                    winterTireDiameter: pair.front.diameter,
+                                    winterRearTireWidth: pair.rear.width,
+                                    winterRearTireProfile: pair.rear.height,
+                                    winterRearTireDiameter: pair.rear.diameter,
+                                    winterIsStaggered: true,
+                                  })
+                                }))
+                              }}
+                              className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
+                                (formData.tireSeason === "summer"
+                                  ? (formData.summerTireWidth === pair.front.width &&
+                                     formData.summerTireProfile === pair.front.height &&
+                                     formData.summerTireDiameter === pair.front.diameter &&
+                                     formData.summerRearTireWidth === pair.rear.width &&
+                                     formData.summerRearTireProfile === pair.rear.height &&
+                                     formData.summerRearTireDiameter === pair.rear.diameter &&
+                                     formData.summerIsStaggered)
+                                  : (formData.winterTireWidth === pair.front.width &&
+                                     formData.winterTireProfile === pair.front.height &&
+                                     formData.winterTireDiameter === pair.front.diameter &&
+                                     formData.winterRearTireWidth === pair.rear.width &&
+                                     formData.winterRearTireProfile === pair.rear.height &&
+                                     formData.winterRearTireDiameter === pair.rear.diameter &&
+                                     formData.winterIsStaggered))
+                                  ? 'border-[#009CFF] bg-[#009CFF]/10'
+                                  : 'border-gray-200 dark:border-gray-700 hover:border-[#009CFF] hover:bg-[#009CFF]/5'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex-1">
+                                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Передняя ось</div>
+                                  <div className="font-semibold text-[#1F1F1F] dark:text-white">
+                                    {pair.front.width}/{pair.front.height} R{pair.front.diameter}
+                                  </div>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Задняя ось</div>
+                                  <div className="font-semibold text-[#1F1F1F] dark:text-white">
+                                    {pair.rear.width}/{pair.rear.height} R{pair.rear.diameter}
+                                  </div>
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 ) : null}
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   {tireSizes.length > 0 ? 'Нажмите на размер для быстрого выбора' : 'Заполните данные об автомобиле для получения рекомендаций'}
@@ -609,7 +822,7 @@ export default function AddCarPage() {
               </div>
             )}
 
-            {tireSizes.length > 0 && (
+            {(tireSizes.length > 0 || staggeredTireSizes.length > 0) && (
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t border-gray-300 dark:border-gray-700" />
@@ -622,6 +835,15 @@ export default function AddCarPage() {
               </div>
             )}
 
+            {/* Передняя ось - показываем заголовок только если есть разноширокие */}
+            {staggeredTireSizes.length > 0 && (
+              <div className="flex items-center gap-2">
+                <div className="h-px flex-1 bg-gray-300 dark:bg-gray-700" />
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase">Передняя ось</span>
+                <div className="h-px flex-1 bg-gray-300 dark:bg-gray-700" />
+              </div>
+            )}
+
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="tire-width">Ширина</Label>
@@ -630,8 +852,13 @@ export default function AddCarPage() {
                   type="number"
                   placeholder="185"
                   className="w-full"
-                  value={formData.tireWidth}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, tireWidth: e.target.value }))}
+                  value={formData.tireSeason === "summer" ? formData.summerTireWidth : formData.winterTireWidth}
+                  onChange={(e) => setFormData((prev) => ({
+                    ...prev,
+                    ...(prev.tireSeason === "summer"
+                      ? { summerTireWidth: e.target.value }
+                      : { winterTireWidth: e.target.value })
+                  }))}
                 />
               </div>
 
@@ -642,8 +869,13 @@ export default function AddCarPage() {
                   type="number"
                   placeholder="65"
                   className="w-full"
-                  value={formData.tireProfile}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, tireProfile: e.target.value }))}
+                  value={formData.tireSeason === "summer" ? formData.summerTireProfile : formData.winterTireProfile}
+                  onChange={(e) => setFormData((prev) => ({
+                    ...prev,
+                    ...(prev.tireSeason === "summer"
+                      ? { summerTireProfile: e.target.value }
+                      : { winterTireProfile: e.target.value })
+                  }))}
                 />
               </div>
 
@@ -654,11 +886,84 @@ export default function AddCarPage() {
                   type="number"
                   placeholder="15"
                   className="w-full"
-                  value={formData.tireDiameter}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, tireDiameter: e.target.value }))}
+                  value={formData.tireSeason === "summer" ? formData.summerTireDiameter : formData.winterTireDiameter}
+                  onChange={(e) => setFormData((prev) => ({
+                    ...prev,
+                    ...(prev.tireSeason === "summer"
+                      ? { summerTireDiameter: e.target.value }
+                      : { winterTireDiameter: e.target.value })
+                  }))}
                 />
               </div>
             </div>
+
+            {/* Задняя ось - показываем только если есть разноширокие варианты */}
+            {staggeredTireSizes.length > 0 && (
+              <>
+                <div className="flex items-center gap-2">
+                  <div className="h-px flex-1 bg-gray-300 dark:bg-gray-700" />
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase">Задняя ось</span>
+                  <div className="h-px flex-1 bg-gray-300 dark:bg-gray-700" />
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="rear-tire-width">Ширина</Label>
+                    <Input
+                      id="rear-tire-width"
+                      type="number"
+                      placeholder="185"
+                      className="w-full"
+                      value={formData.tireSeason === "summer" ? formData.summerRearTireWidth : formData.winterRearTireWidth}
+                      onChange={(e) => setFormData((prev) => ({
+                        ...prev,
+                        ...(prev.tireSeason === "summer"
+                          ? { summerRearTireWidth: e.target.value, summerIsStaggered: true }
+                          : { winterRearTireWidth: e.target.value, winterIsStaggered: true })
+                      }))}
+                      disabled={formData.tireSeason === "summer" ? !formData.summerIsStaggered : !formData.winterIsStaggered}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="rear-tire-profile">Профиль</Label>
+                    <Input
+                      id="rear-tire-profile"
+                      type="number"
+                      placeholder="65"
+                      className="w-full"
+                      value={formData.tireSeason === "summer" ? formData.summerRearTireProfile : formData.winterRearTireProfile}
+                      onChange={(e) => setFormData((prev) => ({
+                        ...prev,
+                        ...(prev.tireSeason === "summer"
+                          ? { summerRearTireProfile: e.target.value, summerIsStaggered: true }
+                          : { winterRearTireProfile: e.target.value, winterIsStaggered: true })
+                      }))}
+                      disabled={formData.tireSeason === "summer" ? !formData.summerIsStaggered : !formData.winterIsStaggered}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="rear-tire-diameter">Диаметр</Label>
+                    <Input
+                      id="rear-tire-diameter"
+                      type="number"
+                      placeholder="15"
+                      className="w-full"
+                      value={formData.tireSeason === "summer" ? formData.summerRearTireDiameter : formData.winterRearTireDiameter}
+                      onChange={(e) => setFormData((prev) => ({
+                        ...prev,
+                        ...(prev.tireSeason === "summer"
+                          ? { summerRearTireDiameter: e.target.value, summerIsStaggered: true }
+                          : { winterRearTireDiameter: e.target.value, winterIsStaggered: true })
+                      }))}
+                      disabled={formData.tireSeason === "summer" ? !formData.summerIsStaggered : !formData.winterIsStaggered}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
 
           </form>
         </div>

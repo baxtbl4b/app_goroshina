@@ -153,11 +153,32 @@ export default function CarsListPage() {
                       <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Пробег:</span>
                       <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">{car.mileage}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Шины:</span>
-                      <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">
-                        {car.tires} {car.tireSeason && `(${car.tireSeason})`}
-                      </span>
+                    <div className="space-y-1">
+                      {car.summerTires && car.summerTires !== "Не указано" && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Летние:</span>
+                          <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">
+                            {car.summerTires}
+                          </span>
+                        </div>
+                      )}
+                      {car.winterTires && car.winterTires !== "Не указано" && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Зимние:</span>
+                          <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">
+                            {car.winterTires}
+                          </span>
+                        </div>
+                      )}
+                      {/* Fallback для старых автомобилей без сезонных данных */}
+                      {!car.summerTires && !car.winterTires && car.tires && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Шины:</span>
+                          <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">
+                            {car.tires} {car.tireSeason && `(${car.tireSeason})`}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Link>

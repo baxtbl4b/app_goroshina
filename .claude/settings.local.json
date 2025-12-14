@@ -24,7 +24,8 @@
       "Bash(Write-Host \"Done\")",
       "Bash(del \"C:\\app_goroshina\\app\\loading.tsx\")",
       "Bash(rm:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(python -m json.tool:*)"
     ],
     "deny": [],
     "ask": []
