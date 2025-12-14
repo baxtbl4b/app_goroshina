@@ -5,16 +5,16 @@ import { Button } from "@/components/ui/button"
 
 export default function TireStoragePage() {
   return (
-    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="flex items-center">
+    <main className="flex flex-col min-h-screen bg-[#121212]">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center">
           <Link href="/account/cars/1">
             <Button variant="ghost" size="icon" className="mr-2">
-              <ArrowLeft className="h-5 w-5 text-[#1F1F1F] dark:text-white" />
+              <ArrowLeft className="h-5 w-5 text-white" />
             </Button>
           </Link>
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-[#1F1F1F] dark:text-white">Хранение шин</span>
+            <span className="text-xl font-bold text-white">Хранение шин</span>
           </div>
         </div>
       </header>

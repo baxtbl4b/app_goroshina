@@ -317,8 +317,8 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen bg-[#121212]">
       {/* Custom Header */}
-      <header className="sticky top-0 z-50 bg-[#121212]/95 backdrop-blur-lg">
-        <div className="flex items-center justify-between px-4 py-3 pt-[calc(env(safe-area-inset-top)+12px)]">
+      <header className="sticky top-0 z-50 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-white">Профиль</h1>
           <Link href="/settings">
             <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white/10">
@@ -329,7 +329,7 @@ export default function AccountPage() {
       </header>
 
       {/* Main content */}
-      <div className="px-4 pb-24 space-y-5">
+      <div className="px-4 pt-5 pb-24 space-y-5">
         {/* User Profile Card */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#D3DF3D] via-[#B8C736] to-[#009CFF] p-[1px]">
           <div className="relative bg-[#2A2A2A] rounded-[23px] p-5">
