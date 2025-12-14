@@ -62,28 +62,21 @@ const savedCards = [
   },
 ]
 
-// Mock stores data
+// Данные магазинов в Санкт-Петербурге
 const stores = [
   {
     id: "store1",
-    name: "Магазин на Автомобильной",
-    address: "ул. Автомобильная, 15",
-    phone: "+7 (495) 123-45-67",
-    coordinates: "37.618423,55.751244", // Longitude, Latitude
+    name: "Горошина на Таллинском",
+    address: "Таллинское шоссе, 190",
+    phone: "+7 (812) 123-45-67",
+    coordinates: "30.170431,59.810374", // Таллинское шоссе 190
   },
   {
     id: "store2",
-    name: "Шинный центр на Ленина",
-    address: "пр. Ленина, 78",
-    phone: "+7 (495) 987-65-43",
-    coordinates: "37.617635,55.755814", // Longitude, Latitude
-  },
-  {
-    id: "store3",
-    name: "Склад на Профсоюзной",
-    address: "ул. Профсоюзная, 100",
-    phone: "+7 (495) 555-11-22",
-    coordinates: "37.527393,55.665298", // Longitude, Latitude
+    name: "Горошина на Пискаревском",
+    address: "Пискаревский проспект, 144АК",
+    phone: "+7 (812) 987-65-43",
+    coordinates: "30.451318,60.008971", // Пискаревский проспект 144АК
   },
 ]
 
@@ -107,12 +100,12 @@ const savedAddresses = [
   },
 ]
 
-// Mock delivery companies for Russia-wide delivery
+// Транспортные компании для доставки по России
 const deliveryCompanies = [
-  { id: 1, name: "СДЭК", price: 800, days: "3-7" },
-  { id: 2, name: "Почта России", price: 600, days: "5-10" },
-  { id: 3, name: "DPD", price: 900, days: "2-5" },
-  { id: 4, name: "Boxberry", price: 750, days: "3-6" },
+  { id: 1, name: "ПЭК", price: 800, days: "3-7" },
+  { id: 2, name: "КИТ", price: 750, days: "4-8" },
+  { id: 3, name: "Деловые Линии", price: 900, days: "2-5" },
+  { id: 4, name: "Энергия", price: 850, days: "3-6" },
 ]
 
 // Helper function to get status badge variant and color
@@ -204,6 +197,33 @@ export default function OrderPage() {
   // Get the selected address details
   const selectedAddressDetails = savedAddresses.find((address) => address.id === selectedAddress)
 
+  // Форматирование телефона: +7 в начале
+  const formatPhone = (value: string) => {
+    // Если пустое, разрешаем
+    if (value === "" || value === "+") {
+      return value
+    }
+
+    // Убираем все кроме цифр
+    let digits = value.replace(/\D/g, "")
+
+    // Если начинается с 8, заменяем на 7
+    if (digits.startsWith("8")) {
+      digits = "7" + digits.slice(1)
+    }
+
+    // Если есть цифры, добавляем +7
+    if (digits.length > 0) {
+      // Убираем лидирующую 7 если есть (чтобы не было +77)
+      if (digits.startsWith("7")) {
+        digits = digits.slice(1)
+      }
+      return "+7" + digits
+    }
+
+    return value
+  }
+
   // Handle address selection
   const handleAddressSelect = (addressId: number) => {
     setSelectedAddress(addressId)
@@ -232,9 +252,10 @@ export default function OrderPage() {
 
   // Handle recipient information change
   const handleRecipientChange = (field: string, value: string) => {
+    const finalValue = field === "phone" ? formatPhone(value) : value
     setRecipientInfo((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: finalValue,
     }))
   }
 
@@ -252,21 +273,71 @@ export default function OrderPage() {
 
   // Handle proceed to checkout
   const handleProceedToCheckout = () => {
-    // In a real app, we would save the delivery method and address to the session/localStorage
-    const orderDetails = {
-      deliveryMethod,
-      selectedLocation: deliveryMethod === "pickup" ? selectedStore : null,
-      selectedAddress: deliveryMethod === "delivery" ? selectedAddress : null,
-      newAddress: deliveryMethod === "delivery" && showNewAddressForm ? newAddress : null,
-      selectedDeliveryCompany: deliveryMethod === "russia" ? selectedDeliveryCompany : null,
-      recipientInfo: deliveryMethod === "russia" ? recipientInfo : null,
-      paymentType,
-      selectedPayment,
-      selectedCard: selectedPayment === "card" ? selectedCard : null,
+    // Генерируем номер заказа
+    const orderNumber = `P${Math.floor(100000 + Math.random() * 900000)}`
+
+    // Определяем способ доставки и адрес
+    let deliveryMethodName = "Самовывоз"
+    let deliveryAddress = ""
+
+    if (deliveryMethod === "pickup") {
+      deliveryMethodName = "Самовывоз"
+      const store = stores.find(s => s.id === selectedStore)
+      deliveryAddress = store ? store.address : ""
+    } else if (deliveryMethod === "delivery") {
+      deliveryMethodName = "Доставка"
+      if (showNewAddressForm) {
+        deliveryAddress = `${newAddress.city}, ${newAddress.street}`
+      } else {
+        const address = savedAddresses.find(a => a.id === selectedAddress)
+        deliveryAddress = address ? `${address.city}, ${address.street}` : ""
+      }
+    } else if (deliveryMethod === "russia") {
+      deliveryMethodName = "Доставка по России"
+      deliveryAddress = `${newAddress.region || ""}, ${newAddress.city}, ${newAddress.street}`
     }
 
-    // Save to localStorage for the next page
-    localStorage.setItem("orderDetails", JSON.stringify(orderDetails))
+    // Формируем данные заказа
+    const orderData = {
+      orderNumber,
+      status: "зарезервировано",
+      items: items.map(item => ({
+        id: item.id,
+        name: item.name || `${item.brand || ""} ${item.model || ""}`,
+        brand: item.brand || "",
+        size: `${item.width || ""}/${item.height || ""} R${item.diam || item.diameter || ""}`,
+        quantity: item.quantity,
+        price: item.price || item.rrc || 0,
+        image: item.image || "/images/summer-tire-new.png",
+      })),
+      totalAmount: total,
+      subtotal,
+      pointsUsed: appliedPointsDiscount,
+      deliveryCost,
+      createdAt: new Date().toISOString(),
+      customer: {
+        name: customer.name,
+        phone: customer.phone,
+        email: customer.email,
+      },
+      isPaid: false,
+      deliveryMethod: deliveryMethodName,
+      deliveryAddress,
+      selectedDeliveryCompany: deliveryMethod === "russia" ? deliveryCompanies.find(c => c.id === selectedDeliveryCompany)?.name : null,
+      recipientInfo: deliveryMethod === "russia" ? recipientInfo : null,
+    }
+
+    // Сохраняем заказ в localStorage
+    localStorage.setItem("currentOrder", JSON.stringify(orderData))
+
+    // Сохраняем в историю заказов
+    const ordersHistory = JSON.parse(localStorage.getItem("ordersHistory") || "[]")
+    ordersHistory.unshift(orderData)
+    localStorage.setItem("ordersHistory", JSON.stringify(ordersHistory))
+
+    // Очищаем корзину
+    localStorage.removeItem("cart")
+    window.dispatchEvent(new Event("cartUpdated"))
 
     // Navigate to the next step
     router.push("/order/complete")
@@ -371,9 +442,10 @@ export default function OrderPage() {
 
   // Обработчик изменений в полях данных покупателя
   const handleCustomerChange = (field: string, value: string) => {
+    const finalValue = field === "phone" ? formatPhone(value) : value
     setEditedCustomer((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: finalValue,
     }))
   }
 
@@ -741,7 +813,7 @@ export default function OrderPage() {
                                       name="store"
                                       value={store.id}
                                       checked={true}
-                                      className="mt-1"
+                                      className="mt-1 accent-sky-400"
                                       readOnly
                                     />
                                     <div className="flex-1">
@@ -783,7 +855,7 @@ export default function OrderPage() {
                                     value={store.id}
                                     checked={selectedStore === store.id}
                                     onChange={(e) => setSelectedStore(e.target.value)}
-                                    className="mt-1"
+                                    className="mt-1 accent-sky-400"
                                   />
                                   <div className="flex-1">
                                     <div className="font-medium">{store.name}</div>
@@ -832,7 +904,7 @@ export default function OrderPage() {
                                     value={address.id}
                                     checked={selectedAddress === address.id}
                                     onChange={() => handleAddressSelect(address.id)}
-                                    className="mr-3 mt-1"
+                                    className="mr-3 mt-1 accent-sky-400"
                                   />
                                   <div>
                                     <div className="font-medium text-white">{address.name}</div>
@@ -892,7 +964,7 @@ export default function OrderPage() {
                                   type="checkbox"
                                   checked={newAddress.isDefault}
                                   onChange={(e) => handleAddressChange("isDefault", e.target.checked.toString())}
-                                  className="mr-2"
+                                  className="mr-2 accent-sky-400"
                                 />
                                 Сделать адресом по умолчанию
                               </label>
@@ -978,7 +1050,7 @@ export default function OrderPage() {
                                   value={company.id}
                                   checked={selectedDeliveryCompany === company.id}
                                   onChange={(e) => setSelectedDeliveryCompany(Number(e.target.value))}
-                                  className="mr-3"
+                                  className="mr-3 accent-sky-400"
                                 />
                                 <div>
                                   <div className="font-medium text-white">{company.name}</div>
@@ -1003,7 +1075,7 @@ export default function OrderPage() {
                               type="checkbox"
                               checked={useCustomerAsRecipient}
                               onChange={(e) => handleUseCustomerAsRecipient(e.target.checked)}
-                              className="mr-2"
+                              className="mr-2 accent-sky-400"
                             />
                             Получатель совпадает с покупателем
                           </label>

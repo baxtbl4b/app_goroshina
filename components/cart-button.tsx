@@ -47,7 +47,7 @@ export default function CartButton({ className = "" }: CartButtonProps) {
     setIsAnimating(true)
     setTimeout(() => {
       setIsAnimating(false)
-      router.push("/order/checkout")
+      router.push("/order")
     }, 300)
   }
 

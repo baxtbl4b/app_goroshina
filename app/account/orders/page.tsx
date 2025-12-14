@@ -31,13 +31,39 @@ export default function OrdersPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
 
-  // Загрузка заказов (имитация)
+  // Загрузка заказов
   useEffect(() => {
     const loadOrders = () => {
       setIsLoading(true)
 
       try {
         const allOrders: Order[] = []
+
+        // Загружаем заказы из истории (оформленные через корзину)
+        const ordersHistory = localStorage.getItem("ordersHistory")
+        if (ordersHistory) {
+          const historyOrders = JSON.parse(ordersHistory)
+          historyOrders.forEach((order: any) => {
+            // Определяем статус
+            let status: OrderStatus = "в обработке"
+            if (order.status === "зарезервировано") status = "подтвержден"
+            if (order.isPaid) status = "выполнен"
+
+            allOrders.push({
+              id: order.orderNumber,
+              orderNumber: order.orderNumber,
+              date: new Date(order.createdAt).toLocaleDateString("ru-RU"),
+              status,
+              items: order.items?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0,
+              total: `${order.totalAmount?.toLocaleString("ru-RU") || 0} ₽`,
+              products: order.items?.map((item: any) => ({
+                name: item.name,
+                quantity: item.quantity,
+                image: item.image || "/images/summer-tire-new.png",
+              })) || [],
+            })
+          })
+        }
 
         // Загружаем заказы покраски
         const paintingOrder = localStorage.getItem("paintingOrderData")
@@ -61,23 +87,20 @@ export default function OrdersPage() {
 
         // Загружаем заказы шиномонтажа
         const tireMountingOrder = localStorage.getItem("tireMountingOrderData")
-        console.log("Загружаем заказы шиномонтажа:", tireMountingOrder) // Отладка
         if (tireMountingOrder) {
           const order = JSON.parse(tireMountingOrder)
-          console.log("Парсим заказ шиномонтажа:", order) // Отладка
           allOrders.push({
             id: order.orderNumber || `TM${Date.now()}`,
             orderNumber: order.orderNumber || `TM${Date.now()}`,
-            date: new Date().toLocaleDateString("ru-RU"), // Используем текущую дату
+            date: new Date().toLocaleDateString("ru-RU"),
             status: "подтвержден",
             items: Object.keys(order.services || {}).length || 1,
             total: `${order.totalPrice || 0} ₽`,
             products: [{ name: "Шиномонтаж", quantity: 1, image: "/images/shinomontazh-new.png" }],
           })
-          console.log("Добавлен заказ шиномонтажа в список:", allOrders[allOrders.length - 1]) // Отладка
         }
 
-        // Загружаем заказ���� дошиповки
+        // Загружаем заказы дошиповки
         const studdingOrder = localStorage.getItem("studdingOrderData")
         if (studdingOrder) {
           const order = JSON.parse(studdingOrder)
@@ -107,55 +130,21 @@ export default function OrdersPage() {
           })
         }
 
-        // Если нет реальных заказов, показываем демо-данные
-        if (allOrders.length === 0) {
-          const demoOrders: Order[] = [
-            {
-              id: "TM001",
-              orderNumber: "TM001",
-              date: new Date().toLocaleDateString("ru-RU"),
-              status: "подтвержден",
-              items: 3,
-              total: "2 500 ₽",
-              products: [{ name: "Записаться на шиномонтаж", quantity: 1, image: "/images/shinomontazh-new.png" }],
-            },
-            {
-              id: "1",
-              orderNumber: "P123456",
-              date: "20.04.2025",
-              status: "выполнен",
-              items: 4,
-              total: "32 000 ₽",
-              products: [
-                { name: "Michelin Pilot Sport 4", quantity: 2, image: "/images/michelin-tire.png" },
-                { name: "Continental PremiumContact 6", quantity: 2, image: "/images/continental-tire.png" },
-              ],
-            },
-            {
-              id: "2",
-              orderNumber: "P123457",
-              date: "15.04.2025",
-              status: "доставляется",
-              items: 2,
-              total: "15 600 ₽",
-              products: [{ name: "Pirelli P Zero", quantity: 2, image: "/images/pirelli-tire.png" }],
-            },
-          ]
-          allOrders.push(...demoOrders)
-        }
-
         // Сортируем заказы по дате (новые сначала)
-        allOrders.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        allOrders.sort((a, b) => {
+          const dateA = a.date.split('.').reverse().join('-')
+          const dateB = b.date.split('.').reverse().join('-')
+          return new Date(dateB).getTime() - new Date(dateA).getTime()
+        })
 
         setOrders(allOrders)
       } catch (error) {
         console.error("Ошибка при загрузке заказов:", error)
         setOrders([])
       } finally {
-        // Имитация задержки загрузки
         setTimeout(() => {
           setIsLoading(false)
-        }, 800)
+        }, 500)
       }
     }
 
@@ -168,6 +157,8 @@ export default function OrdersPage() {
     localStorage.removeItem("tireMountingOrderData")
     localStorage.removeItem("studdingOrderData")
     localStorage.removeItem("tireStorageOrderData")
+    localStorage.removeItem("ordersHistory")
+    localStorage.removeItem("currentOrder")
     window.location.reload()
   }
 
