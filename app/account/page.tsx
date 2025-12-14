@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useFormStatus } from "react-dom"
-import { Award, ChevronRight, Plus, ShoppingBag, Settings, Car, Heart, Clock, Star, LogOut, User, Phone, Camera } from "lucide-react"
+import { Award, ChevronRight, ChevronLeft, Plus, ShoppingBag, Settings, Car, Heart, Clock, Star, LogOut, User, Phone, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "@/components/ui/use-toast"
@@ -318,12 +318,21 @@ export default function AccountPage() {
     <div className="min-h-screen bg-[#121212]">
       {/* Custom Header */}
       <header className="sticky top-0 z-50 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
-        <div className="h-full px-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-white">Профиль</h1>
+        <div className="h-full px-2 flex items-center justify-between">
+          <div className="flex items-center">
+            <button
+              onClick={() => router.back()}
+              className="p-2 transition-colors"
+              aria-label="Назад"
+            >
+              <ChevronLeft className="h-6 w-6 text-gray-300" />
+            </button>
+            <h1 className="text-xl font-bold text-white">Профиль</h1>
+          </div>
           <Link href="/settings">
-            <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white/10">
+            <button className="p-2 transition-colors" aria-label="Настройки">
               <Settings className="h-5 w-5 text-gray-400" />
-            </Button>
+            </button>
           </Link>
         </div>
       </header>
@@ -380,14 +389,14 @@ export default function AccountPage() {
 
             {/* Loyalty Stats */}
             <div className="mt-5 flex gap-3">
-              <div className="flex-1 bg-[#1F1F1F] rounded-2xl p-3">
+              <div className="flex-1 bg-[#1F1F1F] rounded-2xl p-3 flex flex-col items-center justify-center text-center">
                 <div className="flex items-center gap-2 mb-1">
                   <Award className="w-4 h-4 text-[#D3DF3D]" />
                   <span className="text-xs text-gray-400">Статус</span>
                 </div>
                 <p className="text-white font-semibold">{user.loyaltyLevel}</p>
               </div>
-              <div className="flex-1 bg-[#1F1F1F] rounded-2xl p-3">
+              <div className="flex-1 bg-[#1F1F1F] rounded-2xl p-3 flex flex-col items-center justify-center text-center">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-4 h-4 rounded-full bg-[#D3DF3D]" />
                   <span className="text-xs text-gray-400">Баллы</span>

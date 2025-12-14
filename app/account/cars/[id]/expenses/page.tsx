@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, Calendar, Car, Plus, PenToolIcon as Tool, TrendingUp } from "lucide-react"
+import { ChevronLeft, Calendar, Car, Plus, PenToolIcon as Tool, TrendingUp } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -81,13 +81,15 @@ export default function CarExpensesPage() {
   return (
     <main className="flex flex-col min-h-screen bg-[#121212]">
       <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
-        <div className="h-full px-4 flex items-center">
-          <Button variant="ghost" size="icon" className="mr-2" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5 text-white" />
-          </Button>
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-white">Расходы на автомобиль</span>
-          </div>
+        <div className="h-full px-2 flex items-center">
+          <button
+            onClick={() => router.back()}
+            className="p-2 transition-colors"
+            aria-label="Назад"
+          >
+            <ChevronLeft className="h-6 w-6 text-gray-300" />
+          </button>
+          <span className="text-xl font-bold text-white">Расходы на автомобиль</span>
         </div>
       </header>
 

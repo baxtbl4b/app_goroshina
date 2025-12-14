@@ -1,4 +1,7 @@
-import { ArrowLeft, Car, Save } from "lucide-react"
+"use client"
+
+import { ChevronLeft, Car, Save } from "lucide-react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -7,18 +10,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 
 export default function EditCarPage() {
+  const router = useRouter()
+
   return (
     <main className="flex flex-col min-h-screen bg-[#121212]">
       <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
-        <div className="h-full px-4 flex items-center">
-          <Link href="/account/cars/1">
-            <Button variant="ghost" size="icon" className="mr-2">
-              <ArrowLeft className="h-5 w-5 text-white" />
-            </Button>
-          </Link>
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-white">Редактирование автомобиля</span>
-          </div>
+        <div className="h-full px-2 flex items-center">
+          <button
+            onClick={() => router.back()}
+            className="p-2 transition-colors"
+            aria-label="Назад"
+          >
+            <ChevronLeft className="h-6 w-6 text-gray-300" />
+          </button>
+          <span className="text-xl font-bold text-white">Редактирование автомобиля</span>
         </div>
       </header>
 

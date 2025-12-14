@@ -38,12 +38,7 @@ interface CartItem {
   cargo?: boolean | number | string
 }
 
-// Данные покупателя по умолчанию
-const defaultCustomer = {
-  name: "",
-  phone: "",
-  email: "",
-}
+// Данные покупателя по умолчанию (будут загружены из профиля)
 
 // Mock saved cards data
 const savedCards = [
@@ -161,8 +156,17 @@ export default function OrderPage() {
   const [items, setItems] = useState<CartItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // Данные покупателя
-  const [customer, setCustomer] = useState(defaultCustomer)
+  // Данные покупателя (из профиля пользователя)
+  const [customer, setCustomer] = useState({
+    name: "",
+    phone: "",
+    email: "",
+  })
+  const [editedCustomer, setEditedCustomer] = useState({
+    name: "",
+    phone: "",
+    email: "",
+  })
 
   // Загрузка корзины из localStorage при монтировании
   useEffect(() => {
@@ -191,18 +195,40 @@ export default function OrderPage() {
     }
   }, [])
 
-  // Загрузка баллов пользователя
+  // Загрузка баллов пользователя и данных покупателя из профиля
   useEffect(() => {
-    const loadUserPoints = () => {
+    const loadUserData = () => {
       const user = getUser()
       setUserPoints(user.loyaltyPoints)
+
+      // Загружаем данные покупателя из профиля
+      setCustomer({
+        name: user.name || "",
+        phone: user.phone || "",
+        email: user.email || "",
+      })
+      setEditedCustomer({
+        name: user.name || "",
+        phone: user.phone || "",
+        email: user.email || "",
+      })
     }
 
-    loadUserPoints()
+    loadUserData()
 
     // Слушаем изменения данных пользователя
     const handleUserUpdate = (event: CustomEvent) => {
       setUserPoints(event.detail.loyaltyPoints)
+      setCustomer({
+        name: event.detail.name || "",
+        phone: event.detail.phone || "",
+        email: event.detail.email || "",
+      })
+      setEditedCustomer({
+        name: event.detail.name || "",
+        phone: event.detail.phone || "",
+        email: event.detail.email || "",
+      })
     }
     window.addEventListener("userUpdated", handleUserUpdate as EventListener)
 
@@ -467,11 +493,6 @@ export default function OrderPage() {
   const deliveryCost = getDeliveryCost()
 
   const [isEditingCustomer, setIsEditingCustomer] = useState(false)
-  const [editedCustomer, setEditedCustomer] = useState({
-    name: customer.name,
-    phone: customer.phone,
-    email: customer.email,
-  })
 
   // Обработчик изменений в полях данных покупателя
   const handleCustomerChange = (field: string, value: string) => {

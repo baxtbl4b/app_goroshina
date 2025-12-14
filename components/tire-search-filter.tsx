@@ -57,30 +57,87 @@ export default function TireSearchFilter({ season }: { season: Season }) {
   )
 
 
-  // Add mock data for user's vehicles
-  const userVehicles: VehicleWithTires[] = [
-    {
-      id: "1",
-      name: "Toyota Camry",
-      tireSize: {
-        width: "225",
-        profile: "45",
-        diameter: "17",
-      },
-    },
-    {
-      id: "2",
-      name: "VW Tiguan",
-      tireSize: {
-        width: "235",
-        profile: "55",
-        diameter: "18",
-      },
-    },
-  ]
+  // State for user's vehicles from localStorage
+  const [userVehicles, setUserVehicles] = useState<VehicleWithTires[]>([])
+
+  // Load user vehicles from localStorage with season-specific tire sizes
+  useEffect(() => {
+    const loadUserCars = () => {
+      try {
+        const storedCars = JSON.parse(localStorage.getItem("userCars") || "[]")
+        const vehicles: VehicleWithTires[] = storedCars.map((car: any) => {
+          // Determine which tire size to use based on current season
+          // "w" = winter, "s" = summer, "a" = all-season (use summer as default)
+          const useWinter = season === "w"
+
+          let width = ""
+          let profile = ""
+          let diameter = ""
+
+          if (useWinter) {
+            // For winter season, prefer winter tires, fallback to summer
+            width = car.winterTireWidth || car.summerTireWidth || ""
+            profile = car.winterTireProfile || car.summerTireProfile || ""
+            diameter = car.winterTireDiameter || car.summerTireDiameter || ""
+          } else {
+            // For summer or all-season, prefer summer tires, fallback to winter
+            width = car.summerTireWidth || car.winterTireWidth || ""
+            profile = car.summerTireProfile || car.winterTireProfile || ""
+            diameter = car.summerTireDiameter || car.winterTireDiameter || ""
+          }
+
+          return {
+            id: car.id,
+            name: `${car.brand} ${car.model}`,
+            tireSize: { width, profile, diameter },
+          }
+        }).filter((v: VehicleWithTires) => v.tireSize.width && v.tireSize.profile && v.tireSize.diameter)
+        setUserVehicles(vehicles)
+      } catch (error) {
+        console.error("Error loading user cars:", error)
+        setUserVehicles([])
+      }
+    }
+
+    loadUserCars()
+
+    // Listen for storage changes (when user adds/removes cars)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "userCars") {
+        loadUserCars()
+      }
+    }
+
+    // Also listen for focus to reload when user navigates back
+    const handleFocus = () => {
+      loadUserCars()
+    }
+
+    window.addEventListener("storage", handleStorageChange)
+    window.addEventListener("focus", handleFocus)
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange)
+      window.removeEventListener("focus", handleFocus)
+    }
+  }, [season])
 
   // Add state for selected vehicle and tire size values
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null)
+
+  // Update tire sizes when season changes and a vehicle is selected
+  useEffect(() => {
+    if (selectedVehicle && userVehicles.length > 0) {
+      const vehicle = userVehicles.find(v => v.id === selectedVehicle)
+      if (vehicle) {
+        setWidth(vehicle.tireSize.width)
+        setProfile(vehicle.tireSize.profile)
+        setDiameter(vehicle.tireSize.diameter)
+        // Apply the filter with new season-specific tire sizes
+        applyDimensionFilter(vehicle.tireSize.width, vehicle.tireSize.profile, vehicle.tireSize.diameter)
+      }
+    }
+  }, [userVehicles, season])
 
   // Add these state variables inside the TireSearchFilter component, after the existing useState declarations
   const [priceRange, setPriceRange] = useState<[number, number]>(() => {
@@ -1064,19 +1121,28 @@ onTouchStart={(e) => {
                   onScroll={handleGarageScroll}
                   className="flex gap-1 overflow-x-auto scrollbar-hide mb-1 px-1"
                 >
-                  {userVehicles.map((vehicle) => (
-                    <button
-                      key={vehicle.id}
-                      onClick={() => selectVehicle(vehicle)}
-                      className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
-                        selectedVehicle === vehicle.id
-                          ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
-                          : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
-                      }`}
+                  {userVehicles.length > 0 ? (
+                    userVehicles.map((vehicle) => (
+                      <button
+                        key={vehicle.id}
+                        onClick={() => selectVehicle(vehicle)}
+                        className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
+                          selectedVehicle === vehicle.id
+                            ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
+                            : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                        }`}
+                      >
+                        {vehicle.name}
+                      </button>
+                    ))
+                  ) : (
+                    <a
+                      href="/account/cars/add"
+                      className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#D3DF3D] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
                     >
-                      {vehicle.name}
-                    </button>
-                  ))}
+                      + Добавить авто
+                    </a>
+                  )}
                 </div>
                 {/* Right gradient fade-out overlay */}
                 <div
