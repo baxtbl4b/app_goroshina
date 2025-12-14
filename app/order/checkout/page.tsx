@@ -73,22 +73,49 @@ export default function CheckoutPage() {
     }
   }, [router])
 
-  // Handle place order
-  const handlePlaceOrder = () => {
-    // In a real app, this would submit the order to the backend
-    console.log("Placing order with details:", {
-      orderDetails,
-    })
-
-    // Navigate to order complete page
-    router.push("/order/complete")
-  }
-
   // Calculate delivery cost
   const deliveryCost = orderDetails?.deliveryMethod === "delivery" ? 500 : 0
 
   // Calculate total
   const totalCost = orderData.total + deliveryCost
+
+  // Handle place order
+  const handlePlaceOrder = () => {
+    // Create new order
+    const newOrder = {
+      id: `ORD-${Date.now()}`,
+      date: new Date().toISOString(),
+      status: "processing",
+      items: orderData.items,
+      itemsCount: orderData.items.reduce((acc, item) => acc + item.quantity, 0),
+      subtotal: orderData.subtotal,
+      discount: orderData.discount,
+      deliveryCost: deliveryCost,
+      total: totalCost,
+      deliveryMethod: orderDetails?.deliveryMethod,
+      deliveryAddress: orderDetails?.address,
+      paymentMethod: orderDetails?.paymentMethod,
+    }
+
+    // Save order to localStorage
+    try {
+      const existingOrders = JSON.parse(localStorage.getItem("userOrders") || "[]")
+      existingOrders.unshift(newOrder) // Add new order at the beginning
+      localStorage.setItem("userOrders", JSON.stringify(existingOrders))
+
+      // Save current order ID for complete page
+      localStorage.setItem("lastOrderId", newOrder.id)
+
+      // Clear cart after successful order
+      localStorage.removeItem("cart")
+      window.dispatchEvent(new Event("cartUpdated"))
+    } catch (error) {
+      console.error("Error saving order:", error)
+    }
+
+    // Navigate to order complete page
+    router.push("/order/complete")
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#222222] dark:bg-[#1A1A1A]">

@@ -248,7 +248,7 @@ export default function CarsListPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Отм��на</AlertDialogCancel>
+            <AlertDialogCancel>Отмена</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-red-500 hover:bg-red-600 text-white">
               Удалить
             </AlertDialogAction>

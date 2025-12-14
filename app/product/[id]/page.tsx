@@ -9,7 +9,6 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import BottomNavigation from "@/components/bottom-navigation"
 import CartButton from "@/components/cart-button"
 import { useParams, useRouter } from "next/navigation"
 import type { Tire } from "@/lib/api"
@@ -1103,8 +1102,6 @@ export default function ProductPage() {
           </Tabs>
         </div>
       </div>
-
-      <BottomNavigation />
 
       {/* Share Menu Modal */}
       {showShareMenu && (
