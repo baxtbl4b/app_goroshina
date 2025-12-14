@@ -113,12 +113,19 @@ export default function TireSearchFilter({ season }: { season: Season }) {
       loadUserCars()
     }
 
+    // Listen for custom event when cars are updated in the same tab
+    const handleCarsUpdated = () => {
+      loadUserCars()
+    }
+
     window.addEventListener("storage", handleStorageChange)
     window.addEventListener("focus", handleFocus)
+    window.addEventListener("userCarsUpdated", handleCarsUpdated)
 
     return () => {
       window.removeEventListener("storage", handleStorageChange)
       window.removeEventListener("focus", handleFocus)
+      window.removeEventListener("userCarsUpdated", handleCarsUpdated)
     }
   }, [season])
 

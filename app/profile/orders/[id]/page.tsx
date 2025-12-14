@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Image from "next/image"
 import {
-  ChevronLeft,
   CheckCircle,
   Clock,
   AlertCircle,
@@ -17,6 +16,7 @@ import {
   Globe,
   Package,
 } from "lucide-react"
+import { BackButton } from "@/components/back-button"
 
 import { Button } from "@/components/ui/button"
 import { formatPrice } from "@/lib/utils"
@@ -168,13 +168,7 @@ export default function OrderDetailsPage() {
       <header className="sticky top-0 z-50 bg-[#1F1F1F] pr-4 shadow-sm h-[60px] flex items-center">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
-            <button
-              onClick={() => router.back()}
-              className="p-2 transition-colors"
-              aria-label="Назад"
-            >
-              <ChevronLeft className="h-5 w-5 text-white" />
-            </button>
+            <BackButton />
             <span className="text-xl font-bold text-white">Детали заказа</span>
           </div>
         </div>

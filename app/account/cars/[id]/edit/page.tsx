@@ -1,8 +1,9 @@
 "use client"
 
-import { ChevronLeft, Car, Save } from "lucide-react"
+import { Car, Save } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { BackButton } from "@/components/back-button"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,13 +17,7 @@ export default function EditCarPage() {
     <main className="flex flex-col min-h-screen bg-[#121212]">
       <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-2 flex items-center">
-          <button
-            onClick={() => router.back()}
-            className="p-2 transition-colors"
-            aria-label="Назад"
-          >
-            <ChevronLeft className="h-6 w-6 text-gray-300" />
-          </button>
+          <BackButton />
           <span className="text-xl font-bold text-white">Редактирование автомобиля</span>
         </div>
       </header>

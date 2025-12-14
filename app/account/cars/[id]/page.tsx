@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { ChevronLeft, Calendar, Car, ChevronRight, Edit, PenToolIcon as Tool, Wrench, Sun, Snowflake, Trash2 } from "lucide-react"
+import { Calendar, Car, ChevronRight, Edit, PenToolIcon as Tool, Wrench, Sun, Snowflake, Trash2 } from "lucide-react"
 import Link from "next/link"
+import { BackButton } from "@/components/back-button"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -82,6 +83,7 @@ export default function CarDetailsPage() {
       const storedCars = JSON.parse(localStorage.getItem("userCars") || "[]")
       const updatedCars = storedCars.filter((c: CarData) => c.id !== carId)
       localStorage.setItem("userCars", JSON.stringify(updatedCars))
+      window.dispatchEvent(new CustomEvent("userCarsUpdated"))
       router.push("/account/cars")
     } catch (error) {
       console.error("Ошибка при удалении автомобиля:", error)
@@ -113,13 +115,7 @@ export default function CarDetailsPage() {
       <main className="flex flex-col min-h-screen bg-[#121212]">
         <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
           <div className="h-full px-2 flex items-center">
-            <button
-              onClick={() => router.back()}
-              className="p-2 transition-colors"
-              aria-label="Назад"
-            >
-              <ChevronLeft className="h-6 w-6 text-gray-300" />
-            </button>
+            <BackButton />
             <span className="text-lg font-semibold text-white">Загрузка...</span>
           </div>
         </header>
@@ -135,13 +131,7 @@ export default function CarDetailsPage() {
       <main className="flex flex-col min-h-screen bg-[#121212]">
         <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
           <div className="h-full px-2 flex items-center">
-            <button
-              onClick={() => router.back()}
-              className="p-2 transition-colors"
-              aria-label="Назад"
-            >
-              <ChevronLeft className="h-6 w-6 text-gray-300" />
-            </button>
+            <BackButton />
             <span className="text-lg font-semibold text-white">Автомобиль не найден</span>
           </div>
         </header>
@@ -166,13 +156,7 @@ export default function CarDetailsPage() {
       <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-2 flex items-center justify-between">
           <div className="flex items-center">
-            <button
-              onClick={() => router.back()}
-              className="p-2 transition-colors"
-              aria-label="Назад"
-            >
-              <ChevronLeft className="h-6 w-6 text-gray-300" />
-            </button>
+            <BackButton />
             <span className="text-lg font-semibold text-white truncate">
               {car.brand} {car.model}
             </span>

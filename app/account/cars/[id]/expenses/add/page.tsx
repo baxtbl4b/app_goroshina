@@ -2,8 +2,9 @@
 
 import type React from "react"
 
-import { ChevronLeft, Car, Plus } from "lucide-react"
+import { Car, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { BackButton } from "@/components/back-button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -63,13 +64,7 @@ export default function AddExpensePage() {
     <main className="flex flex-col min-h-screen bg-[#121212]">
       <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-2 flex items-center">
-          <button
-            onClick={() => router.back()}
-            className="p-2 transition-colors"
-            aria-label="Назад"
-          >
-            <ChevronLeft className="h-6 w-6 text-gray-300" />
-          </button>
+          <BackButton />
           <span className="text-xl font-bold text-white">Добавление расхода</span>
         </div>
       </header>

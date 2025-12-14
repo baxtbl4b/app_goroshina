@@ -3,8 +3,9 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { ChevronLeft, Heart, Truck, ShieldCheck, Info, Star } from "lucide-react"
+import { Heart, Truck, ShieldCheck, Info, Star } from "lucide-react"
 import Link from "next/link"
+import { BackButton } from "@/components/back-button"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -752,13 +753,7 @@ export default function ProductPage() {
       <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] pr-4 shadow-sm h-[60px] flex items-center">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
-            <button
-              onClick={() => router.back()}
-              className="p-2 transition-colors"
-              aria-label="Назад"
-            >
-              <ChevronLeft className="h-5 w-5 text-white" />
-            </button>
+            <BackButton />
             <div className="flex items-center gap-2">
               <span className="text-xl font-bold text-white">Карточка товара</span>
             </div>

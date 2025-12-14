@@ -5,7 +5,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useFormStatus } from "react-dom"
-import { Award, ChevronRight, ChevronLeft, Plus, ShoppingBag, Settings, Car, Heart, Clock, Star, LogOut, User, Phone, Camera } from "lucide-react"
+import { Award, ChevronRight, Plus, ShoppingBag, Settings, Car, Heart, Clock, Star, LogOut, User, Phone, Camera, Pencil, X, Check } from "lucide-react"
+import { BackButton } from "@/components/back-button"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "@/components/ui/use-toast"
@@ -62,6 +63,12 @@ export default function AccountPage() {
   const [carsLoaded, setCarsLoaded] = useState(false)
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
 
+  // Состояния для редактирования профиля
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
+  const [editName, setEditName] = useState("")
+  const [editPhone, setEditPhone] = useState("")
+  const [isSavingProfile, setIsSavingProfile] = useState(false)
+
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -114,6 +121,50 @@ export default function AccountPage() {
       ...prev,
       [carId]: !prev[carId],
     }))
+  }
+
+  const startEditingProfile = () => {
+    setEditName(user.name)
+    setEditPhone(user.phone)
+    setIsEditingProfile(true)
+  }
+
+  const cancelEditingProfile = () => {
+    setIsEditingProfile(false)
+    setEditName("")
+    setEditPhone("")
+  }
+
+  const saveProfile = () => {
+    if (!editName.trim()) {
+      toast({
+        title: "Ошибка",
+        description: "Введите имя",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsSavingProfile(true)
+
+    // Сохраняем обновленные данные
+    const updatedUser = {
+      ...user,
+      name: editName.trim(),
+      phone: editPhone.trim(),
+    }
+
+    saveUser(updatedUser)
+    setUser(updatedUser)
+
+    toast({
+      title: "Успешно",
+      description: "Данные профиля обновлены",
+      variant: "default",
+    })
+
+    setIsSavingProfile(false)
+    setIsEditingProfile(false)
   }
 
   const handleSave = async () => {
@@ -320,13 +371,7 @@ export default function AccountPage() {
       <header className="sticky top-0 z-50 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-2 flex items-center justify-between">
           <div className="flex items-center">
-            <button
-              onClick={() => router.back()}
-              className="p-2 transition-colors"
-              aria-label="Назад"
-            >
-              <ChevronLeft className="h-6 w-6 text-gray-300" />
-            </button>
+            <BackButton />
             <h1 className="text-xl font-bold text-white">Профиль</h1>
           </div>
           <Link href="/settings">
@@ -382,9 +427,57 @@ export default function AccountPage() {
               </div>
               {/* User Info */}
               <div className="flex-1">
-                <h2 className="text-lg font-bold text-white">{user.name}</h2>
-                <p className="text-gray-400 text-sm">{user.phone}</p>
+                {isEditingProfile ? (
+                  <div className="space-y-2">
+                    <Input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      placeholder="Имя"
+                      className="h-9 bg-[#1F1F1F] border-0 text-white rounded-xl text-sm"
+                    />
+                    <Input
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      placeholder="Телефон"
+                      className="h-9 bg-[#1F1F1F] border-0 text-white rounded-xl text-sm"
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <h2 className="text-lg font-bold text-white">{user.name}</h2>
+                    <p className="text-gray-400 text-sm">{user.phone}</p>
+                  </>
+                )}
               </div>
+              {/* Edit Button */}
+              {isEditingProfile ? (
+                <div className="flex gap-2">
+                  <button
+                    onClick={cancelEditingProfile}
+                    className="w-8 h-8 rounded-lg bg-[#1F1F1F] flex items-center justify-center hover:bg-[#333] transition-colors"
+                  >
+                    <X className="w-4 h-4 text-gray-400" />
+                  </button>
+                  <button
+                    onClick={saveProfile}
+                    disabled={isSavingProfile}
+                    className="w-8 h-8 rounded-lg bg-[#D3DF3D] flex items-center justify-center hover:bg-[#C4CF2E] transition-colors disabled:opacity-50"
+                  >
+                    {isSavingProfile ? (
+                      <div className="w-4 h-4 border-2 border-[#1F1F1F] border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Check className="w-4 h-4 text-[#1F1F1F]" />
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={startEditingProfile}
+                  className="w-8 h-8 rounded-lg bg-[#1F1F1F] flex items-center justify-center hover:bg-[#333] transition-colors"
+                >
+                  <Pencil className="w-4 h-4 text-gray-400" />
+                </button>
+              )}
             </div>
 
             {/* Loyalty Stats */}

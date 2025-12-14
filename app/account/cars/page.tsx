@@ -1,8 +1,9 @@
 "use client"
 
-import { ChevronLeft, Car, Plus, Trash2 } from "lucide-react"
+import { Car, Plus, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { BackButton } from "@/components/back-button"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -60,6 +61,7 @@ export default function CarsListPage() {
       const updatedCars = cars.filter((car) => car.id !== carToDelete)
       setCars(updatedCars)
       localStorage.setItem("userCars", JSON.stringify(updatedCars))
+      window.dispatchEvent(new CustomEvent("userCarsUpdated"))
       setCarToDelete(null)
     }
     setIsDeleteDialogOpen(false)
@@ -91,13 +93,7 @@ export default function CarsListPage() {
       <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-2 flex items-center justify-between">
           <div className="flex items-center">
-            <button
-              onClick={() => router.back()}
-              className="p-2 transition-colors"
-              aria-label="Назад"
-            >
-              <ChevronLeft className="h-6 w-6 text-gray-300" />
-            </button>
+            <BackButton />
             <span className="text-xl font-bold text-white">Мои автомобили</span>
           </div>
 

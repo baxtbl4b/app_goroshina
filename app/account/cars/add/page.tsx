@@ -3,8 +3,9 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { ChevronLeft, Car, Plus, Search, Loader2 } from "lucide-react"
+import { Car, Plus, Search, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { BackButton } from "@/components/back-button"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -447,6 +448,9 @@ export default function AddCarPage() {
       const updatedCars = [...existingCars, newCar]
       localStorage.setItem("userCars", JSON.stringify(updatedCars))
 
+      // Отправляем событие об обновлении списка машин
+      window.dispatchEvent(new CustomEvent("userCarsUpdated"))
+
       // Возвращаемся на предыдущую страницу
       router.back()
     } catch (error) {
@@ -461,13 +465,7 @@ export default function AddCarPage() {
     <main className="flex flex-col min-h-screen bg-[#121212]">
       <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-2 flex items-center">
-          <button
-            onClick={() => router.back()}
-            className="p-2 transition-colors"
-            aria-label="Назад"
-          >
-            <ChevronLeft className="h-6 w-6 text-gray-300" />
-          </button>
+          <BackButton />
           <span className="text-xl font-bold text-white">Добавление автомобиля</span>
         </div>
       </header>

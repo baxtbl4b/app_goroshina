@@ -1,7 +1,8 @@
 "use client"
 
-import { ChevronLeft, Save, PenToolIcon as Tool } from "lucide-react"
+import { Save, PenToolIcon as Tool } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { BackButton } from "@/components/back-button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
@@ -15,13 +16,7 @@ export default function EditTiresPage() {
     <main className="flex flex-col min-h-screen bg-[#121212]">
       <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-2 flex items-center">
-          <button
-            onClick={() => router.back()}
-            className="p-2 transition-colors"
-            aria-label="Назад"
-          >
-            <ChevronLeft className="h-6 w-6 text-gray-300" />
-          </button>
+          <BackButton />
           <span className="text-xl font-bold text-white">Редактирование шин и дисков</span>
         </div>
       </header>

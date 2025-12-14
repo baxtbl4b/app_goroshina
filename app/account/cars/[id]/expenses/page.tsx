@@ -1,7 +1,8 @@
 "use client"
 
-import { ChevronLeft, Calendar, Car, Plus, PenToolIcon as Tool, TrendingUp } from "lucide-react"
+import { Calendar, Car, Plus, PenToolIcon as Tool, TrendingUp } from "lucide-react"
 import Link from "next/link"
+import { BackButton } from "@/components/back-button"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useRouter } from "next/navigation"
@@ -82,13 +83,7 @@ export default function CarExpensesPage() {
     <main className="flex flex-col min-h-screen bg-[#121212]">
       <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-2 flex items-center">
-          <button
-            onClick={() => router.back()}
-            className="p-2 transition-colors"
-            aria-label="Назад"
-          >
-            <ChevronLeft className="h-6 w-6 text-gray-300" />
-          </button>
+          <BackButton />
           <span className="text-xl font-bold text-white">Расходы на автомобиль</span>
         </div>
       </header>
