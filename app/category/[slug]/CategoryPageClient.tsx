@@ -11,6 +11,7 @@ import TireSearchFilter from "@/components/tire-search-filter"
 import TireResults from "@/components/tire-results"
 import QuickFilterButtons from "@/components/quick-filter-buttons"
 import CartButton from "@/components/cart-button"
+import { BackButton } from "@/components/back-button"
 import { useState, useEffect, useRef } from "react"
 
 interface CategoryPageClientProps {
@@ -463,7 +464,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   const quickFilterActive = searchParams.has("popularSize") && searchParams.has("stock")
 
   return (
-    <main className="flex flex-col h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px] overflow-hidden">
+    <main className="flex flex-col h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[calc(60px+env(safe-area-inset-top))] overflow-hidden">
       <style jsx global>
         {`
           /* Cart button animation */
@@ -980,7 +981,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
       )}
 
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[60px] overflow-visible"
+        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] overflow-visible"
         style={{ "--header-height": "60px" } as React.CSSProperties}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
@@ -988,13 +989,9 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
         onTouchCancel={onTouchCancel}
       >
         <div className="container max-w-md flex items-center justify-center h-full relative overflow-visible">
-          <button
-            onClick={() => router.push("/")}
-            className="fixed left-2 top-[30px] -translate-y-1/2 p-2 transition-colors z-50"
-            aria-label="На главную"
-          >
-            <ChevronLeft className="h-6 w-6 text-gray-700 dark:text-gray-300" />
-          </button>
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 z-50">
+            <BackButton />
+          </div>
 
           {/* Season Horizontal Carousel */}
           {(() => {

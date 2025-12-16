@@ -116,6 +116,7 @@ export default function TireCard({ tire }: TireCardProps) {
   const [imageKey, setImageKey] = useState(0) // Ключ для принудительной перезагрузки изображения
   const [flagError, setFlagError] = useState(false)
   const [isButtonPulsing, setIsButtonPulsing] = useState(false)
+  const [isFavoriteAnimating, setIsFavoriteAnimating] = useState(false)
   const [floatingNumber, setFloatingNumber] = useState<{ x: number; y: number; count: number } | null>(null)
   const addButtonRef = useRef<HTMLButtonElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
@@ -228,6 +229,10 @@ export default function TireCard({ tire }: TireCardProps) {
     // Предотвращаем переход по ссылке при клике на кнопку
     e.preventDefault()
     e.stopPropagation()
+
+    // Запускаем анимацию
+    setIsFavoriteAnimating(true)
+    setTimeout(() => setIsFavoriteAnimating(false), 300)
 
     // Получаем текущий список избранного
     const favorites = JSON.parse(localStorage.getItem("favorites") || "[]")
@@ -657,7 +662,11 @@ export default function TireCard({ tire }: TireCardProps) {
             >
               <Heart
                 className={`h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 transition-colors ${
-                  isFavorite ? "text-red-500 fill-red-500" : "text-gray-400 hover:text-red-500"
+                  isFavoriteAnimating
+                    ? "animate-wiggle text-blue-500 fill-blue-500"
+                    : isFavorite
+                      ? "text-blue-500 fill-blue-500"
+                      : "text-gray-400"
                 }`}
               />
             </Button>

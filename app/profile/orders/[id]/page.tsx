@@ -61,6 +61,33 @@ export default function OrderDetailsPage() {
   const [order, setOrder] = useState<Order | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  // Таймер обратного отсчета для оплаты (5 минут = 300 секунд)
+  const [paymentTimeLeft, setPaymentTimeLeft] = useState(300)
+
+  // Таймер обратного отсчета
+  useEffect(() => {
+    if (paymentTimeLeft <= 0 || order?.isPaid) return
+
+    const timer = setInterval(() => {
+      setPaymentTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [paymentTimeLeft, order?.isPaid])
+
+  // Форматирование времени для отображения
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
   // Загрузка данных заказа
   useEffect(() => {
     const loadOrderDetails = () => {
@@ -179,12 +206,7 @@ export default function OrderDetailsPage() {
             <BackButton />
             <span className="text-xl font-bold text-white">Заказ № {order.orderNumber}</span>
           </div>
-          {isNewOrder && (
-            <div className="flex items-center gap-2 px-3 py-1.5 border border-[#c4d402] rounded-xl">
-              <CheckCircle className="w-4 h-4 text-[#c4d402]" />
-              <span className="text-xs font-medium text-[#c4d402]">Оформлен</span>
-            </div>
-          )}
+          <OrderStatusBadge status={order.status} />
         </div>
       </header>
 
@@ -203,17 +225,24 @@ export default function OrderDetailsPage() {
                 <DateBadge date={order.createdAt} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Статус заказа:</span>
-                <OrderStatusBadge status={order.status} />
-              </div>
-              <div className="flex justify-between items-center">
                 <span className="text-gray-400">Оплата:</span>
                 <PaymentStatusBadge isPaid={order.isPaid} />
               </div>
 
-              {/* Кнопка оплаты */}
+              {/* Кнопка оплаты с таймером */}
               {!order.isPaid && (
                 <div className="pt-3 mt-3">
+                  {paymentTimeLeft > 0 && (
+                    <div className="flex items-center justify-center gap-2 mb-3 p-2 bg-[#c4d402]/10 rounded-xl border border-[#c4d402]/30">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={paymentTimeLeft <= 60 ? '#ef4444' : '#c4d402'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                      <span className={`text-sm ${paymentTimeLeft <= 60 ? 'text-red-500' : 'text-[#c4d402]'}`}>
+                        Дополнительная скидка при оплате в течении <span className="font-bold">{formatTime(paymentTimeLeft)}</span>
+                      </span>
+                    </div>
+                  )}
                   <Button
                     className="w-full py-6 text-base bg-[#c4d402] hover:bg-[#C4CF2E] text-black font-bold rounded-2xl"
                     onClick={() => router.push("/payment")}
@@ -228,8 +257,8 @@ export default function OrderDetailsPage() {
               <div className="pt-3 mt-3">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-gray-400">Товары:</span>
-                  <span className="text-sm text-gray-400">
-                    {order.items.reduce((sum, item) => sum + item.quantity, 0)} шт.
+                  <span className="text-sm text-muted-foreground bg-[#3A3A3A] px-3 py-1 rounded-full">
+                    {order.items.reduce((sum, item) => sum + item.quantity, 0)} шт / {order.items.reduce((sum, item) => sum + item.quantity * 10, 0)} кг
                   </span>
                 </div>
                 <div className="space-y-3">
@@ -264,9 +293,22 @@ export default function OrderDetailsPage() {
                   <span className="text-gray-400">Сумма заказа:</span>
                   <span className="font-bold text-lg text-white">{formatPrice(order.totalAmount)}</span>
                 </div>
+                {/* Дополнительная скидка при оплате в течение 5 минут */}
+                {!order.isPaid && paymentTimeLeft > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-green-500 text-sm">Скидка за быструю оплату:</span>
+                    <span className="font-medium text-green-500">-{formatPrice(500)}</span>
+                  </div>
+                )}
+                {!order.isPaid && paymentTimeLeft > 0 && (
+                  <div className="flex justify-between items-center pt-2 border-t border-[#3A3A3A]">
+                    <span className="text-white font-medium">Итого к оплате:</span>
+                    <span className="font-bold text-xl text-[#c4d402]">{formatPrice(order.totalAmount - 500)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center pt-2 mt-2 border-t border-[#3A3A3A]">
                   <span className="text-[#c4d402] text-sm">Баллы за покупку:</span>
-                  <span className="font-medium text-[#c4d402]">+{formatPrice(Math.round(order.totalAmount * 0.05))}</span>
+                  <span className="font-medium text-[#c4d402]">+{formatPrice(Math.round((paymentTimeLeft > 0 && !order.isPaid ? order.totalAmount - 500 : order.totalAmount) * 0.05))}</span>
                 </div>
               </div>
 
@@ -292,7 +334,7 @@ export default function OrderDetailsPage() {
               <div className="pt-3 mt-3">
                 <Button
                   variant="outline"
-                  className="w-full py-3 bg-transparent border border-red-500/30 hover:bg-red-500/10 text-red-500 font-medium rounded-xl"
+                  className="w-full py-3 bg-transparent border border-blue-500/30 hover:bg-blue-500/10 text-blue-500 font-medium rounded-xl"
                   onClick={() => {
                     if (confirm("Вы уверены, что хотите отменить заказ?")) {
                       // Удаляем заказ из истории
@@ -376,7 +418,7 @@ export default function OrderDetailsPage() {
       </main>
 
       {/* Кнопки действий - закреплены внизу */}
-      <div className="sticky bottom-0 bg-[#121212] px-3 sm:px-4 py-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
+      <div className="sticky bottom-0 px-3 sm:px-4 pt-8 py-4 pb-[calc(16px+env(safe-area-inset-bottom))]" style={{ background: 'linear-gradient(to top, rgba(18, 18, 18, 0.9) 0%, rgba(18, 18, 18, 0.6) 60%, rgba(18, 18, 18, 0) 100%)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', maskImage: 'linear-gradient(to top, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to top, black 70%, transparent 100%)' }}>
         <div className="flex rounded-lg rounded-b-[32px] overflow-hidden">
           <Button
             variant="outline"

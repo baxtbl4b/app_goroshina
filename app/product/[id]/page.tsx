@@ -31,6 +31,7 @@ export default function ProductPage() {
   const [selectedWarehouse, setSelectedWarehouse] = useState<{ location: string; stock: number } | null>(null)
   const [warehouseCartCounts, setWarehouseCartCounts] = useState<Record<string, number>>({})
   const [showShareMenu, setShowShareMenu] = useState(false)
+  const [isFavoriteAnimating, setIsFavoriteAnimating] = useState(false)
 
   // Load tire data from localStorage or API
   useEffect(() => {
@@ -419,6 +420,10 @@ export default function ProductPage() {
 
     if (!tire) return
 
+    // Запускаем анимацию
+    setIsFavoriteAnimating(true)
+    setTimeout(() => setIsFavoriteAnimating(false), 300)
+
     const favorites = JSON.parse(localStorage.getItem("favorites") || "[]")
 
     if (isFavorite) {
@@ -759,15 +764,7 @@ export default function ProductPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <CartButton />
-            <Button variant="ghost" size="icon" onClick={toggleFavorite}>
-              <Heart
-                className={`h-5 w-5 transition-colors ${
-                  isFavorite ? "text-red-500 fill-red-500" : "text-white hover:text-red-500"
-                }`}
-              />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={handleShare}>
+            <Button variant="ghost" size="icon" onClick={handleShare} className="active:text-blue-500">
               <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="18" cy="5" r="3"/>
                 <circle cx="6" cy="12" r="3"/>
@@ -776,6 +773,18 @@ export default function ProductPage() {
                 <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
               </svg>
             </Button>
+            <Button variant="ghost" size="icon" onClick={toggleFavorite}>
+              <Heart
+                className={`h-5 w-5 transition-colors ${
+                  isFavoriteAnimating
+                    ? "animate-wiggle text-blue-500 fill-blue-500"
+                    : isFavorite
+                      ? "text-blue-500 fill-blue-500"
+                      : "text-white"
+                }`}
+              />
+            </Button>
+            <CartButton />
           </div>
         </div>
       </header>

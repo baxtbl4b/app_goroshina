@@ -25,6 +25,14 @@ body {
   min-height: 100vh;
   min-height: -webkit-fill-available;
   min-height: 100dvh;
+  /* Hide scrollbar but keep functionality */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+body::-webkit-scrollbar {
+  display: none;
 }
 
 body {
@@ -208,6 +216,19 @@ body {
 
 .cart-pulse-effect img {
   filter: drop-shadow(0 0 8px #c4d402) drop-shadow(0 0 15px #c4d402);
+}
+
+/* Анимация подёргивания для избранного */
+@keyframes favoriteWiggle {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-12deg); }
+  40% { transform: rotate(10deg); }
+  60% { transform: rotate(-8deg); }
+  80% { transform: rotate(5deg); }
+}
+
+.animate-wiggle {
+  animation: favoriteWiggle 0.3s ease-in-out;
 }
 
 /* Анимация shine для логотипа */

@@ -13,10 +13,10 @@ export function BackButton({ className = "" }: BackButtonProps) {
   return (
     <button
       onClick={() => router.back()}
-      className={`p-2 transition-colors ${className}`}
+      className={`p-2 transition-colors active:text-blue-500 ${className}`}
       aria-label="Назад"
     >
-      <ChevronLeft className="h-6 w-6 text-gray-300" />
+      <ChevronLeft className="h-6 w-6 text-gray-300 active:text-blue-500" />
     </button>
   )
 }

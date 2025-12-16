@@ -122,13 +122,13 @@ export default function CartButton({ className = "" }: CartButtonProps) {
 
       <button
         onClick={handleClick}
-        className={`p-2 rounded-full hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors flex items-center justify-center relative ${className}`}
+        className={`p-2 rounded-full transition-colors flex items-center justify-center relative active:text-blue-500 ${className}`}
         aria-label="Корзина"
       >
         <div className={`relative ${isAnimating ? "cart-icon-bounce" : ""}`}>
           <ShoppingCart
             size={21}
-            className="text-white"
+            className="text-white active:text-blue-500"
           />
           {cartItemCount > 0 && (
             <span className="absolute -top-3 -right-3 bg-[#c4d402] text-[#1F1F1F] text-[10px] font-bold rounded-full w-[16px] h-[16px] flex items-center justify-center" style={{ lineHeight: '1', padding: '0' }}>

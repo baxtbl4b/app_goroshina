@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation"
 import { useState, useEffect, useRef } from "react"
 import TireCard from "@/components/tire-card"
 import CartButton from "@/components/cart-button"
+import FavoritesButton from "@/components/favorites-button"
 import type { Tire } from "@/lib/api"
 import {
   Dialog,
@@ -281,19 +282,17 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-4">
-                  <Link href="/favorites" className="flex items-center gap-2 text-[#1F1F1F] dark:text-white">
-                    <Heart className="h-6 w-6" />
-                  </Link>
-                  <CartButton />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-[#1F1F1F] dark:text-white relative transform scale-[1.44] active:text-blue-500"
+                    onClick={handleMenuClick}
+                  >
+                    <Menu className="h-7 w-7" />
+                  </Button>
+                  <FavoritesButton />
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-[#1F1F1F] dark:text-white relative transform scale-[1.44]"
-                  onClick={handleMenuClick}
-                >
-                  <Menu className="h-7 w-7" />
-                </Button>
+                <CartButton />
               </div>
             </div>
           </header>

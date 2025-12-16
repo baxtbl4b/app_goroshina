@@ -573,15 +573,6 @@ export default function OrderPage() {
             </button>
             <span className="text-xl font-bold text-white">Оформление заказа</span>
           </div>
-          <div className={`flex items-center gap-2 px-3 py-1.5 border rounded-xl ${timeLeft <= 60 ? 'border-red-500 bg-red-500/10' : 'border-[#c4d402]'}`}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={timeLeft <= 60 ? '#ef4444' : '#c4d402'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
-            <span className={`text-sm font-medium ${timeLeft <= 60 ? 'text-red-500' : 'text-[#c4d402]'}`}>
-              {formatTime(timeLeft)}
-            </span>
-          </div>
         </div>
       </header>
 
@@ -684,7 +675,7 @@ export default function OrderPage() {
                               )}
                               <button
                                 onClick={() => removeItem(item.id)}
-                                className="p-1.5 -mt-0.5 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                className="p-1.5 -mt-0.5 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"
                                 aria-label="Удалить товар"
                               >
                                 <Trash2 className="h-[18px] w-[18px]" />
@@ -1438,9 +1429,9 @@ export default function OrderPage() {
 
       {/* Кнопка оформления - закреплена внизу */}
       {hasItems && (
-        <div className="sticky bottom-0 bg-[#1F1F1F]/[0.96] px-3 sm:px-4 py-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
+        <div className="sticky bottom-0 px-3 sm:px-4 pt-8 py-4 pb-[calc(16px+env(safe-area-inset-bottom))]" style={{ background: 'linear-gradient(to top, rgba(18, 18, 18, 0.9) 0%, rgba(18, 18, 18, 0.6) 60%, rgba(18, 18, 18, 0) 100%)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', maskImage: 'linear-gradient(to top, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to top, black 70%, transparent 100%)' }}>
           <Button
-            className="w-full py-7 text-lg bg-[#c4d402] hover:bg-[#C4CF2E] text-black font-bold rounded-t-lg rounded-b-[32px] shadow-lg"
+            className="w-full py-8 text-lg bg-[#c4d402] hover:bg-[#C4CF2E] text-black font-bold rounded-t-lg rounded-b-[32px] shadow-lg"
             onClick={handleProceedToCheckout}
             disabled={!hasItems}
           >
