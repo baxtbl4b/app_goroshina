@@ -422,14 +422,15 @@ export default function OrderDetailsPage() {
         <div className="flex rounded-lg rounded-b-[32px] overflow-hidden">
           <Button
             variant="outline"
-            className="flex-1 py-8 bg-transparent border border-[#3A3A3A] border-r-0 hover:bg-[#2A2A2A] text-white font-medium rounded-none rounded-tl-lg rounded-bl-[32px]"
+            className="flex-1 py-8 bg-transparent border border-[#3A3A3A] border-r-0 hover:bg-[#2A2A2A] text-white font-medium rounded-none rounded-tl-[32px] rounded-bl-[32px]"
             onClick={() => router.push("/account/orders")}
           >
             <Package className="w-4 h-4 mr-2" />
             Мои заказы
           </Button>
           <Button
-            className="flex-1 py-8 bg-[#c4d402] hover:bg-[#C4CF2E] text-black font-bold rounded-none rounded-tr-lg rounded-br-[32px]"
+            variant="outline"
+            className="flex-1 py-8 bg-transparent border border-[#3A3A3A] border-l-0 hover:bg-[#2A2A2A] text-white font-medium rounded-none rounded-tr-[32px] rounded-br-[32px]"
             onClick={() => router.push("/")}
           >
             На главную

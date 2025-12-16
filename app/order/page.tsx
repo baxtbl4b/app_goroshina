@@ -1431,7 +1431,7 @@ export default function OrderPage() {
       {hasItems && (
         <div className="sticky bottom-0 px-3 sm:px-4 pt-8 py-4 pb-[calc(16px+env(safe-area-inset-bottom))]" style={{ background: 'linear-gradient(to top, rgba(18, 18, 18, 0.9) 0%, rgba(18, 18, 18, 0.6) 60%, rgba(18, 18, 18, 0) 100%)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', maskImage: 'linear-gradient(to top, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to top, black 70%, transparent 100%)' }}>
           <Button
-            className="w-full py-8 text-lg bg-[#c4d402] hover:bg-[#C4CF2E] text-black font-bold rounded-t-lg rounded-b-[32px] shadow-lg"
+            className="w-full py-8 text-lg bg-[#c4d402] hover:bg-[#C4CF2E] text-black font-bold rounded-t-[32px] rounded-b-[32px] shadow-lg"
             onClick={handleProceedToCheckout}
             disabled={!hasItems}
           >
