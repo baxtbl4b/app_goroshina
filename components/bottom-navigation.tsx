@@ -43,6 +43,7 @@ export function BottomNavigation() {
     }
   }, [])
 
+  
   // Hide bottom navigation on tire mounting page and booking page
   if (pathname === "/tire-mounting" || pathname === "/tire-mounting/booking") {
     return null
@@ -50,6 +51,29 @@ export function BottomNavigation() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-10 pb-[env(safe-area-inset-bottom,0px)]" style={{ minHeight: '84px' }}>
+      <style jsx>{`
+        @keyframes moveLineLeft {
+          0% { transform: translateX(-100%); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translateX(100%); opacity: 0; }
+        }
+        @keyframes moveLineRight {
+          0% { transform: translateX(100%); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translateX(-100%); opacity: 0; }
+        }
+        .animate-line-left {
+          animation: moveLineLeft 8s ease-in-out infinite;
+          animation-delay: 3s;
+        }
+        .animate-line-right {
+          animation: moveLineRight 8s ease-in-out infinite;
+          animation-delay: 3s;
+        }
+              `}</style>
+
       {/* SVG cutout shape with smooth rounded transitions */}
       <svg
         className="absolute bottom-0 left-0 right-0 w-full h-[84px] pointer-events-none"
@@ -57,11 +81,51 @@ export function BottomNavigation() {
         preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
       >
+        <defs>
+          <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#c4d402" stopOpacity="0" />
+            <stop offset="50%" stopColor="#c4d402" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#c4d402" stopOpacity="0" />
+          </linearGradient>
+          {/* Левый путь: от левого края, вдоль верхней кромки, огибает кнопку снизу */}
+          <clipPath id="leftClip">
+            <path d="M 0,-2 L 135,-2 Q 143,-2 147,3 C 152,8 158,14 165,18 L 165,28 L 187.5,28 C 187.5,28 187.5,50 187.5,50 L 165,50 L 165,22 C 158,18 152,12 147,7 Q 143,2 135,2 L 0,2 Z" />
+          </clipPath>
+          {/* Правый путь: от правого края, вдоль верхней кромки, огибает кнопку снизу */}
+          <clipPath id="rightClip">
+            <path d="M 375,-2 L 240,-2 Q 232,-2 228,3 C 223,8 217,14 210,18 L 210,28 L 187.5,28 C 187.5,28 187.5,50 187.5,50 L 210,50 L 210,22 C 217,18 223,12 228,7 Q 232,2 240,2 L 375,2 Z" />
+          </clipPath>
+        </defs>
+
         <path
           d="M 0,0 L 135,0 Q 143,0 147,5 C 156,14 168,25 187.5,25 C 207,25 219,14 228,5 Q 232,0 240,0 L 375,0 L 375,84 L 0,84 Z"
           fill="#1F1F1F"
           className="dark:fill-[#1F1F1F]"
         />
+
+        {/* Левая движущаяся полоса - огибает кнопку снизу */}
+        <g clipPath="url(#leftClip)">
+          <rect
+            x="0"
+            y="-1"
+            width="80"
+            height="4"
+            fill="url(#lineGradient)"
+            className="animate-line-left"
+          />
+        </g>
+
+        {/* Правая движущаяся полоса - огибает кнопку снизу */}
+        <g clipPath="url(#rightClip)">
+          <rect
+            x="295"
+            y="-1"
+            width="80"
+            height="4"
+            fill="url(#lineGradient)"
+            className="animate-line-right"
+          />
+        </g>
       </svg>
 
       {/* Content container */}
@@ -102,12 +166,7 @@ export function BottomNavigation() {
             <div
               className="rounded-full transform hover:scale-110 hover:-translate-y-1 transition-all flex items-center justify-center w-[65px] h-[65px] relative overflow-hidden -mt-[47px] bg-[#c4d402]"
               style={{
-                boxShadow: `
-                  0 8px 16px rgba(0, 0, 0, 0.3),
-                  0 4px 8px rgba(0, 0, 0, 0.2),
-                  inset 0 -2px 8px rgba(0, 0, 0, 0.15),
-                  inset 0 2px 4px rgba(255, 255, 255, 0.4)
-                `
+                boxShadow: `0 8px 16px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 -2px 8px rgba(0, 0, 0, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.4)`
               }}
             >
               {/* Shine effect overlay */}
