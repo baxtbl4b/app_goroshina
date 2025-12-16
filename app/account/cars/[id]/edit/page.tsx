@@ -114,7 +114,7 @@ export default function EditCarPage() {
             </div>
 
             <div className="pt-4">
-              <Button className="w-full py-3 rounded-xl bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] font-semibold dark:text-[#1F1F1F]">
+              <Button className="w-full py-3 rounded-xl bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] font-semibold dark:text-[#1F1F1F]">
                 <Save className="mr-2 h-5 w-5" />
                 Сохранить изменения
               </Button>

@@ -56,7 +56,7 @@ export default function BookOnlineConfirmationPage() {
             <div className="space-y-4">
               {/* Service */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <CheckCircle className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -67,7 +67,7 @@ export default function BookOnlineConfirmationPage() {
 
               {/* Date and Time */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <Calendar className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -80,7 +80,7 @@ export default function BookOnlineConfirmationPage() {
 
               {/* Location */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <MapPin className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -92,7 +92,7 @@ export default function BookOnlineConfirmationPage() {
 
               {/* Contact */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <Phone className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -130,7 +130,7 @@ export default function BookOnlineConfirmationPage() {
             disabled={
               isSubmitting || !selectedDate || !selectedTime || !customerName || !customerPhone || !selectedStore
             }
-            className="flex-1 bg-[#d3df3d] hover:bg-[#c5d135] disabled:bg-gray-600 disabled:cursor-not-allowed text-black py-3 px-4 rounded-lg font-medium transition-colors"
+            className="flex-1 bg-[#c4d402] hover:bg-[#c5d135] disabled:bg-gray-600 disabled:cursor-not-allowed text-black py-3 px-4 rounded-lg font-medium transition-colors"
           >
             {isSubmitting ? "Оформление заказа..." : "Записаться"}
           </button>

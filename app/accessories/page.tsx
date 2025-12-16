@@ -443,7 +443,7 @@ export default function AccessoriesPage() {
                       variant="outline"
                       className={`cursor-pointer ${
                         selectedCategories.includes(category)
-                          ? "bg-[#D3DF3D] text-[#1F1F1F] hover:bg-[#D3DF3D]/80"
+                          ? "bg-[#c4d402] text-[#1F1F1F] hover:bg-[#c4d402]/80"
                           : "bg-white dark:bg-[#333333] hover:bg-gray-100 dark:hover:bg-[#444444]"
                       }`}
                       onClick={() => toggleCategory(category)}
@@ -475,7 +475,7 @@ export default function AccessoriesPage() {
                   style={{ maxHeight: "209px" }}
                 >
                   {accessory.oldPrice && (
-                    <Badge className="absolute left-2 top-2 z-10 bg-[#D3DF3D] text-[#1F1F1F]">Акция</Badge>
+                    <Badge className="absolute left-2 top-2 z-10 bg-[#c4d402] text-[#1F1F1F]">Акция</Badge>
                   )}
                   <div
                     className="flex justify-center items-center h-full w-full relative overflow-hidden bg-transparent"
@@ -612,7 +612,7 @@ export default function AccessoriesPage() {
                           <button
                             onClick={() => addToCart(accessory.id)}
                             disabled={accessory.stock !== undefined && accessory.stock <= 0}
-                            className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="bg-[#c4d402]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Увеличить количество"
                           >
                             <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
@@ -631,7 +631,7 @@ export default function AccessoriesPage() {
         {filteredAccessories.length === 0 && (
           <div className="bg-white dark:bg-[#1F1F1F] rounded-xl p-8 text-center">
             <p className="text-[#1F1F1F] dark:text-white mb-4">По вашему запросу ничего не найдено</p>
-            <Button onClick={clearFilters} className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
+            <Button onClick={clearFilters} className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">
               Сбросить фильтры
             </Button>
           </div>

@@ -184,8 +184,8 @@ export default function OrderDetailsPage() {
   return (
     <div className="min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pb-20">
       {/* Заголовок */}
-      <header className="sticky top-0 z-50 bg-white dark:bg-[#1F1F1F] py-4 shadow-sm">
-        <div className="container max-w-md mx-auto flex items-center justify-center relative">
+      <header className="sticky top-0 z-50 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full container max-w-md mx-auto flex items-center justify-center relative">
           <button
             onClick={() => router.back()}
             className="absolute left-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"

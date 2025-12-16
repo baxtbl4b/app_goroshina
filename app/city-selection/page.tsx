@@ -48,8 +48,8 @@ export default function CitySelectionPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/settings">
               <Button variant="ghost" size="icon" className="mr-2">

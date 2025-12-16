@@ -27,8 +27,8 @@ export default function AllBrandsPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="flex items-center">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center">
           <Link href="/">
             <Button variant="ghost" size="icon" className="mr-2">
               <ArrowLeft className="h-5 w-5 text-[#1F1F1F] dark:text-white" />
@@ -47,7 +47,7 @@ export default function AllBrandsPage() {
             placeholder="Поиск брендов"
             className="pl-10 pr-4 py-6 rounded-xl border-[#D9D9DD] bg-white dark:bg-[#2A2A2A] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
           />
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#D3DF3D]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#c4d402]" />
         </div>
 
         {/* Brands grid */}

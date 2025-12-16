@@ -13,7 +13,7 @@ import { toast } from "@/components/ui/use-toast"
 function SubmitButton() {
   const { pending } = useFormStatus()
   return (
-    <Button type="submit" className="w-full bg-[#D3DF3D] text-[#1F1F1F] hover:bg-[#D3DF3D]/80" disabled={pending}>
+    <Button type="submit" className="w-full bg-[#c4d402] text-[#1F1F1F] hover:bg-[#c4d402]/80" disabled={pending}>
       {pending ? "Сохранение..." : "Сохранить данные"}
     </Button>
   )

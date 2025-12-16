@@ -395,8 +395,8 @@ export default function DokatkaPage() {
         `}
       </style>
 
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-[#1F1F1F] shadow-sm">
-        <div className="p-2 px-4 flex items-center justify-between w-full h-[60px]">
+      <header className="fixed top-0 left-0 right-0 z-[100] bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Link href="/" className="text-[#1F1F1F] dark:text-white">
               <ChevronLeft className="h-6 w-6" />
@@ -559,7 +559,7 @@ export default function DokatkaPage() {
                           <button
                             onClick={(e) => addToCart(e, item)}
                             disabled={item.stock <= 0}
-                            className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="bg-[#c4d402]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Увеличить количество"
                           >
                             <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
@@ -577,7 +577,7 @@ export default function DokatkaPage() {
         {filteredDokatki.length === 0 && (
           <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-8 text-center mt-4">
             <p className="text-[#1F1F1F] dark:text-white mb-4">По вашему запросу ничего не найдено</p>
-            <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]" onClick={resetFilters}>
+            <Button className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]" onClick={resetFilters}>
               Сбросить фильтры
             </Button>
           </div>
@@ -605,7 +605,7 @@ export default function DokatkaPage() {
                       key={pattern}
                       className={`py-2 px-3 text-sm rounded-lg border ${
                         selectedBoltPattern === pattern
-                          ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
+                          ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
                           : "bg-white dark:bg-[#333333] border-gray-200 dark:border-gray-700 text-[#1F1F1F] dark:text-white"
                       }`}
                       onClick={() => setSelectedBoltPattern(selectedBoltPattern === pattern ? null : pattern)}
@@ -627,7 +627,7 @@ export default function DokatkaPage() {
                       key={bore}
                       className={`py-2 px-3 text-sm rounded-lg border ${
                         selectedCenterBore === bore
-                          ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
+                          ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
                           : "bg-white dark:bg-[#333333] border-gray-200 dark:border-gray-700 text-[#1F1F1F] dark:text-white"
                       }`}
                       onClick={() => setSelectedCenterBore(selectedCenterBore === bore ? null : bore)}
@@ -649,7 +649,7 @@ export default function DokatkaPage() {
                       key={compatibility}
                       className={`py-2 px-3 text-sm rounded-lg border ${
                         selectedCompatibility === compatibility
-                          ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
+                          ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
                           : "bg-white dark:bg-[#333333] border-gray-200 dark:border-gray-700 text-[#1F1F1F] dark:text-white"
                       }`}
                       onClick={() =>
@@ -668,7 +668,7 @@ export default function DokatkaPage() {
                 Сбросить
               </Button>
               <Button
-                className="flex-1 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]"
+                className="flex-1 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]"
                 onClick={() => setIsFilterOpen(false)}
               >
                 Применить
@@ -748,7 +748,7 @@ export default function DokatkaPage() {
             <h4 className="text-sm font-medium text-[#1F1F1F] dark:text-white">Только в наличии</h4>
             <div
               className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-200 ${
-                inStockOnly ? "bg-[#D3DF3D]" : "bg-gray-300 dark:bg-gray-600"
+                inStockOnly ? "bg-[#c4d402]" : "bg-gray-300 dark:bg-gray-600"
               }`}
               onClick={() => setInStockOnly(!inStockOnly)}
             >

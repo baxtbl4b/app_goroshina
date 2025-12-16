@@ -112,7 +112,7 @@ function getStatusBadge(status: string) {
     case "бронь":
       return { variant: "outline" as const, className: "bg-orange-500/10 text-orange-500 border-orange-500/20" }
     case "оплачено":
-      return { variant: "outline" as const, className: "bg-[#D3DF3D]/10 text-[#D3DF3D] border-[#D3DF3D]/20" }
+      return { variant: "outline" as const, className: "bg-[#c4d402]/10 text-[#c4d402] border-[#c4d402]/20" }
     case "выдано":
       return { variant: "outline" as const, className: "bg-green-500/10 text-green-500 border-green-500/20" }
     default:
@@ -155,6 +155,9 @@ export default function OrderPage() {
   // Состояние для товаров корзины (загружается из localStorage)
   const [items, setItems] = useState<CartItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
+  // Таймер обратного отсчета (5 минут = 300 секунд)
+  const [timeLeft, setTimeLeft] = useState(300)
 
   // Данные покупателя (из профиля пользователя)
   const [customer, setCustomer] = useState({
@@ -236,6 +239,30 @@ export default function OrderPage() {
       window.removeEventListener("userUpdated", handleUserUpdate as EventListener)
     }
   }, [])
+
+  // Таймер обратного отсчета
+  useEffect(() => {
+    if (timeLeft <= 0) return
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [timeLeft])
+
+  // Форматирование времени для отображения
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
 
   // Get the coordinates of the selected location
   const selectedLocationCoordinates =
@@ -321,7 +348,7 @@ export default function OrderPage() {
   // Handle proceed to checkout
   const handleProceedToCheckout = () => {
     // Генерируем номер заказа
-    const orderNumber = `P${Math.floor(100000 + Math.random() * 900000)}`
+    const orderNumber = `${Math.floor(1000 + Math.random() * 9000)}`
 
     // Определяем способ доставки и адрес
     let deliveryMethodName = "Самовывоз"
@@ -347,7 +374,7 @@ export default function OrderPage() {
     // Формируем данные заказа
     const orderData = {
       orderNumber,
-      status: "зарезервировано",
+      status: "Готов к выдаче",
       items: items.map(item => ({
         id: item.id,
         name: item.name || `${item.brand || ""} ${item.model || ""}`,
@@ -398,8 +425,8 @@ export default function OrderPage() {
     localStorage.removeItem("cart")
     window.dispatchEvent(new Event("cartUpdated"))
 
-    // Navigate to the next step
-    router.push("/order/complete")
+    // Navigate to order details page
+    router.push(`/profile/orders/${orderNumber}?new=true`)
   }
 
   // Функция для обновления количества товара
@@ -470,6 +497,16 @@ export default function OrderPage() {
     }
   }
 
+  // Хелпер для получения цвета сезона
+  const getSeasonColor = (season?: string) => {
+    switch (season) {
+      case "w": return "bg-blue-500" // Зима - синий
+      case "s": return "bg-orange-500" // Лето - оранжевый
+      case "a": return "bg-green-500" // Всесезонные - зелёный
+      default: return "bg-gray-500"
+    }
+  }
+
   // Хелпер для получения изображения по умолчанию
   const getDefaultImage = (season?: string) => {
     switch (season) {
@@ -524,7 +561,7 @@ export default function OrderPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#1F1F1F] pr-4 shadow-sm h-[60px] flex items-center relative before:content-[''] before:absolute before:top-[-50px] before:left-0 before:right-0 before:h-[50px] before:bg-[#1F1F1F]">
+      <header className="sticky top-0 z-50 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] pr-4 flex items-center relative before:content-[''] before:absolute before:top-[-50px] before:left-0 before:right-0 before:h-[50px] before:bg-[#1F1F1F]">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <button
@@ -535,6 +572,15 @@ export default function OrderPage() {
               <ChevronLeft className="h-5 w-5 text-white" />
             </button>
             <span className="text-xl font-bold text-white">Оформление заказа</span>
+          </div>
+          <div className={`flex items-center gap-2 px-3 py-1.5 border rounded-xl ${timeLeft <= 60 ? 'border-red-500 bg-red-500/10' : 'border-[#c4d402]'}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={timeLeft <= 60 ? '#ef4444' : '#c4d402'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span className={`text-sm font-medium ${timeLeft <= 60 ? 'text-red-500' : 'text-[#c4d402]'}`}>
+              {formatTime(timeLeft)}
+            </span>
           </div>
         </div>
       </header>
@@ -559,6 +605,7 @@ export default function OrderPage() {
                     const itemPrice = getItemPrice(item)
                     const tireSize = getTireSize(item)
                     const seasonName = getSeasonName(item.season)
+                    const seasonColor = getSeasonColor(item.season)
                     const imageUrl = (item.image && item.image.trim() !== "" && (item.image.startsWith("/") || item.image.startsWith("http")))
                       ? item.image
                       : getDefaultImage(item.season)
@@ -620,7 +667,7 @@ export default function OrderPage() {
                         <div className="flex-1 min-w-0 flex flex-col">
                           <div className="flex justify-between items-start mb-1">
                             <div>
-                              <span className="font-bold text-lg text-[#D3DF3D]">
+                              <span className="font-bold text-lg text-[#c4d402]">
                                 {formatPrice(itemPrice)}
                               </span>
                             </div>
@@ -685,8 +732,8 @@ export default function OrderPage() {
                       </div>
                     </div>
                     <div className="flex justify-between items-center pt-2 border-t border-[#3A3A3A]">
-                      <span className="text-[#D3DF3D]">Баллы за покупку:</span>
-                      <span className="font-medium text-[#D3DF3D]">
+                      <span className="text-[#c4d402]">Баллы за покупку:</span>
+                      <span className="font-medium text-[#c4d402]">
                         +{formatPrice(cashbackAmount)}
                       </span>
                     </div>
@@ -697,10 +744,10 @@ export default function OrderPage() {
                     <div className="flex justify-between items-center mb-3">
                       <h2 className="text-sm font-medium text-gray-300">Списать баллы</h2>
                       <div className="flex items-center gap-1.5">
-                        <div className="w-5 h-5 rounded-full bg-[#D3DF3D] flex items-center justify-center">
+                        <div className="w-5 h-5 rounded-full bg-[#c4d402] flex items-center justify-center">
                           <span className="text-[10px] font-bold text-black">₽</span>
                         </div>
-                        <span className="text-sm font-medium text-[#D3DF3D]">{userPoints} баллов</span>
+                        <span className="text-sm font-medium text-[#c4d402]">{userPoints} баллов</span>
                       </div>
                     </div>
 
@@ -714,9 +761,9 @@ export default function OrderPage() {
                             step="100"
                             value={pointsToUse}
                             onChange={(e) => setPointsToUse(Number(e.target.value))}
-                            className="flex-1 h-2 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#D3DF3D] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#D3DF3D] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+                            className="flex-1 h-2 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#c4d402] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#c4d402] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                             style={{
-                              background: `linear-gradient(to right, #D3DF3D ${(pointsToUse / Math.min(userPoints, Math.round(subtotal * 0.1))) * 100}%, #2A2A2A ${(pointsToUse / Math.min(userPoints, Math.round(subtotal * 0.1))) * 100}%)`
+                              background: `linear-gradient(to right, #c4d402 ${(pointsToUse / Math.min(userPoints, Math.round(subtotal * 0.1))) * 100}%, #2A2A2A ${(pointsToUse / Math.min(userPoints, Math.round(subtotal * 0.1))) * 100}%)`
                             }}
                           />
                           <span className="text-sm font-medium text-white min-w-[80px] text-right">
@@ -731,7 +778,7 @@ export default function OrderPage() {
                                 onClick={() => setPointsToUse(Math.min(amount, Math.round(subtotal * 0.1)))}
                                 className={`px-3 py-1.5 text-xs rounded-lg transition-all ${
                                   pointsToUse === amount
-                                    ? "bg-[#D3DF3D] text-black font-medium"
+                                    ? "bg-[#c4d402] text-black font-medium"
                                     : "bg-[#2A2A2A] text-gray-400 hover:bg-[#3A3A3A]"
                                 }`}
                               >
@@ -740,7 +787,7 @@ export default function OrderPage() {
                             ))}
                           </div>
                           <Button
-                            className="bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black text-sm font-medium py-2 px-4 rounded-xl"
+                            className="bg-[#c4d402] hover:bg-[#C4CF2E] text-black text-sm font-medium py-2 px-4 rounded-xl"
                             onClick={() => {
                               if (pointsToUse > 0) {
                                 setIsPointsApplied(true)
@@ -753,10 +800,10 @@ export default function OrderPage() {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex justify-between items-center bg-[#D3DF3D]/10 p-3 rounded-xl border border-[#D3DF3D]/30">
+                      <div className="flex justify-between items-center bg-[#c4d402]/10 p-3 rounded-xl border border-[#c4d402]/30">
                         <div className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-[#D3DF3D]" />
-                          <span className="text-sm text-[#D3DF3D]">Списано {formatPrice(pointsToUse)}</span>
+                          <Check className="h-4 w-4 text-[#c4d402]" />
+                          <span className="text-sm text-[#c4d402]">Списано {formatPrice(pointsToUse)}</span>
                         </div>
                         <Button
                           variant="ghost"
@@ -796,7 +843,7 @@ export default function OrderPage() {
                   <h3 className="text-lg font-medium mb-2 text-white">Корзина пуста</h3>
                   <p className="text-sm text-gray-400 mb-6">Добавьте товары в корзину, чтобы оформить заказ</p>
                   <Link href="/category/tires">
-                    <Button className="bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black font-medium px-6 py-2.5 rounded-xl">
+                    <Button className="bg-[#c4d402] hover:bg-[#C4CF2E] text-black font-medium px-6 py-2.5 rounded-xl">
                       Перейти к каталогу
                     </Button>
                   </Link>
@@ -818,7 +865,7 @@ export default function OrderPage() {
                       onClick={() => setDeliveryMethod("pickup")}
                       className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all ${
                         deliveryMethod === "pickup"
-                          ? "bg-[#D3DF3D] text-black"
+                          ? "bg-[#c4d402] text-black"
                           : "bg-[#1F1F1F] text-white hover:bg-[#3A3A3A]"
                       }`}
                     >
@@ -831,7 +878,7 @@ export default function OrderPage() {
                       onClick={() => setDeliveryMethod("delivery")}
                       className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all ${
                         deliveryMethod === "delivery"
-                          ? "bg-[#D3DF3D] text-black"
+                          ? "bg-[#c4d402] text-black"
                           : "bg-[#1F1F1F] text-white hover:bg-[#3A3A3A]"
                       }`}
                     >
@@ -844,7 +891,7 @@ export default function OrderPage() {
                       onClick={() => setDeliveryMethod("russia")}
                       className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all ${
                         deliveryMethod === "russia"
-                          ? "bg-[#D3DF3D] text-black"
+                          ? "bg-[#c4d402] text-black"
                           : "bg-[#1F1F1F] text-white hover:bg-[#3A3A3A]"
                       }`}
                     >
@@ -967,7 +1014,7 @@ export default function OrderPage() {
                                     <div className="text-sm text-gray-400">{address.street}</div>
                                     <div className="text-sm text-gray-400">{address.city}</div>
                                     {address.isDefault && (
-                                      <div className="text-xs text-[#D3DF3D] mt-1">По умолчанию</div>
+                                      <div className="text-xs text-[#c4d402] mt-1">По умолчанию</div>
                                     )}
                                   </div>
                                 </div>
@@ -998,7 +1045,7 @@ export default function OrderPage() {
                                 type="text"
                                 value={newAddress.city}
                                 onChange={(e) => handleAddressChange("city", e.target.value)}
-                                className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#D3DF3D] focus:border-[#D3DF3D]"
+                                className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                                 placeholder="Москва"
                               />
                             </div>
@@ -1009,7 +1056,7 @@ export default function OrderPage() {
                                 type="text"
                                 value={newAddress.street}
                                 onChange={(e) => handleAddressChange("street", e.target.value)}
-                                className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#D3DF3D] focus:border-[#D3DF3D]"
+                                className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                                 placeholder="ул. Пушкина, д. 10, кв. 42"
                               />
                             </div>
@@ -1052,7 +1099,7 @@ export default function OrderPage() {
                                   setShowNewAddressForm(false)
                                   // Здесь можно добавить логику для добавления адреса в список savedAddresses
                                 }}
-                                className="flex-1 px-4 py-2 text-sm bg-[#D3DF3D] text-black rounded-md hover:bg-[#C4CF2E] transition-colors font-medium"
+                                className="flex-1 px-4 py-2 text-sm bg-[#c4d402] text-black rounded-md hover:bg-[#C4CF2E] transition-colors font-medium"
                               >
                                 Сохранить
                               </button>
@@ -1076,7 +1123,7 @@ export default function OrderPage() {
                           <div className="border-t border-gray-600 pt-2 mt-3">
                             <div className="flex justify-between items-center">
                               <span className="text-sm font-medium text-white">Итого к оплате:</span>
-                              <span className="text-lg font-bold text-[#D3DF3D]">
+                              <span className="text-lg font-bold text-[#c4d402]">
                                 {formatPrice(total + 500)}
                               </span>
                             </div>
@@ -1144,7 +1191,7 @@ export default function OrderPage() {
                               type="text"
                               value={recipientInfo.name}
                               onChange={(e) => handleRecipientChange("name", e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#D3DF3D] focus:border-[#D3DF3D]"
+                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                               placeholder="Введите ФИО получателя"
                               required
                             />
@@ -1156,23 +1203,12 @@ export default function OrderPage() {
                               type="tel"
                               value={recipientInfo.phone}
                               onChange={(e) => handleRecipientChange("phone", e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#D3DF3D] focus:border-[#D3DF3D]"
+                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                               placeholder="+7 (999) 123-45-67"
                               required
                             />
                           </div>
 
-                          <div>
-                            <label className="block text-xs text-gray-400 mb-1">Email получателя</label>
-                            <input
-                              type="email"
-                              value={recipientInfo.email}
-                              onChange={(e) => handleRecipientChange("email", e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#D3DF3D] focus:border-[#D3DF3D]"
-                              placeholder="example@mail.com"
-                              required
-                            />
-                          </div>
                         </div>
                       </div>
 
@@ -1186,7 +1222,7 @@ export default function OrderPage() {
                               type="text"
                               value={newAddress.region || ""}
                               onChange={(e) => handleAddressChange("region", e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#D3DF3D] focus:border-[#D3DF3D]"
+                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                               placeholder="Московская область"
                               required
                             />
@@ -1198,7 +1234,7 @@ export default function OrderPage() {
                               type="text"
                               value={newAddress.city}
                               onChange={(e) => handleAddressChange("city", e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#D3DF3D] focus:border-[#D3DF3D]"
+                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                               placeholder="Москва"
                               required
                             />
@@ -1210,7 +1246,7 @@ export default function OrderPage() {
                               type="text"
                               value={newAddress.street}
                               onChange={(e) => handleAddressChange("street", e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#D3DF3D] focus:border-[#D3DF3D]"
+                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                               placeholder="ул. Пушкина, д. 10, кв. 42"
                               required
                             />
@@ -1242,7 +1278,7 @@ export default function OrderPage() {
                               <div className="border-t border-gray-600 pt-2 mt-3">
                                 <div className="flex justify-between items-center">
                                   <span className="text-sm font-medium text-white">Итого к оплате:</span>
-                                  <span className="text-lg font-bold text-[#D3DF3D]">
+                                  <span className="text-lg font-bold text-[#c4d402]">
                                     {formatPrice(total + selectedCompany.price)}
                                   </span>
                                 </div>
@@ -1256,14 +1292,6 @@ export default function OrderPage() {
                 </CardContent>
               </Card>
 
-              {/* Кнопка оформления */}
-              <Button
-                className="w-full py-5 text-lg bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black font-bold rounded-2xl shadow-lg"
-                onClick={handleProceedToCheckout}
-                disabled={!hasItems}
-              >
-                Оформить заказ
-              </Button>
             </>
           )}
         </div>
@@ -1318,7 +1346,7 @@ export default function OrderPage() {
                 </Button>
                 <Button
                   size="sm"
-                  className="h-8 text-xs px-3 bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black rounded-lg"
+                  className="h-8 text-xs px-3 bg-[#c4d402] hover:bg-[#C4CF2E] text-black rounded-lg"
                   onClick={saveCustomerChanges}
                 >
                   Сохранить
@@ -1376,7 +1404,7 @@ export default function OrderPage() {
                     value={editedCustomer.name}
                     onChange={(e) => handleCustomerChange("name", e.target.value)}
                     placeholder="Введите ФИО"
-                    className="w-full px-4 py-2.5 text-sm rounded-xl border-0 bg-[#1F1F1F] text-white focus:outline-none focus:ring-2 focus:ring-[#D3DF3D]/50"
+                    className="w-full px-4 py-2.5 text-sm rounded-xl border-0 bg-[#1F1F1F] text-white focus:outline-none focus:ring-2 focus:ring-[#c4d402]/50"
                   />
                 </div>
                 <div>
@@ -1387,7 +1415,7 @@ export default function OrderPage() {
                     value={editedCustomer.phone}
                     onChange={(e) => handleCustomerChange("phone", e.target.value)}
                     placeholder="+7 (999) 123-45-67"
-                    className="w-full px-4 py-2.5 text-sm rounded-xl border-0 bg-[#1F1F1F] text-white focus:outline-none focus:ring-2 focus:ring-[#D3DF3D]/50"
+                    className="w-full px-4 py-2.5 text-sm rounded-xl border-0 bg-[#1F1F1F] text-white focus:outline-none focus:ring-2 focus:ring-[#c4d402]/50"
                   />
                 </div>
                 <div>
@@ -1398,7 +1426,7 @@ export default function OrderPage() {
                     value={editedCustomer.email}
                     onChange={(e) => handleCustomerChange("email", e.target.value)}
                     placeholder="example@mail.com"
-                    className="w-full px-4 py-2.5 text-sm rounded-xl border-0 bg-[#1F1F1F] text-white focus:outline-none focus:ring-2 focus:ring-[#D3DF3D]/50"
+                    className="w-full px-4 py-2.5 text-sm rounded-xl border-0 bg-[#1F1F1F] text-white focus:outline-none focus:ring-2 focus:ring-[#c4d402]/50"
                   />
                 </div>
               </div>
@@ -1407,6 +1435,19 @@ export default function OrderPage() {
         </Card>
         )}
       </main>
+
+      {/* Кнопка оформления - закреплена внизу */}
+      {hasItems && (
+        <div className="sticky bottom-0 bg-[#1F1F1F]/[0.96] px-3 sm:px-4 py-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
+          <Button
+            className="w-full py-7 text-lg bg-[#c4d402] hover:bg-[#C4CF2E] text-black font-bold rounded-t-lg rounded-b-[32px] shadow-lg"
+            onClick={handleProceedToCheckout}
+            disabled={!hasItems}
+          >
+            Оформить заказ
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

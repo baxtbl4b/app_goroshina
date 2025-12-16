@@ -40,15 +40,15 @@ export default function FavoritesPage() {
   if (loading) {
     return (
       <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-        <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm">
-          <div className="p-4 flex items-center justify-between">
+        <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+          <div className="h-full px-4 flex items-center justify-between">
             <div className="flex items-center">
               <Link href="/" className="mr-3">
-                <ChevronLeft className="h-6 w-6 text-[#1F1F1F] dark:text-white" />
+                <ChevronLeft className="h-6 w-6 text-white" />
               </Link>
-              <h1 className="text-xl font-bold text-[#1F1F1F] dark:text-white">Избранное</h1>
+              <h1 className="text-xl font-bold text-white">Избранное</h1>
             </div>
-            <Heart className="h-6 w-6 text-[#D3DF3D]" />
+            <Heart className="h-6 w-6 text-[#c4d402]" />
           </div>
         </header>
         <div className="flex-1 flex items-center justify-center">
@@ -63,15 +63,15 @@ export default function FavoritesPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm">
-        <div className="p-4 flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/" className="mr-3">
-              <ChevronLeft className="h-6 w-6 text-[#1F1F1F] dark:text-white" />
+              <ChevronLeft className="h-6 w-6 text-white" />
             </Link>
-            <h1 className="text-xl font-bold text-[#1F1F1F] dark:text-white">Избранное</h1>
+            <h1 className="text-xl font-bold text-white">Избранное</h1>
           </div>
-          <Heart className="h-6 w-6 text-[#D3DF3D]" />
+          <Heart className="h-6 w-6 text-[#c4d402]" />
         </div>
       </header>
 
@@ -85,7 +85,7 @@ export default function FavoritesPage() {
                 Добавляйте товары в избранное, нажимая на иконку сердечка
               </p>
               <Link href="/category/summer">
-                <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] w-full">Перейти в каталог</Button>
+                <Button className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] w-full">Перейти в каталог</Button>
               </Link>
             </div>
           </div>

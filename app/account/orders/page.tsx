@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronLeft, Search, Package, CheckCircle, XCircle, Clock } from "lucide-react"
+import { ChevronLeft, Search, Package, CheckCircle, Clock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import OrderHistoryItem from "@/components/order-history-item"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -9,7 +9,7 @@ import BottomNavigation from "@/components/bottom-navigation"
 import { Input } from "@/components/ui/input"
 
 // Типы для заказов
-type OrderStatus = "в обработке" | "подтвержден" | "доставляется" | "выполнен" | "отменен"
+type OrderStatus = "На сборке" | "Забронирован" | "Готов к выдаче" | "В пути" | "Выполнен"
 
 interface Order {
   id: string
@@ -45,9 +45,11 @@ export default function OrdersPage() {
           const historyOrders = JSON.parse(ordersHistory)
           historyOrders.forEach((order: any) => {
             // Определяем статус
-            let status: OrderStatus = "в обработке"
-            if (order.status === "зарезервировано") status = "подтвержден"
-            if (order.isPaid) status = "выполнен"
+            let status: OrderStatus = "На сборке"
+            if (order.status === "зарезервировано" || order.status === "забронирован" || order.status === "Забронирован") status = "Забронирован"
+            if (order.status === "готов к выдаче" || order.status === "Готов к выдаче") status = "Готов к выдаче"
+            if (order.status === "в пути" || order.status === "В пути") status = "В пути"
+            if (order.isPaid || order.status === "выполнен" || order.status === "Выполнен") status = "Выполнен"
 
             allOrders.push({
               id: order.orderNumber,
@@ -73,7 +75,7 @@ export default function OrdersPage() {
             id: order.orderNumber || `P${Date.now()}`,
             orderNumber: order.orderNumber || `P${Date.now()}`,
             date: new Date(order.date).toLocaleDateString("ru-RU") || new Date().toLocaleDateString("ru-RU"),
-            status: "в обработке",
+            status: "Забронирован",
             items: Object.keys(order.services || {}).length + Object.keys(order.tireMountingServices || {}).length,
             total: `${order.totalPrice || 0} ₽`,
             products: [
@@ -93,7 +95,7 @@ export default function OrdersPage() {
             id: order.orderNumber || `TM${Date.now()}`,
             orderNumber: order.orderNumber || `TM${Date.now()}`,
             date: new Date().toLocaleDateString("ru-RU"),
-            status: "подтвержден",
+            status: "Забронирован",
             items: Object.keys(order.services || {}).length || 1,
             total: `${order.totalPrice || 0} ₽`,
             products: [{ name: "Шиномонтаж", quantity: 1, image: "/images/shinomontazh-new.png" }],
@@ -108,7 +110,7 @@ export default function OrdersPage() {
             id: order.orderNumber || `ST${Date.now()}`,
             orderNumber: order.orderNumber || `ST${Date.now()}`,
             date: new Date(order.date).toLocaleDateString("ru-RU") || new Date().toLocaleDateString("ru-RU"),
-            status: "в обработке",
+            status: "На сборке",
             items: 1,
             total: `${order.totalPrice || 0} ₽`,
             products: [{ name: "Дошиповка шин", quantity: 1, image: "/images/stupinators.png" }],
@@ -123,7 +125,7 @@ export default function OrdersPage() {
             id: order.orderNumber || `TS${Date.now()}`,
             orderNumber: order.orderNumber || `TS${Date.now()}`,
             date: new Date(order.date).toLocaleDateString("ru-RU") || new Date().toLocaleDateString("ru-RU"),
-            status: "подтвержден",
+            status: "Забронирован",
             items: 1,
             total: `${order.totalPrice || 0} ₽`,
             products: [{ name: "Хранение шин", quantity: 1, image: "/images/tire-storage-bags.png" }],
@@ -162,14 +164,27 @@ export default function OrdersPage() {
     window.location.reload()
   }
 
+  // Очистка всех заказов при первой загрузке (УДАЛИТЬ ПОСЛЕ ТЕСТИРОВАНИЯ)
+  useEffect(() => {
+    const cleared = sessionStorage.getItem("ordersCleared")
+    if (!cleared) {
+      localStorage.removeItem("paintingOrderData")
+      localStorage.removeItem("tireMountingOrderData")
+      localStorage.removeItem("studdingOrderData")
+      localStorage.removeItem("tireStorageOrderData")
+      localStorage.removeItem("ordersHistory")
+      localStorage.removeItem("currentOrder")
+      sessionStorage.setItem("ordersCleared", "true")
+    }
+  }, [])
+
   // Фильтрация заказов по статусу и поиску
   const filteredOrders = orders.filter((order) => order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()))
 
   const activeOrders = filteredOrders.filter((order) =>
-    ["в обработке", "подтвержден", "доставляется"].includes(order.status),
+    ["На сборке", "Забронирован", "Готов к выдаче", "В пути"].includes(order.status),
   )
-  const completedOrders = filteredOrders.filter((order) => order.status === "выполнен")
-  const canceledOrders = filteredOrders.filter((order) => order.status === "отменен")
+  const completedOrders = filteredOrders.filter((order) => order.status === "Выполнен")
 
   // Функция для отображения скелетона загрузки
   const renderSkeletons = () => {
@@ -195,16 +210,16 @@ export default function OrdersPage() {
   // Функция для получения иконки статуса
   const getStatusIcon = (status: OrderStatus) => {
     switch (status) {
-      case "выполнен":
-        return <CheckCircle className="h-4 w-4 text-green-500" />
-      case "отменен":
-        return <XCircle className="h-4 w-4 text-red-500" />
-      case "в обработке":
-        return <Clock className="h-4 w-4 text-orange-500" />
-      case "подтвержден":
-        return <CheckCircle className="h-4 w-4 text-blue-500" />
-      case "доставляется":
-        return <Package className="h-4 w-4 text-purple-500" />
+      case "На сборке":
+        return <Clock className="h-4 w-4 text-blue-400" />
+      case "Забронирован":
+        return <CheckCircle className="h-4 w-4 text-orange-400" />
+      case "Готов к выдаче":
+        return <Package className="h-4 w-4 text-green-400" />
+      case "В пути":
+        return <Package className="h-4 w-4 text-emerald-300" />
+      case "Выполнен":
+        return <CheckCircle className="h-4 w-4 text-green-600" />
       default:
         return null
     }
@@ -213,8 +228,8 @@ export default function OrdersPage() {
   return (
     <div className="min-h-screen bg-[#121212]">
       {/* Заголовок */}
-      <header className="sticky top-0 z-50 bg-[#1F1F1F] py-4 shadow-lg">
-        <div className="flex items-center justify-start pl-4">
+      <header className="sticky top-0 z-50 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full flex items-center justify-start pl-4">
           <button
             onClick={() => router.back()}
             className="p-2 rounded-2xl hover:bg-[#2A2A2A] transition-colors mr-3"
@@ -234,7 +249,7 @@ export default function OrdersPage() {
             <Input
               type="text"
               placeholder="Поиск по номеру заказа"
-              className="pl-11 pr-4 py-3 w-full bg-[#1F1F1F] border-none rounded-2xl text-white placeholder:text-gray-500 focus:ring-2 focus:ring-[#D3DF3D] focus:border-transparent"
+              className="pl-11 pr-4 py-3 w-full bg-[#1F1F1F] border-none rounded-2xl text-white placeholder:text-gray-500 focus:ring-2 focus:ring-[#c4d402] focus:border-transparent"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -243,30 +258,24 @@ export default function OrdersPage() {
 
         {/* Вкладки для фильтрации заказов */}
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid grid-cols-4 mb-6 bg-[#1F1F1F] p-1.5 rounded-2xl shadow-sm h-auto">
+          <TabsList className="grid grid-cols-3 mb-6 bg-[#1F1F1F] p-1.5 rounded-2xl shadow-sm h-auto">
             <TabsTrigger
               value="all"
-              className="data-[state=active]:bg-[#D3DF3D] data-[state=active]:text-black text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
+              className="data-[state=active]:bg-[#c4d402] data-[state=active]:text-black text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
             >
               Все
             </TabsTrigger>
             <TabsTrigger
               value="active"
-              className="data-[state=active]:bg-[#D3DF3D] data-[state=active]:text-black text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
+              className="data-[state=active]:bg-[#c4d402] data-[state=active]:text-black text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
             >
               Активные
             </TabsTrigger>
             <TabsTrigger
               value="completed"
-              className="data-[state=active]:bg-[#D3DF3D] data-[state=active]:text-black text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
+              className="data-[state=active]:bg-[#c4d402] data-[state=active]:text-black text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
             >
-              Готовые
-            </TabsTrigger>
-            <TabsTrigger
-              value="canceled"
-              className="data-[state=active]:bg-[#D3DF3D] data-[state=active]:text-black text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
-            >
-              Отмена
+              Выполнены
             </TabsTrigger>
           </TabsList>
 
@@ -299,7 +308,7 @@ export default function OrdersPage() {
                 <p className="text-gray-500 mb-5">Здесь будет отображаться история ваших заказов</p>
                 <button
                   onClick={() => router.push("/")}
-                  className="px-6 py-3 bg-[#D3DF3D] text-black font-semibold rounded-2xl hover:bg-[#c5d136] transition-colors"
+                  className="px-6 py-3 bg-[#c4d402] text-black font-semibold rounded-2xl hover:bg-[#c5d136] transition-colors"
                 >
                   Перейти к покупкам
                 </button>
@@ -367,37 +376,6 @@ export default function OrdersPage() {
                   У вас нет выполненных заказов
                 </h3>
                 <p className="text-gray-500">Выполненные заказы будут отображаться здесь</p>
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Отмененные заказы */}
-          <TabsContent value="canceled" className="space-y-4 animate-in fade-in-50 duration-300">
-            {isLoading ? (
-              renderSkeletons()
-            ) : canceledOrders.length > 0 ? (
-              <div className="space-y-4">
-                {canceledOrders.map((order) => (
-                  <div key={order.id} className="transform transition-all duration-200 hover:scale-[1.02]">
-                    <OrderHistoryItem
-                      id={order.id}
-                      orderNumber={order.orderNumber}
-                      date={order.date}
-                      status={order.status}
-                      items={order.items}
-                      total={order.total}
-                      products={order.products}
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-10 bg-[#1F1F1F] rounded-2xl p-6">
-                <div className="w-16 h-16 bg-[#2A2A2A] rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <XCircle className="h-8 w-8 text-gray-500" />
-                </div>
-                <h3 className="text-lg font-medium text-white mb-2">У вас нет отмененных заказов</h3>
-                <p className="text-gray-500">Отмененные заказы будут отображаться здесь</p>
               </div>
             )}
           </TabsContent>

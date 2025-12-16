@@ -412,7 +412,7 @@ export default function TireResults({ season, selectedBrands = [] }: TireResults
         data-testid="tire-results-container"
       >
         {/* Header showing pair count */}
-        <div className="bg-[#D3DF3D]/20 dark:bg-[#D3DF3D]/10 rounded-xl p-3 flex items-center justify-between">
+        <div className="bg-[#c4d402]/20 dark:bg-[#c4d402]/10 rounded-xl p-3 flex items-center justify-between">
           <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">
             Найдено пар: {tirePairs.length}
           </span>
@@ -432,7 +432,7 @@ export default function TireResults({ season, selectedBrands = [] }: TireResults
               <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
                 {pair.frontTire.brand} {typeof pair.frontTire.model === "string" ? pair.frontTire.model : (pair.frontTire.model as any)?.name || ""}
               </span>
-              <span className="text-xs bg-[#D3DF3D] text-[#1F1F1F] px-2 py-0.5 rounded-full">
+              <span className="text-xs bg-[#c4d402] text-[#1F1F1F] px-2 py-0.5 rounded-full">
                 Пара #{index + 1}
               </span>
             </div>

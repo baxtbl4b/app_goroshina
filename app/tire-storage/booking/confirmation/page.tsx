@@ -55,7 +55,7 @@ export default function TireStorageBookingConfirmationPage() {
             <div className="space-y-4">
               {/* Service */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <CheckCircle className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -66,7 +66,7 @@ export default function TireStorageBookingConfirmationPage() {
 
               {/* Date and Time */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <Calendar className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -79,7 +79,7 @@ export default function TireStorageBookingConfirmationPage() {
 
               {/* Location */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <MapPin className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -91,7 +91,7 @@ export default function TireStorageBookingConfirmationPage() {
 
               {/* Contact */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <MapPin className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -105,7 +105,7 @@ export default function TireStorageBookingConfirmationPage() {
 
         {/* Navigation Buttons */}
         <div className="space-y-3">
-          <Button asChild className="w-full h-12 bg-[#D3DF3D] hover:bg-[#D3DF3D]/90 text-[#1F1F1F] font-bold">
+          <Button asChild className="w-full h-12 bg-[#c4d402] hover:bg-[#c4d402]/90 text-[#1F1F1F] font-bold">
             <Link href="/account/orders">Посмотреть мои записи</Link>
           </Button>
 

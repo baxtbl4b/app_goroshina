@@ -37,8 +37,8 @@ export default function SettingsPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/">
               <Button variant="ghost" size="icon" className="mr-2">
@@ -89,7 +89,7 @@ export default function SettingsPage() {
                 <Ticket className="h-5 w-5 text-[#009CFF] mr-3" />
                 <span className="text-[#1F1F1F] dark:text-white">Купоны</span>
               </div>
-              <span className="bg-[#D3DF3D] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">2</span>
+              <span className="bg-[#c4d402] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">2</span>
             </Link>
 
             <Link href="/promo-codes" className="flex items-center justify-between p-4">
@@ -104,7 +104,7 @@ export default function SettingsPage() {
                 <BarChart3 className="h-5 w-5 text-[#009CFF] mr-3" />
                 <span className="text-[#1F1F1F] dark:text-white">Опрос</span>
               </div>
-              <span className="bg-[#D3DF3D] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">Новый</span>
+              <span className="bg-[#c4d402] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">Новый</span>
             </Link>
 
             <Link href="/donate-points" className="flex items-center justify-between p-4">

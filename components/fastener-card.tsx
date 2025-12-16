@@ -432,7 +432,7 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
                 <button
                   onClick={addToCart}
                   disabled={fastener.stock <= 0 || cartCount >= fastener.stock}
-                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-[#c4d402]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopRightRadius: '20px', borderBottomRightRadius: '20px' }}
                   aria-label="Увеличить количество"
                 >

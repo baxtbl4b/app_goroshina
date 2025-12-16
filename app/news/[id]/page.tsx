@@ -66,8 +66,8 @@ export default function NewsArticlePage({ params }: { params: { id: string } }) 
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <Link href="/news">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-5 w-5 text-[#1F1F1F] dark:text-white" />
@@ -96,7 +96,7 @@ export default function NewsArticlePage({ params }: { params: { id: string } }) 
           </div>
 
           <div className="flex items-center gap-2 mb-3">
-            <span className="bg-[#D3DF3D] text-[#1F1F1F] text-xs px-2 py-1 rounded-full">Акции</span>
+            <span className="bg-[#c4d402] text-[#1F1F1F] text-xs px-2 py-1 rounded-full">Акции</span>
             <span className="text-xs text-gray-500 dark:text-gray-400">
               {new Date(article.date).toLocaleDateString("ru-RU")}
             </span>

@@ -212,7 +212,7 @@ export default function AddExpensePage() {
             <div className="pt-4">
               <Button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-[#d3df3d] hover:bg-[#d3df3d]/80 text-[#1F1F1F] font-semibold"
+                className="w-full py-3 rounded-xl bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] font-semibold"
               >
                 <Plus className="mr-2 h-5 w-5" />
                 Добавить расход

@@ -949,7 +949,7 @@ onTouchStart={(e) => {
             aria-expanded={!isFilterCollapsed}
           >
             <div className="flex flex-col items-center gap-1">
-              <div className={`w-16 h-1.5 rounded-full transition-colors duration-300 ${isHandleHighlighted ? 'bg-[#D3DF3D]' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+              <div className={`w-16 h-1.5 rounded-full transition-colors duration-300 ${isHandleHighlighted ? 'bg-[#c4d402]' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
               {isFilterCollapsed && (
                 <svg
                   width="16"
@@ -1135,7 +1135,7 @@ onTouchStart={(e) => {
                         onClick={() => selectVehicle(vehicle)}
                         className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
                           selectedVehicle === vehicle.id
-                            ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
+                            ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
                             : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
                         }`}
                       >
@@ -1145,7 +1145,7 @@ onTouchStart={(e) => {
                   ) : (
                     <a
                       href="/account/cars/add"
-                      className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#D3DF3D] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
+                      className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
                     >
                       + Добавить авто
                     </a>
@@ -1275,7 +1275,7 @@ onTouchStart={(e) => {
 
         {/* Quick filter indicator - only show when filter is active and NOT on summer tab */}
         {quickFilterActive && season !== "s" && (
-          <div className="bg-[#D3DF3D]/20 dark:bg-[#D3DF3D]/10 rounded-xl p-2 mb-4 flex items-center justify-between">
+          <div className="bg-[#c4d402]/20 dark:bg-[#c4d402]/10 rounded-xl p-2 mb-4 flex items-center justify-between">
             <span className="text-sm text-[#1F1F1F] dark:text-white">
               Быстрый фильтр активирован: популярный размер, только в наличии
             </span>

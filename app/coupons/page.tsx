@@ -62,8 +62,8 @@ export default function CouponsPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/settings">
               <Button variant="ghost" size="icon" className="mr-2">
@@ -87,7 +87,7 @@ export default function CouponsPage() {
               <div key={coupon.id} className="p-4">
                 <div className="flex justify-between items-center mb-2">
                   <h4 className="font-bold text-[#1F1F1F] dark:text-white">{coupon.title}</h4>
-                  <span className="bg-[#D3DF3D] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">Активен</span>
+                  <span className="bg-[#c4d402] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">Активен</span>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{coupon.description}</p>
                 <div className="flex justify-between items-center">
@@ -118,7 +118,7 @@ export default function CouponsPage() {
                 <div className="flex justify-between items-center mb-2">
                   <h4 className="font-bold text-[#1F1F1F] dark:text-white">{coupon.title}</h4>
                   {isStorageCouponActive ? (
-                    <span className="bg-[#D3DF3D] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">
+                    <span className="bg-[#c4d402] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">
                       Активен
                     </span>
                   ) : (

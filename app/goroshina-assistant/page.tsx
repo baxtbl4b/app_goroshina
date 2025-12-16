@@ -126,7 +126,7 @@ export default function GoroshinaAssistant() {
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-[#121212] transition-colors duration-300">
-      <header className="bg-gray-100 dark:bg-[#1E1E1E] p-4 flex justify-between items-center transition-colors duration-300">
+      <header className="bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] px-4 flex justify-between items-center transition-colors duration-300">
         <div className="flex items-center gap-2">
           <Image src="/images/iigoroshinka.png" alt="Горошина" width={40} height={40} className="rounded-full" />
           <span className="font-medium text-[#1F1F1F] dark:text-white">Умная помошница Горошина</span>
@@ -139,7 +139,7 @@ export default function GoroshinaAssistant() {
             <div
               className={classNames(
                 message.isUser
-                  ? "bg-[#D3DF3D] text-[#1F1F1F] ml-auto"
+                  ? "bg-[#c4d402] text-[#1F1F1F] ml-auto"
                   : "bg-gray-200 dark:bg-[#2D2D2D] text-[#1F1F1F] dark:text-white mr-auto",
                 "inline-block p-3 rounded-2xl max-w-2xl break-words shadow-sm transition-colors duration-300",
               )}
@@ -241,7 +241,7 @@ export default function GoroshinaAssistant() {
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
             placeholder="Задайте вопрос Горошине..."
-            className="flex-1 p-3 rounded-2xl border-gray-300 dark:border-gray-700 bg-white dark:bg-[#2D2D2D] text-[#1F1F1F] dark:text-white transition-colors duration-300 focus:outline-none focus:ring-[#D3DF3D] resize-none"
+            className="flex-1 p-3 rounded-2xl border-gray-300 dark:border-gray-700 bg-white dark:bg-[#2D2D2D] text-[#1F1F1F] dark:text-white transition-colors duration-300 focus:outline-none focus:ring-[#c4d402] resize-none"
           />
           <button className="p-2 rounded-full bg-gray-200 dark:bg-[#2D2D2D] text-[#1F1F1F] dark:text-white hover:bg-gray-300 dark:hover:bg-[#3A3A3A] transition-colors duration-300">
             <MicIcon className="w-5 h-5" />

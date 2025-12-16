@@ -153,8 +153,8 @@ export default function TransactionHistoryPage() {
 
   return (
     <div className="min-h-screen bg-[#F0F0F5] dark:bg-[#121212] flex flex-col">
-      <header className="bg-white dark:bg-[#1E1E1E] p-4 sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Button
               variant="ghost"

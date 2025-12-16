@@ -646,8 +646,8 @@ export default function AddCarPage() {
                   onClick={() => setFormData(prev => ({ ...prev, tireSeason: "summer" }))}
                   className={`p-4 rounded-xl border-2 transition-all ${
                     formData.tireSeason === "summer"
-                      ? 'border-[#D3DF3D] bg-[#D3DF3D]/10'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-[#D3DF3D]/50'
+                      ? 'border-[#c4d402] bg-[#c4d402]/10'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-[#c4d402]/50'
                   }`}
                 >
                   <span className="font-semibold text-[#1F1F1F] dark:text-white">Лето</span>
@@ -675,7 +675,7 @@ export default function AddCarPage() {
                   </Label>
                   <span className={`text-xs px-2 py-1 rounded-full ${
                     formData.tireSeason === "summer"
-                      ? "bg-[#D3DF3D]/20 text-[#1F1F1F] dark:text-white"
+                      ? "bg-[#c4d402]/20 text-[#1F1F1F] dark:text-white"
                       : "bg-[#009CFF]/20 text-[#009CFF]"
                   }`}>
                     {formData.tireSeason === "summer" ? "Летние" : "Зимние"}
@@ -730,7 +730,7 @@ export default function AddCarPage() {
                                      formData.winterTireProfile === size.height &&
                                      formData.winterTireDiameter === size.diameter &&
                                      !formData.winterIsStaggered))
-                                  ? 'border-[#D3DF3D] bg-[#D3DF3D]/10'
+                                  ? 'border-[#c4d402] bg-[#c4d402]/10'
                                   : 'border-gray-200 dark:border-gray-700 hover:border-[#009CFF] hover:bg-[#009CFF]/5'
                               }`}
                             >
@@ -971,7 +971,7 @@ export default function AddCarPage() {
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="w-full py-6 rounded-xl bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] dark:text-[#1F1F1F] font-semibold text-base disabled:opacity-50"
+          className="w-full py-6 rounded-xl bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] dark:text-[#1F1F1F] font-semibold text-base disabled:opacity-50"
         >
           <Plus className="mr-2 h-5 w-5" />
           {isSubmitting ? "Добавление..." : "Добавить автомобиль"}

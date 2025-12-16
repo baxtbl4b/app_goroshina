@@ -228,7 +228,7 @@ export default function TireFilters({ season, onFilterChange }: TireFiltersProps
                   selectedWidths.includes(size.width) &&
                   selectedHeights.includes(size.height) &&
                   selectedDiameters.includes(size.diam)
-                    ? "bg-[#D3DF3D] text-[#1F1F1F] border-[#D3DF3D]"
+                    ? "bg-[#c4d402] text-[#1F1F1F] border-[#c4d402]"
                     : "border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
                 }`}
                 onClick={() => applyQuickSizeFilter(size)}

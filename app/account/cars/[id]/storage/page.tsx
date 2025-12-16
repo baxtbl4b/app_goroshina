@@ -23,7 +23,7 @@ export default function TireStoragePage() {
         <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-[#1F1F1F] dark:text-white">Toyota Camry • А123БВ777</h3>
-            <span className="text-sm font-medium px-3 py-1 bg-[#D3DF3D] text-[#1F1F1F] rounded-full">Активно</span>
+            <span className="text-sm font-medium px-3 py-1 bg-[#c4d402] text-[#1F1F1F] rounded-full">Активно</span>
           </div>
 
           <div className="space-y-3">
@@ -72,7 +72,7 @@ export default function TireStoragePage() {
                 <h4 className="font-medium text-[#1F1F1F] dark:text-white">Стоимость услуги:</h4>
                 <p className="text-lg font-bold text-[#1F1F1F] dark:text-white">6 000 ₽</p>
               </div>
-              <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
+              <Button className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">
                 <Download className="h-4 w-4 mr-2" />
                 Скачать договор
               </Button>

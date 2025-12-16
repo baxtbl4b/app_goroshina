@@ -11,8 +11,8 @@ import BottomNavigation from "@/components/bottom-navigation"
 export default function LoyaltyPage() {
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="relative flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 relative flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/profile">
               <Button variant="ghost" size="icon" className="mr-2">
@@ -28,7 +28,7 @@ export default function LoyaltyPage() {
             <Link href="/cart">
               <Button variant="ghost" size="icon" className="text-[#1F1F1F] dark:text-white relative">
                 <ShoppingCart className="h-6 w-6" />
-                <span className="absolute -top-1 -right-1 bg-[#D3DF3D] text-[#1F1F1F] text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                <span className="absolute -top-1 -right-1 bg-[#c4d402] text-[#1F1F1F] text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
                   2
                 </span>
               </Button>
@@ -41,19 +41,19 @@ export default function LoyaltyPage() {
         <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm">
           <div className="flex items-center justify-between">
             <h2 className="font-bold text-lg text-[#1F1F1F] dark:text-white">Ваш статус</h2>
-            <span className="text-lg font-bold text-[#D3DF3D]">350 горошинов</span>
+            <span className="text-lg font-bold text-[#c4d402]">350 горошинов</span>
           </div>
 
           <div className="mt-6 relative">
             <Progress
               value={35}
               className="h-3 bg-[#D9D9DD] dark:bg-[#3A3A3A]"
-              indicatorClassName="bg-gradient-to-r from-[#D3DF3D] to-[#009CFF]"
+              indicatorClassName="bg-gradient-to-r from-[#c4d402] to-[#009CFF]"
             />
 
             <div className="flex justify-between mt-2">
               <div className="flex flex-col items-center">
-                <div className="w-6 h-6 rounded-full bg-[#D3DF3D] flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-[#c4d402] flex items-center justify-center">
                   <Award className="w-4 h-4 text-[#1F1F1F]" />
                 </div>
                 <span className="text-xs font-medium mt-1 text-[#1F1F1F] dark:text-white">Бронза</span>
@@ -61,7 +61,7 @@ export default function LoyaltyPage() {
               </div>
 
               <div className="flex flex-col items-center">
-                <div className="w-6 h-6 rounded-full bg-[#D3DF3D] flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-[#c4d402] flex items-center justify-center">
                   <Award className="w-4 h-4 text-[#1F1F1F]" />
                 </div>
                 <span className="text-xs font-medium mt-1 text-[#1F1F1F] dark:text-white">Серебро</span>
@@ -88,7 +88,7 @@ export default function LoyaltyPage() {
 
           <div className="mt-6 p-3 bg-[#1F1F1F] dark:bg-[#333333] rounded-lg">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#D3DF3D] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-[#c4d402] flex items-center justify-center">
                 <Award className="w-6 h-6 text-[#1F1F1F]" />
               </div>
               <div>
@@ -99,22 +99,22 @@ export default function LoyaltyPage() {
             <div className="mt-3 space-y-2">
               <div className="flex justify-between">
                 <span className="text-xs text-gray-300">Бесплатная доставка</span>
-                <span className="text-xs text-[#D3DF3D]">Доступно</span>
+                <span className="text-xs text-[#c4d402]">Доступно</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-xs text-gray-300">Скидка на шиномонтаж</span>
-                <span className="text-xs text-[#D3DF3D]">5%</span>
+                <span className="text-xs text-[#c4d402]">5%</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-xs text-gray-300">Доступ к акциям</span>
-                <span className="text-xs text-[#D3DF3D]">Базовый</span>
+                <span className="text-xs text-[#c4d402]">Базовый</span>
               </div>
             </div>
           </div>
 
           <div className="mt-4">
             <p className="text-sm text-[#1F1F1F] dark:text-white">
-              До золотого статуса осталось <span className="font-bold text-[#D3DF3D]">650 горошинов</span>
+              До золотого статуса осталось <span className="font-bold text-[#c4d402]">650 горошинов</span>
             </p>
           </div>
         </div>
@@ -153,14 +153,14 @@ export default function LoyaltyPage() {
                       height={80}
                       className="object-contain"
                     />
-                    <div className="absolute -top-2 -right-2 bg-[#D3DF3D] text-[#1F1F1F] text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                    <div className="absolute -top-2 -right-2 bg-[#c4d402] text-[#1F1F1F] text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
                       <Gift className="w-3 h-3" />
                     </div>
                   </div>
                 </div>
                 <h3 className="font-medium text-center text-[#1F1F1F] dark:text-white">Скидка 500₽</h3>
                 <div className="flex justify-center mt-2">
-                  <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs font-semibold px-3 py-1 h-auto">
+                  <Button className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs font-semibold px-3 py-1 h-auto">
                     200 горошинов
                   </Button>
                 </div>
@@ -176,14 +176,14 @@ export default function LoyaltyPage() {
                       height={80}
                       className="object-contain"
                     />
-                    <div className="absolute -top-2 -right-2 bg-[#D3DF3D] text-[#1F1F1F] text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                    <div className="absolute -top-2 -right-2 bg-[#c4d402] text-[#1F1F1F] text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
                       <Gift className="w-3 h-3" />
                     </div>
                   </div>
                 </div>
                 <h3 className="font-medium text-center text-[#1F1F1F] dark:text-white">Бесплатный шиномонтаж</h3>
                 <div className="flex justify-center mt-2">
-                  <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs font-semibold px-3 py-1 h-auto">
+                  <Button className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs font-semibold px-3 py-1 h-auto">
                     500 горошинов
                   </Button>
                 </div>
@@ -245,7 +245,7 @@ export default function LoyaltyPage() {
                     <p className="font-medium text-[#1F1F1F] dark:text-white">Начисление за заказ</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">15.04.2023</p>
                   </div>
-                  <span className="text-[#D3DF3D] font-bold">+125 горошинов</span>
+                  <span className="text-[#c4d402] font-bold">+125 горошинов</span>
                 </div>
                 <div className="flex justify-between items-center pb-3 border-b border-[#D9D9DD] dark:border-[#3A3A3A]">
                   <div>
@@ -259,14 +259,14 @@ export default function LoyaltyPage() {
                     <p className="font-medium text-[#1F1F1F] dark:text-white">Начисление за заказ</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">03.03.2023</p>
                   </div>
-                  <span className="text-[#D3DF3D] font-bold">+250 горошинов</span>
+                  <span className="text-[#c4d402] font-bold">+250 горошинов</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="font-medium text-[#1F1F1F] dark:text-white">Приветственный бонус</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">15.01.2023</p>
                   </div>
-                  <span className="text-[#D3DF3D] font-bold">+100 горошинов</span>
+                  <span className="text-[#c4d402] font-bold">+100 горошинов</span>
                 </div>
               </div>
             </div>

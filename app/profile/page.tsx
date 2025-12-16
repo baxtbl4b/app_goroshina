@@ -97,7 +97,7 @@ export default function ProfilePage() {
                     src={user.avatar && user.avatar.startsWith('data:') ? user.avatar : (user.avatar || "/placeholder.svg")}
                     alt={user.name}
                   />
-                  <AvatarFallback className="bg-[#D3DF3D] text-[#1F1F1F] text-lg font-bold">
+                  <AvatarFallback className="bg-[#c4d402] text-[#1F1F1F] text-lg font-bold">
                     {user.name
                       .split(" ")
                       .map((n) => n[0])
@@ -114,7 +114,7 @@ export default function ProfilePage() {
                 />
                 <label
                   htmlFor="avatar-upload-profile"
-                  className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#D3DF3D] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#C4CF2E] transition-colors shadow-md active:scale-95"
+                  className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#c4d402] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#b3c002] transition-colors shadow-md active:scale-95"
                 >
                   {isUploadingAvatar ? (
                     <div className="w-3.5 h-3.5 border-2 border-[#1F1F1F] border-t-transparent rounded-full animate-spin" />
@@ -128,10 +128,10 @@ export default function ProfilePage() {
                 {user.email && <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>}
                 <p className="text-sm text-gray-600 dark:text-gray-400">{user.phone}</p>
                 <div className="flex items-center mt-2 space-x-2">
-                  <Badge variant="secondary" className="bg-[#D3DF3D] text-[#1F1F1F]">
+                  <Badge variant="secondary" className="bg-[#c4d402] text-[#1F1F1F]">
                     {user.loyaltyLevel}
                   </Badge>
-                  <span className="text-sm font-medium text-[#D3DF3D]">{user.loyaltyPoints} баллов</span>
+                  <span className="text-sm font-medium text-[#c4d402]">{user.loyaltyPoints} баллов</span>
                 </div>
               </div>
             </div>
@@ -142,7 +142,7 @@ export default function ProfilePage() {
         <div className="grid grid-cols-3 gap-4 mb-6">
           <Card className="bg-white dark:bg-[#2A2A2A] border-0 shadow-sm">
             <CardContent className="p-4 text-center">
-              <ShoppingBag className="h-6 w-6 mx-auto mb-2 text-[#D3DF3D]" />
+              <ShoppingBag className="h-6 w-6 mx-auto mb-2 text-[#c4d402]" />
               <p className="text-2xl font-bold text-[#1F1F1F] dark:text-white">12</p>
               <p className="text-xs text-gray-600 dark:text-gray-400">Заказов</p>
             </CardContent>
@@ -170,7 +170,7 @@ export default function ProfilePage() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-[#D3DF3D]/20 rounded-lg">
+                    <div className="p-2 bg-[#c4d402]/20 rounded-lg">
                       <Image src="/images/crossover-suv.png" alt="Мои автомобили" width={24} height={24} />
                     </div>
                     <span className="font-medium text-[#1F1F1F] dark:text-white">Мои автомобили</span>
@@ -186,8 +186,8 @@ export default function ProfilePage() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-[#D3DF3D]/20 rounded-lg">
-                      <ShoppingBag className="h-6 w-6 text-[#D3DF3D]" />
+                    <div className="p-2 bg-[#c4d402]/20 rounded-lg">
+                      <ShoppingBag className="h-6 w-6 text-[#c4d402]" />
                     </div>
                     <span className="font-medium text-[#1F1F1F] dark:text-white">История заказов</span>
                   </div>

@@ -413,7 +413,7 @@ export function FastenerSearchFilter({ fastenerType = "nut" }: FastenerSearchFil
                     }}
                     className={`text-xs px-1.5 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0 ${
                       selectedCar === car
-                        ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
+                        ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
                         : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
                     }`}
                   >

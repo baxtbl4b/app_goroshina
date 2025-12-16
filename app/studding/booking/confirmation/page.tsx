@@ -74,7 +74,7 @@ export default function StuddingBookingConfirmationPage() {
               <div className="space-y-4">
                 {/* Service */}
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                     <CheckCircle className="h-4 w-4 text-[#1F1F1F]" />
                   </div>
                   <div>
@@ -88,7 +88,7 @@ export default function StuddingBookingConfirmationPage() {
 
                 {/* Date and Time */}
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                     <Calendar className="h-4 w-4 text-[#1F1F1F]" />
                   </div>
                   <div>
@@ -107,7 +107,7 @@ export default function StuddingBookingConfirmationPage() {
 
                 {/* Location */}
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                     <MapPin className="h-4 w-4 text-[#1F1F1F]" />
                   </div>
                   <div>
@@ -119,7 +119,7 @@ export default function StuddingBookingConfirmationPage() {
 
                 {/* Contact */}
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                     <Phone className="h-4 w-4 text-[#1F1F1F]" />
                   </div>
                   <div>
@@ -150,7 +150,7 @@ export default function StuddingBookingConfirmationPage() {
             <div className="border-t border-gray-600 mt-4 pt-4">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-bold">Итого:</span>
-                <span className="text-xl font-bold text-[#D3DF3D]">{orderData.totalPrice}₽</span>
+                <span className="text-xl font-bold text-[#c4d402]">{orderData.totalPrice}₽</span>
               </div>
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function StuddingBookingConfirmationPage() {
             <h2 className="text-lg font-bold mb-3">Что дальше?</h2>
             <div className="space-y-3 text-sm">
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-6 h-6 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                   <span className="text-black font-bold text-xs">1</span>
                 </div>
                 <p>Наш менеджер свяжется с вами для подтверждения записи</p>
@@ -184,7 +184,7 @@ export default function StuddingBookingConfirmationPage() {
           <div className="space-y-3">
             <button
               onClick={handleViewOrders}
-              className="w-full bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black py-3 px-4 rounded-lg font-medium transition-colors"
+              className="w-full bg-[#c4d402] hover:bg-[#C4CF2E] text-black py-3 px-4 rounded-lg font-medium transition-colors"
             >
               Посмотреть мои записи
             </button>

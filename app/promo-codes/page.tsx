@@ -53,8 +53,8 @@ export default function PromoCodesPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Button variant="ghost" size="icon" className="mr-2" onClick={() => router.back()}>
               <ArrowLeft className="h-5 w-5 text-[#1F1F1F] dark:text-white" />
@@ -87,7 +87,7 @@ export default function PromoCodesPage() {
             />
             <Button
               onClick={handleAddPromoCode}
-              className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]"
+              className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]"
               disabled={!newPromoCode.trim()}
             >
               <Plus className="h-4 w-4" />
@@ -112,7 +112,7 @@ export default function PromoCodesPage() {
                   <Hash className="h-5 w-5 text-[#009CFF] mr-2" />
                   <span className="font-bold text-[#1F1F1F] dark:text-white">WINTER2024</span>
                 </div>
-                <span className="bg-[#D3DF3D] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">Активен</span>
+                <span className="bg-[#c4d402] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">Активен</span>
               </div>
               <p className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-2">Скидка 20% на зимние шины</p>
               <div className="flex items-center justify-between">
@@ -145,7 +145,7 @@ export default function PromoCodesPage() {
                   <Hash className="h-5 w-5 text-[#009CFF] mr-2" />
                   <span className="font-bold text-[#1F1F1F] dark:text-white">NEWCLIENT</span>
                 </div>
-                <span className="bg-[#D3DF3D] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">Активен</span>
+                <span className="bg-[#c4d402] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">Активен</span>
               </div>
               <p className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-2">Скидка 15% для новых клиентов</p>
               <div className="flex items-center justify-between">
@@ -178,7 +178,7 @@ export default function PromoCodesPage() {
                   <Hash className="h-5 w-5 text-[#009CFF] mr-2" />
                   <span className="font-bold text-[#1F1F1F] dark:text-white">MOUNTING50</span>
                 </div>
-                <span className="bg-[#D3DF3D] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">Активен</span>
+                <span className="bg-[#c4d402] text-[#1F1F1F] text-xs font-bold px-2 py-1 rounded-full">Активен</span>
               </div>
               <p className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-2">Скидка 50% на шиномонтаж</p>
               <div className="flex items-center justify-between">

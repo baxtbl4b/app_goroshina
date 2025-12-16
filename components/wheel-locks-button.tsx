@@ -9,7 +9,7 @@ export function WheelLocksButton() {
 
   return (
     <>
-      <Button onClick={() => setIsModalOpen(true)} className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
+      <Button onClick={() => setIsModalOpen(true)} className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">
         Купить секретки
       </Button>
 
@@ -23,7 +23,7 @@ export function WheelLocksButton() {
             <p className="text-sm text-[#1F1F1F] dark:text-white mb-4">
               Защитите свои колеса от кражи с помощью надежных секреток.
             </p>
-            <Button onClick={() => setIsModalOpen(false)} className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
+            <Button onClick={() => setIsModalOpen(false)} className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">
               Закрыть
             </Button>
           </div>

@@ -24,7 +24,7 @@ function SubmitButton({ text }: { text: string }) {
   return (
     <Button
       type="submit"
-      className="w-full h-12 bg-[#D3DF3D] text-[#1F1F1F] hover:bg-[#D3DF3D]/90 font-semibold rounded-xl shadow-lg shadow-[#D3DF3D]/20 transition-all duration-200 active:scale-[0.98]"
+      className="w-full h-12 bg-[#c4d402] text-[#1F1F1F] hover:bg-[#c4d402]/90 font-semibold rounded-xl shadow-lg shadow-[#c4d402]/20 transition-all duration-200 active:scale-[0.98]"
       disabled={pending}
     >
       {pending ? "Загрузка..." : text}
@@ -293,7 +293,7 @@ export default function AccountPage() {
       <main className="flex flex-col min-h-screen items-center justify-center bg-gradient-to-b from-[#1F1F1F] to-[#2A2A2A] p-4">
         {/* Logo */}
         <div className="mb-8 text-center">
-          <div className="w-20 h-20 mx-auto mb-4 bg-[#D3DF3D] rounded-3xl flex items-center justify-center shadow-xl shadow-[#D3DF3D]/20">
+          <div className="w-20 h-20 mx-auto mb-4 bg-[#c4d402] rounded-3xl flex items-center justify-center shadow-xl shadow-[#c4d402]/20">
             <User className="w-10 h-10 text-[#1F1F1F]" />
           </div>
           <h1 className="text-2xl font-bold text-white">Горошина</h1>
@@ -324,7 +324,7 @@ export default function AccountPage() {
                       type="tel"
                       placeholder="+7 (900) 123-45-67"
                       required
-                      className="h-12 pl-12 bg-[#1F1F1F] text-white border-0 rounded-xl focus:ring-2 focus:ring-[#D3DF3D] placeholder:text-gray-500"
+                      className="h-12 pl-12 bg-[#1F1F1F] text-white border-0 rounded-xl focus:ring-2 focus:ring-[#c4d402] placeholder:text-gray-500"
                     />
                   </div>
                 </div>
@@ -348,7 +348,7 @@ export default function AccountPage() {
                     placeholder="• • • •"
                     maxLength={4}
                     required
-                    className="h-14 text-center text-2xl tracking-[1em] bg-[#1F1F1F] text-white border-0 rounded-xl focus:ring-2 focus:ring-[#D3DF3D] placeholder:text-gray-600"
+                    className="h-14 text-center text-2xl tracking-[1em] bg-[#1F1F1F] text-white border-0 rounded-xl focus:ring-2 focus:ring-[#c4d402] placeholder:text-gray-600"
                   />
                 </div>
                 {error && (
@@ -398,12 +398,12 @@ export default function AccountPage() {
       {/* Main content */}
       <div className="px-4 pt-5 pb-24 space-y-5">
         {/* User Profile Card */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#D3DF3D] via-[#B8C736] to-[#009CFF] p-[1px]">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#c4d402] via-[#B8C736] to-[#009CFF] p-[1px]">
           <div className="relative bg-[#2A2A2A] rounded-[23px] p-5">
             <div className="flex items-center gap-4">
               {/* Avatar */}
               <div className="relative">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#D3DF3D] to-[#009CFF] flex items-center justify-center overflow-hidden">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#c4d402] to-[#009CFF] flex items-center justify-center overflow-hidden">
                   {user.avatar && user.avatar.startsWith('data:') ? (
                     <Image
                       src={user.avatar}
@@ -429,7 +429,7 @@ export default function AccountPage() {
                 />
                 <label
                   htmlFor="avatar-upload"
-                  className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#D3DF3D] rounded-lg flex items-center justify-center cursor-pointer hover:bg-[#C4CF2E] transition-colors active:scale-95"
+                  className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#c4d402] rounded-lg flex items-center justify-center cursor-pointer hover:bg-[#C4CF2E] transition-colors active:scale-95"
                 >
                   {isUploadingAvatar ? (
                     <div className="w-3 h-3 border-2 border-[#1F1F1F] border-t-transparent rounded-full animate-spin" />
@@ -474,7 +474,7 @@ export default function AccountPage() {
                   <button
                     onClick={saveProfile}
                     disabled={isSavingProfile}
-                    className="w-8 h-8 rounded-lg bg-[#D3DF3D] flex items-center justify-center hover:bg-[#C4CF2E] transition-colors disabled:opacity-50"
+                    className="w-8 h-8 rounded-lg bg-[#c4d402] flex items-center justify-center hover:bg-[#C4CF2E] transition-colors disabled:opacity-50"
                   >
                     {isSavingProfile ? (
                       <div className="w-4 h-4 border-2 border-[#1F1F1F] border-t-transparent rounded-full animate-spin" />
@@ -497,14 +497,14 @@ export default function AccountPage() {
             <div className="mt-5 flex gap-3">
               <div className="flex-1 bg-[#1F1F1F] rounded-2xl p-3 flex flex-col items-center justify-center text-center">
                 <div className="flex items-center gap-2 mb-1">
-                  <Award className="w-4 h-4 text-[#D3DF3D]" />
+                  <Award className="w-4 h-4 text-[#c4d402]" />
                   <span className="text-xs text-gray-400">Статус</span>
                 </div>
                 <p className="text-white font-semibold">{user.loyaltyLevel}</p>
               </div>
               <div className="flex-1 bg-[#1F1F1F] rounded-2xl p-3 flex flex-col items-center justify-center text-center">
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="w-4 h-4 rounded-full bg-[#D3DF3D]" />
+                  <div className="w-4 h-4 rounded-full bg-[#c4d402]" />
                   <span className="text-xs text-gray-400">Баллы</span>
                 </div>
                 <p className="text-white font-semibold">{user.loyaltyPoints.toLocaleString()}</p>
@@ -517,7 +517,7 @@ export default function AccountPage() {
         <div className="grid grid-cols-4 gap-3">
           <Link href="/account/cars/add" className="flex flex-col items-center">
             <div className="w-14 h-14 rounded-2xl bg-[#2A2A2A] flex items-center justify-center mb-2 hover:bg-[#333] transition-colors">
-              <Plus className="h-6 w-6 text-[#D3DF3D]" />
+              <Plus className="h-6 w-6 text-[#c4d402]" />
             </div>
             <span className="text-xs text-gray-400 text-center">Добавить</span>
           </Link>
@@ -545,7 +545,7 @@ export default function AccountPage() {
         <div className="bg-[#2A2A2A] rounded-3xl overflow-hidden">
           <div className="flex items-center justify-between p-4 pb-2">
             <div className="flex items-center gap-2">
-              <Car className="w-5 h-5 text-[#D3DF3D]" />
+              <Car className="w-5 h-5 text-[#c4d402]" />
               <h3 className="font-bold text-white">Мои автомобили</h3>
             </div>
             <Link href="/account/cars">
@@ -557,7 +557,7 @@ export default function AccountPage() {
           <div className="px-4 pb-4 space-y-2">
             {!carsLoaded ? (
               <div className="text-center py-6 text-gray-500">
-                <div className="w-8 h-8 border-2 border-[#D3DF3D] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                <div className="w-8 h-8 border-2 border-[#c4d402] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                 Загрузка...
               </div>
             ) : userCars.length === 0 ? (
@@ -567,7 +567,7 @@ export default function AccountPage() {
                 </div>
                 <p className="text-gray-400 mb-4">У вас пока нет автомобилей</p>
                 <Link href="/account/cars/add">
-                  <Button className="bg-[#D3DF3D] text-[#1F1F1F] hover:bg-[#D3DF3D]/90 rounded-xl h-10 px-6 font-semibold">
+                  <Button className="bg-[#c4d402] text-[#1F1F1F] hover:bg-[#c4d402]/90 rounded-xl h-10 px-6 font-semibold">
                     <Plus className="h-4 w-4 mr-2" /> Добавить авто
                   </Button>
                 </Link>
@@ -576,7 +576,7 @@ export default function AccountPage() {
               userCars.slice(0, 3).map((car, index) => (
                 <Link key={car.id} href={`/account/cars/${car.id}`}>
                   <div className="flex items-center gap-3 p-3 rounded-2xl bg-[#1F1F1F] hover:bg-[#252525] transition-colors active:scale-[0.98]">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#009CFF]/20 to-[#D3DF3D]/20 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#009CFF]/20 to-[#c4d402]/20 flex items-center justify-center">
                       <span className="text-white font-bold">
                         {car.brand?.charAt(0) || "A"}
                       </span>
@@ -587,7 +587,7 @@ export default function AccountPage() {
                           {car.brand} {car.model}
                         </p>
                         {car.isPrimary && (
-                          <Badge className="bg-[#D3DF3D]/20 text-[#D3DF3D] text-[10px] px-2 py-0.5 rounded-md shrink-0">
+                          <Badge className="bg-[#c4d402]/20 text-[#c4d402] text-[10px] px-2 py-0.5 rounded-md shrink-0">
                             Основной
                           </Badge>
                         )}

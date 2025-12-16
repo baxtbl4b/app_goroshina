@@ -45,7 +45,7 @@ function ExpenseChart() {
                 <div className="w-full bg-[#D9D9DD] dark:bg-[#3a3a3a] rounded-full h-6 relative overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-300 ${
-                      isHighExpense ? "bg-[#D3DF3D]" : "bg-[#009CFF]"
+                      isHighExpense ? "bg-[#c4d402]" : "bg-[#009CFF]"
                     }`}
                     style={{ width: `${Math.max(percentage, 5)}%` }}
                   />
@@ -70,7 +70,7 @@ function ExpenseChart() {
         </div>
         <div className="flex justify-between items-center mt-1">
           <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Максимальные расходы:</span>
-          <span className="font-bold text-[#D3DF3D]">{maxAmount.toLocaleString()} ₽</span>
+          <span className="font-bold text-[#c4d402]">{maxAmount.toLocaleString()} ₽</span>
         </div>
       </div>
     </div>
@@ -108,14 +108,14 @@ export default function CarExpensesPage() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Средняя стоимость за 1км пути:</span>
-              <span className="font-medium text-[#1F1F1F] bg-[#d3df3d] px-2 py-1 rounded">10.75 ₽/км</span>
+              <span className="font-medium text-[#1F1F1F] bg-[#c4d402] px-2 py-1 rounded">10.75 ₽/км</span>
             </div>
           </div>
 
           <div className="border-t border-[#D9D9DD] dark:border-[#3a3a3a] pt-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center">
-                <Tool className="h-5 w-5 text-[#D3DF3D] mr-2" />
+                <Tool className="h-5 w-5 text-[#c4d402] mr-2" />
                 <span className="text-sm font-medium text-[#1F1F1F] dark:text-gray-300">Общие расходы:</span>
               </div>
               <span className="text-lg font-bold text-[#1F1F1F] dark:text-white">78 500 ₽</span>
@@ -171,13 +171,13 @@ export default function CarExpensesPage() {
             <div className="bg-white dark:bg-[#2a2a2a] rounded-xl p-4 shadow-sm">
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
-                  <div className="w-3 h-3 rounded-full bg-[#D3DF3D] mr-2"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#c4d402] mr-2"></div>
                   <span className="font-medium text-[#1F1F1F] dark:text-white">Замена шин</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-[#1F1F1F] dark:text-gray-300">15.04.2023</span>
                   <Link href="/account/cars/1/expenses/add?type=tires&name=Замена шин">
-                    <Button size="sm" className="h-6 px-2 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs">
+                    <Button size="sm" className="h-6 px-2 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs">
                       <Plus className="h-3 w-3 mr-1" /> Добавить
                     </Button>
                   </Link>
@@ -213,7 +213,7 @@ export default function CarExpensesPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-[#1F1F1F] dark:text-gray-300">10.03.2023</span>
                   <Link href="/account/cars/1/expenses/add?type=service&name=ТО-2">
-                    <Button size="sm" className="h-6 px-2 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs">
+                    <Button size="sm" className="h-6 px-2 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs">
                       <Plus className="h-3 w-3 mr-1" /> Добавить
                     </Button>
                   </Link>
@@ -253,7 +253,7 @@ export default function CarExpensesPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-[#1F1F1F] dark:text-gray-300">05.02.2023</span>
                   <Link href="/account/cars/1/expenses/add?type=other&name=Мойка и химчистка">
-                    <Button size="sm" className="h-6 px-2 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs">
+                    <Button size="sm" className="h-6 px-2 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs">
                       <Plus className="h-3 w-3 mr-1" /> Добавить
                     </Button>
                   </Link>
@@ -289,7 +289,7 @@ export default function CarExpensesPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-[#1F1F1F] dark:text-gray-300">20.04.2023</span>
                   <Link href="/account/cars/1/expenses/add?type=fuel&name=Заправка">
-                    <Button size="sm" className="h-6 px-2 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs">
+                    <Button size="sm" className="h-6 px-2 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs">
                       <Plus className="h-3 w-3 mr-1" /> Добавить
                     </Button>
                   </Link>
@@ -321,7 +321,7 @@ export default function CarExpensesPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-[#1F1F1F] dark:text-gray-300">01.01.2023</span>
                   <Link href="/account/cars/1/expenses/add?type=insurance&name=ОСАГО">
-                    <Button size="sm" className="h-6 px-2 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs">
+                    <Button size="sm" className="h-6 px-2 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs">
                       <Plus className="h-3 w-3 mr-1" /> Добавить
                     </Button>
                   </Link>
@@ -353,13 +353,13 @@ export default function CarExpensesPage() {
             <div className="bg-white dark:bg-[#2a2a2a] rounded-xl p-4 shadow-sm">
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
-                  <div className="w-3 h-3 rounded-full bg-[#D3DF3D] mr-2"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#c4d402] mr-2"></div>
                   <span className="font-medium text-[#1F1F1F] dark:text-white">Замена шин</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-[#1F1F1F] dark:text-gray-300">15.04.2023</span>
                   <Link href="/account/cars/1/expenses/add?type=tires&name=Замена шин">
-                    <Button size="sm" className="h-6 px-2 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs">
+                    <Button size="sm" className="h-6 px-2 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs">
                       <Plus className="h-3 w-3 mr-1" /> Добавить
                     </Button>
                   </Link>
@@ -397,7 +397,7 @@ export default function CarExpensesPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-[#1F1F1F] dark:text-gray-300">10.03.2023</span>
                   <Link href="/account/cars/1/expenses/add?type=service&name=ТО-2">
-                    <Button size="sm" className="h-6 px-2 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs">
+                    <Button size="sm" className="h-6 px-2 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs">
                       <Plus className="h-3 w-3 mr-1" /> Добавить
                     </Button>
                   </Link>
@@ -439,7 +439,7 @@ export default function CarExpensesPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-[#1F1F1F] dark:text-gray-300">05.02.2023</span>
                   <Link href="/account/cars/1/expenses/add?type=other&name=Мойка и химчистка">
-                    <Button size="sm" className="h-6 px-2 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs">
+                    <Button size="sm" className="h-6 px-2 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs">
                       <Plus className="h-3 w-3 mr-1" /> Добавить
                     </Button>
                   </Link>
@@ -477,7 +477,7 @@ export default function CarExpensesPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-[#1F1F1F] dark:text-gray-300">20.04.2023</span>
                   <Link href="/account/cars/1/expenses/add?type=fuel&name=Заправка">
-                    <Button size="sm" className="h-6 px-2 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs">
+                    <Button size="sm" className="h-6 px-2 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs">
                       <Plus className="h-3 w-3 mr-1" /> Добавить
                     </Button>
                   </Link>
@@ -511,7 +511,7 @@ export default function CarExpensesPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-[#1F1F1F] dark:text-gray-300">01.01.2023</span>
                   <Link href="/account/cars/1/expenses/add?type=insurance&name=ОСАГО">
-                    <Button size="sm" className="h-6 px-2 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs">
+                    <Button size="sm" className="h-6 px-2 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs">
                       <Plus className="h-3 w-3 mr-1" /> Добавить
                     </Button>
                   </Link>

@@ -346,7 +346,7 @@ export default function TireMountingPage() {
                       ? "bg-red-900 border-2 border-red-500 text-white animate-pulse shadow-lg shadow-red-500/50 opacity-80"
                       : carType === ""
                         ? "bg-[#2A2A2A] text-white border-2 border-red-500 focus:ring-red-500 opacity-80"
-                        : "bg-[#1e293b] border border-[#d3df3d] text-white focus:ring-blue-500"
+                        : "bg-[#1e293b] border border-[#c4d402] text-white focus:ring-blue-500"
                   }`}
                 >
                   <option value="">Выберите тип автомобиля</option>
@@ -366,7 +366,7 @@ export default function TireMountingPage() {
                   className={`w-full text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 ${
                     diameter === ""
                       ? "bg-[#2A2A2A] border-2 border-red-500 focus:ring-red-500 opacity-80"
-                      : "bg-[#1e293b] border border-[#d3df3d] focus:ring-blue-500"
+                      : "bg-[#1e293b] border border-[#c4d402] focus:ring-blue-500"
                   }`}
                 >
                   <option value="">Выберите диаметр</option>
@@ -431,7 +431,7 @@ export default function TireMountingPage() {
                                 }))
                               }}
                               disabled={isServiceSelectionDisabled}
-                              className="w-12 h-12 bg-[#d3df3d] text-black rounded-lg flex items-center justify-center hover:bg-[#c5d135] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-xl font-bold"
+                              className="w-12 h-12 bg-[#c4d402] text-black rounded-lg flex items-center justify-center hover:bg-[#c5d135] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-xl font-bold"
                             >
                               +
                             </button>
@@ -495,7 +495,7 @@ export default function TireMountingPage() {
                                 }))
                               }}
                               disabled={isServiceSelectionDisabled}
-                              className="w-12 h-12 bg-[#d3df3d] text-black rounded-lg flex items-center justify-center hover:bg-[#c5d135] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-xl font-bold"
+                              className="w-12 h-12 bg-[#c4d402] text-black rounded-lg flex items-center justify-center hover:bg-[#c5d135] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-xl font-bold"
                             >
                               +
                             </button>
@@ -574,7 +574,7 @@ export default function TireMountingPage() {
                             <button
                               onClick={() => incrementService(key)}
                               disabled={isServiceSelectionDisabled}
-                              className="w-10 h-10 bg-[#d3df3d] text-black rounded-lg flex items-center justify-center hover:bg-[#c5d135] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="w-10 h-10 bg-[#c4d402] text-black rounded-lg flex items-center justify-center hover:bg-[#c5d135] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               +
                             </button>
@@ -690,7 +690,7 @@ export default function TireMountingPage() {
                       } else if (returnTo === "painting") {
                         return (
                           <button
-                            className="w-full bg-[#d3df3d] hover:bg-[#c5d135] text-black py-3 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-[#c4d402] hover:bg-[#c5d135] text-black py-3 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={Object.keys(selectedServices).length === 0 || !diameter}
                             onClick={() => {
                               const tireMountingServices = {
@@ -713,7 +713,7 @@ export default function TireMountingPage() {
                       } else {
                         return (
                           <button
-                            className="w-full bg-[#d3df3d] hover:bg-[#c5d135] text-black py-3 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-[#c4d402] hover:bg-[#c5d135] text-black py-3 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={Object.keys(selectedServices).length === 0 || !diameter}
                             onClick={() => {
                               const tireMountingBookingData = {

@@ -258,7 +258,7 @@ export default function BookOnlinePage() {
           disabled={isPast}
           className={`h-10 w-full rounded-md text-sm font-medium transition-all ${
             isSelected
-              ? "bg-[#D3DF3D] text-[#1F1F1F]"
+              ? "bg-[#c4d402] text-[#1F1F1F]"
               : isTodayDate
                 ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300"
                 : isPast
@@ -346,7 +346,7 @@ export default function BookOnlinePage() {
                           onClick={() => setSelectedCar(car.id)}
                           className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                             selectedCar === car.id
-                              ? "border-[#D3DF3D] bg-[#D3DF3D]/10"
+                              ? "border-[#c4d402] bg-[#c4d402]/10"
                               : "border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333]"
                           }`}
                         >
@@ -360,13 +360,13 @@ export default function BookOnlinePage() {
                               </div>
                             </div>
                             {car.isPrimary && (
-                              <span className="text-xs bg-[#D3DF3D] text-[#1F1F1F] px-2 py-1 rounded">Основной</span>
+                              <span className="text-xs bg-[#c4d402] text-[#1F1F1F] px-2 py-1 rounded">Основной</span>
                             )}
                           </div>
                         </div>
                       ))}
                       <Link href="/account/cars/add">
-                        <div className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333] cursor-pointer hover:border-[#D3DF3D] transition-colors">
+                        <div className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333] cursor-pointer hover:border-[#c4d402] transition-colors">
                           <div className="text-center text-[#009CFF] font-medium">+ Добавить автомобиль</div>
                         </div>
                       </Link>
@@ -487,7 +487,7 @@ export default function BookOnlinePage() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="lucide lucide-calendar h-5 w-5 text-[#D3DF3D]"
+                  className="lucide lucide-calendar h-5 w-5 text-[#c4d402]"
                 >
                   <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
                   <line x1="16" x2="16" y1="2" y2="6" />
@@ -593,7 +593,7 @@ export default function BookOnlinePage() {
             ref={bookingButtonRef}
             onClick={handleBooking}
             disabled={isBooking || !selectedTimeSlot || !selectedShop}
-            className="w-full h-12 bg-[#D3DF3D] hover:bg-[#D3DF3D]/90 text-[#1F1F1F] font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-12 bg-[#c4d402] hover:bg-[#c4d402]/90 text-[#1F1F1F] font-bold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isBooking ? "Оформляем запись..." : "Подтвердить запись"}
           </Button>

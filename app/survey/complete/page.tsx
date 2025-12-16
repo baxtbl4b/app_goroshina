@@ -24,7 +24,7 @@ export default function SurveyCompletePage() {
       {/* Completion Content */}
       <div className="p-4">
         <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-6 flex flex-col items-center text-center">
-          <div className="w-20 h-20 rounded-full bg-[#D3DF3D] flex items-center justify-center mb-4">
+          <div className="w-20 h-20 rounded-full bg-[#c4d402] flex items-center justify-center mb-4">
             <CheckCircle2 className="h-10 w-10 text-[#1F1F1F]" />
           </div>
 

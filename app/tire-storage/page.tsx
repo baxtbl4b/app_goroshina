@@ -106,7 +106,7 @@ export default function TireStoragePage() {
           disabled={isPast}
           className={`h-10 w-full rounded-md text-sm font-medium transition-all ${
             isSelected
-              ? "bg-[#D3DF3D] text-[#1F1F1F]"
+              ? "bg-[#c4d402] text-[#1F1F1F]"
               : isTodayDate
                 ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300"
                 : isPast
@@ -175,8 +175,8 @@ export default function TireStoragePage() {
                     }}
                     className={`flex-1 px-3 py-2 text-sm rounded-md border transition-all duration-300 transform hover:scale-105 ${
                       selectedQuickDate === "today"
-                        ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F] shadow-lg"
-                        : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#D3DF3D] hover:shadow-md"
+                        ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F] shadow-lg"
+                        : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:shadow-md"
                     }`}
                   >
                     Сегодня
@@ -192,8 +192,8 @@ export default function TireStoragePage() {
                     }}
                     className={`flex-1 px-3 py-2 text-sm rounded-md border transition-all duration-300 transform hover:scale-105 ${
                       selectedQuickDate === "tomorrow"
-                        ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F] shadow-lg"
-                        : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#D3DF3D] hover:shadow-md"
+                        ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F] shadow-lg"
+                        : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:shadow-md"
                     }`}
                   >
                     Завтра
@@ -325,7 +325,7 @@ export default function TireStoragePage() {
                 </div>
               </div>
 
-              <Button className="w-full bg-[#D3DF3D] hover:bg-[#D3DF3D]/90 text-[#1F1F1F]" onClick={handleBookNow}>
+              <Button className="w-full bg-[#c4d402] hover:bg-[#c4d402]/90 text-[#1F1F1F]" onClick={handleBookNow}>
                 Забронировать
               </Button>
             </div>
@@ -337,19 +337,19 @@ export default function TireStoragePage() {
           <TabsList className="w-full bg-[#1F1F1F] dark:bg-[#2A2A2A] rounded-xl p-1">
             <TabsTrigger
               value="about"
-              className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#d3df3d] data-[state=active]:text-[#1F1F1F]"
+              className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-[#1F1F1F]"
             >
               О услуге
             </TabsTrigger>
             <TabsTrigger
               value="conditions"
-              className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#d3df3d] data-[state=active]:text-[#1F1F1F]"
+              className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-[#1F1F1F]"
             >
               Условия
             </TabsTrigger>
             <TabsTrigger
               value="faq"
-              className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#d3df3d] data-[state=active]:text-[#1F1F1F]"
+              className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-[#1F1F1F]"
             >
               FAQ
             </TabsTrigger>
@@ -366,7 +366,7 @@ export default function TireStoragePage() {
 
                 <div className="space-y-3 mt-4">
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-[#D3DF3D] flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="h-5 w-5 text-[#c4d402] flex-shrink-0 mt-0.5" />
                     <div>
                       <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Контроль температуры</h4>
                       <p className="text-xs text-gray-700 dark:text-gray-300">
@@ -376,7 +376,7 @@ export default function TireStoragePage() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-[#D3DF3D] flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="h-5 w-5 text-[#c4d402] flex-shrink-0 mt-0.5" />
                     <div>
                       <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Контроль влажности</h4>
                       <p className="text-xs text-gray-700 dark:text-gray-300">
@@ -386,7 +386,7 @@ export default function TireStoragePage() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-[#D3DF3D] flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="h-5 w-5 text-[#c4d402] flex-shrink-0 mt-0.5" />
                     <div>
                       <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Защита от УФ-излучения</h4>
                       <p className="text-xs text-gray-700 dark:text-gray-300">
@@ -396,7 +396,7 @@ export default function TireStoragePage() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-[#D3DF3D] flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="h-5 w-5 text-[#c4d402] flex-shrink-0 mt-0.5" />
                     <div>
                       <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Экономия места</h4>
                       <p className="text-xs text-gray-700 dark:text-gray-300">
@@ -416,8 +416,8 @@ export default function TireStoragePage() {
 
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="bg-[#D3DF3D]/20 p-2 rounded-full">
-                      <CalendarDays className="h-5 w-5 text-[#D3DF3D]" />
+                    <div className="bg-[#c4d402]/20 p-2 rounded-full">
+                      <CalendarDays className="h-5 w-5 text-[#c4d402]" />
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Минимальный срок</h4>
@@ -426,8 +426,8 @@ export default function TireStoragePage() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="bg-[#D3DF3D]/20 p-2 rounded-full">
-                      <Info className="h-5 w-5 text-[#D3DF3D]" />
+                    <div className="bg-[#c4d402]/20 p-2 rounded-full">
+                      <Info className="h-5 w-5 text-[#c4d402]" />
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Состояние шин</h4>
@@ -438,8 +438,8 @@ export default function TireStoragePage() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="bg-[#D3DF3D]/20 p-2 rounded-full">
-                      <Info className="h-5 w-5 text-[#D3DF3D]" />
+                    <div className="bg-[#c4d402]/20 p-2 rounded-full">
+                      <Info className="h-5 w-5 text-[#c4d402]" />
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Маркировка</h4>
@@ -450,8 +450,8 @@ export default function TireStoragePage() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="bg-[#D3DF3D]/20 p-2 rounded-full">
-                      <Info className="h-5 w-5 text-[#D3DF3D]" />
+                    <div className="bg-[#c4d402]/20 p-2 rounded-full">
+                      <Info className="h-5 w-5 text-[#c4d402]" />
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Доступ</h4>

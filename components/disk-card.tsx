@@ -262,7 +262,7 @@ export default function DiskCard({ disk }: DiskCardProps) {
     <div className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
       {/* Левая часть - Изображение */}
       <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[123px] sm:w-[161px] md:w-[197px] lg:w-[222px] overflow-hidden flex items-center justify-center bg-white rounded-l-xl" style={{ maxHeight: "209px" }}>
-        {disk.isPromotional && <Badge className="absolute left-2 top-2 z-10 bg-[#D3DF3D] text-[#1F1F1F]">Акция</Badge>}
+        {disk.isPromotional && <Badge className="absolute left-2 top-2 z-10 bg-[#c4d402] text-[#1F1F1F]">Акция</Badge>}
         <div
           className="flex justify-center items-center h-full w-full relative overflow-hidden bg-transparent"
           style={{ zIndex: 1 }}
@@ -446,7 +446,7 @@ export default function DiskCard({ disk }: DiskCardProps) {
                   ref={addButtonRef}
                   onClick={addToCart}
                   disabled={disk.stock <= 0 || cartCount + 4 > disk.stock}
-                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-[#c4d402]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopRightRadius: '20px', borderBottomRightRadius: '20px' }}
                   aria-label="Увеличить количество"
                 >
@@ -467,7 +467,7 @@ export default function DiskCard({ disk }: DiskCardProps) {
             top: floatingNumber.y,
           }}
         >
-          <span className="text-xl font-bold text-[#D3DF3D]">+{floatingNumber.count}</span>
+          <span className="text-xl font-bold text-[#c4d402]">+{floatingNumber.count}</span>
         </div>
       )}
     </div>

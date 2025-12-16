@@ -20,8 +20,8 @@ export default function EarnPointsPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#F5F5F7] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm">
-        <div className="p-4 flex items-center">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center">
           <Link href="/" className="mr-4">
             <ArrowLeft className="h-6 w-6 text-[#1F1F1F] dark:text-white" />
           </Link>
@@ -33,7 +33,7 @@ export default function EarnPointsPage() {
         {/* Overview Card */}
         <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-5 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
-            <Award className="h-8 w-8 text-[#D3DF3D]" />
+            <Award className="h-8 w-8 text-[#c4d402]" />
             <h2 className="text-lg font-bold text-[#1F1F1F] dark:text-white">Программа лояльности</h2>
           </div>
           <p className="text-sm text-[#666666] dark:text-[#BBBBBB] mb-4">
@@ -42,7 +42,7 @@ export default function EarnPointsPage() {
           <div className="bg-[#F5F5F7] dark:bg-[#333333] p-3 rounded-lg">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">Ваш баланс:</span>
-              <span className="text-lg font-bold text-[#D3DF3D]">350 баллов</span>
+              <span className="text-lg font-bold text-[#c4d402]">350 баллов</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">Статус:</span>
@@ -56,7 +56,7 @@ export default function EarnPointsPage() {
           <button
             className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${
               activeTab === "purchases"
-                ? "bg-[#D3DF3D] text-[#1F1F1F]"
+                ? "bg-[#c4d402] text-[#1F1F1F]"
                 : "bg-white dark:bg-[#2A2A2A] text-[#1F1F1F] dark:text-white"
             }`}
             onClick={() => setActiveTab("purchases")}
@@ -66,7 +66,7 @@ export default function EarnPointsPage() {
           <button
             className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${
               activeTab === "services"
-                ? "bg-[#D3DF3D] text-[#1F1F1F]"
+                ? "bg-[#c4d402] text-[#1F1F1F]"
                 : "bg-white dark:bg-[#2A2A2A] text-[#1F1F1F] dark:text-white"
             }`}
             onClick={() => setActiveTab("services")}
@@ -76,7 +76,7 @@ export default function EarnPointsPage() {
           <button
             className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${
               activeTab === "activities"
-                ? "bg-[#D3DF3D] text-[#1F1F1F]"
+                ? "bg-[#c4d402] text-[#1F1F1F]"
                 : "bg-white dark:bg-[#2A2A2A] text-[#1F1F1F] dark:text-white"
             }`}
             onClick={() => setActiveTab("activities")}
@@ -86,7 +86,7 @@ export default function EarnPointsPage() {
           <button
             className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${
               activeTab === "referrals"
-                ? "bg-[#D3DF3D] text-[#1F1F1F]"
+                ? "bg-[#c4d402] text-[#1F1F1F]"
                 : "bg-white dark:bg-[#2A2A2A] text-[#1F1F1F] dark:text-white"
             }`}
             onClick={() => setActiveTab("referrals")}
@@ -103,7 +103,7 @@ export default function EarnPointsPage() {
             <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm">
               <div className="flex items-start gap-3">
                 <div className="bg-[#F5F5F7] dark:bg-[#333333] p-2 rounded-lg">
-                  <ShoppingBag className="h-6 w-6 text-[#D3DF3D]" />
+                  <ShoppingBag className="h-6 w-6 text-[#c4d402]" />
                 </div>
                 <div className="flex-1">
                   <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white mb-1">Покупка шин</h4>
@@ -111,7 +111,7 @@ export default function EarnPointsPage() {
                     Получайте до 5% от стоимости покупки в виде баллов при покупке шин
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-[#D3DF3D]">+5% баллов</span>
+                    <span className="text-xs font-medium text-[#c4d402]">+5% баллов</span>
                     <span className="text-[10px] text-[#666666] dark:text-[#BBBBBB]">от суммы покупки</span>
                   </div>
                 </div>
@@ -121,7 +121,7 @@ export default function EarnPointsPage() {
             <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm">
               <div className="flex items-start gap-3">
                 <div className="bg-[#F5F5F7] dark:bg-[#333333] p-2 rounded-lg">
-                  <Car className="h-6 w-6 text-[#D3DF3D]" />
+                  <Car className="h-6 w-6 text-[#c4d402]" />
                 </div>
                 <div className="flex-1">
                   <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white mb-1">Покупка дисков</h4>
@@ -129,7 +129,7 @@ export default function EarnPointsPage() {
                     Получайте до 3% от стоимости покупки в виде баллов при покупке дисков
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-[#D3DF3D]">+3% баллов</span>
+                    <span className="text-xs font-medium text-[#c4d402]">+3% баллов</span>
                     <span className="text-[10px] text-[#666666] dark:text-[#BBBBBB]">от суммы покупки</span>
                   </div>
                 </div>
@@ -139,7 +139,7 @@ export default function EarnPointsPage() {
             <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm">
               <div className="flex items-start gap-3">
                 <div className="bg-[#F5F5F7] dark:bg-[#333333] p-2 rounded-lg">
-                  <Tool className="h-6 w-6 text-[#D3DF3D]" />
+                  <Tool className="h-6 w-6 text-[#c4d402]" />
                 </div>
                 <div className="flex-1">
                   <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white mb-1">Покупка аксессуаров</h4>
@@ -147,7 +147,7 @@ export default function EarnPointsPage() {
                     Получайте до 7% от стоимости покупки в виде баллов при покупке аксессуаров
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-[#D3DF3D]">+7% баллов</span>
+                    <span className="text-xs font-medium text-[#c4d402]">+7% баллов</span>
                     <span className="text-[10px] text-[#666666] dark:text-[#BBBBBB]">от суммы покупки</span>
                   </div>
                 </div>
@@ -180,7 +180,7 @@ export default function EarnPointsPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-bold text-[#D3DF3D]">+500</span>
+                  <span className="text-sm font-bold text-[#c4d402]">+500</span>
                   <p className="text-[10px] text-[#666666] dark:text-[#BBBBBB]">баллов</p>
                 </div>
               </div>
@@ -204,7 +204,7 @@ export default function EarnPointsPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-bold text-[#D3DF3D]">+100</span>
+                  <span className="text-sm font-bold text-[#c4d402]">+100</span>
                   <p className="text-[10px] text-[#666666] dark:text-[#BBBBBB]">баллов</p>
                 </div>
               </div>
@@ -228,7 +228,7 @@ export default function EarnPointsPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-bold text-[#D3DF3D]">+150</span>
+                  <span className="text-sm font-bold text-[#c4d402]">+150</span>
                   <p className="text-[10px] text-[#666666] dark:text-[#BBBBBB]">баллов</p>
                 </div>
               </div>
@@ -243,7 +243,7 @@ export default function EarnPointsPage() {
             <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm">
               <div className="flex items-start gap-3">
                 <div className="bg-[#F5F5F7] dark:bg-[#333333] p-2 rounded-lg">
-                  <Calendar className="h-6 w-6 text-[#D3DF3D]" />
+                  <Calendar className="h-6 w-6 text-[#c4d402]" />
                 </div>
                 <div className="flex-1">
                   <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white mb-1">Ежедневный вход</h4>
@@ -251,7 +251,7 @@ export default function EarnPointsPage() {
                     Заходите в приложение каждый день и получайте баллы
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-[#D3DF3D]">+5 баллов</span>
+                    <span className="text-xs font-medium text-[#c4d402]">+5 баллов</span>
                     <span className="text-[10px] text-[#666666] dark:text-[#BBBBBB]">ежедневно</span>
                   </div>
                 </div>
@@ -261,7 +261,7 @@ export default function EarnPointsPage() {
             <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm">
               <div className="flex items-start gap-3">
                 <div className="bg-[#F5F5F7] dark:bg-[#333333] p-2 rounded-lg">
-                  <Check className="h-6 w-6 text-[#D3DF3D]" />
+                  <Check className="h-6 w-6 text-[#c4d402]" />
                 </div>
                 <div className="flex-1">
                   <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white mb-1">Оставить отзыв</h4>
@@ -269,7 +269,7 @@ export default function EarnPointsPage() {
                     Оставьте отзыв о купленном товаре или услуге
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-[#D3DF3D]">+50 баллов</span>
+                    <span className="text-xs font-medium text-[#c4d402]">+50 баллов</span>
                     <span className="text-[10px] text-[#666666] dark:text-[#BBBBBB]">за каждый отзыв</span>
                   </div>
                 </div>
@@ -279,7 +279,7 @@ export default function EarnPointsPage() {
             <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm">
               <div className="flex items-start gap-3">
                 <div className="bg-[#F5F5F7] dark:bg-[#333333] p-2 rounded-lg">
-                  <Gift className="h-6 w-6 text-[#D3DF3D]" />
+                  <Gift className="h-6 w-6 text-[#c4d402]" />
                 </div>
                 <div className="flex-1">
                   <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white mb-1">День рождения</h4>
@@ -287,7 +287,7 @@ export default function EarnPointsPage() {
                     Получите подарок в день вашего рождения
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-[#D3DF3D]">+200 баллов</span>
+                    <span className="text-xs font-medium text-[#c4d402]">+200 баллов</span>
                     <span className="text-[10px] text-[#666666] dark:text-[#BBBBBB]">ежегодно</span>
                   </div>
                 </div>
@@ -304,7 +304,7 @@ export default function EarnPointsPage() {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3">
                   <div className="bg-[#F5F5F7] dark:bg-[#333333] p-2 rounded-full">
-                    <span className="text-lg font-bold text-[#D3DF3D]">1</span>
+                    <span className="text-lg font-bold text-[#c4d402]">1</span>
                   </div>
                   <p className="text-sm text-[#1F1F1F] dark:text-white">
                     Поделитесь своим реферальным кодом с друзьями
@@ -313,21 +313,21 @@ export default function EarnPointsPage() {
 
                 <div className="flex items-center gap-3">
                   <div className="bg-[#F5F5F7] dark:bg-[#333333] p-2 rounded-full">
-                    <span className="text-lg font-bold text-[#D3DF3D]">2</span>
+                    <span className="text-lg font-bold text-[#c4d402]">2</span>
                   </div>
                   <p className="text-sm text-[#1F1F1F] dark:text-white">Друг регистрируется по вашему коду</p>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <div className="bg-[#F5F5F7] dark:bg-[#333333] p-2 rounded-full">
-                    <span className="text-lg font-bold text-[#D3DF3D]">3</span>
+                    <span className="text-lg font-bold text-[#c4d402]">3</span>
                   </div>
                   <p className="text-sm text-[#1F1F1F] dark:text-white">Друг совершает первую покупку</p>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <div className="bg-[#F5F5F7] dark:bg-[#333333] p-2 rounded-full">
-                    <span className="text-lg font-bold text-[#D3DF3D]">4</span>
+                    <span className="text-lg font-bold text-[#c4d402]">4</span>
                   </div>
                   <p className="text-sm text-[#1F1F1F] dark:text-white">
                     Вы получаете 300 баллов, а ваш друг — 150 баллов
@@ -339,14 +339,14 @@ export default function EarnPointsPage() {
                 <p className="text-xs text-[#666666] dark:text-[#BBBBBB] mb-2">Ваш реферальный код:</p>
                 <div className="flex items-center justify-between">
                   <span className="text-lg font-bold text-[#1F1F1F] dark:text-white">TIRE2025</span>
-                  <button className="px-3 py-1 bg-[#D3DF3D] text-[#1F1F1F] text-xs font-medium rounded-lg">
+                  <button className="px-3 py-1 bg-[#c4d402] text-[#1F1F1F] text-xs font-medium rounded-lg">
                     Скопировать
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="bg-[#D3DF3D]/10 rounded-xl p-4">
+            <div className="bg-[#c4d402]/10 rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white mb-1">Приглашено друзей:</h4>
@@ -354,7 +354,7 @@ export default function EarnPointsPage() {
                 </div>
                 <div className="text-right">
                   <span className="text-sm font-bold text-[#1F1F1F] dark:text-white">3</span>
-                  <p className="text-xs font-bold text-[#D3DF3D]">900</p>
+                  <p className="text-xs font-bold text-[#c4d402]">900</p>
                 </div>
               </div>
             </div>
@@ -367,7 +367,7 @@ export default function EarnPointsPage() {
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
               <div className="mt-1 flex-shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#D3DF3D]"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#c4d402]"></div>
               </div>
               <p className="text-xs text-[#666666] dark:text-[#BBBBBB]">
                 Баллы действительны в течение 12 месяцев с момента начисления
@@ -375,7 +375,7 @@ export default function EarnPointsPage() {
             </li>
             <li className="flex items-start gap-2">
               <div className="mt-1 flex-shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#D3DF3D]"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#c4d402]"></div>
               </div>
               <p className="text-xs text-[#666666] dark:text-[#BBBBBB]">
                 Баллы можно использовать для оплаты до 50% стоимости товаров и услуг
@@ -383,7 +383,7 @@ export default function EarnPointsPage() {
             </li>
             <li className="flex items-start gap-2">
               <div className="mt-1 flex-shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#D3DF3D]"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#c4d402]"></div>
               </div>
               <p className="text-xs text-[#666666] dark:text-[#BBBBBB]">
                 Баллы начисляются в течение 24 часов после совершения покупки
@@ -391,7 +391,7 @@ export default function EarnPointsPage() {
             </li>
             <li className="flex items-start gap-2">
               <div className="mt-1 flex-shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#D3DF3D]"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#c4d402]"></div>
               </div>
               <p className="text-xs text-[#666666] dark:text-[#BBBBBB]">
                 Компания оставляет за собой право изменять условия программы лояльности

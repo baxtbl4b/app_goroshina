@@ -82,8 +82,8 @@ export default function DonatePointsPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm">
-        <div className="p-4 flex items-center">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center">
           <Button
             variant="ghost"
             size="icon"
@@ -106,8 +106,8 @@ export default function DonatePointsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <Award className="h-6 w-6 text-[#D3DF3D]" />
-              <span className="text-2xl font-bold text-[#D3DF3D]">{availableBalance} баллов</span>
+              <Award className="h-6 w-6 text-[#c4d402]" />
+              <span className="text-2xl font-bold text-[#c4d402]">{availableBalance} баллов</span>
             </div>
           </CardContent>
         </Card>
@@ -165,7 +165,7 @@ export default function DonatePointsPage() {
                   <label htmlFor="donationAmount" className="text-sm font-medium text-[#1F1F1F] dark:text-white">
                     Сумма пожертвования
                   </label>
-                  <div className="bg-[#D3DF3D] text-[#1F1F1F] px-3 py-1 rounded-full text-sm font-medium">
+                  <div className="bg-[#c4d402] text-[#1F1F1F] px-3 py-1 rounded-full text-sm font-medium">
                     {donationAmount} баллов
                   </div>
                 </div>
@@ -204,7 +204,7 @@ export default function DonatePointsPage() {
               <Button
                 onClick={handleConfirmDonation}
                 disabled={donationAmount <= 0 || donationAmount > USER_BALANCE}
-                className="bg-[#D3DF3D] hover:bg-[#C4CF2E] text-[#1F1F1F]"
+                className="bg-[#c4d402] hover:bg-[#C4CF2E] text-[#1F1F1F]"
               >
                 <Heart className="h-4 w-4 mr-2" />
                 Пожертвовать
@@ -238,15 +238,15 @@ export default function DonatePointsPage() {
               <div className="text-center">
                 <p className="text-sm text-[#1F1F1F]/70 dark:text-white/70">Ваш новый баланс:</p>
                 <div className="flex items-center justify-center gap-2 mt-1">
-                  <Award className="h-6 w-6 text-[#D3DF3D]" />
-                  <span className="text-2xl font-bold text-[#D3DF3D]">{availableBalance} баллов</span>
+                  <Award className="h-6 w-6 text-[#c4d402]" />
+                  <span className="text-2xl font-bold text-[#c4d402]">{availableBalance} баллов</span>
                 </div>
               </div>
             </CardContent>
             <CardFooter>
               <Button
                 onClick={() => router.push("/settings")}
-                className="w-full bg-[#D3DF3D] hover:bg-[#C4CF2E] text-[#1F1F1F]"
+                className="w-full bg-[#c4d402] hover:bg-[#C4CF2E] text-[#1F1F1F]"
               >
                 Готово
               </Button>

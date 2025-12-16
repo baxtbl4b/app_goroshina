@@ -18,8 +18,8 @@ export default function NextStepDemo() {
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
-            <Award className="h-6 w-6 text-[#D3DF3D]" />
-            <span className="text-2xl font-bold text-[#D3DF3D]">350 баллов</span>
+            <Award className="h-6 w-6 text-[#c4d402]" />
+            <span className="text-2xl font-bold text-[#c4d402]">350 баллов</span>
           </div>
         </CardContent>
       </Card>
@@ -53,7 +53,7 @@ export default function NextStepDemo() {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <label className="text-sm text-[#1F1F1F]/70 dark:text-white/70">Количество баллов</label>
-              <div className="bg-[#D3DF3D] text-[#1F1F1F] px-3 py-1 rounded-full text-sm font-medium">150</div>
+              <div className="bg-[#c4d402] text-[#1F1F1F] px-3 py-1 rounded-full text-sm font-medium">150</div>
             </div>
 
             {/* Ползунок */}
@@ -86,7 +86,7 @@ export default function NextStepDemo() {
           <Button variant="outline" className="border-[#1F1F1F]/20 dark:border-white/20">
             Отмена
           </Button>
-          <Button className="bg-[#D3DF3D] hover:bg-[#C4CF2E] text-[#1F1F1F]">
+          <Button className="bg-[#c4d402] hover:bg-[#C4CF2E] text-[#1F1F1F]">
             <Send className="h-4 w-4 mr-2" />
             Перевести
           </Button>

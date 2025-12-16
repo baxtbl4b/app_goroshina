@@ -57,10 +57,10 @@ export default function CartButton({ className = "" }: CartButtonProps) {
         /* Cart pulsation when has items */
         @keyframes cartPulseGlow {
           0%, 100% {
-            filter: brightness(0) saturate(100%) invert(83%) sepia(44%) saturate(484%) hue-rotate(22deg) brightness(97%) contrast(91%) drop-shadow(0 0 2px rgba(211, 223, 61, 0.5));
+            filter: brightness(0) saturate(100%) invert(83%) sepia(44%) saturate(484%) hue-rotate(22deg) brightness(97%) contrast(91%) drop-shadow(0 0 2px rgba(196, 212, 2, 0.5));
           }
           50% {
-            filter: brightness(0) saturate(100%) invert(83%) sepia(44%) saturate(484%) hue-rotate(22deg) brightness(97%) contrast(91%) drop-shadow(0 0 8px rgba(211, 223, 61, 0.9));
+            filter: brightness(0) saturate(100%) invert(83%) sepia(44%) saturate(484%) hue-rotate(22deg) brightness(97%) contrast(91%) drop-shadow(0 0 8px rgba(196, 212, 2, 0.9));
           }
         }
 
@@ -131,7 +131,7 @@ export default function CartButton({ className = "" }: CartButtonProps) {
             className="text-white"
           />
           {cartItemCount > 0 && (
-            <span className="absolute -top-3 -right-3 bg-[#D3DF3D] text-[#1F1F1F] text-[10px] font-bold rounded-full w-[16px] h-[16px] flex items-center justify-center" style={{ lineHeight: '1', padding: '0' }}>
+            <span className="absolute -top-3 -right-3 bg-[#c4d402] text-[#1F1F1F] text-[10px] font-bold rounded-full w-[16px] h-[16px] flex items-center justify-center" style={{ lineHeight: '1', padding: '0' }}>
               {cartItemCount}
             </span>
           )}

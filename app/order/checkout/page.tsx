@@ -45,7 +45,7 @@ function getStatusBadge(status: string) {
     case "бронь":
       return { variant: "outline" as const, className: "bg-orange-500/10 text-orange-500 border-orange-500/20" }
     case "оплачено":
-      return { variant: "outline" as const, className: "bg-[#D3DF3D]/10 text-[#D3DF3D] border-[#D3DF3D]/20" }
+      return { variant: "outline" as const, className: "bg-[#c4d402]/10 text-[#c4d402] border-[#c4d402]/20" }
     case "выдано":
       return { variant: "outline" as const, className: "bg-green-500/10 text-green-500 border-green-500/20" }
     default:
@@ -81,30 +81,43 @@ export default function CheckoutPage() {
 
   // Handle place order
   const handlePlaceOrder = () => {
+    // Generate order number
+    const orderNumber = `${Math.floor(1000 + Math.random() * 9000)}`
+
     // Create new order
     const newOrder = {
+      orderNumber,
       id: `ORD-${Date.now()}`,
       date: new Date().toISOString(),
-      status: "processing",
+      createdAt: new Date().toISOString(),
+      status: "На сборке",
       items: orderData.items,
       itemsCount: orderData.items.reduce((acc, item) => acc + item.quantity, 0),
       subtotal: orderData.subtotal,
       discount: orderData.discount,
       deliveryCost: deliveryCost,
       total: totalCost,
-      deliveryMethod: orderDetails?.deliveryMethod,
+      totalAmount: totalCost,
+      deliveryMethod: orderDetails?.deliveryMethod === "pickup" ? "Самовывоз" : "Доставка",
       deliveryAddress: orderDetails?.address,
       paymentMethod: orderDetails?.paymentMethod,
+      isPaid: false,
+      customer: {
+        name: "Не указано",
+        phone: "Не указан",
+        email: "Не указан",
+      },
     }
 
     // Save order to localStorage
     try {
-      const existingOrders = JSON.parse(localStorage.getItem("userOrders") || "[]")
-      existingOrders.unshift(newOrder) // Add new order at the beginning
-      localStorage.setItem("userOrders", JSON.stringify(existingOrders))
+      // Save to ordersHistory for profile/orders page
+      const ordersHistory = JSON.parse(localStorage.getItem("ordersHistory") || "[]")
+      ordersHistory.unshift(newOrder)
+      localStorage.setItem("ordersHistory", JSON.stringify(ordersHistory))
 
-      // Save current order ID for complete page
-      localStorage.setItem("lastOrderId", newOrder.id)
+      // Save current order
+      localStorage.setItem("currentOrder", JSON.stringify(newOrder))
 
       // Clear cart after successful order
       localStorage.removeItem("cart")
@@ -116,15 +129,15 @@ export default function CheckoutPage() {
       console.error("Error saving order:", error)
     }
 
-    // Navigate to order complete page
-    router.push("/order/complete")
+    // Navigate to order details page
+    router.push(`/profile/orders/${orderNumber}?new=true`)
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#222222] dark:bg-[#1A1A1A]">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background dark:bg-[#1A1A1A] border-b border-border/40 dark:border-border/20">
-        <div className="container px-4 py-3 flex items-center justify-between -mt-1">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full container px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/order" className="mr-2">
               <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -148,11 +161,11 @@ export default function CheckoutPage() {
               <span className="text-muted-foreground">Сумма заказа</span>
               <span>{formatPrice(orderData.subtotal)}</span>
             </div>
-            <div className="flex justify-between text-sm text-[#D3DF3D]">
+            <div className="flex justify-between text-sm text-[#c4d402]">
               <span>Скидка при оплате сейчас</span>
               <span>-{formatPrice(orderData.discount)}</span>
             </div>
-            <div className="flex justify-between text-sm text-[#D3DF3D]">
+            <div className="flex justify-between text-sm text-[#c4d402]">
               <span className="flex items-center">
                 <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="12" cy="12" r="10" fill="currentColor" fillOpacity="0.2" />
@@ -177,7 +190,7 @@ export default function CheckoutPage() {
           </CardContent>
           <CardFooter className="flex-col space-y-3 pt-4">
             <Button
-              className="w-full bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black font-medium"
+              className="w-full bg-[#c4d402] hover:bg-[#C4CF2E] text-black font-medium"
               onClick={handlePlaceOrder}
             >
               Подтвердить заказ

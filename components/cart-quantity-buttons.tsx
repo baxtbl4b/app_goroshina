@@ -103,7 +103,7 @@ const CartQuantityButtons = forwardRef<HTMLButtonElement, CartQuantityButtonsPro
           ref={ref}
           onClick={onAdd}
           disabled={disabled || maxStock <= 0 || count >= maxStock}
-          className={`${currentSize.button} bg-[#d3df3d] text-black rounded-lg flex items-center justify-center hover:bg-[#c5d135] transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`${currentSize.button} bg-[#c4d402] text-black rounded-lg flex items-center justify-center hover:bg-[#b3c002] transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
           aria-label="Увеличить количество"
         >
           <Plus className={currentSize.icon} />

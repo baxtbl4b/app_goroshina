@@ -152,11 +152,11 @@ export default function TireStorageBookingPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-[#1F1F1F] dark:text-white flex items-center gap-2">
-                  <User className="h-5 w-5 text-[#D3DF3D]" />
+                  <User className="h-5 w-5 text-[#c4d402]" />
                   Контактная информация
                 </h2>
                 {isLoadingUserData && <span className="text-sm text-gray-500">Загружаем данные...</span>}
-                {!isLoadingUserData && <span className="text-sm text-[#D3DF3D]">Из личного кабинета</span>}
+                {!isLoadingUserData && <span className="text-sm text-[#c4d402]">Из личного кабинета</span>}
               </div>
 
               <div className="space-y-4">
@@ -207,7 +207,7 @@ export default function TireStorageBookingPage() {
                             onClick={() => setSelectedCar(car.id)}
                             className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                               selectedCar === car.id
-                                ? "border-[#D3DF3D] bg-[#D3DF3D]/10"
+                                ? "border-[#c4d402] bg-[#c4d402]/10"
                                 : "border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333]"
                             }`}
                           >
@@ -221,14 +221,14 @@ export default function TireStorageBookingPage() {
                                 </div>
                               </div>
                               {car.isPrimary && (
-                                <span className="text-xs bg-[#D3DF3D] text-[#1F1F1F] px-2 py-1 rounded">Основной</span>
+                                <span className="text-xs bg-[#c4d402] text-[#1F1F1F] px-2 py-1 rounded">Основной</span>
                               )}
                             </div>
                           </div>
                         ))}
                         <div
                           onClick={() => router.push("/account/cars/add")}
-                          className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333] cursor-pointer hover:border-[#D3DF3D] transition-colors"
+                          className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333] cursor-pointer hover:border-[#c4d402] transition-colors"
                         >
                           <div className="text-center text-[#009CFF] font-medium">+ Добавить автомобиль</div>
                         </div>
@@ -319,7 +319,7 @@ export default function TireStorageBookingPage() {
                     type="button"
                     variant="outline"
                     onClick={() => setShowAllStores(true)}
-                    className="w-full mt-4 border-[#D3DF3D] text-[#D3DF3D] hover:bg-[#D3DF3D]/10"
+                    className="w-full mt-4 border-[#c4d402] text-[#c4d402] hover:bg-[#c4d402]/10"
                   >
                     Показать все магазины
                   </Button>
@@ -333,7 +333,7 @@ export default function TireStorageBookingPage() {
             <CardContent className="p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-[#1F1F1F] dark:text-white">Период хранения</h2>
-                <span className="text-sm text-[#D3DF3D]">Из калькулятора</span>
+                <span className="text-sm text-[#c4d402]">Из калькулятора</span>
               </div>
 
               <div className="space-y-4">
@@ -348,7 +348,7 @@ export default function TireStorageBookingPage() {
                         htmlFor="startDate"
                         className="text-sm font-medium text-[#1F1F1F] dark:text-white flex items-center gap-2"
                       >
-                        <Calendar className="h-4 w-4 text-[#D3DF3D]" />
+                        <Calendar className="h-4 w-4 text-[#c4d402]" />
                         Дата начала хранения
                       </Label>
                       <Input
@@ -365,7 +365,7 @@ export default function TireStorageBookingPage() {
                         htmlFor="endDate"
                         className="text-sm font-medium text-[#1F1F1F] dark:text-white flex items-center gap-2"
                       >
-                        <Calendar className="h-4 w-4 text-[#D3DF3D]" />
+                        <Calendar className="h-4 w-4 text-[#c4d402]" />
                         Дата окончания хранения
                       </Label>
                       <Input
@@ -406,7 +406,7 @@ export default function TireStorageBookingPage() {
             <button
               type="submit"
               disabled={!selectedStore}
-              className="flex-1 bg-[#d3df3d] hover:bg-[#c5d135] disabled:bg-gray-600 disabled:cursor-not-allowed text-black py-3 px-4 rounded-lg font-medium transition-colors"
+              className="flex-1 bg-[#c4d402] hover:bg-[#c5d135] disabled:bg-gray-600 disabled:cursor-not-allowed text-black py-3 px-4 rounded-lg font-medium transition-colors"
             >
               Записаться
             </button>

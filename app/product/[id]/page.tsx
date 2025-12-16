@@ -455,7 +455,7 @@ export default function ProductPage() {
           </p>
           <div className="flex flex-col gap-3">
             <Link href="/category/tires">
-              <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] w-full">
+              <Button className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] w-full">
                 Перейти в каталог шин
               </Button>
             </Link>
@@ -750,7 +750,7 @@ export default function ProductPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] pr-4 shadow-sm h-[60px] flex items-center">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] pr-4 flex items-center">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <BackButton />
@@ -791,7 +791,7 @@ export default function ProductPage() {
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      className={`h-3 w-3 ${star <= 4 ? "fill-[#D3DF3D] text-[#D3DF3D]" : "text-gray-400"}`}
+                      className={`h-3 w-3 ${star <= 4 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-400"}`}
                     />
                   ))}
                 </div>
@@ -966,7 +966,7 @@ export default function ProductPage() {
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 bg-[#2A2A2A] rounded-lg">
-              <span className="h-5 w-5 text-[#D3DF3D] font-bold text-sm flex items-center justify-center">%</span>
+              <span className="h-5 w-5 text-[#c4d402] font-bold text-sm flex items-center justify-center">%</span>
               <div>
                 <p className="text-sm font-medium text-white">Скидка на шиномонтаж 20%</p>
                 <p className="text-xs text-gray-400">При покупке от 4 шин</p>
@@ -1062,7 +1062,7 @@ export default function ProductPage() {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className={`h-3 w-3 ${star <= 5 ? "fill-[#D3DF3D] text-[#D3DF3D]" : "text-gray-600"}`}
+                          className={`h-3 w-3 ${star <= 5 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-600"}`}
                         />
                       ))}
                     </div>
@@ -1079,7 +1079,7 @@ export default function ProductPage() {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className={`h-3 w-3 ${star <= 4 ? "fill-[#D3DF3D] text-[#D3DF3D]" : "text-gray-600"}`}
+                          className={`h-3 w-3 ${star <= 4 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-600"}`}
                         />
                       ))}
                     </div>

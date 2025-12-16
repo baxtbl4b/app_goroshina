@@ -8,8 +8,8 @@ import BottomNavigation from "@/components/bottom-navigation"
 export default function ChangePasswordPage() {
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/settings">
               <Button variant="ghost" size="icon" className="mr-2">
@@ -57,7 +57,7 @@ export default function ChangePasswordPage() {
               </div>
             </div>
 
-            <Button className="w-full bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] mt-4">
+            <Button className="w-full bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] mt-4">
               Сохранить изменения
             </Button>
           </form>

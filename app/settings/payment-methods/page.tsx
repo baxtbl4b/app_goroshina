@@ -6,8 +6,8 @@ import BottomNavigation from "@/components/bottom-navigation"
 export default function PaymentMethodsPage() {
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/settings">
               <Button variant="ghost" size="icon" className="mr-2">
@@ -21,7 +21,7 @@ export default function PaymentMethodsPage() {
 
       <div className="flex-1 p-4 space-y-6 pb-20">
         <div className="flex justify-end">
-          <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
+          <Button className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">
             <Plus className="h-4 w-4 mr-2" /> Добавить карту
           </Button>
         </div>
@@ -39,7 +39,7 @@ export default function PaymentMethodsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <div className="bg-[#D3DF3D] text-xs font-bold px-2 py-1 rounded text-[#1F1F1F]">Основная</div>
+                <div className="bg-[#c4d402] text-xs font-bold px-2 py-1 rounded text-[#1F1F1F]">Основная</div>
                 <Button variant="ghost" size="icon" className="text-red-500">
                   <Trash2 className="h-5 w-5" />
                 </Button>

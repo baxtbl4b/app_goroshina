@@ -285,7 +285,7 @@ export default function TireMountingBookingPage() {
           disabled={isPast}
           className={`h-10 w-full rounded-md text-sm font-medium transition-all ${
             isSelected
-              ? "bg-[#D3DF3D] text-[#1F1F1F]"
+              ? "bg-[#c4d402] text-[#1F1F1F]"
               : isTodayDate
                 ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300"
                 : isPast
@@ -371,7 +371,7 @@ export default function TireMountingBookingPage() {
         <SafeAreaHeader title="Запись на шиномонтаж" showBackButton backUrl="/tire-mounting" />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D3DF3D] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c4d402] mx-auto mb-4"></div>
             <p>Загрузка данных...</p>
           </div>
         </main>
@@ -391,7 +391,7 @@ export default function TireMountingBookingPage() {
           <Card className="bg-white dark:bg-[#2A2A2A] border-none shadow-sm">
             <CardHeader className="pb-4">
               <CardTitle className="text-lg font-bold text-[#1F1F1F] dark:text-white flex items-center gap-2">
-                <User className="h-5 w-5 text-[#D3DF3D]" />
+                <User className="h-5 w-5 text-[#c4d402]" />
                 Контактная информация
               </CardTitle>
             </CardHeader>
@@ -446,7 +446,7 @@ export default function TireMountingBookingPage() {
                       }}
                       className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                         selectedCar === "1"
-                          ? "border-[#D3DF3D] bg-[#D3DF3D]/10"
+                          ? "border-[#c4d402] bg-[#c4d402]/10"
                           : "border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333]"
                       }`}
                     >
@@ -455,7 +455,7 @@ export default function TireMountingBookingPage() {
                           <div className="font-semibold text-[#1F1F1F] dark:text-white">Toyota Camry</div>
                           <div className="text-sm text-gray-500">2019 • А123БВ777</div>
                         </div>
-                        <span className="text-xs bg-[#D3DF3D] text-[#1F1F1F] px-2 py-1 rounded">Основной</span>
+                        <span className="text-xs bg-[#c4d402] text-[#1F1F1F] px-2 py-1 rounded">Основной</span>
                       </div>
                     </div>
                     <div
@@ -475,7 +475,7 @@ export default function TireMountingBookingPage() {
                       }}
                       className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                         selectedCar === "2"
-                          ? "border-[#D3DF3D] bg-[#D3DF3D]/10"
+                          ? "border-[#c4d402] bg-[#c4d402]/10"
                           : "border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333]"
                       }`}
                     >
@@ -487,7 +487,7 @@ export default function TireMountingBookingPage() {
                       </div>
                     </div>
                     <Link href="/account/cars/add">
-                      <div className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333] cursor-pointer hover:border-[#D3DF3D] transition-colors">
+                      <div className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333] cursor-pointer hover:border-[#c4d402] transition-colors">
                         <div className="text-center text-[#009CFF] font-medium">+ Добавить автомобиль</div>
                       </div>
                     </Link>
@@ -526,7 +526,7 @@ export default function TireMountingBookingPage() {
             <div className="border-t border-gray-600 mt-3 pt-3">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-bold">Общая стоимость:</span>
-                <span className="text-xl font-bold text-[#D3DF3D]">{bookingData.totalPrice} ₽</span>
+                <span className="text-xl font-bold text-[#c4d402]">{bookingData.totalPrice} ₽</span>
               </div>
             </div>
 
@@ -579,7 +579,7 @@ export default function TireMountingBookingPage() {
                               />
                             </div>
                           </div>
-                          <div className="w-5 h-5 rounded-full bg-[#D3DF3D] flex items-center justify-center">
+                          <div className="w-5 h-5 rounded-full bg-[#c4d402] flex items-center justify-center">
                             <svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
                               <path
                                 fillRule="evenodd"
@@ -649,7 +649,7 @@ export default function TireMountingBookingPage() {
                           </div>
                         </div>
                         {selectedStore === store.id && (
-                          <div className="w-5 h-5 rounded-full bg-[#D3DF3D] flex items-center justify-center">
+                          <div className="w-5 h-5 rounded-full bg-[#c4d402] flex items-center justify-center">
                             <svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
                               <path
                                 fillRule="evenodd"
@@ -671,7 +671,7 @@ export default function TireMountingBookingPage() {
           <Card ref={dateTimeRef} className="bg-white dark:bg-[#2A2A2A] border-none shadow-sm">
             <CardHeader className="pb-4">
               <CardTitle className="text-lg font-bold text-[#1F1F1F] dark:text-white flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-[#D3DF3D]" />
+                <Calendar className="h-5 w-5 text-[#c4d402]" />
                 Дата и время
               </CardTitle>
             </CardHeader>
@@ -690,8 +690,8 @@ export default function TireMountingBookingPage() {
                         }}
                         className={`flex-1 px-3 py-2 text-sm rounded-md border transition-all duration-300 transform hover:scale-105 ${
                           selectedQuickDate === "today"
-                            ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F] shadow-lg"
-                            : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#D3DF3D] hover:shadow-md"
+                            ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F] shadow-lg"
+                            : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:shadow-md"
                         }`}
                       >
                         Сегодня
@@ -706,8 +706,8 @@ export default function TireMountingBookingPage() {
                         }}
                         className={`flex-1 px-3 py-2 text-sm rounded-md border transition-all duration-300 transform hover:scale-105 ${
                           selectedQuickDate === "tomorrow"
-                            ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F] shadow-lg"
-                            : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#D3DF3D] hover:shadow-md"
+                            ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F] shadow-lg"
+                            : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:shadow-md"
                         }`}
                       >
                         Завтра
@@ -774,8 +774,8 @@ export default function TireMountingBookingPage() {
                           }}
                           className={`p-2 text-sm rounded-md border transition-all ${
                             selectedTime === time
-                              ? "bg-[#D3DF3D] border-[#D3DF3D] text-[#1F1F1F]"
-                              : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#D3DF3D]"
+                              ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
+                              : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402]"
                           }`}
                         >
                           {time}
@@ -844,7 +844,7 @@ export default function TireMountingBookingPage() {
                 !customerInfo.phone ||
                 !selectedCar
               }
-              className="flex-1 bg-[#D3DF3D] hover:bg-[#C4CF2E] disabled:opacity-50 disabled:cursor-not-allowed text-black py-3 px-4 rounded-lg text-base font-medium transition-colors"
+              className="flex-1 bg-[#c4d402] hover:bg-[#C4CF2E] disabled:opacity-50 disabled:cursor-not-allowed text-black py-3 px-4 rounded-lg text-base font-medium transition-colors"
             >
               Записаться
             </button>
@@ -853,7 +853,7 @@ export default function TireMountingBookingPage() {
           {/* Согласие с условиями */}
           <p className="text-xs text-gray-400 text-center mt-4">
             Нажимая "Записаться", вы соглашаетесь с{" "}
-            <Link href="/settings/terms" className="text-[#D3DF3D] hover:underline">
+            <Link href="/settings/terms" className="text-[#c4d402] hover:underline">
               условиями
             </Link>{" "}
             предоставления услуг

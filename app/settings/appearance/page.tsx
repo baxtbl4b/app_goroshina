@@ -9,8 +9,8 @@ import BottomNavigation from "@/components/bottom-navigation"
 export default function AppearancePage() {
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/settings">
               <Button variant="ghost" size="icon" className="mr-2">
@@ -30,7 +30,7 @@ export default function AppearancePage() {
             <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-[#333333] rounded-lg">
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-white dark:bg-[#2A2A2A] rounded-lg flex items-center justify-center mr-3">
-                  <Sun className="h-5 w-5 text-[#D3DF3D]" />
+                  <Sun className="h-5 w-5 text-[#c4d402]" />
                 </div>
                 <Label htmlFor="theme-light" className="text-[#1F1F1F] dark:text-white cursor-pointer">
                   Светлая
@@ -54,7 +54,7 @@ export default function AppearancePage() {
             <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-[#333333] rounded-lg">
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-gradient-to-r from-white to-[#1F1F1F] rounded-lg flex items-center justify-center mr-3">
-                  <div className="w-5 h-5 rounded-full bg-gradient-to-r from-[#D3DF3D] to-[#009CFF]"></div>
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-r from-[#c4d402] to-[#009CFF]"></div>
                 </div>
                 <Label htmlFor="theme-system" className="text-[#1F1F1F] dark:text-white cursor-pointer">
                   Системная
@@ -70,7 +70,7 @@ export default function AppearancePage() {
 
           <div className="grid grid-cols-5 gap-3">
             <div className="flex flex-col items-center">
-              <div className="w-12 h-12 rounded-full bg-[#D3DF3D] cursor-pointer ring-2 ring-offset-2 ring-[#D3DF3D]"></div>
+              <div className="w-12 h-12 rounded-full bg-[#c4d402] cursor-pointer ring-2 ring-offset-2 ring-[#c4d402]"></div>
               <span className="text-xs mt-1 text-[#1F1F1F] dark:text-white">Лайм</span>
             </div>
             <div className="flex flex-col items-center">
@@ -119,7 +119,7 @@ export default function AppearancePage() {
           </div>
         </div>
 
-        <Button className="w-full bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">Сохранить изменения</Button>
+        <Button className="w-full bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">Сохранить изменения</Button>
       </div>
 
       <BottomNavigation />

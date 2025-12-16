@@ -68,7 +68,7 @@ export default function SoundproofingConfirmationPage() {
             <div className="space-y-4">
               {/* Service */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <CheckCircle className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -82,7 +82,7 @@ export default function SoundproofingConfirmationPage() {
 
               {/* Date and Time */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <Calendar className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -98,7 +98,7 @@ export default function SoundproofingConfirmationPage() {
 
               {/* Location */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <MapPin className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -110,7 +110,7 @@ export default function SoundproofingConfirmationPage() {
 
               {/* Contact */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <Phone className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -123,7 +123,7 @@ export default function SoundproofingConfirmationPage() {
               <div className="mt-4 p-4 bg-[#F5F5F5] dark:bg-[#333333] rounded-lg">
                 <div className="flex justify-between items-center">
                   <span className="font-medium text-[#1F1F1F] dark:text-white">Предварительная стоимость:</span>
-                  <span className="text-xl font-bold text-[#D3DF3D]">{bookingDetails.estimatedPrice}</span>
+                  <span className="text-xl font-bold text-[#c4d402]">{bookingDetails.estimatedPrice}</span>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                   Окончательная стоимость может отличаться в зависимости от состояния шин
@@ -149,7 +149,7 @@ export default function SoundproofingConfirmationPage() {
         <div className="space-y-3">
           <button
             onClick={handleViewOrders}
-            className="w-full bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black py-3 px-4 rounded-lg font-medium transition-colors"
+            className="w-full bg-[#c4d402] hover:bg-[#C4CF2E] text-black py-3 px-4 rounded-lg font-medium transition-colors"
           >
             Посмотреть мои записи
           </button>

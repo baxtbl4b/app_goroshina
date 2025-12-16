@@ -9,7 +9,7 @@ import BottomNavigation from "@/components/bottom-navigation"
 
 const categories = [
   { id: "all", name: "Все", color: "bg-[#009CFF]" },
-  { id: "promotions", name: "Акции", color: "bg-[#D3DF3D] text-[#1F1F1F]" },
+  { id: "promotions", name: "Акции", color: "bg-[#c4d402] text-[#1F1F1F]" },
   { id: "products", name: "Новинки", color: "bg-[#FF6B35]" },
   { id: "tips", name: "Советы", color: "bg-[#4ECDC4]" },
   { id: "company", name: "Компания", color: "bg-[#45B7D1]" },
@@ -92,8 +92,8 @@ export default function NewsPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm pt-[env(safe-area-inset-top)]">
+        <div className="h-[60px] px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/settings">
               <Button variant="ghost" size="icon" className="mr-2">

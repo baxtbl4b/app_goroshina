@@ -13,8 +13,8 @@ export default function PromotionsPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] p-4 shadow-sm">
-        <div className="relative flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 relative flex items-center justify-between">
           <div className="flex items-center">
             <Button variant="ghost" size="icon" className="mr-2" onClick={() => router.back()}>
               <ArrowLeft className="h-5 w-5 text-[#1F1F1F] dark:text-white" />
@@ -32,7 +32,7 @@ export default function PromotionsPage() {
           <div className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm">
             <div className="relative h-40">
               <Image src="/images/winter-tire-new.png" alt="Зимние шины со скидкой 15%" fill className="object-cover" />
-              <div className="absolute top-3 left-3 bg-[#D3DF3D] text-[#1F1F1F] text-sm font-bold px-3 py-1 rounded-full">
+              <div className="absolute top-3 left-3 bg-[#c4d402] text-[#1F1F1F] text-sm font-bold px-3 py-1 rounded-full">
                 -15%
               </div>
             </div>
@@ -44,7 +44,7 @@ export default function PromotionsPage() {
               <div className="flex justify-between items-center mt-3">
                 <span className="text-xs text-[#1F1F1F] dark:text-gray-400">До 31.10.2023</span>
                 <Link href="/promotions/winter-tires">
-                  <Button size="sm" className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
+                  <Button size="sm" className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">
                     Подробнее
                   </Button>
                 </Link>
@@ -68,7 +68,7 @@ export default function PromotionsPage() {
               <div className="flex justify-between items-center mt-3">
                 <span className="text-xs text-[#1F1F1F] dark:text-gray-400">До 15.11.2023</span>
                 <Link href="/promotions/free-mounting">
-                  <Button size="sm" className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
+                  <Button size="sm" className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">
                     Подробнее
                   </Button>
                 </Link>
@@ -80,7 +80,7 @@ export default function PromotionsPage() {
           <div className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm">
             <div className="relative h-40">
               <Image src="/images/hranenie.png" alt="Скидка на хранение шин" fill className="object-cover" />
-              <div className="absolute top-3 left-3 bg-[#D3DF3D] text-[#1F1F1F] text-sm font-bold px-3 py-1 rounded-full">
+              <div className="absolute top-3 left-3 bg-[#c4d402] text-[#1F1F1F] text-sm font-bold px-3 py-1 rounded-full">
                 -20%
               </div>
             </div>
@@ -92,7 +92,7 @@ export default function PromotionsPage() {
               <div className="flex justify-between items-center mt-3">
                 <span className="text-xs text-[#1F1F1F] dark:text-gray-400">До 30.11.2023</span>
                 <Link href="/promotions/storage-discount">
-                  <Button size="sm" className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
+                  <Button size="sm" className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">
                     Подробнее
                   </Button>
                 </Link>
@@ -116,7 +116,7 @@ export default function PromotionsPage() {
               <div className="flex justify-between items-center mt-3">
                 <span className="text-xs text-[#1F1F1F] dark:text-gray-400">Постоянная акция</span>
                 <Link href="/promotions/installment">
-                  <Button size="sm" className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
+                  <Button size="sm" className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">
                     Подробнее
                   </Button>
                 </Link>

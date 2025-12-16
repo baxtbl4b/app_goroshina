@@ -25,7 +25,8 @@
       "Bash(del \"C:\\app_goroshina\\app\\loading.tsx\")",
       "Bash(rm:*)",
       "Bash(find:*)",
-      "Bash(python -m json.tool:*)"
+      "Bash(python -m json.tool:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

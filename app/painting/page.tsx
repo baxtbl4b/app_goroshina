@@ -478,7 +478,7 @@ export default function PaintingPage() {
               <select
                 value={paintingType}
                 onChange={(e) => setPaintingType(e.target.value)}
-                className="w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 bg-[#2A2A2A] text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm border-2 border-[#D3DF3D]"
+                className="w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 bg-[#2A2A2A] text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm border-2 border-[#c4d402]"
               >
                 <option value="powder">Порошковая покраска</option>
                 <option value="acrylic">Акриловая покраска</option>
@@ -756,7 +756,7 @@ export default function PaintingPage() {
                         className={`flex-1 rounded-lg px-3 py-2 relative transition-all duration-200 ease-in-out active:scale-95 hover:shadow-md ${
                           key === "disk-painting"
                             ? serviceQuantities[key] > 0
-                              ? "bg-[#1e293b] border-l-4 border-[#d3df3d] shadow-lg text-center"
+                              ? "bg-[#1e293b] border-l-4 border-[#c4d402] shadow-lg text-center"
                               : !diameter
                                 ? "bg-gray-800 text-gray-400 text-center"
                                 : "bg-gray-700 text-white cursor-pointer hover:bg-[#1a1a1a] hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 ease-in-out text-center"
@@ -826,7 +826,7 @@ export default function PaintingPage() {
                             className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold transition-all duration-200 active:scale-90 ${
                               !diameter
                                 ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                                : "bg-[#d3df3d] text-black hover:bg-[#c5d135] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                : "bg-[#c4d402] text-black hover:bg-[#c5d135] focus:outline-none focus:ring-2 focus:ring-blue-500"
                             }`}
                           >
                             +
@@ -872,7 +872,7 @@ export default function PaintingPage() {
                             className={`w-10 h-10 rounded-lg flex items-center justify-center focus:outline-none transition-all duration-200 active:scale-90 ${
                               !diameter
                                 ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                                : "bg-[#d3df3d] text-black hover:bg-[#c5d135] focus:ring-2 focus:ring-blue-500"
+                                : "bg-[#c4d402] text-black hover:bg-[#c5d135] focus:ring-2 focus:ring-blue-500"
                             }`}
                           >
                             +
@@ -960,7 +960,7 @@ export default function PaintingPage() {
                       Посмотреть полный прайс
                     </button>
                     <button
-                      className="w-full bg-[#d3df3d] hover:bg-[#c5d135] text-black py-3 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-[#c4d402] hover:bg-[#c5d135] text-black py-3 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={
                         (Object.keys(selectedServices).length === 0 &&
                           Object.keys(tireMountingServices).length === 0) ||

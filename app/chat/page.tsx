@@ -103,13 +103,13 @@ export default function ChatPage() {
               {!message.isUser && (
                 <Avatar className="h-8 w-8 flex-shrink-0">
                   <AvatarImage src="/images/iigoroshinka.png" alt="Горошина" />
-                  <AvatarFallback className="bg-[#D3DF3D] text-[#1F1F1F] text-sm">Г</AvatarFallback>
+                  <AvatarFallback className="bg-[#c4d402] text-[#1F1F1F] text-sm">Г</AvatarFallback>
                 </Avatar>
               )}
               <div
                 className={`rounded-2xl px-4 py-2 ${
                   message.isUser
-                    ? "bg-[#D3DF3D] text-[#1F1F1F]"
+                    ? "bg-[#c4d402] text-[#1F1F1F]"
                     : "bg-white dark:bg-[#2A2A2A] text-[#1F1F1F] dark:text-white"
                 }`}
               >
@@ -125,7 +125,7 @@ export default function ChatPage() {
             <div className="flex items-end space-x-2 max-w-[80%]">
               <Avatar className="h-8 w-8 flex-shrink-0">
                 <AvatarImage src="/images/iigoroshinka.png" alt="Горошина" />
-                <AvatarFallback className="bg-[#D3DF3D] text-[#1F1F1F] text-sm">Г</AvatarFallback>
+                <AvatarFallback className="bg-[#c4d402] text-[#1F1F1F] text-sm">Г</AvatarFallback>
               </Avatar>
               <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl px-4 py-2">
                 <div className="flex items-center space-x-1">
@@ -172,7 +172,7 @@ export default function ChatPage() {
           <Button
             type="submit"
             size="icon"
-            className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] rounded-full"
+            className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] rounded-full"
             disabled={!inputValue.trim() || isLoading}
           >
             <Send className="h-4 w-4" />

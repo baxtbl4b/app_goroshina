@@ -482,7 +482,7 @@ export default function DiskiPage() {
         marginTop: "-6px",
         marginBottom: "-6px",
       },
-      buttonClass: "border border-[#D3DF3D] bg-[#D3DF3D]/10 text-[#1F1F1F] dark:text-white font-medium",
+      buttonClass: "border border-[#c4d402] bg-[#c4d402]/10 text-[#1F1F1F] dark:text-white font-medium",
       animationStyle: "",
     }
   }
@@ -498,7 +498,7 @@ export default function DiskiPage() {
       return `${baseClass} ${buttonClass} rounded-xl`
     }
 
-    return `${baseClass} border border-transparent hover:border-[#D3DF3D] hover:bg-[#D3DF3D]/10 text-[#1F1F1F] dark:text-white rounded-xl`
+    return `${baseClass} border border-transparent hover:border-[#c4d402] hover:bg-[#c4d402]/10 text-[#1F1F1F] dark:text-white rounded-xl`
   }
 
   const handleBrandSelect = (brands: string[]) => {
@@ -699,8 +699,8 @@ export default function DiskiPage() {
         </div>
       )}
 
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[60px]">
-        <div className="container max-w-md flex items-center justify-center h-full relative overflow-hidden">
+      <header className="fixed top-0 left-0 right-0 z-[100] bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full container max-w-md flex items-center justify-center relative overflow-hidden">
           <Link
             href="/"
             className="fixed left-0 top-2 p-2 rounded-tr-md rounded-br-md hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors z-50"
@@ -711,9 +711,9 @@ export default function DiskiPage() {
 
           <div className="disk-tabs-container">
             {[
-              { key: "stamped", label: "Штампы", color: "#D3DF3D", index: 0 },
-              { key: "cast", label: "Литые", color: "#D3DF3D", index: 1 },
-              { key: "forged", label: "Кованные", color: "#D3DF3D", index: 2 },
+              { key: "stamped", label: "Штампы", color: "#c4d402", index: 0 },
+              { key: "cast", label: "Литые", color: "#c4d402", index: 1 },
+              { key: "forged", label: "Кованные", color: "#c4d402", index: 2 },
             ].map((tab) => {
               const isActive = diskType === tab.key
               const activeIndex = diskType === "stamped" ? 0 : diskType === "cast" ? 1 : 2

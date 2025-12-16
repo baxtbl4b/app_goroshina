@@ -100,7 +100,7 @@ export function BottomNavigation() {
             aria-label="Открыть умную помощницу Горошина"
           >
             <div
-              className="rounded-full transform hover:scale-110 hover:-translate-y-1 transition-all flex items-center justify-center w-[65px] h-[65px] relative overflow-hidden -mt-[47px] bg-[#D3DF3D]"
+              className="rounded-full transform hover:scale-110 hover:-translate-y-1 transition-all flex items-center justify-center w-[65px] h-[65px] relative overflow-hidden -mt-[47px] bg-[#c4d402]"
               style={{
                 boxShadow: `
                   0 8px 16px rgba(0, 0, 0, 0.3),

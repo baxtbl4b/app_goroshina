@@ -1,5 +1,6 @@
 import { ChevronRight } from "lucide-react"
 import Link from "next/link"
+import { OrderStatusBadge } from "@/components/status-badge"
 
 interface OrderHistoryItemProps {
   id: string
@@ -22,34 +23,14 @@ export default function OrderHistoryItem({
   status,
   items,
   total,
-  products = [], // Default to empty array if not provided
+  products = [],
 }: OrderHistoryItemProps) {
-  // Функция для определения цвета и бейджа статуса
-  const getStatusStyle = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "в обработке":
-        return { text: "text-orange-400", bg: "bg-orange-400/10" }
-      case "подтвержден":
-        return { text: "text-blue-400", bg: "bg-blue-400/10" }
-      case "выполнен":
-        return { text: "text-green-400", bg: "bg-green-400/10" }
-      case "отменен":
-        return { text: "text-red-400", bg: "bg-red-400/10" }
-      default:
-        return { text: "text-[#D3DF3D]", bg: "bg-[#D3DF3D]/10" }
-    }
-  }
-
-  const statusStyle = getStatusStyle(status)
-
   return (
     <Link href={`/profile/orders/${id}`}>
       <div className="bg-[#1F1F1F] rounded-2xl p-4 hover:bg-[#252525] transition-all duration-200">
         <div className="flex justify-between items-center mb-3">
           <span className="font-semibold text-white">Заказ #{orderNumber}</span>
-          <span className={`text-xs font-medium px-3 py-1 rounded-xl ${statusStyle.text} ${statusStyle.bg}`}>
-            {status}
-          </span>
+          <OrderStatusBadge status={status} />
         </div>
 
         {/* Product information section */}
@@ -82,7 +63,7 @@ export default function OrderHistoryItem({
         <div className="flex justify-between items-center pt-2 border-t border-[#2A2A2A]">
           <div>
             <p className="text-xs text-gray-500 mb-1">{date}</p>
-            <p className="font-bold text-[#D3DF3D] text-lg">{total}</p>
+            <p className="font-bold text-[#c4d402] text-lg">{total}</p>
           </div>
           <div className="w-10 h-10 bg-[#2A2A2A] rounded-xl flex items-center justify-center">
             <ChevronRight className="h-5 w-5 text-gray-400" />

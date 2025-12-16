@@ -74,7 +74,7 @@ function FavoritesList() {
       <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-8 text-center">
         <p className="text-[#1F1F1F] dark:text-white mb-4">У вас пока нет избранных товаров</p>
         <Link href="/category/summer">
-          <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">Перейти в каталог</Button>
+          <Button className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">Перейти в каталог</Button>
         </Link>
         <BottomNavigation />
       </div>
@@ -213,12 +213,12 @@ export default function HomePage() {
       // [2010–2014]$$years:2010-2014$$  ➜  years button
       .replace(
         /\[([^\]]+)\]\$\$years:([^)]+)\$\$/g,
-        '<button class="inline-block bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] px-3 py-1 rounded-lg text-sm font-medium mx-1 my-1 years-button" data-years="$2">$1</button>',
+        '<button class="inline-block bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] px-3 py-1 rounded-lg text-sm font-medium mx-1 my-1 years-button" data-years="$2">$1</button>',
       )
       // [2010–2014] plain – make button
       .replace(
         /\[(\d{4}–\d{4})\]/g,
-        '<button class="inline-block bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] px-3 py-1 rounded-lg text-sm font-medium mx-1 my-1 years-button" data-years="$1">$1</button>',
+        '<button class="inline-block bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] px-3 py-1 rounded-lg text-sm font-medium mx-1 my-1 years-button" data-years="$1">$1</button>',
       )
       // [label]$$link$$  ➜  anchor
       .replace(
@@ -335,7 +335,7 @@ export default function HomePage() {
                       <div
                         className={`max-w-[80%] p-3 rounded-lg ${
                           message.isUser
-                            ? "bg-[#D3DF3D] text-[#1F1F1F]"
+                            ? "bg-[#c4d402] text-[#1F1F1F]"
                             : "bg-gray-100 dark:bg-[#333333] text-[#1F1F1F] dark:text-white"
                         }`}
                       >
@@ -405,7 +405,7 @@ export default function HomePage() {
                       onChange={(e) => setChatInput(e.target.value)}
                       className="w-full bg-[#F5F5F5] dark:bg-[#333333] rounded-xl py-3 px-10 text-[#1F1F1F] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#009CFF]"
                     />
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#d3df3d] pointer-events-none" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#c4d402] pointer-events-none" />
                     <button
                       type="submit"
                       disabled={!chatInput.trim() || isChatLoading}
@@ -452,7 +452,7 @@ export default function HomePage() {
                     onChange={(e) => setChatInput(e.target.value)}
                     className="w-full bg-[#F5F5F5] dark:bg-[#333333] rounded-xl py-3 px-10 text-[#1F1F1F] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#009CFF]"
                   />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#d3df3d] pointer-events-none" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#c4d402] pointer-events-none" />
                   <button
                     type="button"
                     onClick={() => {
@@ -499,9 +499,9 @@ export default function HomePage() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Award className="h-5 w-5 text-[#D3DF3D]" />
+                      <Award className="h-5 w-5 text-[#c4d402]" />
                       <div className="flex items-center">
-                        <span className="text-lg font-bold text-[#D3DF3D]">{user.loyaltyPoints} баллов</span>
+                        <span className="text-lg font-bold text-[#c4d402]">{user.loyaltyPoints} баллов</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -518,7 +518,7 @@ export default function HomePage() {
                     <Progress
                       value={35}
                       className="h-2 bg-[#D9D9DD] dark:bg-[#3A3A3A]"
-                      indicatorClassName="bg-gradient-to-r from-[#D3DF3D] to-[#009CFF]"
+                      indicatorClassName="bg-gradient-to-r from-[#c4d402] to-[#009CFF]"
                     />
                   </div>
 
@@ -643,13 +643,13 @@ export default function HomePage() {
               <TabsList className="w-full bg-[#1F1F1F] rounded-xl p-2 h-14">
                 <TabsTrigger
                   value="popular"
-                  className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#d3df3d] data-[state=active]:text-[#1F1F1F] data-[state=active]:scale-105 data-[state=active]:shadow-lg data-[state=active]:shadow-[#d3df3d]/30 data-[state=active]:transform data-[state=active]:font-bold h-10 px-6 text-base font-medium hover:scale-102 hover:bg-white/10"
+                  className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-[#1F1F1F] data-[state=active]:scale-105 data-[state=active]:shadow-lg data-[state=active]:shadow-[#c4d402]/30 data-[state=active]:transform data-[state=active]:font-bold h-10 px-6 text-base font-medium hover:scale-102 hover:bg-white/10"
                 >
                   Товары
                 </TabsTrigger>
                 <TabsTrigger
                   value="sale"
-                  className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#d3df3d] data-[state=active]:text-[#1F1F1F] h-10 px-6 text-base font-medium"
+                  className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-[#1F1F1F] h-10 px-6 text-base font-medium"
                 >
                   Услуги
                 </TabsTrigger>
@@ -945,7 +945,7 @@ export default function HomePage() {
                 >
                   <div className="flex flex-col items-start text-left">
                     <h3 className="font-medium text-xs text-[#1F1F1F] dark:text-white mb-1">Оформить каско</h3>
-                    <p className="text-[10px] text-[#d3df3d] flex items-center">
+                    <p className="text-[10px] text-[#c4d402] flex items-center">
                       +500 <span className="ml-1">баллов</span>
                     </p>
                   </div>
@@ -966,7 +966,7 @@ export default function HomePage() {
                 >
                   <div className="flex flex-col items-start text-left">
                     <h3 className="font-medium text-xs text-[#1F1F1F] dark:text-white mb-1">История авто</h3>
-                    <p className="text-[10px] text-[#d3df3d] flex items-center">
+                    <p className="text-[10px] text-[#c4d402] flex items-center">
                       +100 <span className="ml-1">баллов</span>
                     </p>
                   </div>
@@ -987,7 +987,7 @@ export default function HomePage() {
                 >
                   <div className="flex flex-col items-start text-left">
                     <h3 className="font-medium text-xs text-[#1F1F1F] dark:text-white mb-1">Проверить штрафы</h3>
-                    <p className="text-[10px] text-[#d3df3d] flex items-center">
+                    <p className="text-[10px] text-[#c4d402] flex items-center">
                       +50 <span className="ml-1">баллов</span>
                     </p>
                   </div>
@@ -1002,7 +1002,7 @@ export default function HomePage() {
                 >
                   <div className="flex flex-col items-start text-left">
                     <h3 className="font-medium text-xs text-[#1F1F1F] dark:text-white mb-1">Помыть авто</h3>
-                    <p className="text-[10px] text-[#d3df3d] flex items-center">
+                    <p className="text-[10px] text-[#c4d402] flex items-center">
                       +150 <span className="ml-1">баллов</span>
                     </p>
                   </div>
@@ -1017,7 +1017,7 @@ export default function HomePage() {
                 >
                   <div className="flex flex-col items-start text-left">
                     <h3 className="font-medium text-xs text-[#1F1F1F] dark:text-white mb-1">Автоюристы</h3>
-                    <p className="text-[10px] text-[#d3df3d] flex items-center">
+                    <p className="text-[10px] text-[#c4d402] flex items-center">
                       +300 <span className="ml-1">баллов</span>
                     </p>
                   </div>

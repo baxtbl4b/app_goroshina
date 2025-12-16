@@ -748,7 +748,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
           .carousel-highlight {
             position: absolute;
-            background: #D3DF3D;
+            background: #c4d402;
             border-radius: 50px;
             z-index: 2;
             pointer-events: none;
@@ -760,7 +760,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
           .carousel-item-center {
             padding: 7px 18px;
-            background: #D3DF3D;
+            background: #c4d402;
             color: #1F1F1F;
             font-size: 14px;
             font-weight: 600;
@@ -1197,8 +1197,8 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                 }}
                 className={`text-xs py-1.5 px-2.5 rounded-xl border transition-all duration-200 whitespace-nowrap snap-start flex-shrink-0 ${
                   currentWidth === size.width && currentProfile === size.profile && currentDiameter === size.diameter
-                    ? "bg-[#D3DF3D] text-[#1F1F1F] border-[#D3DF3D] font-medium"
-                    : "border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white hover:border-[#D3DF3D] hover:bg-[#D3DF3D]/10"
+                    ? "bg-[#c4d402] text-[#1F1F1F] border-[#c4d402] font-medium"
+                    : "border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:bg-[#c4d402]/10"
                 }`}
               >
                 {size.label}

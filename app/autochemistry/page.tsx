@@ -426,8 +426,8 @@ export default function AutochemistryPage() {
           animation: cartIconBounce 0.6s ease-in-out;
         }
       `}</style>
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-[#1F1F1F] shadow-sm">
-        <div className="p-2 px-4 flex items-center justify-between w-full h-[60px]">
+      <header className="fixed top-0 left-0 right-0 z-[100] bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Link href="/" className="text-[#1F1F1F] dark:text-white">
               <ChevronLeft className="h-6 w-6" />
@@ -580,7 +580,7 @@ export default function AutochemistryPage() {
                           {/* Кнопка плюс */}
                           <button
                             onClick={(e) => addToCart(product, e)}
-                            className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors"
+                            className="bg-[#c4d402]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors"
                             aria-label="Увеличить количество"
                           >
                             <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />

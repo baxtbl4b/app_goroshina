@@ -192,7 +192,7 @@ export default function EditTiresPage() {
                   <RadioGroupItem value="5" id="r5" className="peer sr-only" />
                   <Label
                     htmlFor="r5"
-                    className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[#D9D9DD] dark:border-[#3a3a3a] bg-white dark:bg-[#1F1F1F] text-center peer-data-[state=checked]:bg-[#D3DF3D] peer-data-[state=checked]:text-[#1F1F1F] peer-data-[state=checked]:border-[#D3DF3D] hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
+                    className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[#D9D9DD] dark:border-[#3a3a3a] bg-white dark:bg-[#1F1F1F] text-center peer-data-[state=checked]:bg-[#c4d402] peer-data-[state=checked]:text-[#1F1F1F] peer-data-[state=checked]:border-[#c4d402] hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
                   >
                     5
                   </Label>
@@ -221,7 +221,7 @@ export default function EditTiresPage() {
             </div>
 
             <div className="pt-4">
-              <Button className="w-full py-3 rounded-xl bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] font-semibold">
+              <Button className="w-full py-3 rounded-xl bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] font-semibold">
                 <Save className="mr-2 h-5 w-5" />
                 Сохранить изменения
               </Button>

@@ -238,8 +238,8 @@ export default function DiskProductPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#1F1F1F]">
-      <header className="sticky top-0 z-10 bg-[#2A2A2A] p-4 shadow-sm">
-        <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/diski">
               <Button variant="ghost" size="icon" className="mr-2">
@@ -255,7 +255,7 @@ export default function DiskProductPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2 bg-[#D3DF3D] text-black hover:bg-[#D3DF3D]/80 border-none"
+                className="flex items-center gap-2 bg-[#c4d402] text-black hover:bg-[#c4d402]/80 border-none"
               >
                 <ShoppingCart className="h-4 w-4" />
                 <span className="font-medium">Корзина</span>
@@ -283,7 +283,7 @@ export default function DiskProductPage() {
       <div className="flex-1 pb-20">
         <div className="bg-[#2A2A2A] p-4">
           <div className="flex justify-center mb-4">
-            <Badge className="bg-[#D3DF3D] text-white font-medium">Акция</Badge>
+            <Badge className="bg-[#c4d402] text-white font-medium">Акция</Badge>
           </div>
 
           {/* Image Gallery */}
@@ -323,7 +323,7 @@ export default function DiskProductPage() {
                   key={index}
                   onClick={() => goToImage(index)}
                   className={`h-2 w-2 rounded-full transition-colors ${
-                    index === currentImageIndex ? "bg-[#D3DF3D]" : "bg-gray-600"
+                    index === currentImageIndex ? "bg-[#c4d402]" : "bg-gray-600"
                   }`}
                   aria-label={`Перейти к изображению ${index + 1}`}
                 />
@@ -340,7 +340,7 @@ export default function DiskProductPage() {
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className={`h-4 w-4 ${star <= 4 ? "fill-[#D3DF3D] text-[#D3DF3D]" : "text-gray-600"}`}
+                    className={`h-4 w-4 ${star <= 4 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-600"}`}
                   />
                 ))}
               </div>
@@ -361,7 +361,7 @@ export default function DiskProductPage() {
               <span className="text-2xl font-bold text-[#009CFF]">{product.price * 4} ₽</span>
               <div className="flex items-center gap-2">
                 <span className="text-sm line-through text-gray-500">{Math.round(product.price * 4 * 1.1)} ₽</span>
-                <Badge className="bg-[#D3DF3D] text-white">-10%</Badge>
+                <Badge className="bg-[#c4d402] text-white">-10%</Badge>
               </div>
               <p className="text-xs text-gray-400 mt-1">за комплект (4 шт.)</p>
             </div>
@@ -389,7 +389,7 @@ export default function DiskProductPage() {
                 <button
                   onClick={addToCart}
                   disabled={product.stock <= 0}
-                  className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-[#c4d402]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopRightRadius: '20px', borderBottomRightRadius: '20px' }}
                   aria-label="Увеличить количество"
                 >
@@ -510,7 +510,7 @@ export default function DiskProductPage() {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className={`h-3 w-3 ${star <= 5 ? "fill-[#D3DF3D] text-[#D3DF3D]" : "text-gray-600"}`}
+                          className={`h-3 w-3 ${star <= 5 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-600"}`}
                         />
                       ))}
                     </div>
@@ -527,7 +527,7 @@ export default function DiskProductPage() {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className={`h-3 w-3 ${star <= 4 ? "fill-[#D3DF3D] text-[#D3DF3D]" : "text-gray-600"}`}
+                          className={`h-3 w-3 ${star <= 4 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-600"}`}
                         />
                       ))}
                     </div>
@@ -544,7 +544,7 @@ export default function DiskProductPage() {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className={`h-3 w-3 ${star <= 4 ? "fill-[#D3DF3D] text-[#D3DF3D]" : "text-gray-600"}`}
+                          className={`h-3 w-3 ${star <= 4 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-600"}`}
                         />
                       ))}
                     </div>

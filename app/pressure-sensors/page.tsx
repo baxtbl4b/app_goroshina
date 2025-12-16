@@ -557,7 +557,7 @@ export default function PressureSensorsPage() {
                           <button
                             onClick={(e) => addToCart(sensor, e)}
                             disabled={sensor.stock <= 0}
-                            className="bg-[#D3DF3D]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="bg-[#c4d402]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Увеличить количество"
                           >
                             <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />

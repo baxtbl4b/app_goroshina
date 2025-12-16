@@ -311,7 +311,7 @@ export default function PaintingPage() {
           disabled={isPast}
           className={`h-10 w-full rounded-md text-sm font-medium transition-all ${
             isSelected
-              ? "bg-[#d3df3d] text-[#1F1F1F]"
+              ? "bg-[#c4d402] text-[#1F1F1F]"
               : isTodayDate
                 ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300"
                 : isPast
@@ -822,7 +822,7 @@ export default function PaintingPage() {
       <div className="flex flex-col min-h-screen bg-[#121212] text-white">
         <SafeAreaHeader title="Оформление заказа" showBackButton backUrl="/painting" />
         <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#d3df3d]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#c4d402]"></div>
         </div>
         <BottomNavigation />
       </div>
@@ -841,7 +841,7 @@ export default function PaintingPage() {
 
             {/* Painting Services */}
             <div className="space-y-2 mb-4">
-              <h3 className="font-medium text-[#d3df3d]">Покраска дисков:</h3>
+              <h3 className="font-medium text-[#c4d402]">Покраска дисков:</h3>
               {Object.entries(bookingData.selectedServices).map(([key, service]: [string, any]) => (
                 <div key={key} className="flex justify-between items-center text-sm">
                   <span>{service.name}</span>
@@ -914,7 +914,7 @@ export default function PaintingPage() {
             <div className="border-t border-gray-600 pt-4">
               <div className="flex justify-between items-center font-bold text-lg">
                 <span>Итого:</span>
-                <span className="text-[#d3df3d]">{bookingData.combinedTotalPrice || bookingData.totalPrice}₽</span>
+                <span className="text-[#c4d402]">{bookingData.combinedTotalPrice || bookingData.totalPrice}₽</span>
               </div>
             </div>
           </div>
@@ -923,7 +923,7 @@ export default function PaintingPage() {
           <Card ref={contactInfoRef} className="bg-white dark:bg-[#2A2A2A] border-none shadow-sm">
             <CardHeader className="pb-4">
               <CardTitle className="text-lg font-bold text-[#1F1F1F] dark:text-white flex items-center gap-2">
-                <User className="h-5 w-5 text-[#d3df3d]" />
+                <User className="h-5 w-5 text-[#c4d402]" />
                 Контактная информация
               </CardTitle>
             </CardHeader>
@@ -965,7 +965,7 @@ export default function PaintingPage() {
                       onClick={() => setSelectedCar("1")}
                       className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                         selectedCar === "1"
-                          ? "border-[#d3df3d] bg-[#d3df3d]/10"
+                          ? "border-[#c4d402] bg-[#c4d402]/10"
                           : "border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333]"
                       }`}
                     >
@@ -974,14 +974,14 @@ export default function PaintingPage() {
                           <div className="font-semibold text-[#1F1F1F] dark:text-white">Toyota Camry</div>
                           <div className="text-sm text-gray-500">2019 • А123БВ777</div>
                         </div>
-                        <span className="text-xs bg-[#d3df3d] text-[#1F1F1F] px-2 py-1 rounded">Основной</span>
+                        <span className="text-xs bg-[#c4d402] text-[#1F1F1F] px-2 py-1 rounded">Основной</span>
                       </div>
                     </div>
                     <div
                       onClick={() => setSelectedCar("2")}
                       className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                         selectedCar === "2"
-                          ? "border-[#d3df3d] bg-[#d3df3d]/10"
+                          ? "border-[#c4d402] bg-[#c4d402]/10"
                           : "border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333]"
                       }`}
                     >
@@ -993,7 +993,7 @@ export default function PaintingPage() {
                       </div>
                     </div>
                     <Link href="/account/cars/add">
-                      <div className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333] cursor-pointer hover:border-[#d3df3d] transition-colors">
+                      <div className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333] cursor-pointer hover:border-[#c4d402] transition-colors">
                         <div className="text-center text-[#009CFF] font-medium">+ Добавить автомобиль</div>
                       </div>
                     </Link>
@@ -1085,7 +1085,7 @@ export default function PaintingPage() {
           <Card ref={dateTimeRef} className="bg-white dark:bg-[#2A2A2A] border-none shadow-sm">
             <CardHeader className="pb-4">
               <CardTitle className="text-lg font-bold text-[#1F1F1F] dark:text-white flex items-center gap-2">
-                <svg className="h-5 w-5 text-[#d3df3d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 text-[#c4d402]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                   <line x1="16" y1="2" x2="16" y2="6"></line>
                   <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -1111,8 +1111,8 @@ export default function PaintingPage() {
                         }}
                         className={`flex-1 px-3 py-2 text-sm rounded-md border transition-all duration-300 transform hover:scale-105 ${
                           selectedDate === new Date().toISOString().split("T")[0]
-                            ? "bg-[#d3df3d] border-[#d3df3d] text-[#1F1F1F]"
-                            : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#d3df3d] hover:shadow-md"
+                            ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
+                            : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:shadow-md"
                         }`}
                       >
                         Сегодня
@@ -1124,7 +1124,7 @@ export default function PaintingPage() {
                           tomorrow.setDate(tomorrow.getDate() + 1)
                           setSelectedDate(tomorrow.toISOString().split("T")[0])
                         }}
-                        className="flex-1 px-3 py-2 text-sm rounded-md border transition-all duration-300 transform hover:scale-105 bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#d3df3d] hover:shadow-md"
+                        className="flex-1 px-3 py-2 text-sm rounded-md border transition-all duration-300 transform hover:scale-105 bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:shadow-md"
                       >
                         Завтра
                       </button>
@@ -1189,8 +1189,8 @@ export default function PaintingPage() {
                           }}
                           className={`p-2 text-sm rounded-md border transition-all ${
                             selectedTime === time
-                              ? "bg-[#d3df3d] border-[#d3df3d] text-[#1F1F1F]"
-                              : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#d3df3d]"
+                              ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
+                              : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402]"
                           }`}
                         >
                           {time}
@@ -1211,7 +1211,7 @@ export default function PaintingPage() {
               <textarea
                 value={customerComment}
                 onChange={(e) => setCustomerComment(e.target.value)}
-                className="w-full bg-[#121212] text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d3df3d] h-24 resize-none"
+                className="w-full bg-[#121212] text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#c4d402] h-24 resize-none"
                 placeholder="Дополнительные пожелания или комментарии к заказу"
               />
             </div>
@@ -1231,7 +1231,7 @@ export default function PaintingPage() {
               disabled={
                 isSubmitting || !selectedDate || !selectedTime || !customerName || !customerPhone || !selectedStore
               }
-              className="flex-1 bg-[#d3df3d] hover:bg-[#c5d135] disabled:bg-gray-600 disabled:cursor-not-allowed text-black py-3 px-4 rounded-lg font-medium transition-colors"
+              className="flex-1 bg-[#c4d402] hover:bg-[#c5d135] disabled:bg-gray-600 disabled:cursor-not-allowed text-black py-3 px-4 rounded-lg font-medium transition-colors"
             >
               {isSubmitting ? "Оформление заказа..." : "Записаться"}
             </button>

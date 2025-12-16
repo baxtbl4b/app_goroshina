@@ -126,7 +126,7 @@ export default function StuddingPage() {
         <Card className="bg-white dark:bg-[#2A2A2A] border-none shadow-sm">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold text-[#1F1F1F] dark:text-white flex items-center gap-2">
-              <Info className="h-5 w-5 text-[#D3DF3D]" />О услуге дошиповки
+              <Info className="h-5 w-5 text-[#c4d402]" />О услуге дошиповки
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -149,7 +149,7 @@ export default function StuddingPage() {
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-[#D3DF3D]">Преимущества:</h4>
+                  <h4 className="font-semibold text-[#c4d402]">Преимущества:</h4>
                   <ul className="text-xs space-y-1">
                     <li>• Улучшенное сцепление на льду</li>
                     <li>• Повышенная безопасность</li>
@@ -158,7 +158,7 @@ export default function StuddingPage() {
                   </ul>
                 </div>
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-[#D3DF3D]">Процесс:</h4>
+                  <h4 className="font-semibold text-[#c4d402]">Процесс:</h4>
                   <ul className="text-xs space-y-1">
                     <li>• Осмотр шин</li>
                     <li>• Разметка мест установки</li>
@@ -175,7 +175,7 @@ export default function StuddingPage() {
         <Card className="bg-white dark:bg-[#2A2A2A] border-none shadow-sm">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold text-[#1F1F1F] dark:text-white flex items-center gap-2">
-              <Calculator className="h-5 w-5 text-[#D3DF3D]" />
+              <Calculator className="h-5 w-5 text-[#c4d402]" />
               Калькулятор стоимости
             </CardTitle>
           </CardHeader>
@@ -191,7 +191,7 @@ export default function StuddingPage() {
                     onClick={() => setStudType("new")}
                     className={`flex flex-col items-center p-3 rounded-lg border text-sm font-medium transition-colors ${
                       studType === "new"
-                        ? "bg-[#D3DF3D] text-[#1F1F1F] border-[#D3DF3D]"
+                        ? "bg-[#c4d402] text-[#1F1F1F] border-[#c4d402]"
                         : "bg-white dark:bg-[#333333] text-[#1F1F1F] dark:text-white border-gray-300 dark:border-gray-600"
                     }`}
                   >
@@ -206,7 +206,7 @@ export default function StuddingPage() {
                     onClick={() => setStudType("repair")}
                     className={`flex flex-col items-center p-3 rounded-lg border text-sm font-medium transition-colors ${
                       studType === "repair"
-                        ? "bg-[#D3DF3D] text-[#1F1F1F] border-[#D3DF3D]"
+                        ? "bg-[#c4d402] text-[#1F1F1F] border-[#c4d402]"
                         : "bg-white dark:bg-[#333333] text-[#1F1F1F] dark:text-white border-gray-300 dark:border-gray-600"
                     }`}
                   >
@@ -229,7 +229,7 @@ export default function StuddingPage() {
                   size="icon"
                   onClick={() => setStudsPerTire(studsPerTire - 1)}
                   disabled={studsPerTire <= 1}
-                  className="h-10 w-10 rounded-full border-2 border-gray-300 dark:border-gray-600 hover:border-[#D3DF3D] hover:bg-[#D3DF3D] hover:text-[#1F1F1F]"
+                  className="h-10 w-10 rounded-full border-2 border-gray-300 dark:border-gray-600 hover:border-[#c4d402] hover:bg-[#c4d402] hover:text-[#1F1F1F]"
                 >
                   <span className="text-lg font-bold">−</span>
                 </Button>
@@ -242,7 +242,7 @@ export default function StuddingPage() {
                       const value = Number.parseInt(e.target.value) || 1
                       setStudsPerTire(value)
                     }}
-                    className="w-full px-4 py-3 text-center text-lg font-semibold border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#333333] text-[#1F1F1F] dark:text-white focus:border-[#D3DF3D] focus:outline-none"
+                    className="w-full px-4 py-3 text-center text-lg font-semibold border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#333333] text-[#1F1F1F] dark:text-white focus:border-[#c4d402] focus:outline-none"
                     placeholder="Количество шипов"
                   />
                 </div>
@@ -253,7 +253,7 @@ export default function StuddingPage() {
                   size="icon"
                   onClick={() => setStudsPerTire(studsPerTire + 1)}
                   disabled={false}
-                  className="h-10 w-10 rounded-full border-2 border-gray-300 dark:border-gray-600 hover:border-[#D3DF3D] hover:bg-[#D3DF3D] hover:text-[#1F1F1F]"
+                  className="h-10 w-10 rounded-full border-2 border-gray-300 dark:border-gray-600 hover:border-[#c4d402] hover:bg-[#c4d402] hover:text-[#1F1F1F]"
                 >
                   <span className="text-lg font-bold">+</span>
                 </Button>
@@ -272,7 +272,7 @@ export default function StuddingPage() {
               <hr className="border-gray-300 dark:border-gray-600" />
               <div className="flex justify-between items-center">
                 <span className="text-lg font-bold text-[#1F1F1F] dark:text-white">Итого:</span>
-                <span className="text-xl font-bold text-[#D3DF3D]">{calculatePrice()} ₽</span>
+                <span className="text-xl font-bold text-[#c4d402]">{calculatePrice()} ₽</span>
               </div>
 
               <div className="mt-4 space-y-2">
@@ -293,15 +293,15 @@ export default function StuddingPage() {
               <h3 className="font-semibold text-[#1F1F1F] dark:text-white">Дополнительная информация</h3>
               <div className="grid grid-cols-1 gap-4 text-sm">
                 <div className="p-3 bg-[#F5F5F5] dark:bg-[#333333] rounded-lg">
-                  <h4 className="font-medium text-[#D3DF3D] mb-1">Время выполнения</h4>
+                  <h4 className="font-medium text-[#c4d402] mb-1">Время выполнения</h4>
                   <p className="text-[#1F1F1F] dark:text-gray-200">1-3 часа в зависимости от количества шипов</p>
                 </div>
                 <div className="p-3 bg-[#F5F5F5] dark:bg-[#333333] rounded-lg">
-                  <h4 className="font-medium text-[#D3DF3D] mb-1">Гарантия</h4>
+                  <h4 className="font-medium text-[#c4d402] mb-1">Гарантия</h4>
                   <p className="text-[#1F1F1F] dark:text-gray-200">6 месяцев на установленные шипы</p>
                 </div>
                 <div className="p-3 bg-[#F5F5F5] dark:bg-[#333333] rounded-lg">
-                  <h4 className="font-medium text-[#D3DF3D] mb-1">Материалы</h4>
+                  <h4 className="font-medium text-[#c4d402] mb-1">Материалы</h4>
                   <p className="text-[#1F1F1F] dark:text-gray-200">
                     Высококачественные шипы с твердосплавным сердечником
                   </p>

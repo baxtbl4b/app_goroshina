@@ -479,7 +479,7 @@ export default function TireCard({ tire }: TireCardProps) {
     <div ref={cardRef} id={`tire-card-${tire.id}`} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
       {/* Left side - Image */}
       <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[145px] sm:w-[190px] md:w-[234px] lg:w-[263px] overflow-hidden bg-white rounded-l-xl" style={{ maxHeight: "248px" }}>
-        {tire.item_day && <Badge className="absolute left-2 top-2 z-10 bg-[#D3DF3D] text-[#1F1F1F]">Товар дня</Badge>}
+        {tire.item_day && <Badge className="absolute left-2 top-2 z-10 bg-[#c4d402] text-[#1F1F1F]">Товар дня</Badge>}
         {/* Gift icon badge - only shown for specific tires */}
         {hasGiftPromotion && (
           <Badge className="absolute left-0 top-0 z-10 bg-[#FF4D4D] text-white p-1 h-6 w-6 flex items-center justify-center rounded-tr-xl">

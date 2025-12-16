@@ -122,7 +122,7 @@ export default function CarsListPage() {
                     {!car.isPrimary && (
                       <Button
                         size="sm"
-                        className="h-8 bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F] text-xs"
+                        className="h-8 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F] text-xs"
                         onClick={() => handleSetPrimary(car.id)}
                       >
                         Сделать основным
@@ -194,7 +194,7 @@ export default function CarsListPage() {
               <p className="text-[#1F1F1F] dark:text-white mb-2 font-semibold">У вас пока нет автомобилей</p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Добавьте свой первый автомобиль</p>
               <Link href="/account/cars/add">
-                <Button className="bg-[#D3DF3D] hover:bg-[#D3DF3D]/80 text-[#1F1F1F]">
+                <Button className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">
                   <Plus className="h-4 w-4 mr-2" /> Добавить автомобиль
                 </Button>
               </Link>

@@ -181,8 +181,8 @@ body {
 
 .floating-plus-one span {
   text-shadow:
-    0 0 10px rgba(211, 223, 61, 0.8),
-    0 0 20px rgba(211, 223, 61, 0.5),
+    0 0 10px rgba(196, 212, 2, 0.8),
+    0 0 20px rgba(196, 212, 2, 0.5),
     2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -207,7 +207,7 @@ body {
 }
 
 .cart-pulse-effect img {
-  filter: drop-shadow(0 0 8px #D3DF3D) drop-shadow(0 0 15px #D3DF3D);
+  filter: drop-shadow(0 0 8px #c4d402) drop-shadow(0 0 15px #c4d402);
 }
 
 /* Анимация shine для логотипа */

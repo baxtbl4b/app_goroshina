@@ -89,8 +89,8 @@ export default function TransferPointsPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm">
-        <div className="p-4 flex items-center">
+      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <div className="h-full px-4 flex items-center">
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="mr-2">
             <ArrowLeft className="h-5 w-5 text-[#1F1F1F] dark:text-white" />
           </Button>
@@ -106,8 +106,8 @@ export default function TransferPointsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <Award className="h-6 w-6 text-[#D3DF3D]" />
-              <span className="text-2xl font-bold text-[#D3DF3D]">350 баллов</span>
+              <Award className="h-6 w-6 text-[#c4d402]" />
+              <span className="text-2xl font-bold text-[#c4d402]">350 баллов</span>
             </div>
           </CardContent>
         </Card>
@@ -116,13 +116,13 @@ export default function TransferPointsPage() {
           <TabsList className="w-full bg-[#1F1F1F] rounded-xl p-1">
             <TabsTrigger
               value="transfer"
-              className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#d3df3d] data-[state=active]:text-[#1F1F1F]"
+              className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-[#1F1F1F]"
             >
               Перевод
             </TabsTrigger>
             <TabsTrigger
               value="history"
-              className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#d3df3d] data-[state=active]:text-[#1F1F1F]"
+              className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-[#1F1F1F]"
             >
               История
             </TabsTrigger>
@@ -210,7 +210,7 @@ export default function TransferPointsPage() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <label className="text-sm text-[#1F1F1F]/70 dark:text-white/70">Количество баллов</label>
-                      <div className="bg-[#D3DF3D] text-[#1F1F1F] px-3 py-1 rounded-full text-sm font-medium">
+                      <div className="bg-[#c4d402] text-[#1F1F1F] px-3 py-1 rounded-full text-sm font-medium">
                         {transferAmount || "0"}
                       </div>
                     </div>
@@ -252,7 +252,7 @@ export default function TransferPointsPage() {
                     disabled={
                       !transferAmount || Number.parseInt(transferAmount) <= 0 || Number.parseInt(transferAmount) > 350
                     }
-                    className="bg-[#D3DF3D] hover:bg-[#C4CF2E] text-[#1F1F1F]"
+                    className="bg-[#c4d402] hover:bg-[#C4CF2E] text-[#1F1F1F]"
                   >
                     <Send className="h-4 w-4 mr-2" />
                     Перевести
@@ -288,23 +288,23 @@ export default function TransferPointsPage() {
                       <p className="text-xs text-[#1F1F1F]/70 dark:text-white/70">{selectedUser.phone}</p>
                     </div>
                     <div className="flex items-center">
-                      <Award className="h-4 w-4 text-[#D3DF3D] mr-1" />
-                      <span className="text-sm font-bold text-[#D3DF3D]">+{transferAmount}</span>
+                      <Award className="h-4 w-4 text-[#c4d402] mr-1" />
+                      <span className="text-sm font-bold text-[#c4d402]">+{transferAmount}</span>
                     </div>
                   </div>
 
                   <div className="bg-[#F5F5F5] dark:bg-[#333333] p-3 rounded-lg">
                     <p className="text-sm text-[#1F1F1F]/70 dark:text-white/70">Ваш текущий баланс</p>
                     <div className="flex items-center mt-1">
-                      <Award className="h-5 w-5 text-[#D3DF3D] mr-2" />
-                      <span className="text-lg font-bold text-[#D3DF3D]">
+                      <Award className="h-5 w-5 text-[#c4d402] mr-2" />
+                      <span className="text-lg font-bold text-[#c4d402]">
                         {350 - Number.parseInt(transferAmount)} баллов
                       </span>
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button onClick={resetTransfer} className="w-full bg-[#D3DF3D] hover:bg-[#C4CF2E] text-[#1F1F1F]">
+                  <Button onClick={resetTransfer} className="w-full bg-[#c4d402] hover:bg-[#C4CF2E] text-[#1F1F1F]">
                     Готово
                   </Button>
                 </CardFooter>
@@ -338,8 +338,8 @@ export default function TransferPointsPage() {
                           </div>
                         </div>
                         <div className="flex items-center">
-                          <Award className="h-4 w-4 text-[#D3DF3D] mr-1" />
-                          <span className="text-sm font-bold text-[#D3DF3D]">-{transfer.amount}</span>
+                          <Award className="h-4 w-4 text-[#c4d402] mr-1" />
+                          <span className="text-sm font-bold text-[#c4d402]">-{transfer.amount}</span>
                         </div>
                       </div>
                     ))}

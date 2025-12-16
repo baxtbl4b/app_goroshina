@@ -120,7 +120,7 @@ export default function CarDetailsPage() {
           </div>
         </header>
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-10 h-10 border-2 border-[#D3DF3D] border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-2 border-[#c4d402] border-t-transparent rounded-full animate-spin" />
         </div>
       </main>
     )
@@ -139,7 +139,7 @@ export default function CarDetailsPage() {
           <Car className="w-16 h-16 text-gray-600 mb-4" />
           <p className="text-gray-400 text-center mb-4">Автомобиль не найден или был удалён</p>
           <Link href="/account/cars">
-            <Button className="bg-[#D3DF3D] text-[#1F1F1F] hover:bg-[#D3DF3D]/90 rounded-xl">
+            <Button className="bg-[#c4d402] text-[#1F1F1F] hover:bg-[#c4d402]/90 rounded-xl">
               Вернуться к списку
             </Button>
           </Link>
@@ -195,7 +195,7 @@ export default function CarDetailsPage() {
         <div className="bg-[#2A2A2A] rounded-2xl p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#009CFF]/20 to-[#D3DF3D]/20 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#009CFF]/20 to-[#c4d402]/20 flex items-center justify-center">
                 <Car className="h-6 w-6 text-[#009CFF]" />
               </div>
               <div>
@@ -204,7 +204,7 @@ export default function CarDetailsPage() {
               </div>
             </div>
             {car.isPrimary && (
-              <Badge className="bg-[#D3DF3D]/20 text-[#D3DF3D]">Основной</Badge>
+              <Badge className="bg-[#c4d402]/20 text-[#c4d402]">Основной</Badge>
             )}
           </div>
 
@@ -235,7 +235,7 @@ export default function CarDetailsPage() {
                 onClick={handleSetPrimary}
                 variant="outline"
                 size="sm"
-                className="flex-1 h-10 text-[#D3DF3D] border-[#D3DF3D]/30 hover:bg-[#D3DF3D]/10 rounded-xl"
+                className="flex-1 h-10 text-[#c4d402] border-[#c4d402]/30 hover:bg-[#c4d402]/10 rounded-xl"
               >
                 Сделать основным
               </Button>
@@ -263,9 +263,9 @@ export default function CarDetailsPage() {
                 <TabsTrigger
                   value="summer"
                   disabled={!hasSummerTires}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 data-[state=active]:border-[#D3DF3D] data-[state=active]:bg-[#D3DF3D]/10 border-gray-700 disabled:opacity-50 h-auto"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 data-[state=active]:border-[#c4d402] data-[state=active]:bg-[#c4d402]/10 border-gray-700 disabled:opacity-50 h-auto"
                 >
-                  <Sun className="h-5 w-5 text-[#D3DF3D]" />
+                  <Sun className="h-5 w-5 text-[#c4d402]" />
                   <span className="font-medium text-white">Летние</span>
                 </TabsTrigger>
                 <TabsTrigger
@@ -346,13 +346,13 @@ export default function CarDetailsPage() {
         <div className="bg-[#2A2A2A] rounded-2xl p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#D3DF3D]/20 flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-[#D3DF3D]" />
+              <div className="w-10 h-10 rounded-xl bg-[#c4d402]/20 flex items-center justify-center">
+                <Calendar className="h-5 w-5 text-[#c4d402]" />
               </div>
               <h3 className="font-bold text-white">Хранение шин</h3>
             </div>
             {car.hasStorage ? (
-              <Badge className="bg-[#D3DF3D]/20 text-[#D3DF3D]">Активно</Badge>
+              <Badge className="bg-[#c4d402]/20 text-[#c4d402]">Активно</Badge>
             ) : (
               <Badge className="bg-gray-700 text-gray-400">Нет</Badge>
             )}
@@ -362,14 +362,14 @@ export default function CarDetailsPage() {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-400">Статус</span>
-                <span className="text-sm font-medium text-[#D3DF3D]">На хранении</span>
+                <span className="text-sm font-medium text-[#c4d402]">На хранении</span>
               </div>
             </div>
           ) : (
             <div className="text-center py-4">
               <p className="text-gray-400 text-sm mb-3">Услуга хранения не активна</p>
               <Link href="/tire-storage">
-                <Button size="sm" className="bg-[#D3DF3D] text-[#1F1F1F] hover:bg-[#D3DF3D]/90 rounded-xl">
+                <Button size="sm" className="bg-[#c4d402] text-[#1F1F1F] hover:bg-[#c4d402]/90 rounded-xl">
                   Оформить хранение
                 </Button>
               </Link>
@@ -391,7 +391,7 @@ export default function CarDetailsPage() {
 
           <div className="space-y-2">
             <div className="flex items-center text-sm">
-              <div className="w-3 h-3 rounded-full bg-[#D3DF3D] mr-2"></div>
+              <div className="w-3 h-3 rounded-full bg-[#c4d402] mr-2"></div>
               <span className="flex-1 text-gray-400">Шины и диски</span>
               <span className="font-medium text-white">32 600 ₽</span>
             </div>
@@ -437,7 +437,7 @@ export default function CarDetailsPage() {
             <div className="bg-[#2A2A2A] rounded-2xl p-4">
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
-                  <div className="w-3 h-3 rounded-full bg-[#D3DF3D] mr-2"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#c4d402] mr-2"></div>
                   <span className="font-medium text-white">Замена шин</span>
                 </div>
                 <span className="text-sm text-gray-400">15.04.2023</span>
@@ -504,7 +504,7 @@ export default function CarDetailsPage() {
             <div className="bg-[#2A2A2A] rounded-2xl p-4">
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
-                  <div className="w-3 h-3 rounded-full bg-[#D3DF3D] mr-2"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#c4d402] mr-2"></div>
                   <span className="font-medium text-white">Замена зимних шин</span>
                 </div>
                 <span className="text-sm text-gray-400">Ноябрь 2023</span>
@@ -527,7 +527,7 @@ export default function CarDetailsPage() {
           </Link>
           <Link href="/tire-storage/booking" className="block">
             <div className="bg-[#2A2A2A] rounded-2xl p-4 hover:bg-[#333] transition-colors active:scale-[0.98]">
-              <Calendar className="h-6 w-6 text-[#D3DF3D] mb-2" />
+              <Calendar className="h-6 w-6 text-[#c4d402] mb-2" />
               <p className="font-medium text-white text-sm">Оформить хранение</p>
             </div>
           </Link>

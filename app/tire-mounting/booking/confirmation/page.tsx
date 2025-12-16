@@ -46,7 +46,7 @@ export default function TireMountingBookingConfirmationPage() {
         <SafeAreaHeader title="Подтверждение записи" showBackButton={false} className="bg-gray-200" />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D3DF3D] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c4d402] mx-auto mb-4"></div>
             <p>Загрузка...</p>
           </div>
         </main>
@@ -83,7 +83,7 @@ export default function TireMountingBookingConfirmationPage() {
             <div className="space-y-4">
               {/* Date and Time */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <Calendar className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -102,7 +102,7 @@ export default function TireMountingBookingConfirmationPage() {
 
               {/* Location */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <MapPin className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -114,7 +114,7 @@ export default function TireMountingBookingConfirmationPage() {
 
               {/* Contact */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <Phone className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -125,7 +125,7 @@ export default function TireMountingBookingConfirmationPage() {
 
               {/* Customer Info */}
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#D3DF3D] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#c4d402] rounded-full flex items-center justify-center flex-shrink-0">
                   <CheckCircle className="h-4 w-4 text-[#1F1F1F]" />
                 </div>
                 <div>
@@ -161,7 +161,7 @@ export default function TireMountingBookingConfirmationPage() {
             <div className="border-t border-gray-300 dark:border-gray-600 mt-4 pt-4">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-bold text-[#1F1F1F] dark:text-white">Итого:</span>
-                <span className="text-xl font-bold text-[#D3DF3D]">{orderData.totalPrice}₽</span>
+                <span className="text-xl font-bold text-[#c4d402]">{orderData.totalPrice}₽</span>
               </div>
             </div>
           </CardContent>
@@ -184,7 +184,7 @@ export default function TireMountingBookingConfirmationPage() {
         <div className="space-y-3">
           <button
             onClick={handleViewOrders}
-            className="w-full bg-[#D3DF3D] hover:bg-[#C4CF2E] text-black py-3 px-4 rounded-lg font-medium transition-colors"
+            className="w-full bg-[#c4d402] hover:bg-[#C4CF2E] text-black py-3 px-4 rounded-lg font-medium transition-colors"
           >
             Посмотреть мои записи
           </button>
