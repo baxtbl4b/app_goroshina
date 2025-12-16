@@ -109,6 +109,9 @@ export default function CheckoutPage() {
       // Clear cart after successful order
       localStorage.removeItem("cart")
       window.dispatchEvent(new Event("cartUpdated"))
+
+      // Notify about new order
+      window.dispatchEvent(new CustomEvent("userOrdersUpdated"))
     } catch (error) {
       console.error("Error saving order:", error)
     }

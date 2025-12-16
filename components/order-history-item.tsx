@@ -24,66 +24,69 @@ export default function OrderHistoryItem({
   total,
   products = [], // Default to empty array if not provided
 }: OrderHistoryItemProps) {
-  // Функция для определения цвета статуса
-  const getStatusColor = (status: string) => {
+  // Функция для определения цвета и бейджа статуса
+  const getStatusStyle = (status: string) => {
     switch (status.toLowerCase()) {
       case "в обработке":
-        return "text-blue-500"
+        return { text: "text-orange-400", bg: "bg-orange-400/10" }
       case "подтвержден":
-        return "text-orange-500"
+        return { text: "text-blue-400", bg: "bg-blue-400/10" }
       case "выполнен":
-        return "text-green-500"
+        return { text: "text-green-400", bg: "bg-green-400/10" }
       case "отменен":
-        return "text-red-500"
+        return { text: "text-red-400", bg: "bg-red-400/10" }
       default:
-        return "text-[#D3DF3D]"
+        return { text: "text-[#D3DF3D]", bg: "bg-[#D3DF3D]/10" }
     }
   }
 
+  const statusStyle = getStatusStyle(status)
+
   return (
     <Link href={`/profile/orders/${id}`}>
-      <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex justify-between items-center mb-2">
-          <span className="font-medium text-[#1F1F1F] dark:text-white">Заказ {orderNumber}</span>
-          <span className="text-sm text-[#1F1F1F] dark:text-gray-300">{date}</span>
+      <div className="bg-[#1F1F1F] rounded-2xl p-4 hover:bg-[#252525] transition-all duration-200">
+        <div className="flex justify-between items-center mb-3">
+          <span className="font-semibold text-white">Заказ #{orderNumber}</span>
+          <span className={`text-xs font-medium px-3 py-1 rounded-xl ${statusStyle.text} ${statusStyle.bg}`}>
+            {status}
+          </span>
         </div>
 
         {/* Product information section */}
         {products.length > 0 && (
-          <div className="my-3 border-t border-b border-gray-100 dark:border-gray-700 py-2">
-            {products.map((product, index) => (
-              <div key={index} className="flex items-center gap-3 py-1">
+          <div className="my-3 bg-[#2A2A2A] rounded-xl p-3 space-y-2">
+            {products.slice(0, 2).map((product, index) => (
+              <div key={index} className="flex items-center gap-3">
                 {product.image && (
-                  <div className="w-10 h-10 rounded-md bg-gray-100 dark:bg-gray-800 overflow-hidden flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-white overflow-hidden flex-shrink-0">
                     <img
                       src={product.image || "/placeholder.svg"}
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain p-1"
                     />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#1F1F1F] dark:text-white truncate">{product.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Количество: {product.quantity}</p>
+                  <p className="text-sm font-medium text-white truncate">{product.name}</p>
+                  <p className="text-xs text-gray-500">{product.quantity} шт.</p>
                 </div>
               </div>
             ))}
 
             {products.length > 2 && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">И еще {products.length - 2} товара...</p>
+              <p className="text-xs text-gray-500 pt-1">+ ещё {products.length - 2} товара</p>
             )}
           </div>
         )}
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center pt-2 border-t border-[#2A2A2A]">
           <div>
-            <div className="flex items-center gap-2">
-              <span className={`font-medium ${getStatusColor(status)}`}>{status}</span>
-              <span className="text-sm text-[#1F1F1F] dark:text-gray-300">• {items} товара</span>
-            </div>
-            <p className="font-bold text-[#1F1F1F] dark:text-white">{total}</p>
+            <p className="text-xs text-gray-500 mb-1">{date}</p>
+            <p className="font-bold text-[#D3DF3D] text-lg">{total}</p>
           </div>
-          <ChevronRight className="h-5 w-5 text-[#D9D9DD] dark:text-gray-500" />
+          <div className="w-10 h-10 bg-[#2A2A2A] rounded-xl flex items-center justify-center">
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </div>
         </div>
       </div>
     </Link>

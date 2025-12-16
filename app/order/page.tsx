@@ -559,7 +559,9 @@ export default function OrderPage() {
                     const itemPrice = getItemPrice(item)
                     const tireSize = getTireSize(item)
                     const seasonName = getSeasonName(item.season)
-                    const imageUrl = item.image || getDefaultImage(item.season)
+                    const imageUrl = (item.image && item.image.trim() !== "" && (item.image.startsWith("/") || item.image.startsWith("http")))
+                      ? item.image
+                      : getDefaultImage(item.season)
                     const loadSpeedIndex = item.load_index && item.speed_index
                       ? `${item.load_index}${item.speed_index}`
                       : ""
@@ -1266,11 +1268,12 @@ export default function OrderPage() {
           )}
         </div>
 
-        {/* Данные покупателя */}
+        {/* Данные покупателя - только для доставки по России */}
+        {deliveryMethod === "russia" && (
         <Card className="border-0 shadow-lg bg-[#2A2A2A] rounded-2xl overflow-hidden mt-4">
           <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
-              <h2 className="font-semibold text-lg">Данные покупателя</h2>
+              <h2 className="font-semibold text-lg">Данные получателя</h2>
               <button
                 onClick={() => setIsCustomerCardCollapsed(!isCustomerCardCollapsed)}
                 className="p-1.5 text-gray-400 hover:text-white hover:bg-[#3A3A3A] rounded-lg transition-all"
@@ -1402,6 +1405,7 @@ export default function OrderPage() {
             )}
           </CardContent>
         </Card>
+        )}
       </main>
     </div>
   )

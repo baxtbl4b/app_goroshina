@@ -237,11 +237,24 @@ export default function AccountPage() {
       loadCars()
       loadOrders()
     }
+
+    const handleOrdersUpdated = () => {
+      loadOrders()
+    }
+
+    const handleCarsUpdated = () => {
+      loadCars()
+    }
+
     window.addEventListener("focus", handleFocus)
+    window.addEventListener("userOrdersUpdated", handleOrdersUpdated)
+    window.addEventListener("userCarsUpdated", handleCarsUpdated)
 
     return () => {
       window.removeEventListener("userUpdated", handleUserUpdate as EventListener)
       window.removeEventListener("focus", handleFocus)
+      window.removeEventListener("userOrdersUpdated", handleOrdersUpdated)
+      window.removeEventListener("userCarsUpdated", handleCarsUpdated)
     }
   }, []) // Запускаем один раз при монтировании
   // --- End Existing Account Page State & Handlers ---
