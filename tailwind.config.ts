@@ -11,9 +11,9 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-rubik)", "Arial", "Helvetica", "sans-serif"],
-        rubik: ["var(--font-rubik)", "Arial", "Helvetica", "sans-serif"],
-        "pt-sans": ["var(--font-pt-sans)", "Arial", "Helvetica", "sans-serif"],
+        sans: ["var(--font-rubik)"],
+        rubik: ["var(--font-rubik)"],
+        "pt-sans": ["var(--font-pt-sans)"],
       },
       colors: {
         background: "hsl(var(--background))",
