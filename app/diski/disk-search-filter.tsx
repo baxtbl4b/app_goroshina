@@ -76,33 +76,66 @@ export default function DiskSearchFilter({ diskType = "cast", onDiskTypeChange }
     }
   }
 
-  // Add mock data for user's vehicles
-  const userVehicles: VehicleWithWheels[] = [
-    {
-      id: "1",
-      name: "Toyota Camry",
-      wheelSize: {
-        diameter: "17",
-        width: "7",
-        pcd: "5x114.3",
-        et: "45",
-        hub: "60.1",
-      },
-    },
-    {
-      id: "2",
-      name: "VW Tiguan",
-      wheelSize: {
-        diameter: "18",
-        width: "8",
-        pcd: "5x112",
-        et: "43",
-        hub: "57.1",
-      },
-    },
-  ]
-
+  // State for user's vehicles from localStorage
+  const [userVehicles, setUserVehicles] = useState<VehicleWithWheels[]>([])
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null)
+
+  // Load user vehicles from localStorage with wheel sizes
+  useEffect(() => {
+    const loadUserCars = () => {
+      try {
+        const storedCars = JSON.parse(localStorage.getItem("userCars") || "[]")
+        const vehicles: VehicleWithWheels[] = storedCars.map((car: any) => {
+          return {
+            id: car.id,
+            name: `${car.brand} ${car.model}`,
+            wheelSize: {
+              diameter: car.wheelDiameter || "",
+              width: car.wheelWidth || "",
+              pcd: car.wheelPcd || "",
+              et: car.wheelEt || "",
+              hub: car.wheelHub || "",
+            },
+          }
+        }).filter((v: VehicleWithWheels) =>
+          v.wheelSize.diameter && v.wheelSize.width && v.wheelSize.pcd
+        )
+        setUserVehicles(vehicles)
+      } catch (error) {
+        console.error("Error loading user cars:", error)
+        setUserVehicles([])
+      }
+    }
+
+    loadUserCars()
+
+    // Listen for storage changes (when user adds/removes cars)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "userCars") {
+        loadUserCars()
+      }
+    }
+
+    // Also listen for focus to reload when user navigates back
+    const handleFocus = () => {
+      loadUserCars()
+    }
+
+    // Listen for custom event when cars are updated in the same tab
+    const handleCarsUpdated = () => {
+      loadUserCars()
+    }
+
+    window.addEventListener("storage", handleStorageChange)
+    window.addEventListener("focus", handleFocus)
+    window.addEventListener("userCarsUpdated", handleCarsUpdated)
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange)
+      window.removeEventListener("focus", handleFocus)
+      window.removeEventListener("userCarsUpdated", handleCarsUpdated)
+    }
+  }, [])
 
   // Diameter options
   const diameterOptions = ["13", "14", "15", "16", "17", "18", "19", "20", "21", "22"]
@@ -544,69 +577,6 @@ export default function DiskSearchFilter({ diskType = "cast", onDiskTypeChange }
               </>
             </button>
           </div>
-
-          {/* Disk type toggle */}
-          <div className="flex-1 max-w-[210px]">
-            <style jsx>{`
-              @keyframes diskTypeGlow {
-                0%, 100% {
-                  box-shadow: 0 0 8px rgba(196, 212, 2, 0.5), 0 0 16px rgba(196, 212, 2, 0.5);
-                }
-                50% {
-                  box-shadow: 0 0 12px rgba(196, 212, 2, 0.5), 0 0 24px rgba(196, 212, 2, 0.5);
-                }
-              }
-              .disktype-btn-active {
-                animation: diskTypeGlow 2s ease-in-out infinite;
-              }
-            `}</style>
-            <div
-              className="relative h-8 w-full rounded-full bg-gray-100 dark:bg-gray-800 flex items-center z-0 overflow-hidden touch-pan-x"
-              role="radiogroup"
-              aria-label="Тип дисков"
-            >
-              {/* Toggle buttons */}
-              <button
-                onClick={() => onDiskTypeChange?.("stamped")}
-                className={`flex-1 h-full rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 z-10 relative mx-0.5 ${
-                  diskType === "stamped"
-                    ? "bg-gradient-to-r from-[#c4d402] to-[#d4e002] text-[#1F1F1F] font-bold disktype-btn-active"
-                    : "text-[#1F1F1F] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
-                }`}
-                aria-pressed={diskType === "stamped"}
-                role="radio"
-                aria-checked={diskType === "stamped"}
-              >
-                Штамп
-              </button>
-              <button
-                onClick={() => onDiskTypeChange?.("cast")}
-                className={`flex-1 h-full rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 z-10 relative mx-0.5 ${
-                  diskType === "cast"
-                    ? "bg-gradient-to-r from-[#c4d402] to-[#d4e002] text-[#1F1F1F] font-bold disktype-btn-active"
-                    : "text-[#1F1F1F] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
-                }`}
-                aria-pressed={diskType === "cast"}
-                role="radio"
-                aria-checked={diskType === "cast"}
-              >
-                Литые
-              </button>
-              <button
-                onClick={() => onDiskTypeChange?.("forged")}
-                className={`flex-1 h-full rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 z-10 relative mx-0.5 ${
-                  diskType === "forged"
-                    ? "bg-gradient-to-r from-[#c4d402] to-[#d4e002] text-[#1F1F1F] font-bold disktype-btn-active"
-                    : "text-[#1F1F1F] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
-                }`}
-                aria-pressed={diskType === "forged"}
-                role="radio"
-                aria-checked={diskType === "forged"}
-              >
-                Кован
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Collapsible part (remaining filters) */}
@@ -617,125 +587,26 @@ export default function DiskSearchFilter({ diskType = "cast", onDiskTypeChange }
         >
           <div className="space-y-4">
             <div className="space-y-3">
-              {/* More compact filters in a row */}
+              {/* Filters in a row: Stock Filter and Price Range */}
               <div className="flex flex-wrap gap-3 justify-between">
-                {/* Disk type options as compact checkboxes */}
-                <div className="w-full md:flex-1 border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-md p-3 flex items-center justify-center">
-                  <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 items-center justify-center">
-                    {diskType === "stamped" && (
-                      <>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox id="black" className="h-4 w-4" />
-                          <Label htmlFor="black" className="text-xs text-[#1F1F1F] dark:text-gray-300">
-                            Черные
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox id="silver" className="h-4 w-4" />
-                          <Label htmlFor="silver" className="text-xs text-[#1F1F1F] dark:text-gray-300">
-                            Серебр��стые
-                          </Label>
-                        </div>
-                      </>
-                    )}
-
-                    {diskType === "cast" && (
-                      <>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox id="polished" className="h-4 w-4" />
-                          <Label htmlFor="polished" className="text-xs text-[#1F1F1F] dark:text-gray-300">
-                            Полированные
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox id="painted" className="h-4 w-4" />
-                          <Label htmlFor="painted" className="text-xs text-[#1F1F1F] dark:text-gray-300">
-                            Крашеные
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox id="diamond-cut" className="h-4 w-4" />
-                          <Label htmlFor="diamond-cut" className="text-xs text-[#1F1F1F] dark:text-gray-300">
-                            Алмазная огранка
-                          </Label>
-                        </div>
-                      </>
-                    )}
-
-                    {diskType === "forged" && (
-                      <>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox id="one-piece" className="h-4 w-4" />
-                          <Label htmlFor="one-piece" className="text-xs text-[#1F1F1F] dark:text-gray-300">
-                            Моноблок
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox id="multi-piece" className="h-4 w-4" />
-                          <Label htmlFor="multi-piece" className="text-xs text-[#1F1F1F] dark:text-gray-300">
-                            Составные
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox id="custom" className="h-4 w-4" />
-                          <Label htmlFor="custom" className="text-xs text-[#1F1F1F] dark:text-gray-300">
-                            Кастомные
-                          </Label>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Filters in a row: Stock Filter and Price Range */}
-                <div className="flex flex-wrap gap-3 w-full md:w-3/4">
-                  {/* Stock Filter - Checkbox style button */}
-                  <div className="w-[45%] sm:w-[30%] bg-[#F5F5F5] dark:bg-[#333333] rounded-md p-2">
+                <div className="flex gap-3 w-full">
+                  {/* Stock Filter - Button style */}
+                  <div className="w-[45%] sm:w-[30%]">
                     <button
                       onClick={() => setStockFilter(stockFilter === "single" ? "full" : "single")}
-                      className={`w-full h-16 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center px-2 ${
+                      className={`w-full h-16 rounded-t-xl rounded-bl-[28px] rounded-br-xl text-xs font-medium transition-all duration-200 flex items-center justify-center px-2 ${
                         stockFilter === "full"
                           ? "bg-blue-500 text-white"
-                          : "bg-white dark:bg-[#2A2A2A] text-[#1F1F1F] dark:text-white border border-gray-300 dark:border-gray-600"
+                          : "bg-[#F5F5F5] dark:bg-[#333333] text-[#1F1F1F] dark:text-white"
                       }`}
                     >
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-5 h-5 flex items-center justify-center rounded border ${
-                            stockFilter === "full" ? "bg-white border-white" : "border-gray-400 dark:border-gray-500"
-                          }`}
-                        >
-                          {stockFilter === "full" && (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="text-blue-500"
-                            >
-                              <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                          )}
-                        </div>
-                        <span>Скрыть меньше 4шт</span>
-                      </div>
+                      Скрыть меньше 4шт
                     </button>
                   </div>
 
                   {/* Price range slider */}
-                  <div className="w-[50%] sm:w-[65%] bg-[#F5F5F5] dark:bg-[#333333] rounded-md p-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <h4 className="text-sm font-medium text-[#1F1F1F] dark:text-white">Цена</h4>
-                      <div className="text-xs text-[#1F1F1F] dark:text-white">
-                        {priceRange[0].toLocaleString()} ₽ - {priceRange[1].toLocaleString()} ₽
-                      </div>
-                    </div>
-                    <div className="px-1 py-2">
+                  <div className="flex-1 bg-[#F5F5F5] dark:bg-[#333333] rounded-t-xl rounded-bl-xl rounded-br-[28px] p-2">
+                    <div className="px-1 pt-2 pb-1">
                       <Slider
                         defaultValue={[3000, 30000]}
                         min={3000}
@@ -745,6 +616,9 @@ export default function DiskSearchFilter({ diskType = "cast", onDiskTypeChange }
                         onValueChange={(value) => setPriceRange(value as [number, number])}
                         className="w-full"
                       />
+                    </div>
+                    <div className="text-xs text-[#1F1F1F] dark:text-white text-center mt-2 pb-1">
+                      <span className="font-medium">Цена:</span> {priceRange[0].toLocaleString()} ₽ - {priceRange[1].toLocaleString()} ₽
                     </div>
                   </div>
                 </div>
