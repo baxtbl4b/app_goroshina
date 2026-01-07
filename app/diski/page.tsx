@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import DiskSearchFilter from "./disk-search-filter"
@@ -49,17 +49,17 @@ export default function DiskiPage() {
   const [allDisks, setAllDisks] = useState<Disk[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [sortBy, setSortBy] = useState<string>("default")
+  const [filterHeight, setFilterHeight] = useState(200)
 
-  // Filter states
-  const [filters, setFilters] = useState({
-    diameter: "",
-    width: "",
-    pcd: "",
-    et: "",
-    hub: "",
-    priceRange: [3000, 30000] as [number, number],
-    stockFilter: "single" as "single" | "full",
-  })
+  // Read filter values directly from URL parameters (like tire page)
+  const filterDiameter = searchParams.get("diameter")
+  const filterWidth = searchParams.get("width")
+  const filterPcd = searchParams.get("pcd")
+  const filterEt = searchParams.get("et")
+  const filterHub = searchParams.get("hub")
+  const minPriceParam = searchParams.get("minPrice")
+  const maxPriceParam = searchParams.get("maxPrice")
+  const stockFilterParam = searchParams.get("stockFilter")
 
   // Сброс курсора при загрузке страницы
   useEffect(() => {
@@ -105,71 +105,79 @@ export default function DiskiPage() {
     fetchDisks()
   }, [])
 
-  // Фильтруем диски по типу на клиенте
-  const filteredByType = allDisks.filter((disk) => disk.type === diskType)
+  // Фильтруем диски по типу на клиенте - memoized
+  const filteredByType = useMemo(() => {
+    return allDisks.filter((disk) => disk.type === diskType)
+  }, [allDisks, diskType])
 
-  // Фильтруем по брендам
-  const filteredByBrand = selectedBrands.length > 0
-    ? filteredByType.filter((disk) => selectedBrands.includes(disk.brand))
-    : filteredByType
+  // Фильтруем по брендам - memoized
+  const filteredByBrand = useMemo(() => {
+    if (selectedBrands.length === 0) return filteredByType
+    return filteredByType.filter((disk) => selectedBrands.includes(disk.brand))
+  }, [filteredByType, selectedBrands])
 
-  // Применяем фильтры из блока фильтров
-  const filteredDisks = filteredByBrand.filter((disk) => {
-    // Diameter filter
-    if (filters.diameter && parseFloat(disk.diameter.toString()) !== parseFloat(filters.diameter)) {
-      return false
-    }
-
-    // Width filter
-    if (filters.width && parseFloat(disk.width.toString()) !== parseFloat(filters.width)) {
-      return false
-    }
-
-    // PCD filter
-    if (filters.pcd && disk.pcd !== filters.pcd) {
-      return false
-    }
-
-    // ET filter - allow range of ±5
-    if (filters.et) {
-      const filterEt = parseFloat(filters.et)
-      const diskEt = parseFloat(disk.et.toString())
-      if (Math.abs(diskEt - filterEt) > 5) {
+  // Применяем фильтры из URL параметров - memoized (like tire page)
+  const filteredDisks = useMemo(() => {
+    return filteredByBrand.filter((disk) => {
+      // Diameter filter
+      if (filterDiameter && parseFloat(disk.diameter.toString()) !== parseFloat(filterDiameter)) {
         return false
       }
-    }
 
-    // Hub/DIA filter - disk hub should be >= filter hub
-    if (filters.hub) {
-      const filterHub = parseFloat(filters.hub)
-      const diskHub = parseFloat(disk.dia.toString())
-      if (diskHub < filterHub) {
+      // Width filter
+      if (filterWidth && parseFloat(disk.width.toString()) !== parseFloat(filterWidth)) {
         return false
       }
-    }
 
-    // Price range filter
-    if (disk.price < filters.priceRange[0] || disk.price > filters.priceRange[1]) {
-      return false
-    }
+      // PCD filter
+      if (filterPcd && disk.pcd !== filterPcd) {
+        return false
+      }
 
-    // Stock filter - hide disks with less than 4 items
-    if (filters.stockFilter === "full" && disk.stock < 4) {
-      return false
-    }
+      // ET filter - allow range of ±5
+      if (filterEt) {
+        const filterEtNum = parseFloat(filterEt)
+        const diskEt = parseFloat(disk.et.toString())
+        if (Math.abs(diskEt - filterEtNum) > 5) {
+          return false
+        }
+      }
 
-    return true
-  })
+      // Hub/DIA filter - disk hub should be >= filter hub
+      if (filterHub) {
+        const filterHubNum = parseFloat(filterHub)
+        const diskHub = parseFloat(disk.dia.toString())
+        if (diskHub < filterHubNum) {
+          return false
+        }
+      }
 
-  // Применяем сортировку
-  const sortedDisks = [...filteredDisks].sort((a, b) => {
+      // Price range filter
+      const minPrice = minPriceParam ? parseFloat(minPriceParam) : 3000
+      const maxPrice = maxPriceParam ? parseFloat(maxPriceParam) : 30000
+      if (disk.price < minPrice || disk.price > maxPrice) {
+        return false
+      }
+
+      // Stock filter - hide disks with less than 4 items
+      if (stockFilterParam === "full" && disk.stock < 4) {
+        return false
+      }
+
+      return true
+    })
+  }, [filteredByBrand, filterDiameter, filterWidth, filterPcd, filterEt, filterHub, minPriceParam, maxPriceParam, stockFilterParam])
+
+  // Применяем сортировку - memoized
+  const sortedDisks = useMemo(() => {
+    const sorted = [...filteredDisks]
     if (sortBy === "price-asc") {
-      return a.price - b.price
+      sorted.sort((a, b) => a.price - b.price)
     } else if (sortBy === "price-desc") {
-      return b.price - a.price
+      sorted.sort((a, b) => b.price - a.price)
     }
-    return 0 // default - no sorting
-  })
+    return sorted
+  }, [filteredDisks, sortBy])
 
 
   // Track cast button coordinates
@@ -348,20 +356,8 @@ export default function DiskiPage() {
     console.log("Применена сортировка:", sortValue)
   }
 
-  const handleFiltersChange = useCallback((newFilters: {
-    diameter: string
-    width: string
-    pcd: string
-    et: string
-    hub: string
-    priceRange: [number, number]
-    stockFilter: "single" | "full"
-  }) => {
-    setFilters(newFilters)
-  }, [])
-
-  // Get unique options from API data
-  const getUniqueOptions = useCallback(() => {
+  // Get unique options from API data - memoized
+  const filterOptions = useMemo(() => {
     if (allDisks.length === 0) {
       // Return empty arrays while loading
       return {
@@ -396,23 +392,6 @@ export default function DiskiPage() {
     }
   }, [allDisks])
 
-  const filterOptions = getUniqueOptions()
-
-  // Debug: Log filtered results
-  useEffect(() => {
-    console.log("=== Filters Debug ===")
-    console.log("Active filters:", filters)
-    console.log("Disk type:", diskType)
-    console.log("Selected brands:", selectedBrands)
-    console.log("Available options from API:", {
-      diameters: filterOptions.diameterOptions.length,
-      widths: filterOptions.widthOptions.length,
-      pcds: filterOptions.pcdOptions.length,
-      ets: filterOptions.etOptions.length,
-      hubs: filterOptions.hubOptions.length,
-    })
-    console.log("===================")
-  }, [filters, diskType, selectedBrands, filterOptions])
 
   // Определяем позицию для индикатора корзины в зависимости от наличия фильтра размеров
   const cartIndicatorTopClass = isDimensionFilterActive ? "top-24" : "top-16"
@@ -737,7 +716,10 @@ export default function DiskiPage() {
             </div>
           </div>
         ) : (
-          <div className="space-y-3 sm:space-y-4 sm:grid sm:grid-cols-1 sm:gap-3 sm:space-y-0 md:grid-cols-2 md:gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 pb-[200px]">
+          <div
+            className="space-y-3 sm:space-y-4 sm:grid sm:grid-cols-1 sm:gap-3 sm:space-y-0 md:grid-cols-2 md:gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+            style={{ paddingBottom: `${filterHeight + 20}px` }}
+          >
             {sortedDisks.map((disk) => (
               <div key={disk.id} className="w-full">
                 <DiskCard disk={disk} />
@@ -751,12 +733,12 @@ export default function DiskiPage() {
       <DiskSearchFilter
         diskType={diskType}
         onDiskTypeChange={(type) => setDiskType(type)}
-        onFiltersChange={handleFiltersChange}
         diameterOptions={filterOptions.diameterOptions}
         widthOptions={filterOptions.widthOptions}
         pcdOptions={filterOptions.pcdOptions}
         etOptions={filterOptions.etOptions}
         hubOptions={filterOptions.hubOptions}
+        onFilterHeightChange={setFilterHeight}
       />
     </main>
   )

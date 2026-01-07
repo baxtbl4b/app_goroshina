@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, memo } from "react"
 import Link from "next/link"
-import { Heart, Plus, Minus, CheckCircle, Clock, Calendar, AlertCircle } from "lucide-react"
+import { Heart, Plus, Minus, CheckCircle, Clock, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
@@ -44,16 +44,12 @@ const formatPrice = (price: number): string => {
   }).format(price)
 }
 
-export default function DiskCard({ disk }: DiskCardProps) {
+const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
   // Состояния
   const [isFavorite, setIsFavorite] = useState(false)
   const [imageModalOpen, setImageModalOpen] = useState(false)
   const [cartCount, setCartCount] = useState(0)
   const [imageError, setImageError] = useState(false)
-  const [isButtonPulsing, setIsButtonPulsing] = useState(false)
-  const [floatingNumber, setFloatingNumber] = useState<{ x: number; y: number; count: number } | null>(null)
-  const [showMinQuantityInfo, setShowMinQuantityInfo] = useState(false)
-  const addButtonRef = useRef<HTMLButtonElement>(null)
 
   // При монтировании компонента проверяем, есть ли товар в избранном и корзине
   useEffect(() => {
@@ -67,23 +63,6 @@ export default function DiskCard({ disk }: DiskCardProps) {
     const cartItem = cart.find((item: any) => item.id === disk.id)
     setCartCount(cartItem ? cartItem.quantity : 0)
   }, [disk.id])
-
-  // Закрываем tooltip при клике вне его
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (showMinQuantityInfo) {
-        setShowMinQuantityInfo(false)
-      }
-    }
-
-    if (showMinQuantityInfo) {
-      document.addEventListener('click', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [showMinQuantityInfo])
 
   // Слушаем событие сброса счетчиков корзины
   useEffect(() => {
@@ -133,24 +112,6 @@ export default function DiskCard({ disk }: DiskCardProps) {
     if (cartCount + 4 > disk.stock) {
       return
     }
-
-    // Запускаем анимацию числа
-    const newCount = cartCount + 4
-    if (addButtonRef.current) {
-      const buttonRect = addButtonRef.current.getBoundingClientRect()
-      setFloatingNumber({
-        x: buttonRect.left + buttonRect.width / 2,
-        y: buttonRect.top + buttonRect.height / 2,
-        count: newCount,
-      })
-
-      // Убираем число после анимации
-      setTimeout(() => setFloatingNumber(null), 700)
-    }
-
-    // Запускаем анимацию пульсации
-    setIsButtonPulsing(true)
-    setTimeout(() => setIsButtonPulsing(false), 1000)
 
     // Увеличиваем счетчик товаров в корзине на 4 (комплект)
     setCartCount((prev) => prev + 4)
@@ -267,7 +228,7 @@ export default function DiskCard({ disk }: DiskCardProps) {
   return (
     <div className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
       {/* Левая часть - Изображение */}
-      <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[123px] sm:w-[161px] md:w-[197px] lg:w-[222px] overflow-hidden flex items-center justify-center bg-white rounded-l-xl" style={{ maxHeight: "209px" }}>
+      <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[145px] sm:w-[190px] md:w-[234px] lg:w-[263px] overflow-hidden flex items-center justify-center bg-white rounded-l-xl" style={{ maxHeight: "248px" }}>
         {disk.isPromotional && <Badge className="absolute left-2 top-2 z-10 bg-[#c4d402] text-[#1F1F1F]">Акция</Badge>}
         <div
           className="flex justify-center items-center h-full w-full relative overflow-hidden bg-transparent"
@@ -350,7 +311,7 @@ export default function DiskCard({ disk }: DiskCardProps) {
           </Link>
         </div>
 
-        <div className="flex flex-col relative pb-8 sm:pb-9 md:pb-11 -mt-[10px]">
+        <div className="flex flex-col relative pb-8 sm:pb-9 md:pb-11 mt-3">
           <div className="flex items-center justify-end w-full mb-3 sm:mb-4">
             <div className="flex flex-row items-end gap-2">
               <p className="text-[11px] sm:text-[14.3px] md:text-[16.5px] text-gray-500 dark:text-gray-400 line-through">
@@ -377,27 +338,6 @@ export default function DiskCard({ disk }: DiskCardProps) {
                       >
                         {availableStock > 20 ? ">20 шт" : `${availableStock} шт`}
                       </span>
-                      <div className="relative">
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setShowMinQuantityInfo(!showMinQuantityInfo);
-                          }}
-                          className="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 rounded-full bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30 transition-colors"
-                          aria-label="Информация о минимальном количестве"
-                        >
-                          <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                        </button>
-                        {showMinQuantityInfo && (
-                          <div className="absolute left-0 bottom-full mb-2 w-48 sm:w-56 bg-white dark:bg-[#2A2A2A] border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3 z-50">
-                            <p className="text-xs text-gray-700 dark:text-gray-300">
-                              Покупка меньше 4шт недоступна
-                            </p>
-                            <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white dark:border-t-[#2A2A2A]"></div>
-                          </div>
-                        )}
-                      </div>
                     </>
                   );
                 } else {
@@ -408,7 +348,6 @@ export default function DiskCard({ disk }: DiskCardProps) {
               })()}
             </div>
             <CartQuantityButtons
-              ref={addButtonRef}
               count={cartCount}
               maxStock={disk.stock}
               onAdd={addToCart}
@@ -418,18 +357,8 @@ export default function DiskCard({ disk }: DiskCardProps) {
         </div>
       </div>
 
-      {/* Всплывающее число при добавлении в корзину */}
-      {floatingNumber && (
-        <div
-          className="fixed pointer-events-none z-[9999] floating-plus-one"
-          style={{
-            left: floatingNumber.x,
-            top: floatingNumber.y,
-          }}
-        >
-          <span className="text-xl font-bold text-[#c4d402]">+{floatingNumber.count}</span>
-        </div>
-      )}
     </div>
   )
-}
+})
+
+export default DiskCard

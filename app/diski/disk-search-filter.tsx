@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -23,31 +23,23 @@ interface VehicleWithWheels {
 interface DiskSearchFilterProps {
   diskType: string
   onDiskTypeChange?: (type: "stamped" | "cast" | "forged") => void
-  onFiltersChange?: (filters: {
-    diameter: string
-    width: string
-    pcd: string
-    et: string
-    hub: string
-    priceRange: [number, number]
-    stockFilter: "single" | "full"
-  }) => void
   diameterOptions?: string[]
   widthOptions?: string[]
   pcdOptions?: string[]
   etOptions?: string[]
   hubOptions?: string[]
+  onFilterHeightChange?: (height: number) => void
 }
 
-export default function DiskSearchFilter({
+const DiskSearchFilter = memo(function DiskSearchFilter({
   diskType = "cast",
   onDiskTypeChange,
-  onFiltersChange,
   diameterOptions = [],
   widthOptions = [],
   pcdOptions = [],
   etOptions = [],
-  hubOptions = []
+  hubOptions = [],
+  onFilterHeightChange
 }: DiskSearchFilterProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -56,6 +48,9 @@ export default function DiskSearchFilter({
   const [pcd, setPcd] = useState<string>(searchParams.get("pcd") || "")
   const [et, setEt] = useState<string>(searchParams.get("et") || "")
   const [hub, setHub] = useState<string>(searchParams.get("hub") || "")
+
+  // State to track which Select is currently open (only one can be open at a time)
+  const [openSelect, setOpenSelect] = useState<string | null>(null)
 
   // Add state for filter collapse
   const [isFilterCollapsed, setIsFilterCollapsed] = useState(false)
@@ -82,38 +77,104 @@ export default function DiskSearchFilter({
   }
 
   // Add state for price range
-  const [priceRange, setPriceRange] = useState<[number, number]>([3000, 30000])
-  const [stockFilter, setStockFilter] = useState<"single" | "full">("single")
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    parseFloat(searchParams.get("minPrice") || "3000"),
+    parseFloat(searchParams.get("maxPrice") || "30000")
+  ])
+  const [stockFilter, setStockFilter] = useState<"single" | "full">(
+    searchParams.get("stockFilter") as "single" | "full" || "single"
+  )
 
-  // Notify parent component when filters change
+  // Debounced URL update ONLY for price slider (for smooth dragging)
+  const priceUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
   useEffect(() => {
-    if (onFiltersChange) {
-      onFiltersChange({
-        diameter,
-        width,
-        pcd,
-        et,
-        hub,
-        priceRange,
-        stockFilter,
-      })
+    // Clear existing timeout
+    if (priceUpdateTimeoutRef.current) {
+      clearTimeout(priceUpdateTimeoutRef.current)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [diameter, width, pcd, et, hub, priceRange[0], priceRange[1], stockFilter])
+
+    // Debounce ONLY price range updates for smooth slider
+    priceUpdateTimeoutRef.current = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString())
+
+      // Price range
+      if (priceRange[0] !== 3000) params.set("minPrice", priceRange[0].toString())
+      else params.delete("minPrice")
+
+      if (priceRange[1] !== 30000) params.set("maxPrice", priceRange[1].toString())
+      else params.delete("maxPrice")
+
+      // Only update if params changed
+      const newParamsString = params.toString()
+      const currentParamsString = searchParams.toString()
+      if (newParamsString !== currentParamsString) {
+        router.push(`${window.location.pathname}?${newParamsString}`, { scroll: false })
+      }
+    }, 300) // 300ms debounce for price slider only
+
+    return () => {
+      if (priceUpdateTimeoutRef.current) {
+        clearTimeout(priceUpdateTimeoutRef.current)
+      }
+    }
+  }, [priceRange, router, searchParams])
+
+  // Immediate URL update for stock filter (no debounce for buttons)
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    // Stock filter - immediate update
+    if (stockFilter !== "single") params.set("stockFilter", stockFilter)
+    else params.delete("stockFilter")
+
+    const newParamsString = params.toString()
+    const currentParamsString = searchParams.toString()
+    if (newParamsString !== currentParamsString) {
+      router.push(`${window.location.pathname}?${newParamsString}`, { scroll: false })
+    }
+  }, [stockFilter, router, searchParams])
+
+  // Immediate URL update for dimension filters (no debounce for select dropdowns)
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    // Dimension filters - immediate updates
+    if (diameter) params.set("diameter", diameter)
+    else params.delete("diameter")
+
+    if (width) params.set("width", width)
+    else params.delete("width")
+
+    if (pcd) params.set("pcd", pcd)
+    else params.delete("pcd")
+
+    if (et) params.set("et", et)
+    else params.delete("et")
+
+    if (hub) params.set("hub", hub)
+    else params.delete("hub")
+
+    const newParamsString = params.toString()
+    const currentParamsString = searchParams.toString()
+    if (newParamsString !== currentParamsString) {
+      router.push(`${window.location.pathname}?${newParamsString}`, { scroll: false })
+    }
+  }, [diameter, width, pcd, et, hub, router, searchParams])
 
   // Add state for garage scroll gradients
   const [showLeftGradient, setShowLeftGradient] = useState(false)
   const [showRightGradient, setShowRightGradient] = useState(true)
   const garageScrollRef = useRef<HTMLDivElement>(null)
 
-  // Handle garage scroll
-  const handleGarageScroll = () => {
+  // Handle garage scroll - memoized
+  const handleGarageScroll = useCallback(() => {
     if (garageScrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = garageScrollRef.current
       setShowLeftGradient(scrollLeft > 5)
       setShowRightGradient(scrollLeft < scrollWidth - clientWidth - 5)
     }
-  }
+  }, [])
 
   // State for user's vehicles from localStorage
   const [userVehicles, setUserVehicles] = useState<VehicleWithWheels[]>([])
@@ -196,47 +257,43 @@ export default function DiskSearchFilter({
     }
   }, [])
 
-  // Function to select vehicle and set wheel sizes
-  const selectVehicle = (vehicle: VehicleWithWheels) => {
+  // Track filter height and notify parent
+  useEffect(() => {
+    const updateHeight = () => {
+      if (filterRef.current && onFilterHeightChange) {
+        const height = filterRef.current.offsetHeight
+        onFilterHeightChange(height)
+      }
+    }
+
+    // Initial measurement
+    updateHeight()
+
+    // Update on state changes
+    const timer = setTimeout(updateHeight, 350) // Wait for animation to complete
+
+    // Update on window resize
+    window.addEventListener("resize", updateHeight)
+
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener("resize", updateHeight)
+    }
+  }, [isFilterCollapsed, isExpanded, onFilterHeightChange])
+
+  // Function to select vehicle and set wheel sizes - memoized
+  const selectVehicle = useCallback((vehicle: VehicleWithWheels) => {
     setSelectedVehicle(vehicle.id)
     setDiameter(vehicle.wheelSize.diameter)
     setWidth(vehicle.wheelSize.width)
     setPcd(vehicle.wheelSize.pcd)
     setEt(vehicle.wheelSize.et)
     setHub(vehicle.wheelSize.hub)
+    // URL will be updated automatically by the dimension filters useEffect
+  }, [])
 
-    // Apply the filter immediately when a vehicle is selected
-    applyDimensionFilter(
-      vehicle.wheelSize.diameter,
-      vehicle.wheelSize.width,
-      vehicle.wheelSize.pcd,
-      vehicle.wheelSize.et,
-      vehicle.wheelSize.hub,
-    )
-  }
-
-  // Function to apply dimension filter
-  const applyDimensionFilter = (
-    diameterValue: string,
-    widthValue: string,
-    pcdValue: string,
-    etValue: string,
-    hubValue: string,
-  ) => {
-    const params = new URLSearchParams(searchParams.toString())
-
-    if (diameterValue) params.set("diameter", diameterValue)
-    if (widthValue) params.set("width", widthValue)
-    if (pcdValue) params.set("pcd", pcdValue)
-    if (etValue) params.set("et", etValue)
-    if (hubValue) params.set("hub", hubValue)
-
-    // Navigate with the parameters
-    router.push(`${window.location.pathname}?${params.toString()}`)
-  }
-
-  // Function to clear dimension filter
-  const clearAllDimensions = () => {
+  // Function to clear dimension filter - memoized
+  const clearAllDimensions = useCallback(() => {
     setDiameter("")
     setWidth("")
     setPcd("")
@@ -253,17 +310,17 @@ export default function DiskSearchFilter({
 
     // Navigate with the parameters
     router.push(`${window.location.pathname}?${params.toString()}`)
-  }
+  }, [router, searchParams])
 
-  // Function to scroll to filter
-  const scrollToFilter = () => {
+  // Function to scroll to filter - memoized
+  const scrollToFilter = useCallback(() => {
     if (filterRef.current) {
       filterRef.current.scrollIntoView({ behavior: "smooth" })
     }
-  }
+  }, [])
 
-  // Get filter title based on disk type
-  const getFilterTitle = () => {
+  // Get filter title based on disk type - memoized
+  const filterTitle = useMemo(() => {
     switch (diskType) {
       case "stamped":
         return "Фильтр штампованных дисков"
@@ -274,7 +331,17 @@ export default function DiskSearchFilter({
       default:
         return "Фильтр дисков"
     }
-  }
+  }, [diskType])
+
+  // Toggle stock filter - memoized
+  const toggleStockFilter = useCallback(() => {
+    setStockFilter(prev => prev === "single" ? "full" : "single")
+  }, [])
+
+  // Handle price range change - memoized
+  const handlePriceRangeChange = useCallback((value: number[]) => {
+    setPriceRange(value as [number, number])
+  }, [])
 
   return (
     <>
@@ -311,7 +378,7 @@ export default function DiskSearchFilter({
           WebkitOverflowScrolling: 'touch',
           pointerEvents: 'auto',
         }}
-        aria-label={getFilterTitle()}
+        aria-label={filterTitle}
         data-testid="disk-filter-container"
         onTouchStart={(e) => {
           if (isFilterCollapsed) {
@@ -429,7 +496,12 @@ export default function DiskSearchFilter({
                 <Label htmlFor="diameter" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                   Диаметр
                 </Label>
-                <Select value={diameter} onValueChange={setDiameter}>
+                <Select
+                  value={diameter}
+                  onValueChange={setDiameter}
+                  open={openSelect === "diameter"}
+                  onOpenChange={(open) => setOpenSelect(open ? "diameter" : null)}
+                >
                   <SelectTrigger id="diameter" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
@@ -447,7 +519,12 @@ export default function DiskSearchFilter({
                 <Label htmlFor="width" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                   Ширина
                 </Label>
-                <Select value={width} onValueChange={setWidth}>
+                <Select
+                  value={width}
+                  onValueChange={setWidth}
+                  open={openSelect === "width"}
+                  onOpenChange={(open) => setOpenSelect(open ? "width" : null)}
+                >
                   <SelectTrigger id="width" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
@@ -465,7 +542,12 @@ export default function DiskSearchFilter({
                 <Label htmlFor="pcd" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                   PCD
                 </Label>
-                <Select value={pcd} onValueChange={setPcd}>
+                <Select
+                  value={pcd}
+                  onValueChange={setPcd}
+                  open={openSelect === "pcd"}
+                  onOpenChange={(open) => setOpenSelect(open ? "pcd" : null)}
+                >
                   <SelectTrigger id="pcd" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
@@ -501,7 +583,12 @@ export default function DiskSearchFilter({
               <Label htmlFor="et" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block">
                 Вылет (ET)
               </Label>
-              <Select value={et} onValueChange={setEt}>
+              <Select
+                value={et}
+                onValueChange={setEt}
+                open={openSelect === "et"}
+                onOpenChange={(open) => setOpenSelect(open ? "et" : null)}
+              >
                 <SelectTrigger id="et" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
@@ -519,7 +606,12 @@ export default function DiskSearchFilter({
               <Label htmlFor="hub" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block">
                 Ступица (DIA)
               </Label>
-              <Select value={hub} onValueChange={setHub}>
+              <Select
+                value={hub}
+                onValueChange={setHub}
+                open={openSelect === "hub"}
+                onOpenChange={(open) => setOpenSelect(open ? "hub" : null)}
+              >
                 <SelectTrigger id="hub" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
@@ -618,7 +710,7 @@ export default function DiskSearchFilter({
                   {/* Stock Filter - Button style */}
                   <div className="w-[45%] sm:w-[30%]">
                     <button
-                      onClick={() => setStockFilter(stockFilter === "single" ? "full" : "single")}
+                      onClick={toggleStockFilter}
                       className={`w-full h-16 rounded-t-xl rounded-bl-[28px] rounded-br-xl text-xs font-medium transition-all duration-200 flex items-center justify-center px-2 ${
                         stockFilter === "full"
                           ? "bg-blue-500 text-white"
@@ -638,7 +730,7 @@ export default function DiskSearchFilter({
                         max={30000}
                         step={1000}
                         value={priceRange}
-                        onValueChange={(value) => setPriceRange(value as [number, number])}
+                        onValueChange={handlePriceRangeChange}
                         className="w-full"
                       />
                     </div>
@@ -654,4 +746,6 @@ export default function DiskSearchFilter({
       </div>
     </>
   )
-}
+})
+
+export default DiskSearchFilter
