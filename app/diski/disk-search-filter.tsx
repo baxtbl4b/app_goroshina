@@ -22,9 +22,10 @@ interface VehicleWithWheels {
 
 interface DiskSearchFilterProps {
   diskType: string
+  onDiskTypeChange?: (type: "stamped" | "cast" | "forged") => void
 }
 
-export default function DiskSearchFilter({ diskType = "cast" }: DiskSearchFilterProps) {
+export default function DiskSearchFilter({ diskType = "cast", onDiskTypeChange }: DiskSearchFilterProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [diameter, setDiameter] = useState<string>(searchParams.get("diameter") || "")
@@ -39,9 +40,41 @@ export default function DiskSearchFilter({ diskType = "cast" }: DiskSearchFilter
   const [isExpanded, setIsExpanded] = useState(false)
   const filterRef = useRef<HTMLDivElement>(null)
 
+  // Add touch handling states
+  const [touchStartY, setTouchStartY] = useState<number | null>(null)
+  const [touchEndY, setTouchEndY] = useState<number | null>(null)
+  const [handleTouchStartY, setHandleTouchStartY] = useState<number | null>(null)
+  const [isHandleHighlighted, setIsHandleHighlighted] = useState(false)
+  const handleHighlightTimeout = useRef<NodeJS.Timeout | null>(null)
+
+  // Function to highlight handle
+  const highlightHandle = () => {
+    setIsHandleHighlighted(true)
+    if (handleHighlightTimeout.current) {
+      clearTimeout(handleHighlightTimeout.current)
+    }
+    handleHighlightTimeout.current = setTimeout(() => {
+      setIsHandleHighlighted(false)
+    }, 1000)
+  }
+
   // Add state for price range
   const [priceRange, setPriceRange] = useState<[number, number]>([3000, 30000])
   const [stockFilter, setStockFilter] = useState<"single" | "full">("single")
+
+  // Add state for garage scroll gradients
+  const [showLeftGradient, setShowLeftGradient] = useState(false)
+  const [showRightGradient, setShowRightGradient] = useState(true)
+  const garageScrollRef = useRef<HTMLDivElement>(null)
+
+  // Handle garage scroll
+  const handleGarageScroll = () => {
+    if (garageScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = garageScrollRef.current
+      setShowLeftGradient(scrollLeft > 5)
+      setShowRightGradient(scrollLeft < scrollWidth - clientWidth - 5)
+    }
+  }
 
   // Add mock data for user's vehicles
   const userVehicles: VehicleWithWheels[] = [
@@ -211,21 +244,135 @@ export default function DiskSearchFilter({ diskType = "cast" }: DiskSearchFilter
 
       <div
         ref={filterRef}
-        className={`bg-white dark:bg-[#2A2A2A] p-4 shadow-lg rounded-xl transition-all duration-300 ${
-          isFilterCollapsed ? "max-h-[120px] overflow-hidden" : ""
-        }`}
+        className={`px-4 pt-2 pb-4 fixed left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] bg-white dark:bg-[#2A2A2A] backdrop-blur-md`}
+        style={{
+          bottom: '0',
+          transform: isFilterCollapsed ? 'translateY(calc(100% - 56px))' : 'translateY(0)',
+          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%)',
+          maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%)',
+          touchAction: isFilterCollapsed ? 'none' : 'pan-x pinch-zoom',
+          WebkitOverflowScrolling: 'touch',
+        }}
         aria-label={getFilterTitle()}
+        data-testid="disk-filter-container"
+        onTouchStart={(e) => {
+          if (isFilterCollapsed) {
+            e.preventDefault()
+            setTouchStartY(e.touches[0].clientY)
+            setTouchEndY(null)
+          }
+        }}
+        onTouchMove={(e) => {
+          if (isFilterCollapsed && touchStartY !== null) {
+            e.preventDefault()
+            setTouchEndY(e.touches[0].clientY)
+          }
+        }}
+        onTouchEnd={() => {
+          if (isFilterCollapsed && touchStartY !== null && touchEndY !== null) {
+            const diff = touchEndY - touchStartY
+            if (diff < -20) {
+              setIsFilterCollapsed(false)
+              highlightHandle()
+            }
+          }
+          setTouchStartY(null)
+          setTouchEndY(null)
+        }}
       >
+        {/* Swipe handle for collapse/expand */}
+        <div
+          className="flex items-center justify-center mb-2 -mx-4 px-4"
+          data-swipe-handle
+          style={{
+            touchAction: 'none',
+            paddingTop: isFilterCollapsed ? '12px' : '0',
+            paddingBottom: isFilterCollapsed ? '12px' : '0',
+          }}
+        >
+          <button
+            className="flex items-center justify-center py-3 cursor-pointer w-full group"
+            style={{ touchAction: 'none' }}
+            onClick={() => {
+              if (isFilterCollapsed) {
+                setIsFilterCollapsed(false)
+              } else if (!isExpanded) {
+                setIsExpanded(true)
+              } else {
+                setIsExpanded(false)
+              }
+              highlightHandle()
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault()
+              setHandleTouchStartY(e.touches[0].clientY)
+            }}
+            onTouchMove={(e) => {
+              e.preventDefault()
+              if (handleTouchStartY !== null) {
+                setTouchEndY(e.touches[0].clientY)
+              }
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault()
+
+              if (handleTouchStartY !== null) {
+                const endY = e.changedTouches[0].clientY
+                const diff = endY - handleTouchStartY
+
+                if (Math.abs(diff) > 20) {
+                  if (diff < 0) {
+                    if (isFilterCollapsed) {
+                      setIsFilterCollapsed(false)
+                      highlightHandle()
+                    } else if (!isExpanded) {
+                      setIsExpanded(true)
+                      highlightHandle()
+                    }
+                  } else {
+                    if (isExpanded) {
+                      setIsExpanded(false)
+                      highlightHandle()
+                    } else if (!isFilterCollapsed) {
+                      setIsFilterCollapsed(true)
+                      highlightHandle()
+                    }
+                  }
+                }
+
+                setHandleTouchStartY(null)
+                setTouchEndY(null)
+              }
+            }}
+            aria-label={isFilterCollapsed ? "Нажмите для раскрытия фильтра" : "Нажмите для скрытия фильтра"}
+            aria-expanded={!isFilterCollapsed}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <div className={`w-16 h-1.5 rounded-full transition-colors duration-300 ${isHandleHighlighted ? 'bg-[#c4d402]' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+              {isFilterCollapsed && (
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="text-gray-400 dark:text-gray-500 animate-bounce"
+                >
+                  <path d="M18 15L12 9L6 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </div>
+          </button>
+        </div>
         {/* Size selectors - always visible part of the filter */}
         <div className="flex flex-col gap-3 mb-4">
           <div className="flex items-end gap-3">
             <div className="grid grid-cols-3 gap-3 flex-1">
               <div>
-                <Label htmlFor="diameter" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                <Label htmlFor="diameter" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                   Диаметр
                 </Label>
                 <Select value={diameter} onValueChange={setDiameter}>
-                  <SelectTrigger id="diameter" className="w-full bg-[#333333] text-white border border-gray-300/50">
+                  <SelectTrigger id="diameter" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
@@ -239,11 +386,11 @@ export default function DiskSearchFilter({ diskType = "cast" }: DiskSearchFilter
               </div>
 
               <div>
-                <Label htmlFor="width" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                <Label htmlFor="width" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                   Ширина
                 </Label>
                 <Select value={width} onValueChange={setWidth}>
-                  <SelectTrigger id="width" className="w-full bg-[#333333] text-white border border-gray-300/50">
+                  <SelectTrigger id="width" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
@@ -257,11 +404,11 @@ export default function DiskSearchFilter({ diskType = "cast" }: DiskSearchFilter
               </div>
 
               <div>
-                <Label htmlFor="pcd" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                <Label htmlFor="pcd" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                   PCD
                 </Label>
                 <Select value={pcd} onValueChange={setPcd}>
-                  <SelectTrigger id="pcd" className="w-full bg-[#333333] text-white border border-gray-300/50">
+                  <SelectTrigger id="pcd" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
@@ -279,8 +426,12 @@ export default function DiskSearchFilter({ diskType = "cast" }: DiskSearchFilter
               variant="outline"
               size="sm"
               onClick={clearAllDimensions}
-              className="h-10 px-3 text-xs"
-              disabled={!diameter && !width && !pcd && !et && !hub}
+              className={`h-10 px-3 text-xs border-0 rounded-xl transition-all duration-300 ${
+                diameter || width || pcd || et || hub || priceRange[0] > 3000 || priceRange[1] < 30000 || stockFilter === "full"
+                  ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 hover:scale-105 active:scale-95 shadow-md hover:shadow-red-500/30"
+                  : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+              }`}
+              disabled={!diameter && !width && !pcd && !et && !hub && priceRange[0] === 3000 && priceRange[1] === 30000 && stockFilter === "single"}
             >
               Сбросить
             </Button>
@@ -289,11 +440,11 @@ export default function DiskSearchFilter({ diskType = "cast" }: DiskSearchFilter
           {/* Additional disk parameters moved from collapsible section */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="et" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block">
+              <Label htmlFor="et" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block">
                 Вылет (ET)
               </Label>
               <Select value={et} onValueChange={setEt}>
-                <SelectTrigger id="et" className="w-full bg-[#333333] text-white border border-gray-300/50">
+                <SelectTrigger id="et" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -307,11 +458,11 @@ export default function DiskSearchFilter({ diskType = "cast" }: DiskSearchFilter
             </div>
 
             <div>
-              <Label htmlFor="hub" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block">
+              <Label htmlFor="hub" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block">
                 Ступица (DIA)
               </Label>
               <Select value={hub} onValueChange={setHub}>
-                <SelectTrigger id="hub" className="w-full bg-[#333333] text-white border border-gray-300/50">
+                <SelectTrigger id="hub" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -327,25 +478,49 @@ export default function DiskSearchFilter({ diskType = "cast" }: DiskSearchFilter
         </div>
 
         {/* Header section with filter title and buttons */}
-        <div className="flex flex-row items-center justify-between gap-3 mb-4">
+        <div className="flex flex-row items-center justify-between gap-3 mb-3">
           {/* My Garage section */}
-          <div className="flex-1 flex items-center gap-1 sm:gap-2 overflow-hidden">
+          <div className="flex-1 flex items-center gap-1 sm:gap-2 overflow-hidden min-w-0">
             <div className="flex flex-col w-full">
-              <div className="flex gap-1 overflow-x-auto scrollbar-hide mb-1">
-                {userVehicles.map((vehicle) => (
-                  <button
-                    key={vehicle.id}
-                    onClick={() => selectVehicle(vehicle)}
-                    className={`text-xs px-2 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0 ${
-                      selectedVehicle === vehicle.id
-                        ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
-                        : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
-                    }`}
-                  >
-                    {vehicle.name}
-                  </button>
-                ))}
+              <div className="relative w-full">
+                {/* Left gradient fade-out overlay */}
+                <div
+                  className={`absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-[#2A2A2A] to-transparent pointer-events-none z-10 transition-opacity duration-200 ${showLeftGradient ? 'opacity-100' : 'opacity-0'}`}
+                ></div>
+                <div
+                  ref={garageScrollRef}
+                  onScroll={handleGarageScroll}
+                  className="flex gap-1 overflow-x-auto scrollbar-hide mb-1 px-1"
+                >
+                  {userVehicles.length > 0 ? (
+                    userVehicles.map((vehicle) => (
+                      <button
+                        key={vehicle.id}
+                        onClick={() => selectVehicle(vehicle)}
+                        className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
+                          selectedVehicle === vehicle.id
+                            ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
+                            : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                        }`}
+                      >
+                        {vehicle.name}
+                      </button>
+                    ))
+                  ) : (
+                    <a
+                      href="/account/cars/add"
+                      className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
+                    >
+                      + Добавить авто
+                    </a>
+                  )}
+                </div>
+                {/* Right gradient fade-out overlay */}
+                <div
+                  className={`absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-[#2A2A2A] to-transparent pointer-events-none z-10 transition-opacity duration-200 ${showRightGradient ? 'opacity-100' : 'opacity-0'}`}
+                ></div>
               </div>
+              <span className="text-xs text-gray-500 dark:text-gray-400 hidden">Мой гараж</span>
             </div>
           </div>
 
@@ -356,7 +531,7 @@ export default function DiskSearchFilter({ diskType = "cast" }: DiskSearchFilter
               className="flex items-center gap-1 text-xs text-[#009CFF] hover:text-[#007ACC] transition-colors whitespace-nowrap"
             >
               <>
-                Дополнительные фильтры
+                Фильтры
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     d={isExpanded ? "M18 15L12 9L6 15" : "M6 9L12 15L18 9"}
@@ -368,6 +543,69 @@ export default function DiskSearchFilter({ diskType = "cast" }: DiskSearchFilter
                 </svg>
               </>
             </button>
+          </div>
+
+          {/* Disk type toggle */}
+          <div className="flex-1 max-w-[210px]">
+            <style jsx>{`
+              @keyframes diskTypeGlow {
+                0%, 100% {
+                  box-shadow: 0 0 8px rgba(196, 212, 2, 0.5), 0 0 16px rgba(196, 212, 2, 0.5);
+                }
+                50% {
+                  box-shadow: 0 0 12px rgba(196, 212, 2, 0.5), 0 0 24px rgba(196, 212, 2, 0.5);
+                }
+              }
+              .disktype-btn-active {
+                animation: diskTypeGlow 2s ease-in-out infinite;
+              }
+            `}</style>
+            <div
+              className="relative h-8 w-full rounded-full bg-gray-100 dark:bg-gray-800 flex items-center z-0 overflow-hidden touch-pan-x"
+              role="radiogroup"
+              aria-label="Тип дисков"
+            >
+              {/* Toggle buttons */}
+              <button
+                onClick={() => onDiskTypeChange?.("stamped")}
+                className={`flex-1 h-full rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 z-10 relative mx-0.5 ${
+                  diskType === "stamped"
+                    ? "bg-gradient-to-r from-[#c4d402] to-[#d4e002] text-[#1F1F1F] font-bold disktype-btn-active"
+                    : "text-[#1F1F1F] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+                }`}
+                aria-pressed={diskType === "stamped"}
+                role="radio"
+                aria-checked={diskType === "stamped"}
+              >
+                Штамп
+              </button>
+              <button
+                onClick={() => onDiskTypeChange?.("cast")}
+                className={`flex-1 h-full rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 z-10 relative mx-0.5 ${
+                  diskType === "cast"
+                    ? "bg-gradient-to-r from-[#c4d402] to-[#d4e002] text-[#1F1F1F] font-bold disktype-btn-active"
+                    : "text-[#1F1F1F] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+                }`}
+                aria-pressed={diskType === "cast"}
+                role="radio"
+                aria-checked={diskType === "cast"}
+              >
+                Литые
+              </button>
+              <button
+                onClick={() => onDiskTypeChange?.("forged")}
+                className={`flex-1 h-full rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 z-10 relative mx-0.5 ${
+                  diskType === "forged"
+                    ? "bg-gradient-to-r from-[#c4d402] to-[#d4e002] text-[#1F1F1F] font-bold disktype-btn-active"
+                    : "text-[#1F1F1F] dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+                }`}
+                aria-pressed={diskType === "forged"}
+                role="radio"
+                aria-checked={diskType === "forged"}
+              >
+                Кован
+              </button>
+            </div>
           </div>
         </div>
 

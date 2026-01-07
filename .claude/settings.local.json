@@ -26,7 +26,10 @@
       "Bash(rm:*)",
       "Bash(find:*)",
       "Bash(python -m json.tool:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git checkout:*)",
+      "Bash(git log:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

@@ -6,6 +6,8 @@ import { Heart, Plus, Minus, CheckCircle, Clock, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
+import CartQuantityButtons from "@/components/cart-quantity-buttons"
+import { getDeliveryForCategory, getDeliveryColorClass } from "@/lib/delivery-time"
 
 // Тип для диска
 interface Disk {
@@ -16,7 +18,6 @@ interface Disk {
   stock: number
   image: string
   brand: string
-  country: string
   diameter: number
   width: number
   pcd: string // Параметр крепления (например, "5x114.3")
@@ -25,6 +26,8 @@ interface Disk {
   type: "stamped" | "cast" | "forged" // Тип диска
   color?: string
   isPromotional?: boolean
+  provider?: string | null
+  storehouse?: Record<string, number>
 }
 
 interface DiskCardProps {
@@ -41,29 +44,12 @@ const formatPrice = (price: number): string => {
   }).format(price)
 }
 
-// Функция для получения URL флага страны
-function getCountryFlag(country: string): string {
-  const countryMap: Record<string, string> = {
-    Китай: "/images/flags/china.png",
-    Россия: "/images/flags/russia.png",
-    Япония: "/images/flags/japan.png",
-    Германия: "/images/flags/germany.png",
-    Италия: "/images/flags/italy.png",
-    Франция: "/images/flags/france.png",
-    США: "/placeholder.svg?height=16&width=24",
-    Корея: "/placeholder.svg?height=16&width=24",
-  }
-
-  return countryMap[country] || "/placeholder.svg?height=16&width=24"
-}
-
 export default function DiskCard({ disk }: DiskCardProps) {
   // Состояния
   const [isFavorite, setIsFavorite] = useState(false)
   const [imageModalOpen, setImageModalOpen] = useState(false)
   const [cartCount, setCartCount] = useState(0)
   const [imageError, setImageError] = useState(false)
-  const [flagError, setFlagError] = useState(false)
   const [isButtonPulsing, setIsButtonPulsing] = useState(false)
   const [floatingNumber, setFloatingNumber] = useState<{ x: number; y: number; count: number } | null>(null)
   const addButtonRef = useRef<HTMLButtonElement>(null)
@@ -222,23 +208,28 @@ export default function DiskCard({ disk }: DiskCardProps) {
     window.dispatchEvent(cartUpdateEvent)
   }
 
+  // Получаем информацию о доставке из утилиты (с учётом складов и провайдера)
+  const deliveryInfo = getDeliveryForCategory(disk.provider, disk.storehouse)
+
   // Функция для определения статуса наличия
   const getStockStatus = () => {
-    if (disk.stock > 10) {
+    const colorClass = getDeliveryColorClass(deliveryInfo.type)
+
+    if (deliveryInfo.type === "today") {
       return {
-        tooltip: "Сегодня",
-        className: "text-green-500",
+        tooltip: deliveryInfo.text,
+        className: colorClass,
         icon: <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />,
       }
-    } else if (disk.stock > 0) {
+    } else if (deliveryInfo.type === "fast") {
       return {
-        tooltip: "Доставка 1-2 дня",
-        className: "text-blue-500",
+        tooltip: deliveryInfo.text,
+        className: colorClass,
         icon: <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />,
       }
     } else {
       return {
-        tooltip: "Доставка 3 и более дня",
+        tooltip: deliveryInfo.text,
         className: "text-orange-500",
         icon: <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />,
       }
@@ -254,9 +245,6 @@ export default function DiskCard({ disk }: DiskCardProps) {
     }
     return disk.image || "/images/black-wheel.png"
   }
-
-  // Получаем флаг страны
-  const flagUrl = getCountryFlag(disk.country)
 
   return (
     <div className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
@@ -309,22 +297,28 @@ export default function DiskCard({ disk }: DiskCardProps) {
             Покупка меньше 4шт недоступна
           </p>
         </div>
-        <div>
-          <div className="mt-0.5 sm:mt-1 md:mt-2 flex items-center gap-1 sm:gap-2 md:gap-3 flex-wrap">
-            <span className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 md:py-1.5 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white">
-              R{disk.diameter} {disk.pcd}
-            </span>
-
-            {/* Тип диска */}
-            <span className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 md:py-1.5 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white">
-              {disk.type === "stamped" ? "Штамп." : disk.type === "cast" ? "Литой" : "Кованый"}
-            </span>
+        <div className="flex flex-col gap-[8.8px]">
+          <div className="flex items-center gap-[4.4px] sm:gap-[8.8px] md:gap-[13.2px] flex-wrap">
+            {/* Срок доставки */}
+            <div className="flex items-center gap-[4.4px] sm:gap-[6.6px] px-[6.6px] sm:px-[8.8px] md:px-[11px] py-[4.4px] bg-gray-100 dark:bg-[#3A3A3A] rounded-full">
+              <span className="flex items-center justify-center">
+                {React.cloneElement(stockStatus.icon as React.ReactElement, {
+                  className: `h-[13.2px] w-[13.2px] sm:h-[17.6px] sm:w-[17.6px] md:h-[19.8px] md:w-[19.8px] ${
+                    (stockStatus.icon as React.ReactElement).props.className
+                  }`,
+                })}
+              </span>
+              <span className={`text-[9px] sm:text-[11px] md:text-[13px] font-medium whitespace-nowrap ${stockStatus.className}`}>
+                {stockStatus.tooltip}
+              </span>
+            </div>
 
             <span className="flex-grow"></span>
+
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ml-auto sm:ml-0"
+              className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 p-0"
               onClick={toggleFavorite}
               aria-label={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
             >
@@ -341,119 +335,49 @@ export default function DiskCard({ disk }: DiskCardProps) {
               {disk.name}
             </h3>
           </Link>
-
-          <div className="mt-0.5 sm:mt-1 md:mt-2 flex items-center gap-1 sm:gap-2 md:gap-3">
-            {flagError ? (
-              <div
-                className="rounded-sm w-[20px] h-[14px] sm:w-[24px] sm:h-[16px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[8px] text-gray-500"
-                title={`Страна: ${disk.country}`}
-              >
-                {disk.country.substring(0, 2)}
-              </div>
-            ) : (
-              <img
-                src={flagUrl || "/placeholder.svg"}
-                alt={disk.country}
-                width={20}
-                height={14}
-                className="rounded-sm w-[20px] h-[14px] sm:w-[24px] sm:h-[16px] border border-gray-200"
-                title={`Страна: ${disk.country}`}
-                onError={() => setFlagError(true)}
-              />
-            )}
-            <span className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 dark:text-gray-400">
-              {disk.country}
-            </span>
-          </div>
         </div>
 
-        <div className="mt-0.5 sm:mt-1 flex flex-col relative pb-7 sm:pb-8 md:pb-10">
-          <div className="flex items-center justify-between w-full mb-1">
-            <div>
-              {/* Статус наличия */}
-              <div className="flex items-center gap-1">
-                <span className="flex items-center justify-center">
-                  {React.cloneElement(stockStatus.icon as React.ReactElement, {
-                    className: `h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 ${
-                      (stockStatus.icon as React.ReactElement).props.className
-                    }`,
-                  })}
-                </span>
-                <span className={`text-xs sm:text-sm md:text-base lg:text-lg font-medium ${stockStatus.className}`}>
-                  {stockStatus.tooltip}
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-col items-end">
-              {disk.stock > 0 ? (
-                <>
-                  <span
-                    className={`text-base sm:text-xl md:text-2xl lg:text-3xl font-medium opacity-80 ${
-                      disk.stock > 10 ? "text-green-500" : disk.stock > 5 ? "text-yellow-500" : "text-orange-500"
-                    }`}
-                  >
-                    {disk.stock} шт
-                  </span>
-                  <span className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 dark:text-gray-400">
-                    Количество:
-                  </span>
-                </>
-              ) : (
-                <span className="text-base sm:text-xl font-medium opacity-80 text-red-500">Нет в наличии</span>
-              )}
-            </div>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center mt-2 sm:mt-0 px-0">
-            <div>
-              <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 dark:text-gray-400 line-through">
+        <div className="flex flex-col relative pb-8 sm:pb-9 md:pb-11 -mt-[10px]">
+          <div className="flex items-center justify-end w-full mb-3 sm:mb-4">
+            <div className="flex flex-row items-end gap-2">
+              <p className="text-[11px] sm:text-[14.3px] md:text-[16.5px] text-gray-500 dark:text-gray-400 line-through">
                 {formatPrice(disk.rrc)}
               </p>
-              <p
-                className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-[#1F1F1F] dark:text-white relative"
-                style={{
-                  textShadow: "1px 1px 0 rgba(0,0,0,0.1), 2px 2px 0 rgba(0,0,0,0.05), 3px 3px 5px rgba(0,0,0,0.1)",
-                  transform: "translateZ(0)",
-                  perspective: "1000px",
-                  transition: "transform 0.3s ease",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateZ(10px) scale(1.02)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateZ(0)")}
-              >
+              <p className="text-[16.5px] sm:text-[18.7px] md:text-[23.1px] font-bold text-[#1F1F1F] dark:text-white">
                 {formatPrice(disk.price)}
               </p>
             </div>
-            <div className="flex items-center flex-1 justify-end ml-2">
-              {/* Кнопки корзины */}
-              <div className="flex h-[31px] sm:h-[34px] md:h-[40px] overflow-hidden w-full max-w-[152px] sm:max-w-[174px] md:max-w-[195px]" style={{ border: 'none', outline: 'none', borderRadius: '20px' }}>
-                {/* Кнопка минус */}
-                <button
-                  onClick={removeFromCart}
-                  disabled={cartCount <= 0 || disk.stock <= 0}
-                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px' }}
-                  aria-label="Уменьшить количество"
-                >
-                  <Minus className="w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] md:w-[22px] md:h-[22px]" />
-                </button>
-
-                {/* Счетчик количества */}
-                <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2.2rem] sm:min-w-[2.75rem] md:min-w-[3.3rem]">
-                  <span className="text-[15px] sm:text-[18px] md:text-[22px] font-medium">{cartCount}</span>
-                </div>
-
-                {/* Кнопка плюс */}
-                <button
-                  ref={addButtonRef}
-                  onClick={addToCart}
-                  disabled={disk.stock <= 0 || cartCount + 4 > disk.stock}
-                  className="bg-[#c4d402]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopRightRadius: '20px', borderBottomRightRadius: '20px' }}
-                  aria-label="Увеличить количество"
-                >
-                  <Plus className="w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] md:w-[22px] md:h-[22px]" />
-                </button>
-              </div>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
+            <div className="flex flex-col items-start">
+              {(() => {
+                const availableStock = disk.stock - cartCount;
+                if (availableStock > 0) {
+                  return (
+                    <span
+                      className={`h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[12px] sm:text-[14px] md:text-[16px] font-medium px-3 rounded-full ${
+                        availableStock > 10 ? "bg-green-500/20 text-green-600 dark:text-green-400" :
+                        availableStock > 5 ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" :
+                        "bg-orange-500/20 text-orange-600 dark:text-orange-400"
+                      }`}
+                    >
+                      {availableStock > 20 ? ">20 шт" : `${availableStock} шт`}
+                    </span>
+                  );
+                } else {
+                  return (
+                    <span className="h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[12px] sm:text-[14px] md:text-[16px] font-medium px-3 rounded-full bg-red-500/20 text-red-600 dark:text-red-400">Нет в наличии</span>
+                  );
+                }
+              })()}
             </div>
+            <CartQuantityButtons
+              ref={addButtonRef}
+              count={cartCount}
+              maxStock={disk.stock}
+              onAdd={addToCart}
+              onRemove={removeFromCart}
+            />
           </div>
         </div>
       </div>

@@ -2,13 +2,34 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { ChevronLeft } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import DiskSearchFilter from "./disk-search-filter"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import QuickFilterButtons from "@/components/quick-filter-buttons"
 import DiskCard from "@/components/disk-card"
 import CartButton from "@/components/cart-button"
-import Link from "next/link"
+import { BackButton } from "@/components/back-button"
+
+// Тип для диска
+interface Disk {
+  id: string
+  name: string
+  price: number
+  rrc: number
+  stock: number
+  image: string
+  brand: string
+  diameter: number
+  width: number
+  pcd: string
+  et: number
+  dia: number
+  type: "stamped" | "cast" | "forged"
+  color?: string
+  isPromotional?: boolean
+  provider?: string | null
+  storehouse?: Record<string, number>
+}
 
 export default function DiskiPage() {
   const searchParams = useSearchParams()
@@ -25,252 +46,30 @@ export default function DiskiPage() {
   const [cartCountPosition, setCartCountPosition] = useState(0)
   const [cartLabelPosition, setCartLabelPosition] = useState(0)
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
+  const [disks, setDisks] = useState<Disk[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Демо-данные для дисков
-  const disks = [
-    {
-      id: "1",
-      name: "СКАД Монако Алмаз R17 5x114.3 ET45 DIA67.1",
-      price: 5500,
-      rrc: 6200,
-      stock: 12,
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/test5-Z7PC3n995cm9WeQU3R3CtistrMl66H.png", // Updated image URL
-      brand: "СКАД",
-      country: "Россия",
-      diameter: 17,
-      width: 7,
-      pcd: "5x114.3",
-      et: 45,
-      dia: 67.1,
-      type: "cast" as const,
-      color: "Алмаз",
-      isPromotional: true,
-    },
-    {
-      id: "2",
-      name: "Replay KI300 Черный R16 5x114.3 ET41 DIA67.1",
-      price: 4800,
-      rrc: 5300,
-      stock: 8,
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/test4-48SGtGCEdDpyqVnh93vaH6YETrUqUp.png", // Updated image URL
-      brand: "Replay",
-      country: "Китай",
-      diameter: 16,
-      width: 6.5,
-      pcd: "5x114.3",
-      et: 41,
-      dia: 67.1,
-      type: "cast" as const,
-      color: "Черный",
-    },
-    {
-      id: "3",
-      name: "Штампованный диск Magnetto R15 5x100 ET38 DIA57.1",
-      price: 2200,
-      rrc: 2500,
-      stock: 20,
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/disk2-obwRb5S4x7B3Rzqpl8Me4DGEN5KO4o.png", // Direct blob URL for black stamped wheel
-      brand: "Magnetto",
-      country: "Россия",
-      diameter: 15,
-      width: 6,
-      pcd: "5x100",
-      et: 38,
-      dia: 57.1,
-      type: "stamped" as const,
-    },
-    {
-      id: "4",
-      name: "BBS CH-R Platinum Silver R18 5x112 ET35 DIA66.5",
-      price: 18500,
-      rrc: 21000,
-      stock: 4,
-      image: "/images/black-wheel.png",
-      brand: "BBS",
-      country: "Германия",
-      diameter: 18,
-      width: 8,
-      pcd: "5x112",
-      et: 35,
-      dia: 66.5,
-      type: "forged" as const,
-      color: "Platinum Silver",
-    },
-    {
-      id: "5",
-      name: "OZ Racing Superturismo LM R19 5x120 ET40 DIA79.0",
-      price: 22000,
-      rrc: 24500,
-      stock: 2,
-      image: "/images/black-wheel.png",
-      brand: "OZ Racing",
-      country: "Италия",
-      diameter: 19,
-      width: 8.5,
-      pcd: "5x120",
-      et: 40,
-      dia: 79.0,
-      type: "forged" as const,
-      color: "Matt Race Silver",
-    },
-    {
-      id: "6",
-      name: "Штампованный диск Trebl R16 5x114.3 ET50 DIA67.1",
-      price: 2800,
-      rrc: 3200,
-      stock: 15,
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/disk-QfI8EZksA5Y1HlY7EIjedjSkXSl4cp.png", // Direct blob URL for silver stamped wheel
-      brand: "Trebl",
-      country: "Россия",
-      diameter: 16,
-      width: 6.5,
-      pcd: "5x114.3",
-      et: 50,
-      dia: 67.1,
-      type: "stamped" as const,
-    },
-    // Новые диски с предоставленными изображениями
-    {
-      id: "7",
-      name: "Carwel Тауус Черный матовый R17 5x114.3 ET42 DIA67.1",
-      price: 6200,
-      rrc: 6800,
-      stock: 10,
-      image: "/images/carwel-wheel.png",
-      brand: "Carwel",
-      country: "Россия",
-      diameter: 17,
-      width: 7.5,
-      pcd: "5x114.3",
-      et: 42,
-      dia: 67.1,
-      type: "cast" as const,
-      color: "Черный матовый",
-      isPromotional: true,
-    },
-    {
-      id: "8",
-      name: "BBS RX-R Bi-color R18 5x112 ET35 DIA66.5",
-      price: 21500,
-      rrc: 24000,
-      stock: 6,
-      image: "/images/bbs-wheel.png",
-      brand: "BBS",
-      country: "Германия",
-      diameter: 18,
-      width: 8.5,
-      pcd: "5x112",
-      et: 35,
-      dia: 66.5,
-      type: "forged" as const,
-      color: "Bi-color",
-      isPromotional: true,
-    },
-    {
-      id: "9",
-      name: "Alutec Grip Graphite R16 6x139.7 ET38 DIA67.1",
-      price: 7800,
-      rrc: 8500,
-      stock: 12,
-      image: "/images/alutec-wheel-1.png",
-      brand: "Alutec",
-      country: "Германия",
-      diameter: 16,
-      width: 7,
-      pcd: "6x139.7",
-      et: 38,
-      dia: 67.1,
-      type: "cast" as const,
-      color: "Graphite",
-    },
-    {
-      id: "10",
-      name: "Alutec Raptr Racing Black R17 5x112 ET40 DIA57.1",
-      price: 8900,
-      rrc: 9800,
-      stock: 8,
-      image: "/images/alutec-wheel-2.png",
-      brand: "Alutec",
-      country: "Германия",
-      diameter: 17,
-      width: 7.5,
-      pcd: "5x112",
-      et: 40,
-      dia: 57.1,
-      type: "cast" as const,
-      color: "Racing Black",
-    },
-    {
-      id: "11",
-      name: "Oxigin 19 Oxspoke Black Polish R18 5x112 ET45 DIA72.6",
-      price: 12800,
-      rrc: 14500,
-      stock: 8,
-      image: "/images/disk-black-silver-accent.png",
-      brand: "Oxigin",
-      country: "Германия",
-      diameter: 18,
-      width: 8,
-      pcd: "5x112",
-      et: 45,
-      dia: 72.6,
-      type: "cast" as const,
-      color: "Black Polish",
-      isPromotional: true,
-    },
-    {
-      id: "12",
-      name: "Dezent TM Silver R17 5x114.3 ET40 DIA71.6",
-      price: 8900,
-      rrc: 9800,
-      stock: 12,
-      image: "/images/disk-silver-gray.png",
-      brand: "Dezent",
-      country: "Германия",
-      diameter: 17,
-      width: 7.5,
-      pcd: "5x114.3",
-      et: 40,
-      dia: 71.6,
-      type: "cast" as const,
-      color: "Silver",
-    },
-    {
-      id: "13",
-      name: "GMP Italia Angel Silver R19 5x120 ET35 DIA72.6",
-      price: 16500,
-      rrc: 18200,
-      stock: 6,
-      image: "/images/disk-silver-multi-spoke.png",
-      brand: "GMP Italia",
-      country: "Италия",
-      diameter: 19,
-      width: 8.5,
-      pcd: "5x120",
-      et: 35,
-      dia: 72.6,
-      type: "forged" as const,
-      color: "Silver",
-      isPromotional: true,
-    },
-    {
-      id: "14",
-      name: "Carwel Gamma Black Polished R18 5x114.3 ET42 DIA67.1",
-      price: 9800,
-      rrc: 11200,
-      stock: 10,
-      image: "/images/disk-carwel-black-silver.png",
-      brand: "Carwel",
-      country: "Россия",
-      diameter: 18,
-      width: 7.5,
-      pcd: "5x114.3",
-      et: 42,
-      dia: 67.1,
-      type: "cast" as const,
-      color: "Black Polished",
-    },
-  ]
+  // Загрузка дисков из API
+  useEffect(() => {
+    const fetchDisks = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch(`/api/wheels?type=${diskType}`)
+        if (!response.ok) {
+          throw new Error("Failed to fetch wheels")
+        }
+        const data = await response.json()
+        setDisks(data.data || [])
+      } catch (error) {
+        console.error("Error fetching wheels:", error)
+        setDisks([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchDisks()
+  }, [diskType])
 
   // Фильтрация дисков по типу
   const filteredDisks = disks.filter((disk) => disk.type === diskType)
@@ -518,78 +317,109 @@ export default function DiskiPage() {
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px]">
       <style jsx global>
         {`
-          /* Disk type tabs styles - same as season tabs */
-          .disk-tabs-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            height: 100%;
-            padding: 0 45px;
-            touch-action: pan-y pinch-zoom;
-            user-select: none;
-            -webkit-user-select: none;
+          /* Carousel Horizontal styles - Dynamic Island style */
+          .carousel-container {
+            position: fixed;
+            left: 50%;
+            top: 30px;
+            transform: translateX(-50%) translateY(-50%);
+            height: 34px;
+            z-index: 51;
+            -webkit-tap-highlight-color: transparent;
           }
 
-          .disk-tab {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 500;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
-            min-width: 80px;
-            text-align: center;
-            font-size: 12px;
-            cursor: pointer;
-            border: none;
-            background: transparent;
-          }
-
-          .disk-tab-active {
+          .carousel-track {
             position: relative;
-            overflow: hidden;
-            transform: scale(1.1);
-            background: linear-gradient(135deg,
-              color-mix(in srgb, var(--tab-color) 80%, transparent),
-              color-mix(in srgb, var(--tab-color) 60%, transparent)
-            );
-            border: none;
-            color: white;
-            font-size: 13px;
-            z-index: 2;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            box-shadow: 0 0 12px color-mix(in srgb, var(--tab-color) 50%, transparent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
           }
 
-          .disk-tab-inactive {
-            transform: scale(0.85);
-            background: rgba(128, 128, 128, 0.1);
-            border: 1px solid transparent;
+          .carousel-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+
+          .carousel-highlight {
+            position: absolute;
+            background: #c4d402;
+            border-radius: 50px;
+            z-index: 2;
+            pointer-events: none;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .carousel-item-center {
+            padding: 7px 18px;
+            background: #c4d402;
+            color: #1F1F1F;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 50px;
+            z-index: 3;
+          }
+
+          .carousel-item-center-text {
+            padding: 7px 18px;
+            background: transparent;
+            color: #1F1F1F;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 50px;
+            z-index: 3;
+          }
+
+          .carousel-item-side {
+            position: absolute;
+            padding: 5px 10px;
+            background: transparent;
             color: #6B7280;
             font-size: 11px;
-            opacity: 0.8;
-            backdrop-filter: blur(4px);
+            font-weight: 500;
+            border-radius: 50px;
+            z-index: 4;
+            opacity: 0.5;
+            top: 50%;
           }
 
-          .disk-tab-inactive:hover {
-            opacity: 1;
-            background: rgba(211, 223, 61, 0.1);
-            border-color: rgba(211, 223, 61, 0.3);
-            transform: scale(0.88);
+          .carousel-item-left {
+            right: calc(50% + 60px);
+            transform: translateY(-50%);
           }
 
-          .dark .disk-tab-inactive {
+          .carousel-item-right {
+            left: calc(50% + 60px);
+            transform: translateY(-50%);
+          }
+
+          .dark .carousel-item-side {
             color: #9CA3AF;
-            background: rgba(255, 255, 255, 0.05);
           }
 
-          .dark .disk-tab-inactive:hover {
-            color: white;
-            background: rgba(211, 223, 61, 0.15);
-            border-color: rgba(211, 223, 61, 0.3);
+          @media (hover: hover) {
+            .carousel-item-side:hover {
+              opacity: 0.8;
+              background: rgba(128, 128, 128, 0.1);
+            }
+          }
+
+          /* Hide scrollbar but keep scroll functionality */
+          .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+          }
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari and Opera */
           }
 
           /* Cart button animation */
@@ -699,60 +529,130 @@ export default function DiskiPage() {
         </div>
       )}
 
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
-        <div className="h-full container max-w-md flex items-center justify-center relative overflow-hidden">
-          <Link
-            href="/"
-            className="fixed left-0 top-2 p-2 rounded-tr-md rounded-br-md hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors z-50"
-            aria-label="На главную"
-          >
-            <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-          </Link>
-
-          <div className="disk-tabs-container">
-            {[
-              { key: "stamped", label: "Штампы", color: "#c4d402", index: 0 },
-              { key: "cast", label: "Литые", color: "#c4d402", index: 1 },
-              { key: "forged", label: "Кованные", color: "#c4d402", index: 2 },
-            ].map((tab) => {
-              const isActive = diskType === tab.key
-              const activeIndex = diskType === "stamped" ? 0 : diskType === "cast" ? 1 : 2
-
-              // Calculate order for circular carousel (prev - active - next)
-              let order = tab.index
-              if (activeIndex === 0) {
-                // stamped active: forged(prev), stamped(center), cast(next)
-                if (tab.index === 0) order = 1      // stamped -> center
-                else if (tab.index === 1) order = 2 // cast -> right (next)
-                else order = 0                       // forged -> left (prev)
-              } else if (activeIndex === 1) {
-                // cast active: stamped(prev), cast(center), forged(next)
-                if (tab.index === 0) order = 0      // stamped -> left (prev)
-                else if (tab.index === 1) order = 1 // cast -> center
-                else order = 2                       // forged -> right (next)
-              } else if (activeIndex === 2) {
-                // forged active: cast(prev), forged(center), stamped(next)
-                if (tab.index === 0) order = 2      // stamped -> right (next)
-                else if (tab.index === 1) order = 0 // cast -> left (prev)
-                else order = 1                       // forged -> center
-              }
-
-              return (
-                <button
-                  key={tab.key}
-                  ref={tab.key === "cast" ? castButtonRef : undefined}
-                  onClick={() => setDiskType(tab.key as "stamped" | "cast" | "forged")}
-                  className={`disk-tab ${isActive ? "disk-tab-active" : "disk-tab-inactive"}`}
-                  style={{ "--tab-color": tab.color, order } as React.CSSProperties}
-                >
-                  <span>{tab.label}</span>
-                </button>
-              )
-            })}
+      <header
+        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] overflow-visible"
+        style={{ "--header-height": "60px" } as React.CSSProperties}
+      >
+        <div className="container max-w-md flex items-center justify-center h-full relative overflow-visible">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 z-50">
+            <BackButton />
           </div>
 
-          {/* Cart button */}
-          <CartButton className="fixed right-0 top-2 z-50" />
+          {/* Disk Type Horizontal Carousel */}
+          {(() => {
+            const tabs = [
+              { key: "stamped", label: "Штампы" },
+              { key: "cast", label: "Литые" },
+              { key: "forged", label: "Кованные" },
+            ]
+
+            // Current active index
+            const activeIndex = diskType === "stamped" ? 0 : diskType === "cast" ? 1 : 2
+
+            // Get prev and next indices (circular)
+            const prevIndex = (activeIndex - 1 + 3) % 3
+            const nextIndex = (activeIndex + 1) % 3
+
+            // Order: [prev, active, next]
+            const orderedTabs = [
+              { ...tabs[prevIndex], position: 'left' },
+              { ...tabs[activeIndex], position: 'center' },
+              { ...tabs[nextIndex], position: 'right' },
+            ]
+
+            return (
+              <div className="carousel-container">
+                {/* Yellow highlight background - stays in place with fixed width */}
+                <div
+                  className="carousel-highlight"
+                  style={{
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    width: '120px',
+                    minWidth: '120px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                  }}
+                />
+
+                {/* Static text labels */}
+                <div className="carousel-track">
+                  {orderedTabs.map((tab) => {
+                    const isCenter = tab.position === 'center'
+                    const positionClass = isCenter
+                      ? 'carousel-item-center-text'
+                      : `carousel-item-side carousel-item-${tab.position}`
+
+                    if (isCenter) {
+                      return (
+                        <div
+                          key={tab.key}
+                          className={`carousel-item ${positionClass}`}
+                        >
+                          <div
+                            style={{
+                              position: 'relative',
+                              overflow: 'hidden',
+                              width: '110px',
+                              height: '20px',
+                            }}
+                          >
+                            <span
+                              style={{
+                                position: 'absolute',
+                                left: '50%',
+                                top: '50%',
+                                whiteSpace: 'nowrap',
+                                transform: 'translate(-50%, -50%)',
+                              }}
+                            >
+                              {tab.label}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    // Side arrows - clickable buttons
+                    return (
+                      <button
+                        key={tab.key}
+                        onClick={() => setDiskType(tab.key as "stamped" | "cast" | "forged")}
+                        className={`carousel-item ${positionClass}`}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {tab.position === 'left' ? (
+                          <ChevronLeft
+                            className="w-[25px] h-[25px]"
+                            style={{
+                              color: '#B0B5BD',
+                              opacity: 0.7,
+                            }}
+                          />
+                        ) : (
+                          <ChevronRight
+                            className="w-[25px] h-[25px]"
+                            style={{
+                              color: '#B0B5BD',
+                              opacity: 0.7,
+                            }}
+                          />
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })()}
+
+        </div>
+        {/* Global cart button - outside container */}
+        <div style={{ position: 'fixed', right: '16px', top: '30px', transform: 'translateY(-50%) scale(1.035)', zIndex: 100 }}>
+          <CartButton />
         </div>
       </header>
 
@@ -765,19 +665,35 @@ export default function DiskiPage() {
         />
 
         {/* Адаптивная сетка карточек дисков */}
-        <div className="space-y-3 sm:space-y-4 sm:grid sm:grid-cols-1 sm:gap-3 sm:space-y-0 md:grid-cols-2 md:gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 pb-[200px]">
-          {filteredDisks.map((disk) => (
-            <div key={disk.id} className="w-full">
-              <DiskCard disk={disk} />
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#c4d402]"></div>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">Загрузка дисков...</p>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : filteredDisks.length === 0 ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <p className="text-gray-600 dark:text-gray-400">Диски не найдены</p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3 sm:space-y-4 sm:grid sm:grid-cols-1 sm:gap-3 sm:space-y-0 md:grid-cols-2 md:gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 pb-[200px]">
+            {filteredDisks.map((disk) => (
+              <div key={disk.id} className="w-full">
+                <DiskCard disk={disk} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Fixed filter at the bottom */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-[#1F1F1F] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] rounded-t-xl">
-        <DiskSearchFilter diskType={diskType} />
-      </div>
+      <DiskSearchFilter
+        diskType={diskType}
+        onDiskTypeChange={(type) => setDiskType(type)}
+      />
     </main>
   )
 }
