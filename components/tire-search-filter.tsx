@@ -878,16 +878,14 @@ onTouchStart={(e) => {
       >
         {/* Swipe handle for collapse/expand - now also clickable */}
         <div
-          className="flex items-center justify-center mb-2 -mx-4 px-4"
+          className="flex items-center justify-center mb-2 -mx-4 px-4 py-3"
           data-swipe-handle
           style={{
             touchAction: 'none',
-            paddingTop: isFilterCollapsed ? '12px' : '0',
-            paddingBottom: isFilterCollapsed ? '12px' : '0',
           }}
         >
           <button
-            className="flex items-center justify-center py-3 cursor-pointer w-full group"
+            className="flex items-center justify-center cursor-pointer w-full group"
             style={{ touchAction: 'none' }}
             onClick={() => {
               // Клик переключает состояние

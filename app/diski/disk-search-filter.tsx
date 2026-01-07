@@ -404,16 +404,15 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
       >
         {/* Swipe handle for collapse/expand */}
         <div
-          className="flex items-center justify-center mb-2 -mx-4 px-4 pt-3"
+          className="flex items-center justify-center -mx-4 px-4 py-3"
           data-swipe-handle
           style={{
             touchAction: 'none',
-            paddingBottom: isFilterCollapsed ? '12px' : '0',
           }}
         >
           <button
             className="flex items-center justify-center cursor-pointer w-full group"
-            style={{ touchAction: 'none', padding: '12px 0' }}
+            style={{ touchAction: 'none' }}
             onClick={() => {
               if (isFilterCollapsed) {
                 setIsFilterCollapsed(false)
