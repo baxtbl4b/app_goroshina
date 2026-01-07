@@ -42,16 +42,7 @@ export async function GET(request: NextRequest) {
       apiParams.append("cb", hub)
     }
 
-    // Type filter (stamped/cast/forged)
-    const type = searchParams.get("type")
-    if (type) {
-      // Преобразуем тип на английский для API
-      let apiType = type
-      if (type === "stamped") apiType = "Штампованные"
-      else if (type === "cast") apiType = "Литые"
-      else if (type === "forged") apiType = "Кованые"
-      apiParams.append("type", apiType)
-    }
+    // Note: API does not support type filtering, we filter on client side
 
     // Brand filter
     const brand = searchParams.get("brand")
@@ -103,41 +94,48 @@ export async function GET(request: NextRequest) {
       }
 
       // Transform the Tirebase API data to match our application's structure
-      const transformedData = responseData.map((wheel: any) => {
-        // Генерируем PCD в формате "5x100"
-        const pcdFormatted = `${wheel.pn || 5}x${wheel.pcd || 100}`
+      const transformedData = responseData
+        .filter((wheel: any) => {
+          // Фильтруем только диски в наличии
+          return wheel.quantity && wheel.quantity > 0
+        })
+        .map((wheel: any) => {
+          // Формируем PCD в формате "4x100" из pn и pcd
+          const pcdFormatted = `${wheel.pn || 4}x${wheel.pcd || 100}`
 
-        // Определяем тип диска на английском
-        let wheelType: "stamped" | "cast" | "forged" = "cast"
-        if (wheel.type) {
-          const typeStr = wheel.type.toLowerCase()
-          if (typeStr.includes("штамп") || typeStr.includes("stamp")) {
-            wheelType = "stamped"
-          } else if (typeStr.includes("кован") || typeStr.includes("forg")) {
-            wheelType = "forged"
+          // Определяем тип диска на английском
+          let wheelType: "stamped" | "cast" | "forged" = "cast"
+          if (wheel.type) {
+            const typeStr = wheel.type.toLowerCase()
+            if (typeStr.includes("штамп") || typeStr.includes("stamp")) {
+              wheelType = "stamped"
+            } else if (typeStr.includes("кован") || typeStr.includes("forg")) {
+              wheelType = "forged"
+            } else if (typeStr.includes("лит") || typeStr.includes("cast")) {
+              wheelType = "cast"
+            }
           }
-        }
 
-        return {
-          id: wheel.id,
-          name: wheel.title || `${wheel.brand || "Unknown"} ${wheel.model || "Model"}`,
-          price: wheel.price || wheel.opt || wheel.rrc || 5000,
-          rrc: wheel.rrc || Math.round((wheel.price || 5000) * 1.15),
-          stock: wheel.quantity || 0,
-          image: wheel.image || "/images/black-wheel.png",
-          brand: wheel.brand || "Unknown Brand",
-          diameter: wheel.diam || 17,
-          width: wheel.width || 7,
-          pcd: pcdFormatted,
-          et: wheel.et || 40,
-          dia: wheel.cb || 66.1,
-          type: wheelType,
-          color: wheel.color || null,
-          isPromotional: false,
-          provider: wheel.provider || null,
-          storehouse: wheel.storehouse || {},
-        }
-      })
+          return {
+            id: wheel.id || `wheel-${Math.random()}`,
+            name: wheel.title || `${wheel.brand || "Unknown"} ${wheel.model || ""}`,
+            price: wheel.rrc || wheel.opt || wheel.price || 5000,
+            rrc: wheel.rrc || wheel.opt || wheel.price || 5000,
+            stock: wheel.quantity || 0,
+            image: wheel.image || "/images/black-wheel.png",
+            brand: wheel.brand || "Unknown",
+            diameter: wheel.diam || 17,
+            width: wheel.width || 7,
+            pcd: pcdFormatted,
+            et: wheel.et || 40,
+            dia: wheel.cb || 66.1,
+            type: wheelType,
+            color: wheel.color || null,
+            isPromotional: false,
+            provider: wheel.provider || null,
+            storehouse: wheel.storehouse || {},
+          }
+        })
 
       console.log(`Transformed ${transformedData.length} wheels`)
 

@@ -36,7 +36,7 @@ export default function DiskiPage() {
   const pathname = usePathname()
   const router = useRouter()
   const [activeFiltersCount, setActiveFiltersCount] = useState(0)
-  const [diskType, setDiskType] = useState("stamped") // stamped, cast, forged
+  const [diskType, setDiskType] = useState("cast") // stamped, cast, forged - начинаем с литых
   const [cartItemCount, setCartItemCount] = useState(0)
   const [isCartButtonAnimating, setIsCartButtonAnimating] = useState(false)
   const castButtonRef = useRef<HTMLButtonElement>(null)
@@ -46,33 +46,33 @@ export default function DiskiPage() {
   const [cartCountPosition, setCartCountPosition] = useState(0)
   const [cartLabelPosition, setCartLabelPosition] = useState(0)
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
-  const [disks, setDisks] = useState<Disk[]>([])
+  const [allDisks, setAllDisks] = useState<Disk[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // Загрузка дисков из API
+  // Загрузка всех дисков из API один раз
   useEffect(() => {
     const fetchDisks = async () => {
       try {
         setIsLoading(true)
-        const response = await fetch(`/api/wheels?type=${diskType}`)
+        const response = await fetch(`/api/wheels`)
         if (!response.ok) {
           throw new Error("Failed to fetch wheels")
         }
         const data = await response.json()
-        setDisks(data.data || [])
+        setAllDisks(data.data || [])
       } catch (error) {
         console.error("Error fetching wheels:", error)
-        setDisks([])
+        setAllDisks([])
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchDisks()
-  }, [diskType])
+  }, [])
 
-  // Фильтрация дисков по типу
-  const filteredDisks = disks.filter((disk) => disk.type === diskType)
+  // Фильтруем диски по типу на клиенте
+  const filteredDisks = allDisks.filter((disk) => disk.type === diskType)
 
   // Inspector mode state
   const [inspectorMode, setInspectorMode] = useState(false)
