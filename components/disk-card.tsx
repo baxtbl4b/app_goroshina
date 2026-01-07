@@ -103,18 +103,18 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
     window.dispatchEvent(new Event("favoritesUpdated"))
   }
 
-  // Функция для добавления товара в корзину
+  // Функция для добавления товара в корзину (по 1шт)
   const addToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
-    // Проверяем, не превышен ли лимит доступного товара (для дисков добавляем по 4 шт)
-    if (cartCount + 4 > disk.stock) {
+    // Проверяем, не превышен ли лимит доступного товара
+    if (cartCount >= disk.stock) {
       return
     }
 
-    // Увеличиваем счетчик товаров в корзине на 4 (комплект)
-    setCartCount((prev) => prev + 4)
+    // Увеличиваем счетчик товаров в корзине на 1
+    setCartCount((prev) => prev + 1)
 
     // Получаем текущую корзину из localStorage
     const cart = JSON.parse(localStorage.getItem("cart") || "[]")
@@ -123,11 +123,11 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
     const existingItemIndex = cart.findIndex((item: any) => item.id === disk.id)
 
     if (existingItemIndex >= 0) {
-      // Если товар уже в корзине, увеличиваем количество на 4
-      cart[existingItemIndex].quantity = (cart[existingItemIndex].quantity || 0) + 4
+      // Если товар уже в корзине, увеличиваем количество на 1
+      cart[existingItemIndex].quantity = (cart[existingItemIndex].quantity || 0) + 1
     } else {
-      // Иначе добавляем новый товар с количеством 4
-      cart.push({ ...disk, quantity: 4 })
+      // Иначе добавляем новый товар с количеством 1
+      cart.push({ ...disk, quantity: 1 })
     }
 
     // Сохраняем обновленную корзину
@@ -145,7 +145,7 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
     window.dispatchEvent(cartUpdateEvent)
   }
 
-  // Функция для уменьшения количества товара в корзине
+  // Функция для уменьшения количества товара в корзине (по 1шт)
   const removeFromCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -153,8 +153,8 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
     // Если товара нет в корзине, ничего не делаем
     if (cartCount <= 0) return
 
-    // Уменьшаем счетчик товаров в корзине на 4
-    setCartCount((prev) => Math.max(0, prev - 4))
+    // Уменьшаем счетчик товаров в корзине на 1
+    setCartCount((prev) => Math.max(0, prev - 1))
 
     // Получаем текущую корзину из localStorage
     const cart = JSON.parse(localStorage.getItem("cart") || "[]")
@@ -163,8 +163,8 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
     const existingItemIndex = cart.findIndex((item: any) => item.id === disk.id)
 
     if (existingItemIndex >= 0) {
-      // Если товар уже в корзине, уменьшаем количество на 4
-      cart[existingItemIndex].quantity = Math.max(0, (cart[existingItemIndex].quantity || 0) - 4)
+      // Если товар уже в корзине, уменьшаем количество на 1
+      cart[existingItemIndex].quantity = Math.max(0, (cart[existingItemIndex].quantity || 0) - 1)
 
       // Если количество стало 0, удаляем товар из корзины
       if (cart[existingItemIndex].quantity === 0) {
@@ -252,7 +252,11 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
         </div>
 
         <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
-          <DialogContent className="sm:max-w-[600px] flex items-center justify-center p-1" style={{ zIndex: 50 }}>
+          <DialogContent
+            className="sm:max-w-[600px] flex items-center justify-center p-1 border-0 shadow-none bg-transparent"
+            style={{ zIndex: 50 }}
+            hideCloseButton={true}
+          >
             <div className="relative w-full h-full max-h-[80vh] flex items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-[#2a2a2a] dark:to-[#1a1a1a] rounded-lg">
               <img
                 src={getImageUrl() || "/placeholder.svg"}
@@ -305,7 +309,7 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
           </div>
 
           <Link href={`/disk/${disk.id}`}>
-            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-sm sm:text-sm md:text-base lg:text-lg leading-tight">
+            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-3 text-sm sm:text-sm md:text-base lg:text-lg leading-tight">
               {disk.name}
             </h3>
           </Link>

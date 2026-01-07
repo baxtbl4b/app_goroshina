@@ -346,20 +346,25 @@ export default function DiskiPage() {
     return `${baseClass} border border-transparent hover:border-[#c4d402] hover:bg-[#c4d402]/10 text-[#1F1F1F] dark:text-white rounded-xl`
   }
 
-  const handleBrandSelect = (brands: string[]) => {
+  const handleBrandSelect = useCallback((brands: string[]) => {
     setSelectedBrands(brands)
     console.log("Выбранные бренды дисков:", brands)
-  }
+  }, [])
 
-  const handleSortChange = (sortValue: string) => {
+  const handleSortChange = useCallback((sortValue: string) => {
     setSortBy(sortValue)
     console.log("Применена сортировка:", sortValue)
-  }
+  }, [])
+
+  const handleDiskTypeChange = useCallback((type: "stamped" | "cast" | "forged") => {
+    setDiskType(type)
+  }, [])
 
   // Get unique options from API data - memoized
+  // Use filteredByType instead of allDisks for better performance
   const filterOptions = useMemo(() => {
-    if (allDisks.length === 0) {
-      // Return empty arrays while loading
+    if (filteredByType.length === 0) {
+      // Return empty arrays while loading or no disks of this type
       return {
         diameterOptions: [],
         widthOptions: [],
@@ -375,7 +380,7 @@ export default function DiskiPage() {
     const ets = new Set<string>()
     const hubs = new Set<string>()
 
-    allDisks.forEach((disk) => {
+    filteredByType.forEach((disk) => {
       if (disk.diameter) diameters.add(disk.diameter.toString())
       if (disk.width) widths.add(disk.width.toString())
       if (disk.pcd) pcds.add(disk.pcd)
@@ -390,7 +395,7 @@ export default function DiskiPage() {
       etOptions: Array.from(ets).sort((a, b) => parseFloat(a) - parseFloat(b)),
       hubOptions: Array.from(hubs).sort((a, b) => parseFloat(a) - parseFloat(b)),
     }
-  }, [allDisks])
+  }, [filteredByType])
 
 
   // Определяем позицию для индикатора корзины в зависимости от наличия фильтра размеров
@@ -705,7 +710,7 @@ export default function DiskiPage() {
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#c4d402]"></div>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
               <p className="mt-4 text-gray-600 dark:text-gray-400">Загрузка дисков...</p>
             </div>
           </div>
@@ -732,7 +737,7 @@ export default function DiskiPage() {
       {/* Fixed filter at the bottom */}
       <DiskSearchFilter
         diskType={diskType}
-        onDiskTypeChange={(type) => setDiskType(type)}
+        onDiskTypeChange={handleDiskTypeChange}
         diameterOptions={filterOptions.diameterOptions}
         widthOptions={filterOptions.widthOptions}
         pcdOptions={filterOptions.pcdOptions}

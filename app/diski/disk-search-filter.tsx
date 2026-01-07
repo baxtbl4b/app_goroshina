@@ -49,9 +49,6 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
   const [et, setEt] = useState<string>(searchParams.get("et") || "")
   const [hub, setHub] = useState<string>(searchParams.get("hub") || "")
 
-  // State to track which Select is currently open (only one can be open at a time)
-  const [openSelect, setOpenSelect] = useState<string | null>(null)
-
   // Add state for filter collapse
   const [isFilterCollapsed, setIsFilterCollapsed] = useState(false)
   const [isFilterVisible, setIsFilterVisible] = useState(true)
@@ -407,17 +404,16 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
       >
         {/* Swipe handle for collapse/expand */}
         <div
-          className="flex items-center justify-center mb-2 -mx-4 px-4"
+          className="flex items-center justify-center mb-2 -mx-4 px-4 pt-3"
           data-swipe-handle
           style={{
             touchAction: 'none',
-            paddingTop: isFilterCollapsed ? '12px' : '0',
             paddingBottom: isFilterCollapsed ? '12px' : '0',
           }}
         >
           <button
-            className="flex items-center justify-center py-3 cursor-pointer w-full group"
-            style={{ touchAction: 'none' }}
+            className="flex items-center justify-center cursor-pointer w-full group"
+            style={{ touchAction: 'none', padding: '12px 0' }}
             onClick={() => {
               if (isFilterCollapsed) {
                 setIsFilterCollapsed(false)
@@ -496,12 +492,7 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
                 <Label htmlFor="diameter" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                   Диаметр
                 </Label>
-                <Select
-                  value={diameter}
-                  onValueChange={setDiameter}
-                  open={openSelect === "diameter"}
-                  onOpenChange={(open) => setOpenSelect(open ? "diameter" : null)}
-                >
+                <Select value={diameter} onValueChange={setDiameter}>
                   <SelectTrigger id="diameter" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
@@ -519,12 +510,7 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
                 <Label htmlFor="width" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                   Ширина
                 </Label>
-                <Select
-                  value={width}
-                  onValueChange={setWidth}
-                  open={openSelect === "width"}
-                  onOpenChange={(open) => setOpenSelect(open ? "width" : null)}
-                >
+                <Select value={width} onValueChange={setWidth}>
                   <SelectTrigger id="width" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
@@ -542,12 +528,7 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
                 <Label htmlFor="pcd" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
                   PCD
                 </Label>
-                <Select
-                  value={pcd}
-                  onValueChange={setPcd}
-                  open={openSelect === "pcd"}
-                  onOpenChange={(open) => setOpenSelect(open ? "pcd" : null)}
-                >
+                <Select value={pcd} onValueChange={setPcd}>
                   <SelectTrigger id="pcd" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
@@ -583,12 +564,7 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
               <Label htmlFor="et" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block">
                 Вылет (ET)
               </Label>
-              <Select
-                value={et}
-                onValueChange={setEt}
-                open={openSelect === "et"}
-                onOpenChange={(open) => setOpenSelect(open ? "et" : null)}
-              >
+              <Select value={et} onValueChange={setEt}>
                 <SelectTrigger id="et" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
@@ -606,12 +582,7 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
               <Label htmlFor="hub" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block">
                 Ступица (DIA)
               </Label>
-              <Select
-                value={hub}
-                onValueChange={setHub}
-                open={openSelect === "hub"}
-                onOpenChange={(open) => setOpenSelect(open ? "hub" : null)}
-              >
+              <Select value={hub} onValueChange={setHub}>
                 <SelectTrigger id="hub" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>

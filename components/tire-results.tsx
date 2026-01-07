@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { Loader2, AlertTriangle } from "lucide-react"
+import { AlertTriangle } from "lucide-react"
 import TireCard from "@/components/tire-card"
 import { getTires, type Tire, type Season } from "@/lib/api"
 import { useSearchParams } from "next/navigation"
@@ -342,8 +342,11 @@ export default function TireResults({ season, selectedBrands = [] }: TireResults
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12 mt-8">
-        <Loader2 className="h-8 w-8 text-[#009CFF] animate-spin" />
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Загрузка шин...</p>
+        </div>
       </div>
     )
   }

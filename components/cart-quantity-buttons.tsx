@@ -13,6 +13,8 @@ interface CartQuantityButtonsProps {
   variant?: "default" | "inline"
   showBorder?: boolean
   showUnit?: boolean
+  addQuantity?: number
+  removeQuantity?: number
 }
 
 const CartQuantityButtons = forwardRef<HTMLButtonElement, CartQuantityButtonsProps>(
@@ -25,7 +27,9 @@ const CartQuantityButtons = forwardRef<HTMLButtonElement, CartQuantityButtonsPro
     size = "md",
     variant = "default",
     showBorder = false,
-    showUnit = false
+    showUnit = false,
+    addQuantity,
+    removeQuantity
   }, ref) => {
 
     // Inline вариант для корзины (компактный стиль)
