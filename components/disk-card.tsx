@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { Heart, Plus, Minus, CheckCircle, Clock, Calendar } from "lucide-react"
+import { Heart, Plus, Minus, CheckCircle, Clock, Calendar, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
@@ -52,6 +52,7 @@ export default function DiskCard({ disk }: DiskCardProps) {
   const [imageError, setImageError] = useState(false)
   const [isButtonPulsing, setIsButtonPulsing] = useState(false)
   const [floatingNumber, setFloatingNumber] = useState<{ x: number; y: number; count: number } | null>(null)
+  const [showMinQuantityInfo, setShowMinQuantityInfo] = useState(false)
   const addButtonRef = useRef<HTMLButtonElement>(null)
 
   // При монтировании компонента проверяем, есть ли товар в избранном и корзине
@@ -66,6 +67,23 @@ export default function DiskCard({ disk }: DiskCardProps) {
     const cartItem = cart.find((item: any) => item.id === disk.id)
     setCartCount(cartItem ? cartItem.quantity : 0)
   }, [disk.id])
+
+  // Закрываем tooltip при клике вне его
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (showMinQuantityInfo) {
+        setShowMinQuantityInfo(false)
+      }
+    }
+
+    if (showMinQuantityInfo) {
+      document.addEventListener('click', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [showMinQuantityInfo])
 
   // Слушаем событие сброса счетчиков корзины
   useEffect(() => {
@@ -292,11 +310,6 @@ export default function DiskCard({ disk }: DiskCardProps) {
 
       {/* Правая часть - Контент */}
       <div className="p-3 sm:p-3 md:p-4 flex-1 flex flex-col justify-between min-h-0">
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded-md mb-1">
-          <p className="text-[10px] sm:text-xs text-yellow-700 dark:text-yellow-500 font-medium">
-            Покупка меньше 4шт недоступна
-          </p>
-        </div>
         <div className="flex flex-col gap-[8.8px]">
           <div className="flex items-center gap-[4.4px] sm:gap-[8.8px] md:gap-[13.2px] flex-wrap">
             {/* Срок доставки */}
@@ -349,20 +362,43 @@ export default function DiskCard({ disk }: DiskCardProps) {
             </div>
           </div>
           <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
-            <div className="flex flex-col items-start">
+            <div className="flex items-center gap-2">
               {(() => {
                 const availableStock = disk.stock - cartCount;
                 if (availableStock > 0) {
                   return (
-                    <span
-                      className={`h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[12px] sm:text-[14px] md:text-[16px] font-medium px-3 rounded-full ${
-                        availableStock > 10 ? "bg-green-500/20 text-green-600 dark:text-green-400" :
-                        availableStock > 5 ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" :
-                        "bg-orange-500/20 text-orange-600 dark:text-orange-400"
-                      }`}
-                    >
-                      {availableStock > 20 ? ">20 шт" : `${availableStock} шт`}
-                    </span>
+                    <>
+                      <span
+                        className={`h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[12px] sm:text-[14px] md:text-[16px] font-medium px-3 rounded-full ${
+                          availableStock > 10 ? "bg-green-500/20 text-green-600 dark:text-green-400" :
+                          availableStock > 5 ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" :
+                          "bg-orange-500/20 text-orange-600 dark:text-orange-400"
+                        }`}
+                      >
+                        {availableStock > 20 ? ">20 шт" : `${availableStock} шт`}
+                      </span>
+                      <div className="relative">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowMinQuantityInfo(!showMinQuantityInfo);
+                          }}
+                          className="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 rounded-full bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30 transition-colors"
+                          aria-label="Информация о минимальном количестве"
+                        >
+                          <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                        </button>
+                        {showMinQuantityInfo && (
+                          <div className="absolute left-0 bottom-full mb-2 w-48 sm:w-56 bg-white dark:bg-[#2A2A2A] border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3 z-50">
+                            <p className="text-xs text-gray-700 dark:text-gray-300">
+                              Покупка меньше 4шт недоступна
+                            </p>
+                            <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white dark:border-t-[#2A2A2A]"></div>
+                          </div>
+                        )}
+                      </div>
+                    </>
                   );
                 } else {
                   return (

@@ -23,9 +23,32 @@ interface VehicleWithWheels {
 interface DiskSearchFilterProps {
   diskType: string
   onDiskTypeChange?: (type: "stamped" | "cast" | "forged") => void
+  onFiltersChange?: (filters: {
+    diameter: string
+    width: string
+    pcd: string
+    et: string
+    hub: string
+    priceRange: [number, number]
+    stockFilter: "single" | "full"
+  }) => void
+  diameterOptions?: string[]
+  widthOptions?: string[]
+  pcdOptions?: string[]
+  etOptions?: string[]
+  hubOptions?: string[]
 }
 
-export default function DiskSearchFilter({ diskType = "cast", onDiskTypeChange }: DiskSearchFilterProps) {
+export default function DiskSearchFilter({
+  diskType = "cast",
+  onDiskTypeChange,
+  onFiltersChange,
+  diameterOptions = [],
+  widthOptions = [],
+  pcdOptions = [],
+  etOptions = [],
+  hubOptions = []
+}: DiskSearchFilterProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [diameter, setDiameter] = useState<string>(searchParams.get("diameter") || "")
@@ -61,6 +84,22 @@ export default function DiskSearchFilter({ diskType = "cast", onDiskTypeChange }
   // Add state for price range
   const [priceRange, setPriceRange] = useState<[number, number]>([3000, 30000])
   const [stockFilter, setStockFilter] = useState<"single" | "full">("single")
+
+  // Notify parent component when filters change
+  useEffect(() => {
+    if (onFiltersChange) {
+      onFiltersChange({
+        diameter,
+        width,
+        pcd,
+        et,
+        hub,
+        priceRange,
+        stockFilter,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [diameter, width, pcd, et, hub, priceRange[0], priceRange[1], stockFilter])
 
   // Add state for garage scroll gradients
   const [showLeftGradient, setShowLeftGradient] = useState(false)
@@ -136,21 +175,6 @@ export default function DiskSearchFilter({ diskType = "cast", onDiskTypeChange }
       window.removeEventListener("userCarsUpdated", handleCarsUpdated)
     }
   }, [])
-
-  // Diameter options
-  const diameterOptions = ["13", "14", "15", "16", "17", "18", "19", "20", "21", "22"]
-
-  // Width options
-  const widthOptions = ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10"]
-
-  // PCD options
-  const pcdOptions = ["4x100", "4x108", "5x100", "5x108", "5x112", "5x114.3", "5x120"]
-
-  // ET options
-  const etOptions = ["15", "20", "25", "30", "35", "40", "45", "50", "55"]
-
-  // Hub options
-  const hubOptions = ["54.1", "56.1", "57.1", "60.1", "63.3", "66.6", "71.6"]
 
   // Add Intersection Observer to detect when filter scrolls out of view
   useEffect(() => {
@@ -285,6 +309,7 @@ export default function DiskSearchFilter({ diskType = "cast", onDiskTypeChange }
           maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%)',
           touchAction: isFilterCollapsed ? 'none' : 'pan-x pinch-zoom',
           WebkitOverflowScrolling: 'touch',
+          pointerEvents: 'auto',
         }}
         aria-label={getFilterTitle()}
         data-testid="disk-filter-container"

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import DiskSearchFilter from "./disk-search-filter"
@@ -48,6 +48,40 @@ export default function DiskiPage() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   const [allDisks, setAllDisks] = useState<Disk[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [sortBy, setSortBy] = useState<string>("default")
+
+  // Filter states
+  const [filters, setFilters] = useState({
+    diameter: "",
+    width: "",
+    pcd: "",
+    et: "",
+    hub: "",
+    priceRange: [3000, 30000] as [number, number],
+    stockFilter: "single" as "single" | "full",
+  })
+
+  // Сброс курсора при загрузке страницы
+  useEffect(() => {
+    // Сбрасываем курсор на body и html
+    document.body.style.cursor = "default"
+    document.documentElement.style.cursor = "default"
+
+    // Убираем crosshair если он был установлен
+    const allElements = document.querySelectorAll('*')
+    allElements.forEach((el) => {
+      const htmlEl = el as HTMLElement
+      if (htmlEl.style.cursor === 'crosshair') {
+        htmlEl.style.cursor = 'default'
+      }
+    })
+
+    return () => {
+      // При размонтировании тоже сбрасываем
+      document.body.style.cursor = "default"
+      document.documentElement.style.cursor = "default"
+    }
+  }, [])
 
   // Загрузка всех дисков из API один раз
   useEffect(() => {
@@ -72,11 +106,71 @@ export default function DiskiPage() {
   }, [])
 
   // Фильтруем диски по типу на клиенте
-  const filteredDisks = allDisks.filter((disk) => disk.type === diskType)
+  const filteredByType = allDisks.filter((disk) => disk.type === diskType)
 
-  // Inspector mode state
-  const [inspectorMode, setInspectorMode] = useState(false)
-  const [hoveredElement, setHoveredElement] = useState<{ name: string; x: number; y: number } | null>(null)
+  // Фильтруем по брендам
+  const filteredByBrand = selectedBrands.length > 0
+    ? filteredByType.filter((disk) => selectedBrands.includes(disk.brand))
+    : filteredByType
+
+  // Применяем фильтры из блока фильтров
+  const filteredDisks = filteredByBrand.filter((disk) => {
+    // Diameter filter
+    if (filters.diameter && parseFloat(disk.diameter.toString()) !== parseFloat(filters.diameter)) {
+      return false
+    }
+
+    // Width filter
+    if (filters.width && parseFloat(disk.width.toString()) !== parseFloat(filters.width)) {
+      return false
+    }
+
+    // PCD filter
+    if (filters.pcd && disk.pcd !== filters.pcd) {
+      return false
+    }
+
+    // ET filter - allow range of ±5
+    if (filters.et) {
+      const filterEt = parseFloat(filters.et)
+      const diskEt = parseFloat(disk.et.toString())
+      if (Math.abs(diskEt - filterEt) > 5) {
+        return false
+      }
+    }
+
+    // Hub/DIA filter - disk hub should be >= filter hub
+    if (filters.hub) {
+      const filterHub = parseFloat(filters.hub)
+      const diskHub = parseFloat(disk.dia.toString())
+      if (diskHub < filterHub) {
+        return false
+      }
+    }
+
+    // Price range filter
+    if (disk.price < filters.priceRange[0] || disk.price > filters.priceRange[1]) {
+      return false
+    }
+
+    // Stock filter - hide disks with less than 4 items
+    if (filters.stockFilter === "full" && disk.stock < 4) {
+      return false
+    }
+
+    return true
+  })
+
+  // Применяем сортировку
+  const sortedDisks = [...filteredDisks].sort((a, b) => {
+    if (sortBy === "price-asc") {
+      return a.price - b.price
+    } else if (sortBy === "price-desc") {
+      return b.price - a.price
+    }
+    return 0 // default - no sorting
+  })
+
 
   // Track cast button coordinates
   useEffect(() => {
@@ -134,62 +228,6 @@ export default function DiskiPage() {
     }
   }, [cartItemCount])
 
-  // Inspector mode event handlers
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "i") {
-        setInspectorMode((prev) => !prev)
-        if (!inspectorMode) {
-          document.body.style.cursor = "crosshair"
-        } else {
-          document.body.style.cursor = "default"
-          setHoveredElement(null)
-        }
-      }
-    }
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (inspectorMode) {
-        const element = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement
-        if (element) {
-          // Get element info
-          let name = element.tagName.toLowerCase()
-
-          // Add class if available
-          if (element.className && typeof element.className === "string") {
-            const firstClass = element.className.split(" ")[0]
-            if (firstClass) name += `.${firstClass}`
-          }
-
-          // Add id if available
-          if (element.id) name += `#${element.id}`
-
-          // Add data attributes if available
-          const dataAttrs = Array.from(element.attributes)
-            .filter((attr) => attr.name.startsWith("data-"))
-            .map((attr) => `[${attr.name}="${attr.value}"]`)
-            .join("")
-
-          if (dataAttrs) name += dataAttrs
-
-          setHoveredElement({
-            name,
-            x: e.clientX + 15, // Offset from cursor
-            y: e.clientY + 15,
-          })
-        }
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    window.addEventListener("mousemove", handleMouseMove)
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      window.removeEventListener("mousemove", handleMouseMove)
-      document.body.style.cursor = "default"
-    }
-  }, [inspectorMode])
 
   // Convert searchParams to a regular object
   const createQueryString = (params: URLSearchParams) => {
@@ -306,9 +344,75 @@ export default function DiskiPage() {
   }
 
   const handleSortChange = (sortValue: string) => {
+    setSortBy(sortValue)
     console.log("Применена сортировка:", sortValue)
-    // Здесь можно добавить логику сортировки
   }
+
+  const handleFiltersChange = useCallback((newFilters: {
+    diameter: string
+    width: string
+    pcd: string
+    et: string
+    hub: string
+    priceRange: [number, number]
+    stockFilter: "single" | "full"
+  }) => {
+    setFilters(newFilters)
+  }, [])
+
+  // Get unique options from API data
+  const getUniqueOptions = useCallback(() => {
+    if (allDisks.length === 0) {
+      // Return empty arrays while loading
+      return {
+        diameterOptions: [],
+        widthOptions: [],
+        pcdOptions: [],
+        etOptions: [],
+        hubOptions: [],
+      }
+    }
+
+    const diameters = new Set<string>()
+    const widths = new Set<string>()
+    const pcds = new Set<string>()
+    const ets = new Set<string>()
+    const hubs = new Set<string>()
+
+    allDisks.forEach((disk) => {
+      if (disk.diameter) diameters.add(disk.diameter.toString())
+      if (disk.width) widths.add(disk.width.toString())
+      if (disk.pcd) pcds.add(disk.pcd)
+      if (disk.et) ets.add(disk.et.toString())
+      if (disk.dia) hubs.add(disk.dia.toString())
+    })
+
+    return {
+      diameterOptions: Array.from(diameters).sort((a, b) => parseFloat(a) - parseFloat(b)),
+      widthOptions: Array.from(widths).sort((a, b) => parseFloat(a) - parseFloat(b)),
+      pcdOptions: Array.from(pcds).sort(),
+      etOptions: Array.from(ets).sort((a, b) => parseFloat(a) - parseFloat(b)),
+      hubOptions: Array.from(hubs).sort((a, b) => parseFloat(a) - parseFloat(b)),
+    }
+  }, [allDisks])
+
+  const filterOptions = getUniqueOptions()
+
+  // Debug: Log filtered results
+  useEffect(() => {
+    console.log("=== Filters Debug ===")
+    console.log("Active filters:", filters)
+    console.log("Disk type:", diskType)
+    console.log("Selected brands:", selectedBrands)
+    console.log("Available options from API:", {
+      diameters: filterOptions.diameterOptions.length,
+      widths: filterOptions.widthOptions.length,
+      pcds: filterOptions.pcdOptions.length,
+      ets: filterOptions.etOptions.length,
+      hubs: filterOptions.hubOptions.length,
+    })
+    console.log("===================")
+  }, [filters, diskType, selectedBrands, filterOptions])
 
   // Определяем позицию для индикатора корзины в зависимости от наличия фильтра размеров
   const cartIndicatorTopClass = isDimensionFilterActive ? "top-24" : "top-16"
@@ -479,55 +583,9 @@ export default function DiskiPage() {
             animation: cartIconBounce 0.5s ease-in-out;
           }
 
-          .element-inspector {
-            position: fixed;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            z-index: 9999;
-            pointer-events: none;
-            max-width: 300px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-          
-          ${
-            inspectorMode
-              ? `
-          * {
-            outline: 1px dashed rgba(255, 0, 0, 0.5) !important;
-          }
-          *:hover {
-            outline: 2px solid rgba(255, 0, 0, 0.8) !important;
-          }
-          `
-              : ""
-          }
         `}
       </style>
 
-      {/* Element inspector tooltip */}
-      {inspectorMode && hoveredElement && (
-        <div
-          className="element-inspector"
-          style={{
-            left: `${hoveredElement.x}px`,
-            top: `${hoveredElement.y}px`,
-          }}
-        >
-          {hoveredElement.name}
-        </div>
-      )}
-
-      {/* Inspector mode indicator */}
-      {inspectorMode && (
-        <div className="fixed top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs z-50">
-          Режим инспектора активен (нажмите 'i' для выключения)
-        </div>
-      )}
 
       <header
         className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] overflow-visible"
@@ -672,7 +730,7 @@ export default function DiskiPage() {
               <p className="mt-4 text-gray-600 dark:text-gray-400">Загрузка дисков...</p>
             </div>
           </div>
-        ) : filteredDisks.length === 0 ? (
+        ) : sortedDisks.length === 0 ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <p className="text-gray-600 dark:text-gray-400">Диски не найдены</p>
@@ -680,7 +738,7 @@ export default function DiskiPage() {
           </div>
         ) : (
           <div className="space-y-3 sm:space-y-4 sm:grid sm:grid-cols-1 sm:gap-3 sm:space-y-0 md:grid-cols-2 md:gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 pb-[200px]">
-            {filteredDisks.map((disk) => (
+            {sortedDisks.map((disk) => (
               <div key={disk.id} className="w-full">
                 <DiskCard disk={disk} />
               </div>
@@ -693,6 +751,12 @@ export default function DiskiPage() {
       <DiskSearchFilter
         diskType={diskType}
         onDiskTypeChange={(type) => setDiskType(type)}
+        onFiltersChange={handleFiltersChange}
+        diameterOptions={filterOptions.diameterOptions}
+        widthOptions={filterOptions.widthOptions}
+        pcdOptions={filterOptions.pcdOptions}
+        etOptions={filterOptions.etOptions}
+        hubOptions={filterOptions.hubOptions}
       />
     </main>
   )

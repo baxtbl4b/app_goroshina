@@ -107,11 +107,16 @@ export async function GET(request: NextRequest) {
           let wheelType: "stamped" | "cast" | "forged" = "cast"
           if (wheel.type) {
             const typeStr = wheel.type.toLowerCase()
-            if (typeStr.includes("штамп") || typeStr.includes("stamp")) {
+            // "Стальной" или "Штампованный"
+            if (typeStr.includes("сталь") || typeStr.includes("steel") || typeStr.includes("штамп") || typeStr.includes("stamp")) {
               wheelType = "stamped"
-            } else if (typeStr.includes("кован") || typeStr.includes("forg")) {
+            }
+            // "Кованый"
+            else if (typeStr.includes("кован") || typeStr.includes("forg")) {
               wheelType = "forged"
-            } else if (typeStr.includes("лит") || typeStr.includes("cast")) {
+            }
+            // "Литой"
+            else if (typeStr.includes("лит") || typeStr.includes("cast")) {
               wheelType = "cast"
             }
           }
