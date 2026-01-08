@@ -1,26 +1,13 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import Link from "next/link"
-import { Heart, Plus, Minus, CheckCircle, Clock, Calendar } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Heart, CheckCircle, Clock, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-
-// Тип для крепежа
-interface Fastener {
-  id: string
-  name: string
-  price: number
-  rrc: number // Рекомендованная розничная цена
-  stock: number
-  image: string
-  brand: string
-  country: string
-  type: "nut" | "bolt" | "lock-nut" | "lock-bolt"
-  thread: string
-  shape: "cone" | "sphere" | "washer"
-  color: "silver" | "black"
-}
+import CartQuantityButtons from "@/components/cart-quantity-buttons"
+import type { Fastener } from "@/lib/api"
 
 interface FastenerCardProps {
   fastener: Fastener
@@ -36,41 +23,26 @@ const formatPrice = (price: number): string => {
   }).format(price)
 }
 
-// Функция для получения URL флага страны
-function getCountryFlag(country: string): string {
-  const countryMap: Record<string, string> = {
-    Китай: "/images/flags/china.png",
-    Россия: "/images/flags/russia.png",
-    Япония: "/images/flags/japan.png",
-    Германия: "/images/flags/germany.png",
-    Италия: "/images/flags/italy.png",
-    Франция: "/images/flags/france.png",
-    США: "/placeholder.svg?height=16&width=24",
-    Корея: "/placeholder.svg?height=16&width=24",
-  }
-
-  return countryMap[country] || "/placeholder.svg?height=16&width=24"
-}
-
 export function FastenerCard({ fastener }: FastenerCardProps) {
+  const router = useRouter()
+
   // Состояния
   const [isFavorite, setIsFavorite] = useState(false)
   const [imageModalOpen, setImageModalOpen] = useState(false)
   const [cartCount, setCartCount] = useState(0)
   const [imageError, setImageError] = useState(false)
-  const [flagError, setFlagError] = useState(false)
-  const [isButtonPulsing, setIsButtonPulsing] = useState(false)
 
   // При монтировании компонента проверяем, есть ли товар в избранном и корзине
   useEffect(() => {
-    // Получаем список избранного из localStorage
-    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]")
+    // Получаем список избранного из localStorage (отдельный для крепежа)
+    const favorites = JSON.parse(localStorage.getItem("favoritesFasteners") || "[]")
     // Проверяем, есть ли текущий товар в избранном
     setIsFavorite(favorites.some((favFastener: Fastener) => favFastener.id === fastener.id))
 
     // Проверяем, есть ли товар в корзине и сколько его там
     const cart = JSON.parse(localStorage.getItem("cart") || "[]")
-    const cartItem = cart.find((item: any) => item.id === fastener.id)
+    const fastenerCartId = `fastener-${fastener.id}`
+    const cartItem = cart.find((item: any) => item.id === fastenerCartId)
     setCartCount(cartItem ? cartItem.quantity : 0)
   }, [fastener.id])
 
@@ -93,19 +65,19 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
     e.preventDefault()
     e.stopPropagation()
 
-    // Получаем текущий список избранного
-    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]")
+    // Получаем текущий список избранного (отдельный для крепежа)
+    const favorites = JSON.parse(localStorage.getItem("favoritesFasteners") || "[]")
 
     // Если товар уже в избранном - удаляем его
     if (isFavorite) {
       const updatedFavorites = favorites.filter((favFastener: Fastener) => favFastener.id !== fastener.id)
-      localStorage.setItem("favorites", JSON.stringify(updatedFavorites))
+      localStorage.setItem("favoritesFasteners", JSON.stringify(updatedFavorites))
       setIsFavorite(false)
     }
     // Иначе добавляем товар в избранное
     else {
       favorites.push(fastener)
-      localStorage.setItem("favorites", JSON.stringify(favorites))
+      localStorage.setItem("favoritesFasteners", JSON.stringify(favorites))
       setIsFavorite(true)
     }
 
@@ -123,25 +95,35 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
       return
     }
 
-    // Запускаем анимацию пульсации
-    setIsButtonPulsing(true)
-    setTimeout(() => setIsButtonPulsing(false), 1000)
-
     // Увеличиваем счетчик товаров в корзине на 1
     setCartCount((prev) => prev + 1)
 
     // Получаем текущую корзину из localStorage
     const cart = JSON.parse(localStorage.getItem("cart") || "[]")
 
+    // Создаем уникальный ID для крепежа
+    const fastenerCartId = `fastener-${fastener.id}`
+
     // Проверяем, есть ли уже этот товар в корзине
-    const existingItemIndex = cart.findIndex((item: any) => item.id === fastener.id)
+    const existingItemIndex = cart.findIndex((item: any) => item.id === fastenerCartId)
 
     if (existingItemIndex >= 0) {
       // Если товар уже в корзине, увеличиваем количество на 1
       cart[existingItemIndex].quantity = (cart[existingItemIndex].quantity || 0) + 1
     } else {
       // Иначе добавляем новый товар с количеством 1
-      cart.push({ ...fastener, quantity: 1 })
+      cart.push({
+        id: fastenerCartId,
+        type: "fastener",
+        originalId: fastener.id,
+        title: fastener.title,
+        price: fastener.price,
+        image: fastener.image,
+        category: fastener.category.name,
+        params: fastener.params,
+        stock: fastener.stock,
+        quantity: 1,
+      })
     }
 
     // Сохраняем обновленную корзину
@@ -173,8 +155,11 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
     // Получаем текущую корзину из localStorage
     const cart = JSON.parse(localStorage.getItem("cart") || "[]")
 
+    // Создаем уникальный ID для крепежа
+    const fastenerCartId = `fastener-${fastener.id}`
+
     // Проверяем, есть ли уже этот товар в корзине
-    const existingItemIndex = cart.findIndex((item: any) => item.id === fastener.id)
+    const existingItemIndex = cart.findIndex((item: any) => item.id === fastenerCartId)
 
     if (existingItemIndex >= 0) {
       // Если товар уже в корзине, уменьшаем количество на 1
@@ -201,25 +186,28 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
     window.dispatchEvent(cartUpdateEvent)
   }
 
+  // Функция для сохранения крепежа в localStorage при клике и навигации
+  const handleFastenerClick = () => {
+    // Сохраняем крепеж в localStorage для страницы карточки товара
+    localStorage.setItem(`fastener_${fastener.id}`, JSON.stringify(fastener))
+    // Переходим на страницу карточки товара
+    router.push(`/krepezh/${fastener.id}`)
+  }
+
   // Функция для определения статуса наличия
   const getStockStatus = () => {
-    if (fastener.stock > 10) {
+    // Все товары со склада - "Забрать сегодня"
+    if (fastener.stock > 0) {
       return {
-        tooltip: "Сегодня",
+        tooltip: "Забрать сегодня",
         className: "text-green-500",
         icon: <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />,
       }
-    } else if (fastener.stock > 0) {
-      return {
-        tooltip: "Доставка 1-2 дня",
-        className: "text-blue-500",
-        icon: <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />,
-      }
     } else {
       return {
-        tooltip: "Доставка 3 и более дня",
-        className: "text-orange-500",
-        icon: <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />,
+        tooltip: "Нет в наличии",
+        className: "text-red-500",
+        icon: <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-red-500" />,
       }
     }
   }
@@ -228,31 +216,35 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
 
   // Получаем изображение крепежа
   const getImageUrl = (): string => {
-    // For bolt type products, use the new image
-    if (fastener.type === "bolt" || fastener.type === "lock-bolt") {
-      return "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ChatGPT%20Image%208%20%D0%BC%D0%B0%D1%8F%202025%20%D0%B3.%2C%2003_06_02-JQXWLyDnrWbi2jAGhpu2uajlH33vnG.png"
+    if (imageError || !fastener.image) {
+      return "/images/fastener-placeholder.png"
     }
-    // For other products, use the existing image
-    return "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1600%20%282%29.jpg-pqOwuWzvhZM5gRA1dDLq9SEk1fowZ0.jpeg"
+    return fastener.image
   }
 
-  // Получаем флаг страны
-  const flagUrl = getCountryFlag(fastener.country)
+  // Форматируем параметры для отображения
+  const getParamsText = (): string => {
+    const parts: string[] = []
+    if (fastener.params.diameter) parts.push(`M${fastener.params.diameter}`)
+    if (fastener.params.step) parts.push(`шаг ${fastener.params.step}`)
+    if (fastener.params.form) parts.push(fastener.params.form)
+    return parts.join(" • ")
+  }
 
   return (
-    <div className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
+    <div
+      className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex hover:shadow-md transition-shadow cursor-pointer"
+      onClick={handleFastenerClick}
+    >
       {/* Левая часть - Изображение */}
-      <div
-        className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[123px] sm:w-[161px] md:w-[197px] lg:w-[222px] overflow-hidden flex items-center justify-center bg-white rounded-l-xl"
-        style={{ maxHeight: "209px" }}
-      >
+      <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[145px] sm:w-[190px] md:w-[234px] lg:w-[263px] overflow-hidden flex items-center justify-center bg-white rounded-l-xl" style={{ maxHeight: "248px" }}>
         <div
           className="flex justify-center items-center h-full w-full relative overflow-hidden bg-transparent"
           style={{ zIndex: 1 }}
         >
           <img
             src={getImageUrl() || "/placeholder.svg"}
-            alt={fastener.name || "Крепеж"}
+            alt={fastener.title || "Крепеж"}
             className="w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
             onClick={(e) => {
               e.preventDefault()
@@ -268,11 +260,15 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
         </div>
 
         <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
-          <DialogContent className="sm:max-w-[600px] flex items-center justify-center p-1" style={{ zIndex: 50 }}>
+          <DialogContent
+            className="sm:max-w-[600px] flex items-center justify-center p-1 border-0 shadow-none bg-transparent"
+            style={{ zIndex: 50 }}
+            hideCloseButton={true}
+          >
             <div className="relative w-full h-full max-h-[80vh] flex items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-[#2a2a2a] dark:to-[#1a1a1a] rounded-lg">
               <img
                 src={getImageUrl() || "/placeholder.svg"}
-                alt={fastener.name || "Крепеж"}
+                alt={fastener.title || "Крепеж"}
                 className="object-contain max-h-[80vh]"
                 onError={() => setImageError(true)}
                 style={{
@@ -286,28 +282,29 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
       </div>
 
       {/* Правая часть - Контент */}
-      <div className="p-2 sm:p-3 md:p-4 flex-1 flex flex-col justify-between">
-        <div>
-          <div className="mt-0.5 sm:mt-1 md:mt-2 flex items-center gap-1 sm:gap-2 md:gap-3 flex-wrap">
-            <span className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 md:py-1.5 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white">
-              {fastener.thread}
-            </span>
-
-            {/* Форма крепежа */}
-            <span className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 md:py-1.5 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white">
-              {fastener.shape === "cone" ? "Конус" : fastener.shape === "sphere" ? "Сфера" : "Шайба"}
-            </span>
-
-            {/* Цвет крепежа */}
-            <span className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 md:py-1.5 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white">
-              {fastener.color === "silver" ? "Серебро" : "Черный"}
-            </span>
+      <div className="p-3 sm:p-3 md:p-4 flex-1 flex flex-col justify-between min-h-0">
+        <div className="flex flex-col gap-[8.8px]">
+          <div className="flex items-center gap-[4.4px] sm:gap-[8.8px] md:gap-[13.2px] flex-wrap">
+            {/* Срок доставки */}
+            <div className="flex items-center gap-[4.4px] sm:gap-[6.6px] px-[6.6px] sm:px-[8.8px] md:px-[11px] py-[4.4px] bg-gray-100 dark:bg-[#3A3A3A] rounded-full">
+              <span className="flex items-center justify-center">
+                {React.cloneElement(stockStatus.icon as React.ReactElement, {
+                  className: `h-[13.2px] w-[13.2px] sm:h-[17.6px] sm:w-[17.6px] md:h-[19.8px] md:w-[19.8px] ${
+                    (stockStatus.icon as React.ReactElement).props.className
+                  }`,
+                })}
+              </span>
+              <span className={`text-[9px] sm:text-[11px] md:text-[13px] font-medium whitespace-nowrap ${stockStatus.className}`}>
+                {stockStatus.tooltip}
+              </span>
+            </div>
 
             <span className="flex-grow"></span>
+
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ml-auto sm:ml-0"
+              className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 p-0"
               onClick={toggleFavorite}
               aria-label={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
             >
@@ -319,127 +316,53 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
             </Button>
           </div>
 
-          <Link href={`/krepezh/${fastener.id}`}>
-            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-xs sm:text-sm md:text-base lg:text-lg">
-              {fastener.name}
-            </h3>
-          </Link>
-
-          <div className="mt-0.5 sm:mt-1 md:mt-2 flex items-center gap-1 sm:gap-2 md:gap-3">
-            {flagError ? (
-              <div
-                className="rounded-sm w-[20px] h-[14px] sm:w-[24px] sm:h-[16px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[8px] text-gray-500"
-                title={`Страна: ${fastener.country}`}
-              >
-                {fastener.country.substring(0, 2)}
-              </div>
-            ) : (
-              <img
-                src={flagUrl || "/placeholder.svg"}
-                alt={fastener.country}
-                width={20}
-                height={14}
-                className="rounded-sm w-[20px] h-[14px] sm:w-[24px] sm:h-[16px] border border-gray-200"
-                title={`Страна: ${fastener.country}`}
-                onError={() => setFlagError(true)}
-              />
-            )}
-            <span className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 dark:text-gray-400">
-              {fastener.country}
-            </span>
-          </div>
+          <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-3 text-sm sm:text-sm md:text-base lg:text-lg leading-tight">
+            {fastener.title}
+          </h3>
         </div>
 
-        <div className="mt-0.5 sm:mt-1 flex flex-col relative pb-7 sm:pb-8 md:pb-10">
-          <div className="flex items-center justify-between w-full mb-1">
-            <div>
-              {/* Статус наличия */}
-              <div className="flex items-center gap-1">
-                <span className="flex items-center justify-center">
-                  {React.cloneElement(stockStatus.icon as React.ReactElement, {
-                    className: `h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 ${
-                      (stockStatus.icon as React.ReactElement).props.className
-                    }`,
-                  })}
-                </span>
-                <span className={`text-xs sm:text-sm md:text-base lg:text-lg font-medium ${stockStatus.className}`}>
-                  {stockStatus.tooltip}
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-col items-end">
-              {fastener.stock > 0 ? (
-                <>
-                  <span
-                    className={`text-base sm:text-xl md:text-2xl lg:text-3xl font-medium opacity-80 ${
-                      fastener.stock > 10
-                        ? "text-green-500"
-                        : fastener.stock > 5
-                          ? "text-yellow-500"
-                          : "text-orange-500"
-                    }`}
-                  >
-                    {fastener.stock} шт
-                  </span>
-                  <span className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 dark:text-gray-400">
-                    Количество:
-                  </span>
-                </>
-              ) : (
-                <span className="text-base sm:text-xl font-medium opacity-80 text-red-500">Нет в наличии</span>
-              )}
-            </div>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center mt-2 sm:mt-0 px-0">
-            <div>
-              <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 dark:text-gray-400 line-through">
-                {formatPrice(fastener.rrc)}
+        <div className="flex flex-col relative pb-8 sm:pb-9 md:pb-11 mt-3">
+          <div className="flex items-center justify-end w-full mb-3 sm:mb-4">
+            <div className="flex flex-row items-end gap-2">
+              <p className="text-[11px] sm:text-[14.3px] md:text-[16.5px] text-gray-500 dark:text-gray-400 line-through">
+                {formatPrice(fastener.wholesalePrice)}
               </p>
-              <p
-                className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-[#1F1F1F] dark:text-white relative"
-                style={{
-                  textShadow: "1px 1px 0 rgba(0,0,0,0.1), 2px 2px 0 rgba(0,0,0,0.05), 3px 3px 5px rgba(0,0,0,0.1)",
-                  transform: "translateZ(0)",
-                  perspective: "1000px",
-                  transition: "transform 0.3s ease",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateZ(10px) scale(1.02)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateZ(0)")}
-              >
+              <p className="text-[16.5px] sm:text-[18.7px] md:text-[23.1px] font-bold text-[#1F1F1F] dark:text-white">
                 {formatPrice(fastener.price)}
               </p>
             </div>
-            <div className="flex items-center flex-1 justify-end ml-2">
-              {/* Кнопки корзины */}
-              <div className="flex h-[31px] sm:h-[34px] md:h-[40px] overflow-hidden w-full max-w-[152px] sm:max-w-[174px] md:max-w-[195px]" style={{ border: 'none', outline: 'none', borderRadius: '20px' }}>
-                {/* Кнопка минус */}
-                <button
-                  onClick={removeFromCart}
-                  disabled={cartCount <= 0 || fastener.stock <= 0}
-                  className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px' }}
-                  aria-label="Уменьшить количество"
-                >
-                  <Minus className="w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] md:w-[22px] md:h-[22px]" />
-                </button>
-
-                {/* Счетчик количества */}
-                <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2.2rem] sm:min-w-[2.75rem] md:min-w-[3.3rem]">
-                  <span className="text-[15px] sm:text-[18px] md:text-[22px] font-medium">{cartCount}</span>
-                </div>
-
-                {/* Кнопка плюс */}
-                <button
-                  onClick={addToCart}
-                  disabled={fastener.stock <= 0 || cartCount >= fastener.stock}
-                  className="bg-[#c4d402]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ border: 'none', outline: 'none', boxShadow: 'none', borderTopRightRadius: '20px', borderBottomRightRadius: '20px' }}
-                  aria-label="Увеличить количество"
-                >
-                  <Plus className="w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] md:w-[22px] md:h-[22px]" />
-                </button>
-              </div>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              {(() => {
+                const availableStock = fastener.stock - cartCount;
+                if (availableStock > 0) {
+                  return (
+                    <>
+                      <span
+                        className={`h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[12px] sm:text-[14px] md:text-[16px] font-medium px-3 rounded-full ${
+                          availableStock > 10 ? "bg-green-500/20 text-green-600 dark:text-green-400" :
+                          availableStock > 5 ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" :
+                          "bg-orange-500/20 text-orange-600 dark:text-orange-400"
+                        }`}
+                      >
+                        {availableStock > 20 ? ">20 шт" : `${availableStock} шт`}
+                      </span>
+                    </>
+                  );
+                } else {
+                  return (
+                    <span className="h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[12px] sm:text-[14px] md:text-[16px] font-medium px-3 rounded-full bg-red-500/20 text-red-600 dark:text-red-400">Нет в наличии</span>
+                  );
+                }
+              })()}
             </div>
+            <CartQuantityButtons
+              count={cartCount}
+              maxStock={fastener.stock}
+              onAdd={addToCart}
+              onRemove={removeFromCart}
+            />
           </div>
         </div>
       </div>

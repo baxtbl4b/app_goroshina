@@ -69,6 +69,43 @@ export interface TireDimensions {
   diameters: string[]
 }
 
+export interface FastenerParams {
+  diameter?: string | null
+  step?: string | null
+  form?: string | null
+  color?: string | null
+}
+
+export interface FastenerCategory {
+  id: number
+  name: string
+}
+
+export interface FastenerStorage {
+  quantity: number
+  code: string
+  name: string
+  store: {
+    id: number
+    code: string
+    name: string
+  }
+}
+
+export interface Fastener {
+  id: number
+  title: string
+  hash: string
+  price: number
+  wholesalePrice: number
+  avgBuyout: number
+  stock: number
+  image?: string | null
+  params: FastenerParams
+  category: FastenerCategory
+  storage: FastenerStorage | null
+}
+
 // Function to transform API data to application format
 // Add default values for fields that might be missing in the API response
 function transformApiData(apiTires: any[]): Tire[] {

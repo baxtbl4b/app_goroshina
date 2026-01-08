@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import Image from "next/image"
 import { ChevronLeft } from "lucide-react"
 import { FastenerSearchFilter } from "./fastener-search-filter"
@@ -8,6 +8,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import QuickFilterButtons from "@/components/quick-filter-buttons"
 import { FastenerCard } from "@/components/fastener-card"
 import CartButton from "@/components/cart-button"
+import { BackButton } from "@/components/back-button"
 
 export default function KrepezhPageClient() {
   const searchParams = useSearchParams()
@@ -24,8 +25,33 @@ export default function KrepezhPageClient() {
   const [cartCountPosition, setCartCountPosition] = useState(0)
   const [cartLabelPosition, setCartLabelPosition] = useState(0)
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [fasteners, setFasteners] = useState([])
+
+  // Загрузка данных из CRM API
+  useEffect(() => {
+    const loadFasteners = async () => {
+      setIsLoading(true)
+      try {
+        const response = await fetch("/api/fasteners")
+        const data = await response.json()
+
+        if (data.data) {
+          console.log("Loaded fasteners:", data.data.length, "items")
+          console.log("Sample fastener:", data.data[0])
+          setFasteners(data.data)
+        } else {
+          console.error("No data received from API")
+        }
+      } catch (error) {
+        console.error("Error loading fasteners:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadFasteners()
+  }, [])
 
   // Демо-данные для крепежа
   // const fasteners = [
@@ -143,8 +169,84 @@ export default function KrepezhPageClient() {
   //   },
   // ]
 
-  // Фильтрация крепежа по типу
-  const filteredFasteners = fasteners.filter((fastener) => fastener.type === fastenerType)
+  // Маппинг старых типов на категории CRM
+  const categoryMap: Record<string, string> = {
+    "nut": "Гайки",
+    "bolt": "Болты",
+    "lock-nut": "Гайки",
+    "lock-bolt": "Болты",
+  }
+
+  // Фильтрация крепежа по категории и параметрам
+  const filteredFasteners = useMemo(() => {
+    const thread = searchParams.get("thread")
+    const shape = searchParams.get("shape")
+    const color = searchParams.get("color")
+    const secretka = searchParams.get("secretka")
+    const expectedCategory = categoryMap[fastenerType]
+
+    console.log("=== Starting Filter ===")
+    console.log("Total fasteners:", fasteners.length)
+    console.log("Fastener type:", fastenerType)
+    console.log("Expected category:", expectedCategory)
+    console.log("Active filters:", { thread, shape, color, secretka })
+
+    const filtered = fasteners.filter((fastener: any) => {
+      if (!fastener.category) {
+        return false
+      }
+
+      // Фильтр по категории (тип: гайки/болты)
+      if (fastener.category.name !== expectedCategory) {
+        return false
+      }
+
+      // Фильтр по резьбе (thread)
+      if (thread) {
+        if (fastener.params.diameter && fastener.params.step) {
+          const fastenerThread = `${fastener.params.diameter}x${fastener.params.step}`
+          if (fastenerThread !== thread) return false
+        } else {
+          // Если нет параметров резьбы, но фильтр установлен - пропускаем товар
+          return false
+        }
+      }
+
+      // Фильтр по форме (shape)
+      if (shape) {
+        if (fastener.params.form) {
+          if (fastener.params.form !== shape) return false
+        } else {
+          // Если нет формы, но фильтр установлен - пропускаем товар
+          return false
+        }
+      }
+
+      // Фильтр по цвету (color)
+      if (color) {
+        if (fastener.params.color) {
+          if (fastener.params.color !== color) return false
+        } else {
+          // Если нет цвета, но фильтр установлен - пропускаем товар
+          return false
+        }
+      }
+
+      // Фильтр "Секретка"
+      if (secretka === "true") {
+        if (!fastener.title.toLowerCase().includes("секретка")) return false
+      }
+
+      return true
+    })
+
+    console.log("Filtered fasteners:", filtered.length)
+    if (filtered.length > 0) {
+      console.log("Sample filtered item:", filtered[0])
+    }
+
+    return filtered
+  }, [fasteners, fastenerType, searchParams])
 
   // Inspector mode state
   const [inspectorMode, setInspectorMode] = useState(false)
@@ -422,200 +524,6 @@ export default function KrepezhPageClient() {
   // Определяем позицию для индикатора корзины в зависимости от наличия фильтра размеров
   const cartIndicatorTopClass = isThreadFilterActive ? "top-24" : "top-16"
 
-  // Add secretka to the parameters passed to getFasteners
-  const secretka = searchParams.get("secretka") || undefined
-
-  // Update the useEffect that fetches fasteners
-  useEffect(() => {
-    const fetchFasteners = async () => {
-      setIsLoading(true)
-      try {
-        const data = await getFasteners({
-          thread: searchParams.get("thread") || undefined,
-          shape: searchParams.get("shape") || undefined,
-          color: searchParams.get("color") || undefined,
-          type: fastenerType,
-          brand: selectedBrands,
-          minPrice: searchParams.get("minPrice") || undefined,
-          maxPrice: searchParams.get("maxPrice") || undefined,
-          inStock: searchParams.get("stock") === "true",
-          secretka,
-        })
-        setFasteners(data)
-      } catch (error) {
-        console.error("Error fetching fasteners:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchFasteners()
-  }, [searchParams, fastenerType, selectedBrands, secretka])
-
-  // Mock getFasteners function
-  async function getFasteners(params: any) {
-    // Simulate an API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const mockData = [
-          {
-            id: "1",
-            name: "Гайка M12x1.5 конус серебро",
-            price: 120,
-            rrc: 150,
-            stock: 100,
-            image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-M3bygLp1Pk3gtK3mjtQlVLwX4nsxco.png",
-            brand: "Starleks",
-            country: "Россия",
-            type: "nut",
-            thread: "M12x1.5",
-            shape: "cone",
-            color: "silver",
-          },
-          {
-            id: "2",
-            name: "Гайка M14x1.5 конус черная",
-            price: 150,
-            rrc: 180,
-            stock: 80,
-            image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-sbgcZnynEkUJ5bjlfd3qmARKlbPIfm.png",
-            brand: "Starleks",
-            country: "Россия",
-            type: "nut",
-            thread: "M14x1.5",
-            shape: "cone",
-            color: "black",
-          },
-          {
-            id: "3",
-            name: "Болт M12x1.25 конус серебро",
-            price: 180,
-            rrc: 220,
-            stock: 60,
-            image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EHCgdNXeCUnS29e8FP2pvTZd1VeHAj.png",
-            brand: "Starleks",
-            country: "Россия",
-            type: "bolt",
-            thread: "M12x1.25",
-            shape: "cone",
-            color: "silver",
-          },
-          {
-            id: "4",
-            name: "Болт M14x1.5 конус черный",
-            price: 200,
-            rrc: 240,
-            stock: 40,
-            image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-2wGMSLx8KSJNV2fQE43bkVEjiXPtA9.png",
-            brand: "Starleks",
-            country: "Россия",
-            type: "bolt",
-            thread: "M14x1.5",
-            shape: "cone",
-            color: "black",
-          },
-          {
-            id: "5",
-            name: "Гайка секретка M12x1.5 сфера серебро",
-            price: 1200,
-            rrc: 1500,
-            stock: 20,
-            image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-ggjwN8Pz83v1B1VKooTLHDrGxWwU9M.png",
-            brand: "McGard",
-            country: "США",
-            type: "lock-nut",
-            thread: "M12x1.5",
-            shape: "sphere",
-            color: "silver",
-          },
-          {
-            id: "6",
-            name: "Болт секретка M14x1.5 конус черный",
-            price: 1500,
-            rrc: 1800,
-            stock: 15,
-            image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-2wGMSLx8KSJNV2fQE43bkVEjiXPtA9.png",
-            brand: "McGard",
-            country: "США",
-            type: "lock-bolt",
-            thread: "M14x1.5",
-            shape: "cone",
-            color: "black",
-          },
-          {
-            id: "7",
-            name: "Гайка M12x1.25 шайба серебро",
-            price: 130,
-            rrc: 160,
-            stock: 90,
-            image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-GoLdlJLff3k6zlMeyVGwbriFuKtfOc.png",
-            brand: "Starleks",
-            country: "Россия",
-            type: "nut",
-            thread: "M12x1.25",
-            shape: "washer",
-            color: "silver",
-          },
-          {
-            id: "8",
-            name: "Гайка M15x1.25 конус черная",
-            price: 160,
-            rrc: 190,
-            stock: 70,
-            image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-sbgcZnynEkUJ5bjlfd3qmARKlbPIfm.png",
-            brand: "Starleks",
-            country: "Россия",
-            type: "nut",
-            thread: "M15x1.25",
-            shape: "cone",
-            color: "black",
-          },
-        ]
-
-        // Apply filters based on params
-        let filteredData = mockData
-
-        if (params.thread) {
-          filteredData = filteredData.filter((item) => item.thread === params.thread)
-        }
-
-        if (params.shape) {
-          filteredData = filteredData.filter((item) => item.shape === params.shape)
-        }
-
-        if (params.color) {
-          filteredData = filteredData.filter((item) => item.color === params.color)
-        }
-
-        if (params.type) {
-          filteredData = filteredData.filter((item) => item.type === params.type)
-        }
-
-        if (params.brand && params.brand.length > 0) {
-          filteredData = filteredData.filter((item) => params.brand.includes(item.brand))
-        }
-
-        if (params.minPrice) {
-          filteredData = filteredData.filter((item) => item.price >= params.minPrice)
-        }
-
-        if (params.maxPrice) {
-          filteredData = filteredData.filter((item) => item.price <= params.maxPrice)
-        }
-
-        if (params.inStock) {
-          filteredData = filteredData.filter((item) => item.stock > 0)
-        }
-
-        if (params.secretka) {
-          filteredData = filteredData.filter((item) => item.name.toLowerCase().includes("секретка"))
-        }
-
-        resolve(filteredData)
-      }, 500)
-    })
-  }
-
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
       <style jsx global>
@@ -707,6 +615,17 @@ export default function KrepezhPageClient() {
               transform: translateY(0);
             }
           }
+
+          @keyframes slideIn {
+            from {
+              transform: scaleX(0);
+              opacity: 0;
+            }
+            to {
+              transform: scaleX(1);
+              opacity: 1;
+            }
+          }
         `}
       </style>
 
@@ -731,48 +650,69 @@ export default function KrepezhPageClient() {
       )}
 
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] py-2 shadow-sm flex flex-col items-center"
-        style={{ height: "51px" }}
+        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] overflow-visible"
+        style={{ "--header-height": "60px" } as React.CSSProperties}
       >
-        <div className="container max-w-md flex items-center justify-center h-full relative">
-          <button
-            onClick={() => router.push("/")}
-            className="fixed left-0 top-2 p-2 rounded-tr-md rounded-br-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors z-50 bg-white dark:bg-[#1F1F1F]"
-            aria-label="На главную"
-          >
-            <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-          </button>
-
-          <div className="flex items-center justify-center space-x-2 h-full">
-            <button
-              onClick={() => setFastenerType("nut")}
-              className={getButtonClass("nut")}
-              style={{
-                ...(fastenerType === "nut" ? buttonStyle : { marginTop: "-6px", marginBottom: "-6px" }),
-                borderRadius: "6px",
-              }}
-            >
-              <span className="relative z-10">ГАЙКИ</span>
-            </button>
-            <button
-              ref={boltButtonRef}
-              onClick={() => setFastenerType("bolt")}
-              className={getButtonClass("bolt")}
-              style={{
-                ...(fastenerType === "bolt" ? buttonStyle : { marginTop: "-6px", marginBottom: "-6px" }),
-                borderRadius: "6px",
-              }}
-            >
-              <span className="relative z-10">БОЛТЫ</span>
-            </button>
+        <div className="container max-w-md flex items-center justify-center h-full relative overflow-visible">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 z-50">
+            <BackButton />
           </div>
 
-          {/* Cart button */}
-          <CartButton className="fixed right-0 top-2 z-50" />
+          {/* Fastener Type Horizontal Carousel */}
+          {(() => {
+            const tabs = [
+              { key: "nut", label: "Гайки" },
+              { key: "bolt", label: "Болты" },
+            ]
+
+            return (
+              <div className="flex items-center justify-center w-full px-16">
+                <div className="relative flex items-center gap-6">
+                  {tabs.map((tab) => {
+                    const isActive = fastenerType === tab.key
+                    return (
+                      <button
+                        key={tab.key}
+                        ref={tab.key === "bolt" ? boltButtonRef : null}
+                        onClick={() => setFastenerType(tab.key)}
+                        className={`
+                          relative text-base font-medium transition-all duration-200
+                          ${
+                            isActive
+                              ? "text-[#1F1F1F] dark:text-white scale-105"
+                              : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                          }
+                        `}
+                        style={{
+                          fontSize: isActive ? "1.1rem" : "1rem",
+                          fontWeight: isActive ? 600 : 500,
+                        }}
+                      >
+                        {tab.label}
+                        {isActive && (
+                          <span
+                            className="absolute -bottom-2 left-0 right-0 h-0.5 bg-[#c4d402] rounded-full"
+                            style={{
+                              animation: "slideIn 0.3s ease-out",
+                            }}
+                          />
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })()}
+
+        </div>
+        {/* Global cart button - outside container */}
+        <div style={{ position: 'fixed', right: '16px', top: '30px', transform: 'translateY(-50%)', zIndex: 100 }}>
+          <CartButton />
         </div>
       </header>
 
-      <div className="flex-1 p-4 space-y-6 pt-[calc(60px+env(safe-area-inset-top)+2rem)] pb-[200px]">
+      <div className="flex-1 p-4 space-y-6 pt-[calc(60px+env(safe-area-inset-top)+1.5rem)] pb-[200px]">
         {/* Quick Filter Container */}
         <QuickFilterButtons
           insideTireResults={true}
@@ -783,18 +723,40 @@ export default function KrepezhPageClient() {
 
         {/* Крепеж в стиле карточек шин */}
         <div className="space-y-4">
-          {/* Отдельные карточки для каждого крепежа */}
-          {filteredFasteners.map((fastener) => (
-            <div key={fastener.id} className="bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm">
-              <FastenerCard fastener={fastener} />
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto mb-4"></div>
+                <p className="text-gray-600 dark:text-gray-400">Загрузка крепежа...</p>
+              </div>
             </div>
-          ))}
+          ) : filteredFasteners.length === 0 ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <p className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Товары не найдены
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Попробуйте изменить параметры фильтрации
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Отдельные карточки для каждого крепежа */}
+              {filteredFasteners.map((fastener) => (
+                <div key={fastener.id} className="w-full">
+                  <FastenerCard fastener={fastener} />
+                </div>
+              ))}
+            </>
+          )}
         </div>
       </div>
 
       {/* Fixed filter at the bottom */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-[#1F1F1F] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] rounded-t-xl">
-        <FastenerSearchFilter fastenerType={fastenerType} />
+        <FastenerSearchFilter fastenerType={fastenerType} fasteners={fasteners} />
       </div>
     </main>
   )
