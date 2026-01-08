@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
 
     const response = await fetch(
-      `${API_BASE_URL}/fitment/specs?access_token=${API_TOKEN}&brand_slug=${brandSlug}&model_slug=${modelSlug}&year=${year}`,
+      `${API_BASE_URL}/fitment?access_token=${API_TOKEN}&brand_slug=${brandSlug}&model_slug=${modelSlug}&year=${year}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -36,6 +36,48 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json()
+
+    // Если это массив (ответ для fitment), извлекаем данные крепежа из первого элемента
+    if (Array.isArray(data) && data.length > 0) {
+      const firstFitment = data[0]
+
+      // Парсим thread_size: "Lug bolts M14 x 1.5" -> { type: "bolt", thread: "14x1.5" }
+      let fastenerType = null
+      let threadSize = null
+
+      if (firstFitment.thread_size) {
+        const threadStr = firstFitment.thread_size.toLowerCase()
+
+        // Определяем тип крепежа
+        // "Lug bolts M14 x 1.5" -> bolt
+        // "Lug nuts M12 x 1.5" -> nut
+        // "M12 x 1.5" (без указания) -> nut (по умолчанию гайки)
+        if (threadStr.includes("bolt")) {
+          fastenerType = "bolt"
+        } else {
+          // Если не указано "bolt", значит гайки (nut)
+          fastenerType = "nut"
+        }
+
+        // Извлекаем размер резьбы: M14 x 1.5 -> 14x1.5
+        const threadMatch = firstFitment.thread_size.match(/M?(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)/i)
+        if (threadMatch) {
+          threadSize = `${threadMatch[1]}x${threadMatch[2]}`
+        }
+      }
+
+      return NextResponse.json({
+        ...firstFitment,
+        // Добавляем распарсенные данные для крепежа
+        fastener: {
+          type: fastenerType,
+          thread: threadSize,
+          raw: firstFitment.thread_size
+        },
+        // Возвращаем также полный массив для других целей
+        allFitments: data
+      })
+    }
 
     return NextResponse.json(data)
   } catch (error) {

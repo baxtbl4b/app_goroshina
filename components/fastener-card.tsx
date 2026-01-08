@@ -1,8 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Heart, CheckCircle, Clock, Calendar } from "lucide-react"
+import { Heart, CheckCircle, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
@@ -24,8 +23,6 @@ const formatPrice = (price: number): string => {
 }
 
 export function FastenerCard({ fastener }: FastenerCardProps) {
-  const router = useRouter()
-
   // Состояния
   const [isFavorite, setIsFavorite] = useState(false)
   const [imageModalOpen, setImageModalOpen] = useState(false)
@@ -186,14 +183,6 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
     window.dispatchEvent(cartUpdateEvent)
   }
 
-  // Функция для сохранения крепежа в localStorage при клике и навигации
-  const handleFastenerClick = () => {
-    // Сохраняем крепеж в localStorage для страницы карточки товара
-    localStorage.setItem(`fastener_${fastener.id}`, JSON.stringify(fastener))
-    // Переходим на страницу карточки товара
-    router.push(`/krepezh/${fastener.id}`)
-  }
-
   // Функция для определения статуса наличия
   const getStockStatus = () => {
     // Все товары со склада - "Забрать сегодня"
@@ -233,8 +222,7 @@ export function FastenerCard({ fastener }: FastenerCardProps) {
 
   return (
     <div
-      className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex hover:shadow-md transition-shadow cursor-pointer"
-      onClick={handleFastenerClick}
+      className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex"
     >
       {/* Левая часть - Изображение */}
       <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[145px] sm:w-[190px] md:w-[234px] lg:w-[263px] overflow-hidden flex items-center justify-center bg-white rounded-l-xl" style={{ maxHeight: "248px" }}>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react"
 import Image from "next/image"
-import { ChevronLeft } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { FastenerSearchFilter } from "./fastener-search-filter"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import QuickFilterButtons from "@/components/quick-filter-buttons"
@@ -27,6 +27,7 @@ export default function KrepezhPageClient() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [fasteners, setFasteners] = useState([])
+  const [sortOrder, setSortOrder] = useState<"price-desc" | "price-asc">("price-desc")
 
   // Загрузка данных из CRM API
   useEffect(() => {
@@ -245,12 +246,15 @@ export default function KrepezhPageClient() {
       console.log("Sample filtered item:", filtered[0])
     }
 
-    return filtered
-  }, [fasteners, fastenerType, searchParams])
+    // Сортировка по цене
+    const sorted = [...filtered].sort((a: any, b: any) => {
+      const priceA = a.price || 0
+      const priceB = b.price || 0
+      return sortOrder === "price-desc" ? priceB - priceA : priceA - priceB
+    })
 
-  // Inspector mode state
-  const [inspectorMode, setInspectorMode] = useState(false)
-  const [hoveredElement, setHoveredElement] = useState<{ name: string; x: number; y: number } | null>(null)
+    return sorted
+  }, [fasteners, fastenerType, searchParams, sortOrder])
 
   // Track bolt button coordinates
   useEffect(() => {
@@ -307,63 +311,6 @@ export default function KrepezhPageClient() {
       window.removeEventListener("resize", updateCartPosition)
     }
   }, [cartItemCount])
-
-  // Inspector mode event handlers
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "i") {
-        setInspectorMode((prev) => !prev)
-        if (!inspectorMode) {
-          document.body.style.cursor = "crosshair"
-        } else {
-          document.body.style.cursor = "default"
-          setHoveredElement(null)
-        }
-      }
-    }
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (inspectorMode) {
-        const element = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement
-        if (element) {
-          // Get element info
-          let name = element.tagName.toLowerCase()
-
-          // Add class if available
-          if (element.className && typeof element.className === "string") {
-            const firstClass = element.className.split(" ")[0]
-            if (firstClass) name += `.${firstClass}`
-          }
-
-          // Add id if available
-          if (element.id) name += `#${element.id}`
-
-          // Add data attributes if available
-          const dataAttrs = Array.from(element.attributes)
-            .filter((attr) => attr.name.startsWith("data-"))
-            .map((attr) => `[${attr.name}="${attr.value}"]`)
-            .join("")
-
-          if (dataAttrs) name += dataAttrs
-
-          setHoveredElement({
-            name,
-            x: e.clientX + 15, // Offset from cursor
-            y: e.clientY + 15,
-          })
-        }
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    window.addEventListener("mousemove", handleMouseMove)
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      window.removeEventListener("mousemove", handleMouseMove)
-      document.body.style.cursor = "default"
-    }
-  }, [inspectorMode])
 
   // Convert searchParams to a regular object
   const createQueryString = (params: URLSearchParams) => {
@@ -518,15 +465,23 @@ export default function KrepezhPageClient() {
 
   const handleSortChange = (sortValue: string) => {
     console.log("Применена сортировка:", sortValue)
-    // Здесь можно добавить логику сортировки
+    setSortOrder(sortValue as "price-desc" | "price-asc")
   }
 
-  const handleCarSelect = (threadSize: string) => {
-    console.log("Выбран автомобиль с резьбой:", threadSize)
-    // Update URL with thread parameter
-    const params = new URLSearchParams(searchParams.toString())
-    params.set("thread", threadSize)
-    router.push(`${pathname}?${params.toString()}`)
+  const handleCarSelect = (fastenerData: { type: string | null; thread: string | null }) => {
+    console.log("Выбран автомобиль, данные крепежа:", fastenerData)
+
+    // Переключаем тип крепежа (bolt/nut)
+    if (fastenerData.type) {
+      setFastenerType(fastenerData.type)
+    }
+
+    // Устанавливаем фильтр резьбы
+    if (fastenerData.thread) {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set("thread", fastenerData.thread)
+      router.push(`${pathname}?${params.toString()}`)
+    }
   }
 
   // Определяем позицию для индикатора корзины в зависимости от наличия фильтра размеров
@@ -536,33 +491,84 @@ export default function KrepezhPageClient() {
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
       <style jsx global>
         {`
-          /* Element inspector styles */
-          .element-inspector {
-            position: fixed;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            z-index: 9999;
+          /* Fastener Type Dynamic Island Carousel */
+          .fastener-carousel-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 34px;
+            -webkit-tap-highlight-color: transparent;
+          }
+
+          .fastener-carousel-highlight {
+            position: absolute;
+            background: #c4d402;
+            border-radius: 50px;
+            height: 34px;
+            width: 120px;
+            min-width: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
             pointer-events: none;
-            max-width: 300px;
+          }
+
+          .fastener-carousel-track {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            z-index: 2;
+          }
+
+          .fastener-carousel-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 34px;
+            padding: 7px 18px;
+          }
+
+          .fastener-carousel-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1F1F1F;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
           }
-          
-          ${
-            inspectorMode
-              ? `
-          * {
-            outline: 1px dashed rgba(255, 0, 0, 0.5) !important;
+
+          .fastener-carousel-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            color: #B0B5BD;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
           }
-          *:hover {
-            outline: 2px solid rgba(255, 0, 0, 0.8) !important;
+
+          .fastener-carousel-arrow:hover {
+            opacity: 1;
           }
-          `
-              : ""
+
+          .dark .fastener-carousel-arrow {
+            color: #9CA3AF;
+          }
+
+          .fastener-carousel-arrow-left {
+            position: absolute;
+            right: calc(50% + 60px);
+          }
+
+          .fastener-carousel-arrow-right {
+            position: absolute;
+            left: calc(50% + 60px);
           }
 
           /* Стили для кнопки корзины */
@@ -637,26 +643,6 @@ export default function KrepezhPageClient() {
         `}
       </style>
 
-      {/* Element inspector tooltip */}
-      {inspectorMode && hoveredElement && (
-        <div
-          className="element-inspector"
-          style={{
-            left: `${hoveredElement.x}px`,
-            top: `${hoveredElement.y}px`,
-          }}
-        >
-          {hoveredElement.name}
-        </div>
-      )}
-
-      {/* Inspector mode indicator */}
-      {inspectorMode && (
-        <div className="fixed top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs z-50">
-          Режим инспектора активен (нажмите 'i' для выключения)
-        </div>
-      )}
-
       <header
         className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] overflow-visible"
         style={{ "--header-height": "60px" } as React.CSSProperties}
@@ -666,48 +652,51 @@ export default function KrepezhPageClient() {
             <BackButton />
           </div>
 
-          {/* Fastener Type Horizontal Carousel */}
+          {/* Fastener Type Dynamic Island Style */}
           {(() => {
             const tabs = [
               { key: "nut", label: "Гайки" },
               { key: "bolt", label: "Болты" },
             ]
 
+            const currentIndex = tabs.findIndex(t => t.key === fastenerType)
+            const prevIndex = currentIndex === 0 ? tabs.length - 1 : currentIndex - 1
+            const nextIndex = currentIndex === tabs.length - 1 ? 0 : currentIndex + 1
+
+            const navigateTo = (direction: 'prev' | 'next') => {
+              const newIndex = direction === 'prev' ? prevIndex : nextIndex
+              setFastenerType(tabs[newIndex].key)
+            }
+
             return (
-              <div className="flex items-center justify-center w-full px-16">
-                <div className="relative flex items-center gap-6">
-                  {tabs.map((tab) => {
-                    const isActive = fastenerType === tab.key
-                    return (
-                      <button
-                        key={tab.key}
-                        ref={tab.key === "bolt" ? boltButtonRef : null}
-                        onClick={() => setFastenerType(tab.key)}
-                        className={`
-                          relative text-base font-medium transition-all duration-200
-                          ${
-                            isActive
-                              ? "text-[#1F1F1F] dark:text-white scale-105"
-                              : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                          }
-                        `}
-                        style={{
-                          fontSize: isActive ? "1.1rem" : "1rem",
-                          fontWeight: isActive ? 600 : 500,
-                        }}
-                      >
-                        {tab.label}
-                        {isActive && (
-                          <span
-                            className="absolute -bottom-2 left-0 right-0 h-0.5 bg-[#c4d402] rounded-full"
-                            style={{
-                              animation: "slideIn 0.3s ease-out",
-                            }}
-                          />
-                        )}
-                      </button>
-                    )
-                  })}
+              <div className="fastener-carousel-container">
+                {/* Yellow highlight background */}
+                <div className="fastener-carousel-highlight" />
+
+                {/* Track with arrows and center text */}
+                <div className="fastener-carousel-track">
+                  {/* Left arrow */}
+                  <button
+                    onClick={() => navigateTo('prev')}
+                    className="fastener-carousel-arrow fastener-carousel-arrow-left"
+                  >
+                    <ChevronLeft className="w-[22px] h-[22px]" />
+                  </button>
+
+                  {/* Center text */}
+                  <div className="fastener-carousel-center">
+                    <span key={fastenerType} className="fastener-carousel-text">
+                      {tabs[currentIndex].label}
+                    </span>
+                  </div>
+
+                  {/* Right arrow */}
+                  <button
+                    onClick={() => navigateTo('next')}
+                    className="fastener-carousel-arrow fastener-carousel-arrow-right"
+                  >
+                    <ChevronRight className="w-[22px] h-[22px]" />
+                  </button>
                 </div>
               </div>
             )
@@ -734,10 +723,7 @@ export default function KrepezhPageClient() {
         <div className="space-y-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto mb-4"></div>
-                <p className="text-gray-600 dark:text-gray-400">Загрузка крепежа...</p>
-              </div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
             </div>
           ) : filteredFasteners.length === 0 ? (
             <div className="flex items-center justify-center py-12">

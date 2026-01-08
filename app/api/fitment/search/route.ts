@@ -45,8 +45,21 @@ export async function GET(request: NextRequest) {
 
     // Search models in two ways:
     // 1. In brands that match the query (e.g., "Changan" when searching "Changun Uni")
-    // 2. In popular brands
-    const popularBrands = ["bmw", "mercedes", "audi", "toyota", "honda", "ford", "volkswagen", "nissan", "hyundai", "kia"]
+    // 2. In popular brands (including Chinese brands popular in Russia)
+    const popularBrands = [
+      // Европейские
+      "bmw", "mercedes", "audi", "volkswagen", "skoda", "opel", "peugeot", "renault", "citroen", "volvo",
+      // Японские
+      "toyota", "honda", "nissan", "mazda", "mitsubishi", "subaru", "suzuki", "lexus", "infiniti",
+      // Корейские
+      "hyundai", "kia", "genesis",
+      // Американские
+      "ford", "chevrolet", "jeep", "cadillac",
+      // Китайские
+      "changan", "geely", "haval", "chery", "exeed", "omoda", "tank", "jetour", "jaecoo", "byd", "gac", "faw", "dongfeng", "great-wall", "lifan", "zotye",
+      // Российские
+      "lada", "uaz", "gaz"
+    ]
 
     // Get brand slugs from matching brands
     const matchingBrandSlugs = matchingBrands.map(b => b.slug)

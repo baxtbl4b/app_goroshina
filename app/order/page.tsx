@@ -17,7 +17,8 @@ import { getUser, deductUserPoints, addUserPoints } from "@/lib/user"
 // Интерфейс для товара в корзине
 interface CartItem {
   id: string
-  name: string
+  name?: string
+  title?: string
   brand?: string
   model?: string
   width?: string | number
@@ -377,7 +378,7 @@ export default function OrderPage() {
       status: "Готов к выдаче",
       items: items.map(item => ({
         id: item.id,
-        name: item.name || `${item.brand || ""} ${item.model || ""}`,
+        name: item.name || item.title || `${item.brand || ""} ${item.model || ""}`,
         brand: item.brand || "",
         size: `${item.width || ""}/${item.height || ""} R${item.diam || item.diameter || ""}`,
         quantity: item.quantity,
@@ -684,7 +685,7 @@ export default function OrderPage() {
                           </div>
 
                           <h3 className="font-medium text-sm text-white leading-tight">
-                            {item.name || `${item.brand || ""} ${item.model || ""}`}
+                            {item.name || item.title || `${item.brand || ""} ${item.model || ""}`}
                           </h3>
 
                           {item.stock !== undefined && item.stock <= 4 && (
