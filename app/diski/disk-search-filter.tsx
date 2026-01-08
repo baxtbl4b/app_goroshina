@@ -47,6 +47,21 @@ export default function DiskSearchFilter({
   const [et, setEt] = useState<string>(searchParams.get("et") || "")
   const [hub, setHub] = useState<string>(searchParams.get("hub") || "")
   const [color, setColor] = useState<string>(searchParams.get("color") || "")
+  const [secondAxis, setSecondAxis] = useState(searchParams.get("secondAxis") === "true")
+  const [todayOnly, setTodayOnly] = useState(searchParams.get("today") === "true")
+
+  // Second axis dimensions
+  const [diameter2, setDiameter2] = useState<string>(searchParams.get("diameter2") || "")
+  const [width2, setWidth2] = useState<string>(searchParams.get("width2") || "")
+  const [et2, setEt2] = useState<string>(searchParams.get("et2") || "")
+
+  // Initialize secondAxis flag from URL on mount
+  useEffect(() => {
+    const hasSecondAxisParams = searchParams.get("diameter2") || searchParams.get("width2") || searchParams.get("et2")
+    if (hasSecondAxisParams && !secondAxis) {
+      setSecondAxis(true)
+    }
+  }, []) // Run only on mount
 
   // Add state for filter collapse
   const [isFilterCollapsed, setIsFilterCollapsed] = useState(false)
@@ -132,6 +147,7 @@ export default function DiskSearchFilter({
   }, [stockFilter, router, searchParams])
 
   // Immediate URL update for dimension filters (no debounce for select dropdowns)
+  // Second axis params are handled by their own handlers (handleDiameter2Change, etc.)
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString())
 
@@ -154,12 +170,19 @@ export default function DiskSearchFilter({
     if (color) params.set("color", color)
     else params.delete("color")
 
+    // Checkbox filters
+    if (secondAxis) params.set("secondAxis", "true")
+    else params.delete("secondAxis")
+
+    if (todayOnly) params.set("today", "true")
+    else params.delete("today")
+
     const newParamsString = params.toString()
     const currentParamsString = searchParams.toString()
     if (newParamsString !== currentParamsString) {
       router.push(`${window.location.pathname}?${newParamsString}`, { scroll: false })
     }
-  }, [diameter, width, pcd, et, hub, color, router, searchParams])
+  }, [diameter, width, pcd, et, hub, color, secondAxis, todayOnly, router, searchParams])
 
   // Add state for garage scroll gradients
   const [showLeftGradient, setShowLeftGradient] = useState(false)
@@ -299,6 +322,11 @@ export default function DiskSearchFilter({
     setEt("")
     setHub("")
     setColor("")
+    setSecondAxis(false)
+    setTodayOnly(false)
+    setDiameter2("")
+    setWidth2("")
+    setEt2("")
     setSelectedVehicle(null)
 
     const params = new URLSearchParams(searchParams.toString())
@@ -308,6 +336,11 @@ export default function DiskSearchFilter({
     params.delete("et")
     params.delete("hub")
     params.delete("color")
+    params.delete("secondAxis")
+    params.delete("today")
+    params.delete("diameter2")
+    params.delete("width2")
+    params.delete("et2")
 
     // Navigate with the parameters
     router.push(`${window.location.pathname}?${params.toString()}`)
@@ -343,6 +376,51 @@ export default function DiskSearchFilter({
   const handlePriceRangeChange = useCallback((value: number[]) => {
     setPriceRange(value as [number, number])
   }, [])
+
+  // Function to apply second axis filter - updates URL when all params are set
+  const applySecondAxisFilter = useCallback((d2: string, w2: string, e2: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    if (d2) params.set("diameter2", d2)
+    else params.delete("diameter2")
+
+    if (w2) params.set("width2", w2)
+    else params.delete("width2")
+
+    if (e2) params.set("et2", e2)
+    else params.delete("et2")
+
+    // Set secondAxis flag when all params are set
+    if (d2 && w2 && e2) {
+      params.set("secondAxis", "true")
+    }
+
+    router.push(`${window.location.pathname}?${params.toString()}`, { scroll: false })
+  }, [router, searchParams])
+
+  // Handle second axis diameter change
+  const handleDiameter2Change = useCallback((value: string) => {
+    setDiameter2(value)
+    if (value && width2 && et2) {
+      applySecondAxisFilter(value, width2, et2)
+    }
+  }, [width2, et2, applySecondAxisFilter])
+
+  // Handle second axis width change
+  const handleWidth2Change = useCallback((value: string) => {
+    setWidth2(value)
+    if (diameter2 && value && et2) {
+      applySecondAxisFilter(diameter2, value, et2)
+    }
+  }, [diameter2, et2, applySecondAxisFilter])
+
+  // Handle second axis ET change
+  const handleEt2Change = useCallback((value: string) => {
+    setEt2(value)
+    if (diameter2 && width2 && value) {
+      applySecondAxisFilter(diameter2, width2, value)
+    }
+  }, [diameter2, width2, applySecondAxisFilter])
 
   return (
     <>
@@ -528,17 +606,17 @@ export default function DiskSearchFilter({
               </div>
 
               <div>
-                <Label htmlFor="pcd" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
-                  PCD
+                <Label htmlFor="et" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                  Вылет (ET)
                 </Label>
-                <Select value={pcd} onValueChange={setPcd}>
-                  <SelectTrigger id="pcd" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                <Select value={et} onValueChange={setEt}>
+                  <SelectTrigger id="et" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
-                    {staticPcdOptions.map((option) => (
+                    {staticEtOptions.map((option) => (
                       <SelectItem key={option} value={option}>
-                        {option}
+                        ET{option}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -551,30 +629,93 @@ export default function DiskSearchFilter({
               size="sm"
               onClick={clearAllDimensions}
               className={`h-10 px-3 text-xs border-0 rounded-xl transition-all duration-300 ${
-                diameter || width || pcd || et || hub || color || priceRange[0] > 3000 || priceRange[1] < 30000 || stockFilter === "full"
+                diameter || width || pcd || et || hub || color || secondAxis || todayOnly || diameter2 || width2 || et2 || priceRange[0] > 3000 || priceRange[1] < 30000 || stockFilter === "full"
                   ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 hover:scale-105 active:scale-95 shadow-md hover:shadow-red-500/30"
                   : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
               }`}
-              disabled={!diameter && !width && !pcd && !et && !hub && !color && priceRange[0] === 3000 && priceRange[1] === 30000 && stockFilter === "single"}
+              disabled={!diameter && !width && !pcd && !et && !hub && !color && !secondAxis && !todayOnly && !diameter2 && !width2 && !et2 && priceRange[0] === 3000 && priceRange[1] === 30000 && stockFilter === "single"}
             >
               Сбросить
             </Button>
           </div>
 
+          {/* Second axis selectors (conditional) - appears as second row */}
+          {secondAxis && (
+            <div className="flex items-end gap-3">
+              <div className="grid grid-cols-3 gap-3 flex-1">
+                <div>
+                  <Label htmlFor="diameter2" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                    Диаметр (2 ось)
+                  </Label>
+                  <Select value={diameter2} onValueChange={handleDiameter2Change}>
+                    <SelectTrigger id="diameter2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                      <SelectValue placeholder="~" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {staticDiameterOptions.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          R{option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="width2" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                    Ширина (2 ось)
+                  </Label>
+                  <Select value={width2} onValueChange={handleWidth2Change}>
+                    <SelectTrigger id="width2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                      <SelectValue placeholder="~" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {staticWidthOptions.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}J
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="et2" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                    Вылет (2 ось)
+                  </Label>
+                  <Select value={et2} onValueChange={handleEt2Change}>
+                    <SelectTrigger id="et2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                      <SelectValue placeholder="~" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {staticEtOptions.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          ET{option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              {/* Empty space to align with Reset button width */}
+              <div className="h-10 px-3" style={{ width: '82px' }}></div>
+            </div>
+          )}
+
           {/* Additional disk parameters moved from collapsible section */}
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <Label htmlFor="et" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block">
-                Вылет (ET)
+              <Label htmlFor="pcd" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block">
+                PCD
               </Label>
-              <Select value={et} onValueChange={setEt}>
-                <SelectTrigger id="et" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+              <Select value={pcd} onValueChange={setPcd}>
+                <SelectTrigger id="pcd" className="w-full bg-[#333333] text-white border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
-                  {staticEtOptions.map((option) => (
+                  {staticPcdOptions.map((option) => (
                     <SelectItem key={option} value={option}>
-                      ET{option}
+                      {option}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -696,6 +837,43 @@ export default function DiskSearchFilter({
         >
           <div className="space-y-4">
             <div className="space-y-3">
+              {/* Checkbox filters: Second Axis and Today */}
+              <div className="w-full border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-xl p-3 flex items-center justify-center">
+                <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 items-center justify-center">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="second-axis-disk"
+                      checked={secondAxis}
+                      onCheckedChange={(checked) => {
+                        const isChecked = !!checked
+                        setSecondAxis(isChecked)
+                        // Clear second axis filters when unchecking
+                        if (!isChecked) {
+                          setDiameter2("")
+                          setWidth2("")
+                          setEt2("")
+                        }
+                      }}
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor="second-axis-disk" className="text-xs text-[#1F1F1F] dark:text-gray-300">
+                      Вторая ось
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="today-disk"
+                      checked={todayOnly}
+                      onCheckedChange={(checked) => setTodayOnly(!!checked)}
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor="today-disk" className="text-xs text-[#1F1F1F] dark:text-gray-300">
+                      Забрать сегодня
+                    </Label>
+                  </div>
+                </div>
+              </div>
+
               {/* Filters in a row: Stock Filter and Price Range */}
               <div className="flex flex-wrap gap-3 justify-between">
                 <div className="flex gap-3 w-full">

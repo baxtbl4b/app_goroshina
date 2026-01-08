@@ -31,6 +31,13 @@ interface Disk {
   storehouse?: Record<string, number>
 }
 
+// Interface for disk pair (front and rear axle)
+interface DiskPair {
+  frontDisk: Disk
+  rearDisk: Disk
+  brandModel: string
+}
+
 export default function DiskiPage() {
   const searchParams = useSearchParams()
   const pathname = usePathname()
@@ -63,6 +70,13 @@ export default function DiskiPage() {
   const minPriceParam = searchParams.get("minPrice")
   const maxPriceParam = searchParams.get("maxPrice")
   const stockFilterParam = searchParams.get("stockFilter")
+
+  // Second axis and additional filters
+  const filterSecondAxis = searchParams.get("secondAxis") === "true"
+  const filterTodayOnly = searchParams.get("today") === "true"
+  const filterDiameter2 = searchParams.get("diameter2")
+  const filterWidth2 = searchParams.get("width2")
+  const filterEt2 = searchParams.get("et2")
 
   // Сброс курсора при загрузке страницы
   useEffect(() => {
@@ -122,28 +136,51 @@ export default function DiskiPage() {
   // Применяем фильтры из URL параметров - memoized (like tire page)
   const filteredDisks = useMemo(() => {
     return filteredByBrand.filter((disk) => {
-      // Diameter filter
-      if (filterDiameter && parseFloat(disk.diameter.toString()) !== parseFloat(filterDiameter)) {
-        return false
-      }
+      // Second axis filter logic: if enabled and specified, disk should match either main params OR second axis params
+      if (filterSecondAxis && (filterDiameter2 || filterWidth2 || filterEt2)) {
+        // Check if disk matches main axis parameters
+        const matchesMainAxis = (
+          (!filterDiameter || parseFloat(disk.diameter.toString()) === parseFloat(filterDiameter)) &&
+          (!filterWidth || parseFloat(disk.width.toString()) === parseFloat(filterWidth)) &&
+          (!filterEt || Math.abs(parseFloat(disk.et.toString()) - parseFloat(filterEt)) <= 5)
+        )
 
-      // Width filter
-      if (filterWidth && parseFloat(disk.width.toString()) !== parseFloat(filterWidth)) {
-        return false
-      }
+        // Check if disk matches second axis parameters
+        const matchesSecondAxis = (
+          (!filterDiameter2 || parseFloat(disk.diameter.toString()) === parseFloat(filterDiameter2)) &&
+          (!filterWidth2 || parseFloat(disk.width.toString()) === parseFloat(filterWidth2)) &&
+          (!filterEt2 || Math.abs(parseFloat(disk.et.toString()) - parseFloat(filterEt2)) <= 5)
+        )
 
-      // PCD filter
-      if (filterPcd && disk.pcd !== filterPcd) {
-        return false
-      }
-
-      // ET filter - allow range of ±5
-      if (filterEt) {
-        const filterEtNum = parseFloat(filterEt)
-        const diskEt = parseFloat(disk.et.toString())
-        if (Math.abs(diskEt - filterEtNum) > 5) {
+        // Disk should match either main axis OR second axis
+        if (!matchesMainAxis && !matchesSecondAxis) {
           return false
         }
+      } else {
+        // Normal filtering without second axis
+        // Diameter filter
+        if (filterDiameter && parseFloat(disk.diameter.toString()) !== parseFloat(filterDiameter)) {
+          return false
+        }
+
+        // Width filter
+        if (filterWidth && parseFloat(disk.width.toString()) !== parseFloat(filterWidth)) {
+          return false
+        }
+
+        // ET filter - allow range of ±5
+        if (filterEt) {
+          const filterEtNum = parseFloat(filterEt)
+          const diskEt = parseFloat(disk.et.toString())
+          if (Math.abs(diskEt - filterEtNum) > 5) {
+            return false
+          }
+        }
+      }
+
+      // PCD filter (always applies)
+      if (filterPcd && disk.pcd !== filterPcd) {
+        return false
       }
 
       // Hub/DIA filter - disk hub should be >= filter hub
@@ -172,9 +209,14 @@ export default function DiskiPage() {
         return false
       }
 
+      // "Забрать сегодня" filter - show only disks available from main stock (provider null or empty)
+      if (filterTodayOnly && disk.provider) {
+        return false
+      }
+
       return true
     })
-  }, [filteredByBrand, filterDiameter, filterWidth, filterPcd, filterEt, filterHub, filterColor, minPriceParam, maxPriceParam, stockFilterParam])
+  }, [filteredByBrand, filterDiameter, filterWidth, filterPcd, filterEt, filterHub, filterColor, minPriceParam, maxPriceParam, stockFilterParam, filterSecondAxis, filterDiameter2, filterWidth2, filterEt2, filterTodayOnly])
 
   // Применяем сортировку - memoized
   const sortedDisks = useMemo(() => {
@@ -187,6 +229,81 @@ export default function DiskiPage() {
     return sorted
   }, [filteredDisks, sortBy])
 
+  // Helper function to get brand+model key for grouping
+  const getBrandModelKey = (disk: Disk): string => {
+    const brand = disk.brand || ""
+    const model = disk.name || ""
+    return `${brand.toLowerCase()}_${model.toLowerCase()}`
+  }
+
+  // Group disks by brand+model for second axis matching
+  const diskPairs = useMemo((): DiskPair[] => {
+    if (!filterSecondAxis || !filterDiameter2 || !filterWidth2 || !filterEt2) {
+      return []
+    }
+
+    const pairs: DiskPair[] = []
+
+    // Separate disks into main axis and second axis
+    const mainAxisDisks: Disk[] = []
+    const secondAxisDisks: Disk[] = []
+
+    sortedDisks.forEach((disk) => {
+      const matchesMainAxis = (
+        (!filterDiameter || parseFloat(disk.diameter.toString()) === parseFloat(filterDiameter)) &&
+        (!filterWidth || parseFloat(disk.width.toString()) === parseFloat(filterWidth)) &&
+        (!filterEt || Math.abs(parseFloat(disk.et.toString()) - parseFloat(filterEt)) <= 5)
+      )
+
+      const matchesSecondAxis = (
+        parseFloat(disk.diameter.toString()) === parseFloat(filterDiameter2) &&
+        parseFloat(disk.width.toString()) === parseFloat(filterWidth2) &&
+        Math.abs(parseFloat(disk.et.toString()) - parseFloat(filterEt2)) <= 5
+      )
+
+      if (matchesMainAxis) {
+        mainAxisDisks.push(disk)
+      }
+      if (matchesSecondAxis) {
+        secondAxisDisks.push(disk)
+      }
+    })
+
+    // Create a map of second axis disks by brand+model
+    const secondAxisDisksMap = new Map<string, Disk[]>()
+    secondAxisDisks.forEach((disk) => {
+      const key = getBrandModelKey(disk)
+      if (!secondAxisDisksMap.has(key)) {
+        secondAxisDisksMap.set(key, [])
+      }
+      secondAxisDisksMap.get(key)!.push(disk)
+    })
+
+    // Match main axis disks with second axis disks by brand+model
+    mainAxisDisks.forEach((frontDisk) => {
+      const key = getBrandModelKey(frontDisk)
+      const matchingSecondAxisDisks = secondAxisDisksMap.get(key)
+
+      if (matchingSecondAxisDisks && matchingSecondAxisDisks.length > 0) {
+        // Find best matching second axis disk (same brand, model)
+        const rearDisk = matchingSecondAxisDisks[0]
+        pairs.push({
+          frontDisk,
+          rearDisk,
+          brandModel: key,
+        })
+        // Remove used rear disk to avoid duplicates
+        matchingSecondAxisDisks.shift()
+      }
+    })
+
+    console.log(`Found ${pairs.length} matching disk pairs`)
+    return pairs
+  }, [sortedDisks, filterSecondAxis, filterDiameter2, filterWidth2, filterEt2, filterDiameter, filterWidth, filterEt])
+
+  // Check if we should show paired view
+  const showPairedView = filterSecondAxis && filterDiameter2 && filterWidth2 && filterEt2
+
   // Limit displayed disks for better performance
   const displayedDisks = useMemo(() => {
     return sortedDisks.slice(0, displayLimit)
@@ -195,7 +312,7 @@ export default function DiskiPage() {
   // Reset display limit when filters change
   useEffect(() => {
     setDisplayLimit(50)
-  }, [filterDiameter, filterWidth, filterPcd, filterEt, filterHub, filterColor, minPriceParam, maxPriceParam, stockFilterParam, selectedBrands, sortBy, diskType])
+  }, [filterDiameter, filterWidth, filterPcd, filterEt, filterHub, filterColor, minPriceParam, maxPriceParam, stockFilterParam, selectedBrands, sortBy, diskType, filterSecondAxis, filterDiameter2, filterWidth2, filterEt2, filterTodayOnly])
 
   // Infinite scroll: load more disks when scrolling to bottom
   useEffect(() => {
@@ -718,13 +835,83 @@ export default function DiskiPage() {
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
             </div>
           </div>
+        ) : showPairedView && diskPairs.length === 0 && sortedDisks.length > 0 ? (
+          <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-8 text-center mt-8">
+            <h3 className="text-xl font-bold mb-2 text-[#1F1F1F] dark:text-white">Пары дисков не найдены</h3>
+            <p className="text-[#1F1F1F] dark:text-white mb-4">
+              Не удалось найти диски с одинаковым брендом и моделью для обоих размеров.
+              <br />
+              Попробуйте изменить размеры осей.
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Передняя ось: {filterWidth}J x R{filterDiameter} ET{filterEt}
+              <br />
+              Задняя ось: {filterWidth2}J x R{filterDiameter2} ET{filterEt2}
+            </p>
+          </div>
         ) : sortedDisks.length === 0 ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <p className="text-gray-600 dark:text-gray-400">Диски не найдены</p>
             </div>
           </div>
+        ) : showPairedView && diskPairs.length > 0 ? (
+          // Paired view when second axis is enabled
+          <div className="space-y-4" style={{ paddingBottom: `${filterHeight + 20}px` }}>
+            {/* Header showing pair count */}
+            <div className="bg-[#c4d402]/20 dark:bg-[#c4d402]/10 rounded-xl p-3 flex items-center justify-between">
+              <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">
+                Найдено пар: {diskPairs.length}
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {filterWidth}J x R{filterDiameter} ET{filterEt} + {filterWidth2}J x R{filterDiameter2} ET{filterEt2}
+              </span>
+            </div>
+
+            {/* Disk pairs */}
+            {diskPairs.map((pair, index) => (
+              <div
+                key={`pair-${index}-${pair.frontDisk.id}-${pair.rearDisk.id}`}
+                className="bg-gray-100 dark:bg-[#333333] rounded-xl p-2 space-y-2"
+              >
+                {/* Pair header */}
+                <div className="flex items-center justify-between px-2 py-1">
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    {pair.frontDisk.brand} {pair.frontDisk.name}
+                  </span>
+                  <span className="text-xs bg-[#c4d402] text-[#1F1F1F] px-2 py-0.5 rounded-full">
+                    Пара #{index + 1}
+                  </span>
+                </div>
+
+                {/* Front axis disk - labeled */}
+                <div className="relative">
+                  <div className="absolute left-2 top-2 z-10 bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded-full">
+                    Передняя ось
+                  </div>
+                  <DiskCard disk={pair.frontDisk} />
+                </div>
+
+                {/* Rear axis disk - labeled */}
+                <div className="relative">
+                  <div className="absolute left-2 top-2 z-10 bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded-full">
+                    Задняя ось
+                  </div>
+                  <DiskCard disk={pair.rearDisk} />
+                </div>
+
+                {/* Combined price */}
+                <div className="flex items-center justify-between px-3 py-2 bg-white dark:bg-[#2A2A2A] rounded-lg">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Комплект (4 шт):</span>
+                  <span className="text-lg font-bold text-[#1F1F1F] dark:text-white">
+                    {((pair.frontDisk.price || 0) * 2 + (pair.rearDisk.price || 0) * 2).toLocaleString()} ₽
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
+          // Default view - single axis
           <>
             <div
               className="space-y-3 sm:space-y-4 sm:grid sm:grid-cols-1 sm:gap-3 sm:space-y-0 md:grid-cols-2 md:gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
