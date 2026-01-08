@@ -229,42 +229,6 @@ export default function PressureSensorsPage() {
     return true
   })
 
-  // Get brand-specific styles
-  const getBrandStyles = (brand: string) => {
-    switch (brand) {
-      case "HUF":
-        return {
-          baseClass: "relative bg-transparent border border-gray-300 text-[#1F1F1F] dark:text-white",
-          activeClass: "bg-[#1F1F1F] dark:bg-white border-[#1F1F1F] dark:border-white text-white dark:text-[#1F1F1F]",
-          hoverClass: "hover:bg-gray-100 dark:hover:bg-gray-800",
-        }
-      case "Sulit":
-        return {
-          baseClass: "relative bg-transparent border border-gray-300 text-[#1F1F1F] dark:text-white",
-          activeClass: "bg-[#1F1F1F] dark:bg-white border-[#1F1F1F] dark:border-white text-white dark:text-[#1F1F1F]",
-          hoverClass: "hover:bg-gray-100 dark:hover:bg-gray-800",
-        }
-      default:
-        return {
-          baseClass: "bg-transparent border border-gray-300 text-[#1F1F1F] dark:text-white",
-          activeClass: "bg-[#1F1F1F] dark:bg-white border-[#1F1F1F] dark:border-white text-white dark:text-[#1F1F1F]",
-          hoverClass: "hover:bg-gray-100 dark:hover:bg-gray-800",
-        }
-    }
-  }
-
-  // Get button class based on selected brand
-  const getButtonClass = (brand: string) => {
-    const isActive = selectedBrand === brand
-
-    const { baseClass, activeClass, hoverClass } = getBrandStyles(brand)
-
-    if (isActive) {
-      return `px-4 h-full flex items-center justify-center rounded-lg text-sm font-medium transition-colors duration-200 ${activeClass}`
-    }
-
-    return `px-4 h-full flex items-center justify-center rounded-lg text-sm font-medium transition-colors duration-200 ${baseClass} ${hoverClass}`
-  }
 
   // Function to format price
   const formatPrice = (price: number): string => {
@@ -360,50 +324,82 @@ export default function PressureSensorsPage() {
       transform: translateY(0);
     }
   }
+
+  @keyframes slideIn {
+    from {
+      transform: scaleX(0);
+      opacity: 0;
+    }
+    to {
+      transform: scaleX(1);
+      opacity: 1;
+    }
+  }
 `}</style>
 
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] py-2 shadow-sm flex flex-col items-center"
-        style={{ height: "51px" }}
+        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] overflow-visible"
+        style={{ "--header-height": "60px" } as React.CSSProperties}
       >
-        <div className="container max-w-md flex items-center justify-center h-full relative">
-          <button
-            onClick={() => router.push("/")}
-            className="fixed left-0 top-2 p-2 rounded-tr-md rounded-br-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors z-50 bg-white dark:bg-[#1F1F1F]"
-            aria-label="На главную"
-          >
-            <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-          </button>
-
-          <div className="flex items-center justify-center space-x-2 h-full">
+        <div className="container max-w-md flex items-center justify-center h-full relative overflow-visible">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 z-50">
             <button
-              onClick={() => setSelectedBrand(selectedBrand === "HUF" ? "" : "HUF")}
-              className={getButtonClass("HUF")}
-              style={{
-                height: "44px",
-                minWidth: "80px",
-              }}
+              onClick={() => router.push("/")}
+              className="p-2 rounded-tr-md rounded-br-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors bg-white dark:bg-[#1F1F1F]"
+              aria-label="На главную"
             >
-              <span className="relative z-10">HUF</span>
-            </button>
-            <button
-              onClick={() => setSelectedBrand(selectedBrand === "Sulit" ? "" : "Sulit")}
-              className={getButtonClass("Sulit")}
-              style={{
-                height: "44px",
-                minWidth: "80px",
-              }}
-            >
-              <span className="relative z-10">Sulit</span>
+              <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
             </button>
           </div>
 
-          {/* Cart button */}
-          <CartButton className="fixed right-0 top-2 z-50" />
+          {/* Brand selector tabs */}
+          <div className="flex items-center justify-center w-full px-16">
+            <div className="relative flex items-center gap-6">
+              {[
+                { key: "HUF", label: "HUF" },
+                { key: "Sulit", label: "Sulit" },
+              ].map((tab) => {
+                const isActive = selectedBrand === tab.key
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setSelectedBrand(selectedBrand === tab.key ? "" : tab.key)}
+                    className={`
+                      relative text-base font-medium transition-all duration-200
+                      ${
+                        isActive
+                          ? "text-[#1F1F1F] dark:text-white scale-105"
+                          : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                      }
+                    `}
+                    style={{
+                      fontSize: isActive ? "1.1rem" : "1rem",
+                      fontWeight: isActive ? 600 : 500,
+                    }}
+                  >
+                    {tab.label}
+                    {isActive && (
+                      <span
+                        className="absolute -bottom-2 left-0 right-0 h-0.5 bg-[#c4d402] rounded-full"
+                        style={{
+                          animation: "slideIn 0.3s ease-out",
+                        }}
+                      />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Global cart button - outside container */}
+        <div style={{ position: "fixed", right: "16px", top: "30px", transform: "translateY(-50%)", zIndex: 100 }}>
+          <CartButton />
         </div>
       </header>
 
-      <div className="flex-1 p-4 space-y-6 pt-[calc(51px+2rem)] pb-[200px]">
+      <div className="flex-1 p-4 space-y-6 pt-[calc(60px+env(safe-area-inset-top)+1.5rem)] pb-[200px]">
         <div className="space-y-4">
           {filteredSensors.map((sensor) => {
             const stockStatus = getStockStatus(sensor.stock)

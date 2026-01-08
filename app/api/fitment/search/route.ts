@@ -43,9 +43,18 @@ export async function GET(request: NextRequest) {
         slug: item.brand_slug,
       }))
 
-    // Search models in popular brands
+    // Search models in two ways:
+    // 1. In brands that match the query (e.g., "Changan" when searching "Changun Uni")
+    // 2. In popular brands
     const popularBrands = ["bmw", "mercedes", "audi", "toyota", "honda", "ford", "volkswagen", "nissan", "hyundai", "kia"]
-    const modelSearchPromises = popularBrands.map(async (brandSlug) => {
+
+    // Get brand slugs from matching brands
+    const matchingBrandSlugs = matchingBrands.map(b => b.slug)
+
+    // Combine matching brands and popular brands, avoiding duplicates
+    const brandsToSearch = [...new Set([...matchingBrandSlugs, ...popularBrands])]
+
+    const modelSearchPromises = brandsToSearch.map(async (brandSlug) => {
       try {
         const response = await fetch(
           `${API_BASE_URL}/fitment/models?access_token=${API_TOKEN}&brand_slug=${brandSlug}`,
@@ -60,6 +69,13 @@ export async function GET(request: NextRequest) {
         if (!response.ok) return []
 
         const data = await response.json()
+
+        // Find the brand name from our data
+        const brandInfo = matchingBrands.find(b => b.slug === brandSlug)
+        const brandName = brandInfo ? brandInfo.name :
+          (Array.isArray(brandsData) ? brandsData : []).find((b: any) => b.brand_slug === brandSlug)?.brand ||
+          brandSlug.charAt(0).toUpperCase() + brandSlug.slice(1)
+
         return (Array.isArray(data) ? data : [])
           .filter((item: any) =>
             item.model.toLowerCase().includes(lowerQuery)
@@ -69,7 +85,7 @@ export async function GET(request: NextRequest) {
             type: "model" as const,
             name: item.model,
             slug: item.model_slug,
-            brandName: brandSlug.charAt(0).toUpperCase() + brandSlug.slice(1),
+            brandName: brandName,
             brandSlug: brandSlug,
           }))
       } catch {
