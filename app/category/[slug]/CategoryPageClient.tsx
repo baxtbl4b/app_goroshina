@@ -1160,7 +1160,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
         </div>
         {/* Global cart button - outside container */}
-        <div style={{ position: 'fixed', right: '16px', top: '30px', transform: 'translateY(-50%) scale(1.035)', zIndex: 100 }}>
+        <div style={{ position: 'fixed', right: '16px', top: '30px', transform: 'translateY(-50%)', zIndex: 100 }}>
           <CartButton />
         </div>
       </header>

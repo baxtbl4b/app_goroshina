@@ -50,6 +50,8 @@ export default function DiskiPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [sortBy, setSortBy] = useState<string>("default")
   const [filterHeight, setFilterHeight] = useState(200)
+  const [displayLimit, setDisplayLimit] = useState(50) // Pagination: show 50 at a time
+  const loadMoreRef = useRef<HTMLDivElement>(null) // Ref for infinite scroll trigger
 
   // Read filter values directly from URL parameters (like tire page)
   const filterDiameter = searchParams.get("diameter")
@@ -57,6 +59,7 @@ export default function DiskiPage() {
   const filterPcd = searchParams.get("pcd")
   const filterEt = searchParams.get("et")
   const filterHub = searchParams.get("hub")
+  const filterColor = searchParams.get("color")
   const minPriceParam = searchParams.get("minPrice")
   const maxPriceParam = searchParams.get("maxPrice")
   const stockFilterParam = searchParams.get("stockFilter")
@@ -152,6 +155,11 @@ export default function DiskiPage() {
         }
       }
 
+      // Color filter
+      if (filterColor && disk.color !== filterColor) {
+        return false
+      }
+
       // Price range filter
       const minPrice = minPriceParam ? parseFloat(minPriceParam) : 3000
       const maxPrice = maxPriceParam ? parseFloat(maxPriceParam) : 30000
@@ -166,7 +174,7 @@ export default function DiskiPage() {
 
       return true
     })
-  }, [filteredByBrand, filterDiameter, filterWidth, filterPcd, filterEt, filterHub, minPriceParam, maxPriceParam, stockFilterParam])
+  }, [filteredByBrand, filterDiameter, filterWidth, filterPcd, filterEt, filterHub, filterColor, minPriceParam, maxPriceParam, stockFilterParam])
 
   // Применяем сортировку - memoized
   const sortedDisks = useMemo(() => {
@@ -178,6 +186,40 @@ export default function DiskiPage() {
     }
     return sorted
   }, [filteredDisks, sortBy])
+
+  // Limit displayed disks for better performance
+  const displayedDisks = useMemo(() => {
+    return sortedDisks.slice(0, displayLimit)
+  }, [sortedDisks, displayLimit])
+
+  // Reset display limit when filters change
+  useEffect(() => {
+    setDisplayLimit(50)
+  }, [filterDiameter, filterWidth, filterPcd, filterEt, filterHub, filterColor, minPriceParam, maxPriceParam, stockFilterParam, selectedBrands, sortBy, diskType])
+
+  // Infinite scroll: load more disks when scrolling to bottom
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0]
+        if (first.isIntersecting && displayLimit < sortedDisks.length) {
+          setDisplayLimit((prev) => prev + 50)
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    const currentRef = loadMoreRef.current
+    if (currentRef) {
+      observer.observe(currentRef)
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef)
+      }
+    }
+  }, [displayLimit, sortedDisks.length])
 
 
   // Track cast button coordinates
@@ -359,43 +401,6 @@ export default function DiskiPage() {
   const handleDiskTypeChange = useCallback((type: "stamped" | "cast" | "forged") => {
     setDiskType(type)
   }, [])
-
-  // Get unique options from API data - memoized
-  // Use filteredByType instead of allDisks for better performance
-  const filterOptions = useMemo(() => {
-    if (filteredByType.length === 0) {
-      // Return empty arrays while loading or no disks of this type
-      return {
-        diameterOptions: [],
-        widthOptions: [],
-        pcdOptions: [],
-        etOptions: [],
-        hubOptions: [],
-      }
-    }
-
-    const diameters = new Set<string>()
-    const widths = new Set<string>()
-    const pcds = new Set<string>()
-    const ets = new Set<string>()
-    const hubs = new Set<string>()
-
-    filteredByType.forEach((disk) => {
-      if (disk.diameter) diameters.add(disk.diameter.toString())
-      if (disk.width) widths.add(disk.width.toString())
-      if (disk.pcd) pcds.add(disk.pcd)
-      if (disk.et) ets.add(disk.et.toString())
-      if (disk.dia) hubs.add(disk.dia.toString())
-    })
-
-    return {
-      diameterOptions: Array.from(diameters).sort((a, b) => parseFloat(a) - parseFloat(b)),
-      widthOptions: Array.from(widths).sort((a, b) => parseFloat(a) - parseFloat(b)),
-      pcdOptions: Array.from(pcds).sort(),
-      etOptions: Array.from(ets).sort((a, b) => parseFloat(a) - parseFloat(b)),
-      hubOptions: Array.from(hubs).sort((a, b) => parseFloat(a) - parseFloat(b)),
-    }
-  }, [filteredByType])
 
 
   // Определяем позицию для индикатора корзины в зависимости от наличия фильтра размеров
@@ -693,7 +698,7 @@ export default function DiskiPage() {
 
         </div>
         {/* Global cart button - outside container */}
-        <div style={{ position: 'fixed', right: '16px', top: '30px', transform: 'translateY(-50%) scale(1.035)', zIndex: 100 }}>
+        <div style={{ position: 'fixed', right: '16px', top: '30px', transform: 'translateY(-50%)', zIndex: 100 }}>
           <CartButton />
         </div>
       </header>
@@ -711,7 +716,6 @@ export default function DiskiPage() {
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-400">Загрузка дисков...</p>
             </div>
           </div>
         ) : sortedDisks.length === 0 ? (
@@ -721,16 +725,36 @@ export default function DiskiPage() {
             </div>
           </div>
         ) : (
-          <div
-            className="space-y-3 sm:space-y-4 sm:grid sm:grid-cols-1 sm:gap-3 sm:space-y-0 md:grid-cols-2 md:gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
-            style={{ paddingBottom: `${filterHeight + 20}px` }}
-          >
-            {sortedDisks.map((disk) => (
-              <div key={disk.id} className="w-full">
-                <DiskCard disk={disk} />
+          <>
+            <div
+              className="space-y-3 sm:space-y-4 sm:grid sm:grid-cols-1 sm:gap-3 sm:space-y-0 md:grid-cols-2 md:gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+            >
+              {displayedDisks.map((disk) => (
+                <div key={disk.id} className="w-full">
+                  <DiskCard disk={disk} />
+                </div>
+              ))}
+            </div>
+
+            {/* Infinite scroll trigger */}
+            {displayLimit < sortedDisks.length && (
+              <div
+                ref={loadMoreRef}
+                className="flex justify-center py-6"
+                style={{ paddingBottom: `${filterHeight + 20}px` }}
+              >
+                <div className="text-center">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#009CFF]"></div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    Загрузка...
+                  </p>
+                </div>
               </div>
-            ))}
-          </div>
+            )}
+            {displayLimit >= sortedDisks.length && (
+              <div style={{ paddingBottom: `${filterHeight + 20}px` }} />
+            )}
+          </>
         )}
       </div>
 
@@ -738,11 +762,6 @@ export default function DiskiPage() {
       <DiskSearchFilter
         diskType={diskType}
         onDiskTypeChange={handleDiskTypeChange}
-        diameterOptions={filterOptions.diameterOptions}
-        widthOptions={filterOptions.widthOptions}
-        pcdOptions={filterOptions.pcdOptions}
-        etOptions={filterOptions.etOptions}
-        hubOptions={filterOptions.hubOptions}
         onFilterHeightChange={setFilterHeight}
       />
     </main>

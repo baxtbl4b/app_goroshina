@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react"
+import { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -23,22 +23,20 @@ interface VehicleWithWheels {
 interface DiskSearchFilterProps {
   diskType: string
   onDiskTypeChange?: (type: "stamped" | "cast" | "forged") => void
-  diameterOptions?: string[]
-  widthOptions?: string[]
-  pcdOptions?: string[]
-  etOptions?: string[]
-  hubOptions?: string[]
   onFilterHeightChange?: (height: number) => void
 }
 
-const DiskSearchFilter = memo(function DiskSearchFilter({
+// Static filter options - defined outside component for true static behavior
+const staticDiameterOptions = ["13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]
+const staticWidthOptions = ["4.5", "5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"]
+const staticPcdOptions = ["4x98", "4x100", "4x108", "4x114.3", "5x100", "5x105", "5x108", "5x110", "5x112", "5x114.3", "5x115", "5x120", "5x127", "5x130", "5x139.7", "5x150", "6x114.3", "6x127", "6x139.7"]
+const staticEtOptions = ["-15", "-10", "-5", "0", "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70"]
+const staticHubOptions = ["54.1", "56.1", "56.6", "57.1", "58.1", "58.6", "60.1", "63.3", "63.4", "64.1", "65.1", "66.1", "66.6", "67.1", "70.1", "71.6", "72.6", "73.1", "74.1", "78.1", "84.1", "95.3", "106.1", "108.1", "110.1"]
+const staticColorOptions = ["Серебристый", "Черный", "Белый", "Серый", "Антрацит", "Графит", "Хром", "Бронза", "Золото"]
+
+export default function DiskSearchFilter({
   diskType = "cast",
   onDiskTypeChange,
-  diameterOptions = [],
-  widthOptions = [],
-  pcdOptions = [],
-  etOptions = [],
-  hubOptions = [],
   onFilterHeightChange
 }: DiskSearchFilterProps) {
   const router = useRouter()
@@ -48,6 +46,7 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
   const [pcd, setPcd] = useState<string>(searchParams.get("pcd") || "")
   const [et, setEt] = useState<string>(searchParams.get("et") || "")
   const [hub, setHub] = useState<string>(searchParams.get("hub") || "")
+  const [color, setColor] = useState<string>(searchParams.get("color") || "")
 
   // Add state for filter collapse
   const [isFilterCollapsed, setIsFilterCollapsed] = useState(false)
@@ -152,12 +151,15 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
     if (hub) params.set("hub", hub)
     else params.delete("hub")
 
+    if (color) params.set("color", color)
+    else params.delete("color")
+
     const newParamsString = params.toString()
     const currentParamsString = searchParams.toString()
     if (newParamsString !== currentParamsString) {
       router.push(`${window.location.pathname}?${newParamsString}`, { scroll: false })
     }
-  }, [diameter, width, pcd, et, hub, router, searchParams])
+  }, [diameter, width, pcd, et, hub, color, router, searchParams])
 
   // Add state for garage scroll gradients
   const [showLeftGradient, setShowLeftGradient] = useState(false)
@@ -296,6 +298,7 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
     setPcd("")
     setEt("")
     setHub("")
+    setColor("")
     setSelectedVehicle(null)
 
     const params = new URLSearchParams(searchParams.toString())
@@ -304,6 +307,7 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
     params.delete("pcd")
     params.delete("et")
     params.delete("hub")
+    params.delete("color")
 
     // Navigate with the parameters
     router.push(`${window.location.pathname}?${params.toString()}`)
@@ -496,7 +500,7 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
-                    {diameterOptions.map((option) => (
+                    {staticDiameterOptions.map((option) => (
                       <SelectItem key={option} value={option}>
                         R{option}
                       </SelectItem>
@@ -514,7 +518,7 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
-                    {widthOptions.map((option) => (
+                    {staticWidthOptions.map((option) => (
                       <SelectItem key={option} value={option}>
                         {option}J
                       </SelectItem>
@@ -532,7 +536,7 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
-                    {pcdOptions.map((option) => (
+                    {staticPcdOptions.map((option) => (
                       <SelectItem key={option} value={option}>
                         {option}
                       </SelectItem>
@@ -547,18 +551,18 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
               size="sm"
               onClick={clearAllDimensions}
               className={`h-10 px-3 text-xs border-0 rounded-xl transition-all duration-300 ${
-                diameter || width || pcd || et || hub || priceRange[0] > 3000 || priceRange[1] < 30000 || stockFilter === "full"
+                diameter || width || pcd || et || hub || color || priceRange[0] > 3000 || priceRange[1] < 30000 || stockFilter === "full"
                   ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 hover:scale-105 active:scale-95 shadow-md hover:shadow-red-500/30"
                   : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
               }`}
-              disabled={!diameter && !width && !pcd && !et && !hub && priceRange[0] === 3000 && priceRange[1] === 30000 && stockFilter === "single"}
+              disabled={!diameter && !width && !pcd && !et && !hub && !color && priceRange[0] === 3000 && priceRange[1] === 30000 && stockFilter === "single"}
             >
               Сбросить
             </Button>
           </div>
 
           {/* Additional disk parameters moved from collapsible section */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div>
               <Label htmlFor="et" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block">
                 Вылет (ET)
@@ -568,7 +572,7 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
-                  {etOptions.map((option) => (
+                  {staticEtOptions.map((option) => (
                     <SelectItem key={option} value={option}>
                       ET{option}
                     </SelectItem>
@@ -586,9 +590,27 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
-                  {hubOptions.map((option) => (
+                  {staticHubOptions.map((option) => (
                     <SelectItem key={option} value={option}>
                       {option} мм
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="color" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block">
+                Цвет
+              </Label>
+              <Select value={color} onValueChange={setColor}>
+                <SelectTrigger id="color" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                  <SelectValue placeholder="~" />
+                </SelectTrigger>
+                <SelectContent>
+                  {staticColorOptions.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -716,6 +738,4 @@ const DiskSearchFilter = memo(function DiskSearchFilter({
       </div>
     </>
   )
-})
-
-export default DiskSearchFilter
+}
