@@ -16,6 +16,7 @@ interface QuickFilterButtonsProps {
   onBrandSelect?: (brands: string[]) => void
   resultsCount?: number
   availableBrands?: string[]
+  onCarSelect?: (threadSize: string) => void
 }
 
 export default function QuickFilterButtons({
@@ -26,6 +27,7 @@ export default function QuickFilterButtons({
   onBrandSelect,
   resultsCount,
   availableBrands,
+  onCarSelect,
 }: QuickFilterButtonsProps) {
   const pathname = usePathname()
 
@@ -40,6 +42,18 @@ export default function QuickFilterButtons({
   // Add state for brands loaded from API
   const [brands, setBrands] = useState<string[]>([])
   const [brandsLoading, setBrandsLoading] = useState(true)
+
+  // Car selector states for krepezh page
+  const [carBrands, setCarBrands] = useState<any[]>([])
+  const [carModels, setCarModels] = useState<any[]>([])
+  const [selectedCarBrand, setSelectedCarBrand] = useState<any | null>(null)
+  const [selectedCarModel, setSelectedCarModel] = useState<any | null>(null)
+  const [selectedYear, setSelectedYear] = useState<number | null>(null)
+  const [carSearchInput, setCarSearchInput] = useState("")
+  const [showCarSelector, setShowCarSelector] = useState(false)
+  const [carSelectorStep, setCarSelectorStep] = useState<"brand" | "model" | "year">("brand")
+  const [searchResults, setSearchResults] = useState<{ brands: any[]; models: any[] }>({ brands: [], models: [] })
+  const [isSearching, setIsSearching] = useState(false)
 
   // Load brands from API
   useEffect(() => {
@@ -72,6 +86,34 @@ export default function QuickFilterButtons({
     }
     loadBrands()
   }, [])
+
+  // Search for cars (brands and models) with debounce
+  useEffect(() => {
+    if (!pathname?.includes("/krepezh")) return
+    if (!carSearchInput || carSearchInput.length < 2) {
+      setSearchResults({ brands: [], models: [] })
+      setIsSearching(false)
+      return
+    }
+
+    setIsSearching(true)
+    const timeoutId = setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/fitment/search?q=${encodeURIComponent(carSearchInput)}`)
+        if (response.ok) {
+          const data = await response.json()
+          console.log("Search results:", data)
+          setSearchResults(data)
+        }
+      } catch (error) {
+        console.error("Search error:", error)
+      } finally {
+        setIsSearching(false)
+      }
+    }, 300) // Debounce 300ms
+
+    return () => clearTimeout(timeoutId)
+  }, [carSearchInput, pathname])
 
   // Add click outside handler to close brand selector
   useEffect(() => {
@@ -224,6 +266,100 @@ export default function QuickFilterButtons({
     }
   }, [])
 
+  // Handle car brand selection
+  const handleCarBrandSelect = async (brand: any) => {
+    setSelectedCarBrand(brand)
+    setCarSearchInput(brand.name)
+    setCarSelectorStep("model")
+
+    // Load models for this brand
+    try {
+      const response = await fetch(`/api/fitment/models?brand_slug=${brand.slug}`)
+      if (response.ok) {
+        const data = await response.json()
+        setCarModels(data.models || [])
+      }
+    } catch (error) {
+      console.error("Failed to load car models:", error)
+    }
+  }
+
+  // Handle direct model selection from search
+  const handleModelSelect = async (model: any) => {
+    // Set the brand first
+    setSelectedCarBrand({ name: model.brandName, slug: model.brandSlug })
+    setSelectedCarModel({ name: model.name, slug: model.slug })
+    setCarSearchInput(`${model.brandName} ${model.name}`)
+    setCarSelectorStep("year")
+
+    // Load years for this model
+    try {
+      const response = await fetch(`/api/fitment/models?brand_slug=${model.brandSlug}`)
+      if (response.ok) {
+        const data = await response.json()
+        const selectedModel = data.models?.find((m: any) => m.slug === model.slug)
+        if (selectedModel && selectedModel.years) {
+          // If years are available in the model data, use them
+          // Otherwise we'll need to fetch from another endpoint
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load model years:", error)
+    }
+  }
+
+  // Handle car model selection
+  const handleCarModelSelect = (model: any) => {
+    setSelectedCarModel(model)
+    setCarSearchInput(`${selectedCarBrand?.name} ${model.name}`)
+    setCarSelectorStep("year")
+  }
+
+  // Handle year selection and fetch fitment data
+  const handleYearSelect = async (year: number) => {
+    setSelectedYear(year)
+    setCarSearchInput(`${selectedCarBrand?.name} ${selectedCarModel?.name} ${year}`)
+    setShowCarSelector(false)
+
+    // Fetch fitment data
+    try {
+      const response = await fetch(
+        `/api/fitment?brand_slug=${selectedCarBrand?.slug}&model_slug=${selectedCarModel?.slug}&year=${year}`
+      )
+      if (response.ok) {
+        const data = await response.json()
+
+        // Parse thread_size (e.g., "M14 x 1.5" or "Lug bolts M14 x 1.5")
+        if (data.thread_size) {
+          // Extract the pattern like "M14 x 1.5" from the string
+          const threadMatch = data.thread_size.match(/M?(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)/i)
+          if (threadMatch) {
+            const diameter = threadMatch[1]
+            const step = threadMatch[2]
+            const threadSize = `${diameter}x${step}`
+
+            // Call the callback to update filters
+            if (onCarSelect) {
+              onCarSelect(threadSize)
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load fitment data:", error)
+    }
+  }
+
+  // Clear car selection
+  const clearCarSelection = () => {
+    setSelectedCarBrand(null)
+    setSelectedCarModel(null)
+    setSelectedYear(null)
+    setCarSearchInput("")
+    setCarSelectorStep("brand")
+    setShowCarSelector(false)
+  }
+
   if (!insideTireResults) return null
 
   return (
@@ -248,25 +384,41 @@ export default function QuickFilterButtons({
 
       {/* Верхняя часть - два скруглённых прямоугольника */}
       <div className="flex gap-2 w-full items-center">
-        {/* Левый блок - Введите бренд */}
+        {/* Левый блок - Введите бренд / Фильтр по модели авто */}
         <div className="relative brand-selector-container flex items-center gap-2 flex-1">
           <div className="relative flex-1">
             <input
               type="text"
-              value={brandSearchInput}
+              value={pathname?.includes("/krepezh") ? carSearchInput : brandSearchInput}
               onChange={(e) => {
-                setBrandSearchInput(e.target.value)
-                // Show the brand selector when typing and there's input
-                if (e.target.value.trim()) {
-                  setShowBrandSelector(true)
-                } else if (e.target.value === "" && selectedBrands.length === 0) {
-                  // Hide selector if input is empty and no brands are selected
-                  setShowBrandSelector(false)
+                if (pathname?.includes("/krepezh")) {
+                  setCarSearchInput(e.target.value)
+                  if (e.target.value.trim()) {
+                    setShowCarSelector(true)
+                    setCarSelectorStep("brand")
+                  } else {
+                    setShowCarSelector(false)
+                  }
+                } else {
+                  setBrandSearchInput(e.target.value)
+                  // Show the brand selector when typing and there's input
+                  if (e.target.value.trim()) {
+                    setShowBrandSelector(true)
+                  } else if (e.target.value === "" && selectedBrands.length === 0) {
+                    // Hide selector if input is empty and no brands are selected
+                    setShowBrandSelector(false)
+                  }
                 }
               }}
-              onFocus={() => setShowBrandSelector(true)}
+              onFocus={() => {
+                if (pathname?.includes("/krepezh")) {
+                  setShowCarSelector(true)
+                } else {
+                  setShowBrandSelector(true)
+                }
+              }}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
+                if (e.key === "Enter" && !pathname?.includes("/krepezh")) {
                   e.preventDefault()
                   handleBrandSearch(e as any)
                 }
@@ -279,18 +431,26 @@ export default function QuickFilterButtons({
           {/* Clear button - вынесен за блок справа */}
           <button
             onClick={() => {
-              if (selectedBrands.length > 0 || brandSearchInput.trim()) {
-                setBrandSearchInput("")
-                setSelectedBrands([])
-                if (onBrandSelect) {
-                  onBrandSelect([])
+              if (pathname?.includes("/krepezh")) {
+                clearCarSelection()
+              } else {
+                if (selectedBrands.length > 0 || brandSearchInput.trim()) {
+                  setBrandSearchInput("")
+                  setSelectedBrands([])
+                  if (onBrandSelect) {
+                    onBrandSelect([])
+                  }
+                  setShowBrandSelector(false)
                 }
-                setShowBrandSelector(false)
               }
             }}
-            disabled={selectedBrands.length === 0 && !brandSearchInput.trim()}
+            disabled={
+              pathname?.includes("/krepezh")
+                ? !carSearchInput.trim()
+                : selectedBrands.length === 0 && !brandSearchInput.trim()
+            }
             className={`p-1.5 rounded-full transition-colors flex-shrink-0 ${
-              selectedBrands.length > 0 || brandSearchInput.trim()
+              (pathname?.includes("/krepezh") ? carSearchInput.trim() : selectedBrands.length > 0 || brandSearchInput.trim())
                 ? "hover:bg-gray-600 cursor-pointer bg-[#333333]/50"
                 : "cursor-not-allowed opacity-30 bg-[#333333]/30"
             }`}
@@ -299,8 +459,124 @@ export default function QuickFilterButtons({
             <X className="h-4 w-4 text-gray-400" />
           </button>
 
+          {/* Car selector for krepezh page */}
+          {pathname?.includes("/krepezh") && showCarSelector && (
+            <div
+              className="absolute top-full left-0 mt-1 bg-white dark:bg-[#2A2A2A] border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-md shadow-lg z-50 w-64 max-h-60 overflow-y-auto"
+              id="car-selector-dropdown"
+            >
+              <div className="p-2">
+                {carSelectorStep === "brand" && (
+                  <>
+                    {isSearching && (
+                      <div className="p-4 text-center text-gray-500">
+                        Поиск...
+                      </div>
+                    )}
+                    {!isSearching && carSearchInput.length >= 2 && (
+                      <>
+                        {searchResults.brands.length > 0 && (
+                          <div className="mb-2">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 font-semibold">
+                              МАРКИ
+                            </div>
+                            {searchResults.brands.map((brand) => (
+                              <div
+                                key={`brand-${brand.slug}`}
+                                className="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer"
+                                onClick={() => handleCarBrandSelect(brand)}
+                              >
+                                <span className="text-base font-medium">{brand.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {searchResults.models.length > 0 && (
+                          <div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 font-semibold">
+                              МОДЕЛИ
+                            </div>
+                            {searchResults.models.map((model) => (
+                              <div
+                                key={`model-${model.brandSlug}-${model.slug}`}
+                                className="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer"
+                                onClick={() => handleModelSelect(model)}
+                              >
+                                <div className="flex flex-col">
+                                  <span className="text-base">{model.name}</span>
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">{model.brandName}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {searchResults.brands.length === 0 && searchResults.models.length === 0 && (
+                          <div className="p-4 text-center text-gray-500">
+                            Ничего не найдено
+                          </div>
+                        )}
+                      </>
+                    )}
+                    {!isSearching && carSearchInput.length < 2 && (
+                      <div className="p-4 text-center text-gray-500 text-sm">
+                        Введите минимум 2 символа для поиска
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {carSelectorStep === "model" && (
+                  <>
+                    <button
+                      className="w-full text-left p-2 mb-2 text-sm text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+                      onClick={() => {
+                        setCarSelectorStep("brand")
+                        setSelectedCarBrand(null)
+                        setCarModels([])
+                      }}
+                    >
+                      ← Назад к маркам
+                    </button>
+                    {carModels.map((model) => (
+                      <div
+                        key={model.slug}
+                        className="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer"
+                        onClick={() => handleCarModelSelect(model)}
+                      >
+                        <span className="text-base">{model.name}</span>
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                {carSelectorStep === "year" && selectedCarModel && (
+                  <>
+                    <button
+                      className="w-full text-left p-2 mb-2 text-sm text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+                      onClick={() => {
+                        setCarSelectorStep("model")
+                        setSelectedCarModel(null)
+                      }}
+                    >
+                      ← Назад к моделям
+                    </button>
+                    {selectedCarModel.years?.map((year: number) => (
+                      <div
+                        key={year}
+                        className="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer"
+                        onClick={() => handleYearSelect(year)}
+                      >
+                        <span className="text-base">{year}</span>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Упрощенный селектор брендов */}
-          {showBrandSelector && (
+          {!pathname?.includes("/krepezh") && showBrandSelector && (
             <div
               className="absolute top-full left-0 mt-1 bg-white dark:bg-[#2A2A2A] border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-md shadow-lg z-50 w-48 max-h-48 sm:max-h-60 overflow-y-auto"
               id="brand-selector-dropdown"

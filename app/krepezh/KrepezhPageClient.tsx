@@ -521,6 +521,14 @@ export default function KrepezhPageClient() {
     // Здесь можно добавить логику сортировки
   }
 
+  const handleCarSelect = (threadSize: string) => {
+    console.log("Выбран автомобиль с резьбой:", threadSize)
+    // Update URL with thread parameter
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("thread", threadSize)
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
   // Определяем позицию для индикатора корзины в зависимости от наличия фильтра размеров
   const cartIndicatorTopClass = isThreadFilterActive ? "top-24" : "top-16"
 
@@ -718,6 +726,7 @@ export default function KrepezhPageClient() {
           insideTireResults={true}
           onBrandSelect={handleBrandSelect}
           onSortChange={handleSortChange}
+          onCarSelect={handleCarSelect}
           activeFiltersCount={selectedBrands.length}
         />
 
