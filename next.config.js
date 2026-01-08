@@ -9,7 +9,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["api.fxcode.ru", "api.tirebase.ru", "hebbkx1anhila5yf.public.blob.vercel-storage.com"],
+    domains: ["api.fxcode.ru", "api.tirebase.ru", "hebbkx1anhila5yf.public.blob.vercel-storage.com", "duplo-s0.shinservice.ru", "diskoptim.ru"],
     remotePatterns: [
       {
         protocol: "https",
@@ -26,6 +26,18 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "hebbkx1anhila5yf.public.blob.vercel-storage.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "duplo-s0.shinservice.ru",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "diskoptim.ru",
         port: "",
         pathname: "/**",
       },

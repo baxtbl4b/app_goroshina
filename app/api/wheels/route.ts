@@ -124,11 +124,13 @@ export async function GET(request: NextRequest) {
           return {
             id: wheel.id || `wheel-${Math.random()}`,
             name: wheel.title || `${wheel.brand || "Unknown"} ${wheel.model || ""}`,
+            title: wheel.title,
             price: wheel.rrc || wheel.opt || wheel.price || 5000,
             rrc: wheel.rrc || wheel.opt || wheel.price || 5000,
             stock: wheel.quantity || 0,
             image: wheel.image || "/images/black-wheel.png",
             brand: wheel.brand || "Unknown",
+            model: wheel.model || null,
             diameter: wheel.diam || 17,
             width: wheel.width || 7,
             pcd: pcdFormatted,

@@ -1,5 +1,36 @@
 export type Season = "s" | "w" | "a"
 
+export interface Disk {
+  id: string
+  name?: string
+  title?: string
+  price?: number
+  rrc?: number
+  stock?: number
+  image?: string | any
+  img?: string
+  images?: string[]
+  brand?: string | any
+  model?: string | any
+  diameter?: number | string
+  diam?: number | string
+  width?: number | string
+  pcd?: string
+  et?: number | string
+  dia?: number | string
+  type?: string | any
+  disk_type?: string | any
+  color?: string
+  isPromotional?: boolean
+  provider?: string | null
+  storehouse?: Record<string, number>
+  providers?: Record<string, { id?: string; quantity?: number; price?: number; rrc?: number }>
+  country?: string | any
+  country_code?: string
+  flag?: string | any
+  description?: string
+}
+
 export interface Tire {
   id: string
   name: string

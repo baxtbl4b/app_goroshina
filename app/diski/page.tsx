@@ -110,6 +110,11 @@ export default function DiskiPage() {
           throw new Error("Failed to fetch wheels")
         }
         const data = await response.json()
+        console.log('Fetched disks from API:', data.data?.length, 'items')
+        if (data.data && data.data.length > 0) {
+          console.log('First disk sample:', data.data[0])
+          console.log('First disk has model field:', data.data[0].model)
+        }
         setAllDisks(data.data || [])
       } catch (error) {
         console.error("Error fetching wheels:", error)

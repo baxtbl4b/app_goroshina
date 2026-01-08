@@ -1,34 +1,14 @@
 "use client"
 
 import React, { useState, useEffect, useRef, memo } from "react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Heart, Plus, Minus, CheckCircle, Clock, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import CartQuantityButtons from "@/components/cart-quantity-buttons"
 import { getDeliveryForCategory, getDeliveryColorClass } from "@/lib/delivery-time"
-
-// Тип для диска
-interface Disk {
-  id: string
-  name: string
-  price: number
-  rrc: number // Рекомендованная розничная цена
-  stock: number
-  image: string
-  brand: string
-  diameter: number
-  width: number
-  pcd: string // Параметр крепления (например, "5x114.3")
-  et: number // Вылет
-  dia: number // Диаметр центрального отверстия
-  type: "stamped" | "cast" | "forged" // Тип диска
-  color?: string
-  isPromotional?: boolean
-  provider?: string | null
-  storehouse?: Record<string, number>
-}
+import type { Disk } from "@/lib/api"
 
 interface DiskCardProps {
   disk: Disk
@@ -45,6 +25,8 @@ const formatPrice = (price: number): string => {
 }
 
 const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
+  const router = useRouter()
+
   // Состояния
   const [isFavorite, setIsFavorite] = useState(false)
   const [imageModalOpen, setImageModalOpen] = useState(false)
@@ -190,6 +172,18 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
   // Получаем информацию о доставке из утилиты (с учётом складов и провайдера)
   const deliveryInfo = getDeliveryForCategory(disk.provider, disk.storehouse)
 
+  // Функция для сохранения диска в localStorage при клике и навигации
+  const handleDiskClick = () => {
+    // Логируем данные диска перед сохранением
+    console.log('Saving disk to localStorage:', disk)
+    console.log('Disk has model field:', disk.model)
+
+    // Сохраняем диск в localStorage для страницы карточки товара
+    localStorage.setItem(`disk_${disk.id}`, JSON.stringify(disk))
+    // Переходим на страницу карточки товара
+    router.push(`/disk/${disk.id}`)
+  }
+
   // Функция для определения статуса наличия
   const getStockStatus = () => {
     const colorClass = getDeliveryColorClass(deliveryInfo.type)
@@ -226,30 +220,33 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
+    <div
+      className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex hover:shadow-md transition-shadow cursor-pointer"
+      onClick={handleDiskClick}
+    >
       {/* Левая часть - Изображение */}
       <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[145px] sm:w-[190px] md:w-[234px] lg:w-[263px] overflow-hidden flex items-center justify-center bg-white rounded-l-xl" style={{ maxHeight: "248px" }}>
-        {disk.isPromotional && <Badge className="absolute left-2 top-2 z-10 bg-[#c4d402] text-[#1F1F1F]">Акция</Badge>}
-        <div
-          className="flex justify-center items-center h-full w-full relative overflow-hidden bg-transparent"
-          style={{ zIndex: 1 }}
-        >
-          <img
-            src={getImageUrl() || "/placeholder.svg"}
-            alt={disk.name || "Диск"}
-            className="w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              setImageModalOpen(true)
-            }}
-            onError={() => setImageError(true)}
-            style={{
-              filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
-              backgroundColor: "transparent",
-            }}
-          />
-        </div>
+          {disk.isPromotional && <Badge className="absolute left-2 top-2 z-10 bg-[#c4d402] text-[#1F1F1F]">Акция</Badge>}
+          <div
+            className="flex justify-center items-center h-full w-full relative overflow-hidden bg-transparent"
+            style={{ zIndex: 1 }}
+          >
+            <img
+              src={getImageUrl() || "/placeholder.svg"}
+              alt={disk.name || "Диск"}
+              className="w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setImageModalOpen(true)
+              }}
+              onError={() => setImageError(true)}
+              style={{
+                filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
+                backgroundColor: "transparent",
+              }}
+            />
+          </div>
 
         <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
           <DialogContent
@@ -308,11 +305,9 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
             </Button>
           </div>
 
-          <Link href={`/disk/${disk.id}`}>
-            <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-3 text-sm sm:text-sm md:text-base lg:text-lg leading-tight">
-              {disk.name}
-            </h3>
-          </Link>
+          <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-3 text-sm sm:text-sm md:text-base lg:text-lg leading-tight">
+            {disk.name}
+          </h3>
         </div>
 
         <div className="flex flex-col relative pb-8 sm:pb-9 md:pb-11 mt-3">
@@ -360,7 +355,6 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
           </div>
         </div>
       </div>
-
     </div>
   )
 })
