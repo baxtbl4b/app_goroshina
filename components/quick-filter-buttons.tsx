@@ -15,6 +15,7 @@ interface QuickFilterButtonsProps {
   insideTireResults?: boolean
   onBrandSelect?: (brands: string[]) => void
   resultsCount?: number
+  availableBrands?: string[]
 }
 
 export default function QuickFilterButtons({
@@ -24,6 +25,7 @@ export default function QuickFilterButtons({
   insideTireResults = false,
   onBrandSelect,
   resultsCount,
+  availableBrands,
 }: QuickFilterButtonsProps) {
   const pathname = usePathname()
 
@@ -184,13 +186,21 @@ export default function QuickFilterButtons({
     console.log("Режим отладки:", !debugMode)
   }
 
+  // Get the appropriate brands list
+  const getBrandsList = () => {
+    if (window.location.pathname.includes("/diski")) {
+      return availableBrands && availableBrands.length > 0 ? availableBrands : wheelBrands
+    }
+    return brands
+  }
+
   // Add a function to handle brand search
   const handleBrandSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (brandSearchInput.trim()) {
       // Check if the brand already exists in our list
       const formattedInput = brandSearchInput.trim()
-      const brandsToSearch = window.location.pathname.includes("/diski") ? wheelBrands : brands
+      const brandsToSearch = getBrandsList()
       const matchingBrand = brandsToSearch.find((brand) => brand.toLowerCase() === formattedInput.toLowerCase())
 
       if (matchingBrand) {
@@ -297,7 +307,7 @@ export default function QuickFilterButtons({
             >
               <div className="p-1 sm:p-2">
                 {/* Filter brands based on search input */}
-                {(window.location.pathname.includes("/diski") ? wheelBrands : brands)
+                {getBrandsList()
                   .filter(
                     (brand) => brandSearchInput === "" || brand.toLowerCase().includes(brandSearchInput.toLowerCase()),
                   )

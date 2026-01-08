@@ -69,7 +69,7 @@ export default function DiskSearchFilter({
   const [isExpanded, setIsExpanded] = useState(false)
   const filterRef = useRef<HTMLDivElement>(null)
 
-  // Add touch handling states
+  // Touch handling states - simple approach like tire page
   const [touchStartY, setTouchStartY] = useState<number | null>(null)
   const [touchEndY, setTouchEndY] = useState<number | null>(null)
   const [handleTouchStartY, setHandleTouchStartY] = useState<number | null>(null)
@@ -455,11 +455,11 @@ export default function DiskSearchFilter({
           maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%)',
           touchAction: isFilterCollapsed ? 'none' : 'pan-x pinch-zoom',
           WebkitOverflowScrolling: 'touch',
-          pointerEvents: 'auto',
         }}
         aria-label={filterTitle}
         data-testid="disk-filter-container"
         onTouchStart={(e) => {
+          // When filter is collapsed - capture all touches
           if (isFilterCollapsed) {
             e.preventDefault()
             setTouchStartY(e.touches[0].clientY)
@@ -467,14 +467,17 @@ export default function DiskSearchFilter({
           }
         }}
         onTouchMove={(e) => {
+          // When filter is collapsed - block system gestures
           if (isFilterCollapsed && touchStartY !== null) {
             e.preventDefault()
             setTouchEndY(e.touches[0].clientY)
           }
         }}
         onTouchEnd={() => {
+          // Handle swipe when filter is collapsed (outside handle button)
           if (isFilterCollapsed && touchStartY !== null && touchEndY !== null) {
             const diff = touchEndY - touchStartY
+            // Swipe up - expand
             if (diff < -20) {
               setIsFilterCollapsed(false)
               highlightHandle()
@@ -484,7 +487,7 @@ export default function DiskSearchFilter({
           setTouchEndY(null)
         }}
       >
-        {/* Swipe handle for collapse/expand */}
+        {/* Swipe handle for collapse/expand - now also clickable */}
         <div
           className="flex items-center justify-center -mx-4 px-4 py-3"
           data-swipe-handle
@@ -496,6 +499,7 @@ export default function DiskSearchFilter({
             className="flex items-center justify-center cursor-pointer w-full group"
             style={{ touchAction: 'none' }}
             onClick={() => {
+              // Click toggles state
               if (isFilterCollapsed) {
                 setIsFilterCollapsed(false)
               } else if (!isExpanded) {
@@ -522,7 +526,9 @@ export default function DiskSearchFilter({
                 const endY = e.changedTouches[0].clientY
                 const diff = endY - handleTouchStartY
 
+                // Swipe threshold
                 if (Math.abs(diff) > 20) {
+                  // Swipe up (diff < 0)
                   if (diff < 0) {
                     if (isFilterCollapsed) {
                       setIsFilterCollapsed(false)
@@ -531,7 +537,9 @@ export default function DiskSearchFilter({
                       setIsExpanded(true)
                       highlightHandle()
                     }
-                  } else {
+                  }
+                  // Swipe down (diff > 0)
+                  else {
                     if (isExpanded) {
                       setIsExpanded(false)
                       highlightHandle()

@@ -127,6 +127,17 @@ export default function DiskiPage() {
     return allDisks.filter((disk) => disk.type === diskType)
   }, [allDisks, diskType])
 
+  // Извлекаем уникальные бренды из всех дисков текущего типа
+  const availableBrands = useMemo(() => {
+    const brandSet = new Set<string>()
+    filteredByType.forEach((disk) => {
+      if (disk.brand) {
+        brandSet.add(disk.brand)
+      }
+    })
+    return Array.from(brandSet).sort()
+  }, [filteredByType])
+
   // Фильтруем по брендам - memoized
   const filteredByBrand = useMemo(() => {
     if (selectedBrands.length === 0) return filteredByType
@@ -826,6 +837,7 @@ export default function DiskiPage() {
           onBrandSelect={handleBrandSelect}
           onSortChange={handleSortChange}
           activeFiltersCount={selectedBrands.length}
+          availableBrands={availableBrands}
         />
 
         {/* Адаптивная сетка карточек дисков */}
@@ -880,7 +892,7 @@ export default function DiskiPage() {
                     {pair.frontDisk.brand} {pair.frontDisk.name}
                   </span>
                   <span className="text-xs bg-[#c4d402] text-[#1F1F1F] px-2 py-0.5 rounded-full">
-                    Пара #{index + 1}
+                    #{index + 1}
                   </span>
                 </div>
 
