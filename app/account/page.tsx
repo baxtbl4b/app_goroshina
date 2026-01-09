@@ -17,6 +17,7 @@ import { sendSmsCodeForAuth, verifySmsCodeAndLogin } from "@/app/auth-actions"
 import SafeAreaHeader from "@/components/safe-area-header"
 import BottomNavigation from "@/components/bottom-navigation"
 import { getUser, saveUser, updateUserAvatar, imageToBase64, type User } from "@/lib/user"
+import LoadingSpinner from "@/components/loading-spinner"
 
 // Helper component for submit button state
 function SubmitButton({ text }: { text: string }) {
@@ -556,9 +557,8 @@ export default function AccountPage() {
           </div>
           <div className="px-4 pb-4 space-y-2">
             {!carsLoaded ? (
-              <div className="text-center py-6 text-gray-500">
-                <div className="w-8 h-8 border-2 border-[#c4d402] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                Загрузка...
+              <div className="flex justify-center py-6">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#009CFF]"></div>
               </div>
             ) : userCars.length === 0 ? (
               <div className="text-center py-6">
@@ -619,9 +619,8 @@ export default function AccountPage() {
           </div>
           <div className="px-4 pb-4 space-y-2">
             {!ordersLoaded ? (
-              <div className="text-center py-6 text-gray-500">
-                <div className="w-8 h-8 border-2 border-[#009CFF] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                Загрузка...
+              <div className="flex justify-center py-6">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#009CFF]"></div>
               </div>
             ) : orders.length === 0 ? (
               <div className="text-center py-6">

@@ -5,6 +5,7 @@ import { AlertTriangle } from "lucide-react"
 import TireCard from "@/components/tire-card"
 import { getTires, type Tire, type Season } from "@/lib/api"
 import { useSearchParams } from "next/navigation"
+import LoadingSpinner from "@/components/loading-spinner"
 
 // Interface for tire pair (front and rear axle)
 interface TirePair {
@@ -343,9 +344,7 @@ export default function TireResults({ season, selectedBrands = [] }: TireResults
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
-        </div>
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
       </div>
     )
   }

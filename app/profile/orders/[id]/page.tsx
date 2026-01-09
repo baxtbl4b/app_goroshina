@@ -18,6 +18,7 @@ import { BackButton } from "@/components/back-button"
 import { Button } from "@/components/ui/button"
 import { formatPrice } from "@/lib/utils"
 import { OrderStatusBadge, PaymentStatusBadge, DateBadge } from "@/components/status-badge"
+import LoadingSpinner from "@/components/loading-spinner"
 
 // Типы для заказа
 type OrderStatus = "На сборке" | "Забронирован" | "Готов к выдаче" | "В пути" | "Выполнен"
@@ -178,7 +179,7 @@ export default function OrderDetailsPage() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-[#121212]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#c4d402]"></div>
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
       </div>
     )
   }

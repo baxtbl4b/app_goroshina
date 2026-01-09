@@ -9,6 +9,7 @@ import QuickFilterButtons from "@/components/quick-filter-buttons"
 import DiskCard from "@/components/disk-card"
 import CartButton from "@/components/cart-button"
 import { BackButton } from "@/components/back-button"
+import LoadingSpinner from "@/components/loading-spinner"
 
 // Тип для диска
 interface Disk {
@@ -848,9 +849,7 @@ export default function DiskiPage() {
         {/* Адаптивная сетка карточек дисков */}
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
-            </div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
           </div>
         ) : showPairedView && diskPairs.length === 0 && sortedDisks.length > 0 ? (
           <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-8 text-center mt-8">
@@ -947,12 +946,7 @@ export default function DiskiPage() {
                 className="flex justify-center py-6"
                 style={{ paddingBottom: `${filterHeight + 20}px` }}
               >
-                <div className="text-center">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#009CFF]"></div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                    Загрузка...
-                  </p>
-                </div>
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#009CFF]"></div>
               </div>
             )}
             {displayLimit >= sortedDisks.length && (

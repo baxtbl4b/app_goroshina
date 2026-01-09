@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import LoadingSpinner from "@/components/loading-spinner"
 
 export default function SpecificArticlePage() {
   const [apiResponse, setApiResponse] = useState<any>(null)
@@ -160,9 +161,8 @@ export default function SpecificArticlePage() {
       </h1>
 
       {loading && (
-        <div className="text-center p-8">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-          <p className="mt-2">Загрузка данных...</p>
+        <div className="flex justify-center p-8">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
         </div>
       )}
 

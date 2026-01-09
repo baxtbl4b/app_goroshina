@@ -9,6 +9,7 @@ import QuickFilterButtons from "@/components/quick-filter-buttons"
 import { FastenerCard } from "@/components/fastener-card"
 import CartButton from "@/components/cart-button"
 import { BackButton } from "@/components/back-button"
+import LoadingSpinner from "@/components/loading-spinner"
 
 export default function KrepezhPageClient() {
   const searchParams = useSearchParams()
@@ -733,8 +734,8 @@ export default function KrepezhPageClient() {
         {/* Крепеж в стиле карточек шин */}
         <div className="space-y-4">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
+            <div className="flex items-center justify-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
             </div>
           ) : filteredFasteners.length === 0 ? (
             <div className="flex items-center justify-center py-12">

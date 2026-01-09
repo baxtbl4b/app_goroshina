@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import LoadingSpinner from "@/components/loading-spinner"
 
 export default function TireMountingBookingPage() {
   const router = useRouter()
@@ -370,10 +371,7 @@ export default function TireMountingBookingPage() {
       <div className="flex flex-col min-h-screen bg-[#121212] text-white">
         <SafeAreaHeader title="Запись на шиномонтаж" showBackButton backUrl="/tire-mounting" />
         <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c4d402] mx-auto mb-4"></div>
-            <p>Загрузка данных...</p>
-          </div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
         </main>
       </div>
     )

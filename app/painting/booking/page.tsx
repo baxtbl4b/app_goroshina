@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
+import LoadingSpinner from "@/components/loading-spinner"
 
 // Pricing data for painting services with different painting types
 const pricingData = {
@@ -822,7 +823,7 @@ export default function PaintingPage() {
       <div className="flex flex-col min-h-screen bg-[#121212] text-white">
         <SafeAreaHeader title="Оформление заказа" showBackButton backUrl="/painting" />
         <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#c4d402]"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
         </div>
         <BottomNavigation />
       </div>

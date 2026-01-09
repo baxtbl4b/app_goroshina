@@ -8,6 +8,7 @@ import { BackButton } from "@/components/back-button"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import LoadingSpinner from "@/components/loading-spinner"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -120,7 +121,7 @@ export default function CarDetailsPage() {
           </div>
         </header>
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-10 h-10 border-2 border-[#c4d402] border-t-transparent rounded-full animate-spin" />
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
         </div>
       </main>
     )

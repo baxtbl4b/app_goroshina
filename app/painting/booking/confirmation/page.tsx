@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Calendar, MapPin, Phone } from "lucide-react"
 import Link from "next/link"
+import LoadingSpinner from "@/components/loading-spinner"
 
 export default function PaintingBookingConfirmationPage() {
   const router = useRouter()
@@ -40,10 +41,7 @@ export default function PaintingBookingConfirmationPage() {
       <div className="flex flex-col min-h-screen bg-[#121212] text-white">
         <SafeAreaHeader title="Подтверждение записи" showBackButton={false} />
         <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c4d402] mx-auto mb-4"></div>
-            <p>Загрузка...</p>
-          </div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
         </main>
       </div>
     )
