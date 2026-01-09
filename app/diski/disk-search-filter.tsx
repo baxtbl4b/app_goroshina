@@ -781,26 +781,25 @@ export default function DiskSearchFilter({
                   onScroll={handleGarageScroll}
                   className="flex gap-1 overflow-x-auto scrollbar-hide mb-1 px-1"
                 >
-                  {userVehicles.length > 0 ? (
-                    userVehicles.map((vehicle) => (
-                      <button
-                        key={vehicle.id}
-                        onClick={() => selectVehicle(vehicle)}
-                        className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
-                          selectedVehicle === vehicle.id
-                            ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
-                            : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
-                        }`}
-                      >
-                        {vehicle.name}
-                      </button>
-                    ))
-                  ) : (
+                  {userVehicles.map((vehicle) => (
+                    <button
+                      key={vehicle.id}
+                      onClick={() => selectVehicle(vehicle)}
+                      className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
+                        selectedVehicle === vehicle.id
+                          ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
+                          : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                      }`}
+                    >
+                      {vehicle.name}
+                    </button>
+                  ))}
+                  {userVehicles.length < 2 && (
                     <a
                       href="/account/cars/add"
                       className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
                     >
-                      + Добавить авто
+                      + Добавить
                     </a>
                   )}
                 </div>

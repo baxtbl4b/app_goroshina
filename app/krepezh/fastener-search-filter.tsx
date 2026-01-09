@@ -418,90 +418,90 @@ export function FastenerSearchFilter({ fastenerType = "nut", fasteners = [] }: F
 
         {/* Filter content */}
         <div className={`transition-all duration-300 ${isFilterCollapsed ? 'hidden' : 'block'}`}>
-          {/* Main filter selectors - 4 column grid (3 filters + reset button) */}
-          <div className="grid grid-cols-4 gap-3">
-            <div>
-              <Label htmlFor="thread" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1.5 block text-center">
-                Резьба
-              </Label>
-              <Select value={thread} onValueChange={handleThreadChange}>
-                <SelectTrigger
-                  id="thread"
-                  className="w-full h-10 text-xs bg-gray-100 dark:bg-[#333333] text-[#1F1F1F] dark:text-white border-0 rounded-lg pr-8"
-                >
-                  <SelectValue placeholder="~" />
-                </SelectTrigger>
-                <SelectContent>
-                  {threadOptions.map((option) => (
-                    <SelectItem key={option} value={option} className="text-sm">
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          {/* Main filter selectors */}
+          <div className="flex items-end gap-3 mb-3">
+            <div className="grid grid-cols-3 gap-3 flex-1">
+              <div>
+                <Label htmlFor="thread" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                  Резьба
+                </Label>
+                <Select value={thread} onValueChange={handleThreadChange}>
+                  <SelectTrigger
+                    id="thread"
+                    className="w-full bg-[#333333] text-white border-0 rounded-xl"
+                  >
+                    <SelectValue placeholder="~" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {threadOptions.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="shape" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                  Форма
+                </Label>
+                <Select value={shape} onValueChange={handleShapeChange}>
+                  <SelectTrigger
+                    id="shape"
+                    className="w-full bg-[#333333] text-white border-0 rounded-xl"
+                  >
+                    <SelectValue placeholder="~" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {shapeOptions.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="color" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                  Цвет
+                </Label>
+                <Select value={color} onValueChange={handleColorChange} disabled={colorOptions.length === 0}>
+                  <SelectTrigger
+                    id="color"
+                    className="w-full bg-[#333333] text-white border-0 rounded-xl"
+                  >
+                    <SelectValue placeholder="~" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {colorOptions.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <div>
-              <Label htmlFor="shape" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1.5 block text-center">
-                Форма
-              </Label>
-              <Select value={shape} onValueChange={handleShapeChange}>
-                <SelectTrigger
-                  id="shape"
-                  className="w-full h-10 text-xs bg-gray-100 dark:bg-[#333333] text-[#1F1F1F] dark:text-white border-0 rounded-lg pr-8"
-                >
-                  <SelectValue placeholder="~" />
-                </SelectTrigger>
-                <SelectContent>
-                  {shapeOptions.map((option) => (
-                    <SelectItem key={option} value={option} className="text-sm">
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="color" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1.5 block text-center">
-                Цвет
-              </Label>
-              <Select value={color} onValueChange={handleColorChange} disabled={colorOptions.length === 0}>
-                <SelectTrigger
-                  id="color"
-                  className="w-full h-10 text-xs bg-gray-100 dark:bg-[#333333] text-[#1F1F1F] dark:text-white border-0 rounded-lg pr-8"
-                >
-                  <SelectValue placeholder="~" />
-                </SelectTrigger>
-                <SelectContent>
-                  {colorOptions.map((option) => (
-                    <SelectItem key={option} value={option} className="text-sm">
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearAllFilters}
-                className={`h-10 px-3 text-xs border-0 rounded-xl transition-all duration-300 ${
-                  thread || shape || color
-                    ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 hover:scale-105 active:scale-95 shadow-md hover:shadow-red-500/30"
-                    : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                }`}
-                disabled={!thread && !shape && !color}
-              >
-                Сбросить
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearAllFilters}
+              className={`h-10 px-3 text-xs border-0 rounded-xl transition-all duration-300 ${
+                thread || shape || color
+                  ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 hover:scale-105 active:scale-95 shadow-md hover:shadow-red-500/30"
+                  : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+              }`}
+              disabled={!thread && !shape && !color}
+            >
+              Сбросить
+            </Button>
           </div>
 
           {/* My Garage section */}
-          <div className="mt-3">
+          <div>
             <div className="relative w-full">
               {/* Left gradient fade-out overlay */}
               <div
@@ -512,26 +512,25 @@ export function FastenerSearchFilter({ fastenerType = "nut", fasteners = [] }: F
                 onScroll={handleGarageScroll}
                 className="flex gap-1 overflow-x-auto scrollbar-hide mb-1 px-1"
               >
-                {userVehicles.length > 0 ? (
-                  userVehicles.map((vehicle) => (
-                    <button
-                      key={vehicle.id}
-                      onClick={() => selectGarageVehicle(vehicle)}
-                      className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
-                        selectedGarageVehicle === vehicle.id
-                          ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
-                          : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
-                      }`}
-                    >
-                      {vehicle.brand} {vehicle.model}
-                    </button>
-                  ))
-                ) : (
+                {userVehicles.map((vehicle) => (
+                  <button
+                    key={vehicle.id}
+                    onClick={() => selectGarageVehicle(vehicle)}
+                    className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
+                      selectedGarageVehicle === vehicle.id
+                        ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
+                        : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                    }`}
+                  >
+                    {vehicle.brand} {vehicle.model}
+                  </button>
+                ))}
+                {userVehicles.length < 2 && (
                   <a
                     href="/account/cars/add"
                     className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
                   >
-                    + Добавить авто
+                    + Добавить
                   </a>
                 )}
               </div>
