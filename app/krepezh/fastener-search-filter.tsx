@@ -6,9 +6,18 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRouter, useSearchParams } from "next/navigation"
 
+// Interface for user's saved vehicles
+interface UserVehicle {
+  id: string
+  brand: string
+  model: string
+  year?: number
+}
+
 interface FastenerSearchFilterProps {
   fastenerType?: string
   fasteners?: any[]
+  onGarageVehicleSelect?: (vehicle: UserVehicle) => void
 }
 
 export function FastenerSearchFilter({ fastenerType = "nut", fasteners = [] }: FastenerSearchFilterProps) {
@@ -30,6 +39,13 @@ export function FastenerSearchFilter({ fastenerType = "nut", fasteners = [] }: F
   const [isHandleHighlighted, setIsHandleHighlighted] = useState(false)
   const handleHighlightTimeout = useRef<NodeJS.Timeout | null>(null)
 
+  // My Garage states
+  const [userVehicles, setUserVehicles] = useState<UserVehicle[]>([])
+  const [selectedGarageVehicle, setSelectedGarageVehicle] = useState<string | null>(null)
+  const [showLeftGradient, setShowLeftGradient] = useState(false)
+  const [showRightGradient, setShowRightGradient] = useState(true)
+  const garageScrollRef = useRef<HTMLDivElement>(null)
+
   // Function to highlight handle
   const highlightHandle = () => {
     setIsHandleHighlighted(true)
@@ -39,6 +55,72 @@ export function FastenerSearchFilter({ fastenerType = "nut", fasteners = [] }: F
     handleHighlightTimeout.current = setTimeout(() => {
       setIsHandleHighlighted(false)
     }, 1000)
+  }
+
+  // Load user vehicles from localStorage for garage
+  useEffect(() => {
+    const loadUserCars = () => {
+      try {
+        const storedCars = JSON.parse(localStorage.getItem("userCars") || "[]")
+        const vehicles: UserVehicle[] = storedCars.map((car: any) => ({
+          id: car.id,
+          brand: car.brand,
+          model: car.model,
+          year: car.year,
+        }))
+        setUserVehicles(vehicles)
+      } catch (error) {
+        console.error("Error loading user cars:", error)
+        setUserVehicles([])
+      }
+    }
+
+    loadUserCars()
+
+    // Listen for storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "userCars") {
+        loadUserCars()
+      }
+    }
+
+    // Reload when user navigates back
+    const handleFocus = () => {
+      loadUserCars()
+    }
+
+    // Listen for custom event when cars are updated in the same tab
+    const handleCarsUpdated = () => {
+      loadUserCars()
+    }
+
+    window.addEventListener("storage", handleStorageChange)
+    window.addEventListener("focus", handleFocus)
+    window.addEventListener("userCarsUpdated", handleCarsUpdated)
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange)
+      window.removeEventListener("focus", handleFocus)
+      window.removeEventListener("userCarsUpdated", handleCarsUpdated)
+    }
+  }, [])
+
+  // Handle garage scroll for gradient effects
+  const handleGarageScroll = () => {
+    if (garageScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = garageScrollRef.current
+      setShowLeftGradient(scrollLeft > 5)
+      setShowRightGradient(scrollLeft < scrollWidth - clientWidth - 5)
+    }
+  }
+
+  // Select vehicle from garage
+  const selectGarageVehicle = (vehicle: UserVehicle) => {
+    setSelectedGarageVehicle(vehicle.id)
+    // Dispatch custom event to notify parent/other components about car selection
+    window.dispatchEvent(new CustomEvent("garageVehicleSelected", {
+      detail: vehicle
+    }))
   }
 
   // Определяем категорию по типу крепежа
@@ -415,6 +497,48 @@ export function FastenerSearchFilter({ fastenerType = "nut", fasteners = [] }: F
               >
                 Сбросить
               </Button>
+            </div>
+          </div>
+
+          {/* My Garage section */}
+          <div className="mt-3">
+            <div className="relative w-full">
+              {/* Left gradient fade-out overlay */}
+              <div
+                className={`absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-[#2A2A2A] to-transparent pointer-events-none z-10 transition-opacity duration-200 ${showLeftGradient ? 'opacity-100' : 'opacity-0'}`}
+              ></div>
+              <div
+                ref={garageScrollRef}
+                onScroll={handleGarageScroll}
+                className="flex gap-1 overflow-x-auto scrollbar-hide mb-1 px-1"
+              >
+                {userVehicles.length > 0 ? (
+                  userVehicles.map((vehicle) => (
+                    <button
+                      key={vehicle.id}
+                      onClick={() => selectGarageVehicle(vehicle)}
+                      className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
+                        selectedGarageVehicle === vehicle.id
+                          ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
+                          : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                      }`}
+                    >
+                      {vehicle.brand} {vehicle.model}
+                    </button>
+                  ))
+                ) : (
+                  <a
+                    href="/account/cars/add"
+                    className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
+                  >
+                    + Добавить авто
+                  </a>
+                )}
+              </div>
+              {/* Right gradient fade-out overlay */}
+              <div
+                className={`absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-[#2A2A2A] to-transparent pointer-events-none z-10 transition-opacity duration-200 ${showRightGradient ? 'opacity-100' : 'opacity-0'}`}
+              ></div>
             </div>
           </div>
         </div>

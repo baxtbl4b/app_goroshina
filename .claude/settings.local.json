@@ -29,7 +29,8 @@
       "Bash(grep:*)",
       "Bash(git checkout:*)",
       "Bash(git log:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "WebFetch(domain:crm.tireshop.ru)"
     ],
     "deny": [],
     "ask": []

@@ -219,9 +219,7 @@ export default function DiskSearchFilter({
               hub: car.wheelHub || "",
             },
           }
-        }).filter((v: VehicleWithWheels) =>
-          v.wheelSize.diameter && v.wheelSize.width && v.wheelSize.pcd
-        )
+        })
         setUserVehicles(vehicles)
       } catch (error) {
         console.error("Error loading user cars:", error)
