@@ -170,12 +170,12 @@ export default function KrepezhPageClient() {
   //   },
   // ]
 
-  // Маппинг старых типов на категории CRM
-  const categoryMap: Record<string, string> = {
-    "nut": "Гайки",
-    "bolt": "Болты",
-    "lock-nut": "Гайки",
-    "lock-bolt": "Болты",
+  // Маппинг старых типов на категории CRM (массив для поддержки нескольких категорий)
+  const categoryMap: Record<string, string[]> = {
+    "nut": ["Гайки"],
+    "bolt": ["Болты", "Секретки"],
+    "lock-nut": ["Гайки"],
+    "lock-bolt": ["Болты", "Секретки"],
   }
 
   // Фильтрация крепежа по категории и параметрам
@@ -184,12 +184,12 @@ export default function KrepezhPageClient() {
     const shape = searchParams.get("shape")
     const color = searchParams.get("color")
     const secretka = searchParams.get("secretka")
-    const expectedCategory = categoryMap[fastenerType]
+    const expectedCategories = categoryMap[fastenerType] || []
 
     console.log("=== Starting Filter ===")
     console.log("Total fasteners:", fasteners.length)
     console.log("Fastener type:", fastenerType)
-    console.log("Expected category:", expectedCategory)
+    console.log("Expected categories:", expectedCategories)
     console.log("Active filters:", { thread, shape, color, secretka })
 
     const filtered = fasteners.filter((fastener: any) => {
@@ -197,8 +197,8 @@ export default function KrepezhPageClient() {
         return false
       }
 
-      // Фильтр по категории (тип: гайки/болты)
-      if (fastener.category.name !== expectedCategory) {
+      // Фильтр по категории (тип: гайки/болты/секретки)
+      if (!expectedCategories.includes(fastener.category.name)) {
         return false
       }
 
@@ -421,6 +421,15 @@ export default function KrepezhPageClient() {
           buttonClass: "border border-[#F59E0B] bg-[#F59E0B]/10 text-[#1F1F1F] dark:text-white font-medium",
           animationStyle: "",
         }
+      case "secretka":
+        return {
+          buttonStyle: {
+            marginTop: "-6px",
+            marginBottom: "-6px",
+          },
+          buttonClass: "border border-[#c4d402] bg-[#c4d402]/10 text-[#1F1F1F] dark:text-white font-medium",
+          animationStyle: "",
+        }
       default:
         return {
           buttonStyle: {
@@ -453,6 +462,8 @@ export default function KrepezhPageClient() {
         return `${baseClass} border border-transparent hover:border-[#D3D3D3] hover:bg-[#D3D3D3]/10 text-[#1F1F1F] dark:text-white rounded-xl`
       case "lock-bolt":
         return `${baseClass} border border-transparent hover:border-[#F59E0B] hover:bg-[#F59E0B]/10 text-[#1F1F1F] dark:text-white rounded-xl`
+      case "secretka":
+        return `${baseClass} border border-transparent hover:border-[#c4d402] hover:bg-[#c4d402]/10 text-[#1F1F1F] dark:text-white rounded-xl`
       default:
         return baseClass
     }
