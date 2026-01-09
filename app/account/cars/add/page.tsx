@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const API_BASE_URL = "https://api.tirebase.ru/api"
 const API_TOKEN = "xN6JxoibNEbSFt952_O5kf-VxL61lOX4k5KAS-iGlBU"
@@ -564,32 +563,39 @@ export default function AddCarPage() {
 
             <div className="space-y-2">
               <Label htmlFor="year">Год выпуска</Label>
-              <Select
-                value={formData.year}
-                onValueChange={(value) => {
-                  console.log("📅 Выбран год:", value)
-                  console.log("📋 Current formData before year update:", formData)
-                  setFormData((prev) => ({ ...prev, year: value }))
-                }}
-                disabled={!formData.modelSlug || loadingYears}
-              >
-                <SelectTrigger id="year" className="w-full">
-                  <SelectValue placeholder={!formData.modelSlug ? "Сначала выберите модель" : loadingYears ? "Загрузка годов..." : "Выберите год"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.length > 0 ? (
-                    years.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="no-years" disabled>
-                      Нет доступных годов
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
+              {!formData.modelSlug ? (
+                <div className="w-full p-3 bg-gray-100 dark:bg-[#1F1F1F] rounded-lg text-center text-sm text-gray-500 dark:text-gray-400">
+                  Сначала выберите модель
+                </div>
+              ) : loadingYears ? (
+                <div className="w-full p-3 bg-gray-100 dark:bg-[#1F1F1F] rounded-lg text-center text-sm text-gray-500 dark:text-gray-400">
+                  Загрузка годов...
+                </div>
+              ) : years.length > 0 ? (
+                <div className="grid grid-cols-4 gap-2">
+                  {years.map((year) => (
+                    <div
+                      key={year}
+                      className={`flex items-center justify-center p-3 rounded-lg cursor-pointer transition-all ${
+                        formData.year === year.toString()
+                          ? 'bg-[#c4d402] text-[#1F1F1F] font-semibold'
+                          : 'bg-gray-100 dark:bg-[#1F1F1F] hover:bg-gray-200 dark:hover:bg-gray-700 text-[#1F1F1F] dark:text-white'
+                      }`}
+                      onClick={() => {
+                        console.log("📅 Выбран год:", year)
+                        console.log("📋 Current formData before year update:", formData)
+                        setFormData((prev) => ({ ...prev, year: year.toString() }))
+                      }}
+                    >
+                      <span className="text-sm">{year}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="w-full p-3 bg-gray-100 dark:bg-[#1F1F1F] rounded-lg text-center text-sm text-gray-500 dark:text-gray-400">
+                  Нет доступных годов
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">

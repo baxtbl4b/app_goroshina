@@ -549,21 +549,23 @@ export default function QuickFilterButtons({
                         ← Назад к моделям
                       </button>
                       {loadingYears ? (
-                        <div className="p-4 text-center text-gray-500">
+                        <div className="p-4 text-center text-gray-500 text-sm">
                           Загрузка годов...
                         </div>
                       ) : carYears.length > 0 ? (
-                        carYears.map((year: number) => (
-                          <div
-                            key={year}
-                            className="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer"
-                            onClick={() => handleYearSelect(year)}
-                          >
-                            <span className="text-base">{year}</span>
-                          </div>
-                        ))
+                        <div className="grid grid-cols-4 gap-1">
+                          {carYears.map((year: number) => (
+                            <div
+                              key={year}
+                              className="flex items-center justify-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer"
+                              onClick={() => handleYearSelect(year)}
+                            >
+                              <span className="text-sm text-[#1F1F1F] dark:text-white">{year}</span>
+                            </div>
+                          ))}
+                        </div>
                       ) : (
-                        <div className="p-4 text-center text-gray-500">
+                        <div className="p-4 text-center text-gray-500 text-sm">
                           Нет доступных годов
                         </div>
                       )}

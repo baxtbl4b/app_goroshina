@@ -522,7 +522,7 @@ export function FastenerSearchFilter({ fastenerType = "nut", fasteners = [] }: F
                         : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
                     }`}
                   >
-                    {vehicle.brand} {vehicle.model}
+                    {vehicle.brand} {vehicle.model}{vehicle.year ? ` ${vehicle.year}` : ""}
                   </button>
                 ))}
                 {userVehicles.length < 2 && (

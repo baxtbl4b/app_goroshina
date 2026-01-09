@@ -14,6 +14,11 @@ export async function GET(request: NextRequest) {
 
     const lowerQuery = query.toLowerCase()
 
+    // Split query into words to handle "Brand Model" searches
+    const queryWords = lowerQuery.trim().split(/\s+/)
+    const firstWord = queryWords[0] || ""
+    const remainingWords = queryWords.slice(1).join(" ")
+
     // Fetch all brands
     const brandsResponse = await fetch(
       `${API_BASE_URL}/fitment/brands?access_token=${API_TOKEN}`,
@@ -31,11 +36,13 @@ export async function GET(request: NextRequest) {
 
     const brandsData = await brandsResponse.json()
 
-    // Filter brands by query
+    // Filter brands by the first word or full query
     const matchingBrands = (Array.isArray(brandsData) ? brandsData : [])
-      .filter((item: any) =>
-        item.brand.toLowerCase().includes(lowerQuery)
-      )
+      .filter((item: any) => {
+        const brandLower = item.brand.toLowerCase()
+        // Match if brand contains first word OR full query
+        return brandLower.includes(firstWord) || brandLower.includes(lowerQuery)
+      })
       .slice(0, 5)
       .map((item: any) => ({
         type: "brand" as const,
@@ -89,18 +96,54 @@ export async function GET(request: NextRequest) {
           (Array.isArray(brandsData) ? brandsData : []).find((b: any) => b.brand_slug === brandSlug)?.brand ||
           brandSlug.charAt(0).toUpperCase() + brandSlug.slice(1)
 
-        return (Array.isArray(data) ? data : [])
-          .filter((item: any) =>
-            item.model.toLowerCase().includes(lowerQuery)
-          )
-          .slice(0, 2)
+        const models = (Array.isArray(data) ? data : [])
+          .filter((item: any) => {
+            const modelLower = item.model.toLowerCase()
+            // If there are multiple words, search model by remaining words
+            // Otherwise search by full query
+            if (remainingWords) {
+              return modelLower.includes(remainingWords)
+            }
+            return modelLower.includes(lowerQuery)
+          })
           .map((item: any) => ({
             type: "model" as const,
             name: item.model,
             slug: item.model_slug,
             brandName: brandName,
             brandSlug: brandSlug,
+            modelLower: item.model.toLowerCase(),
           }))
+
+        // Sort models: prioritize exact matches and those that start with query
+        const searchTerm = remainingWords || lowerQuery
+        models.sort((a, b) => {
+          const aLower = a.modelLower
+          const bLower = b.modelLower
+
+          // Exact match (highest priority)
+          if (aLower === searchTerm && bLower !== searchTerm) return -1
+          if (bLower === searchTerm && aLower !== searchTerm) return 1
+
+          // Starts with search term (second priority)
+          const aStarts = aLower.startsWith(searchTerm)
+          const bStarts = bLower.startsWith(searchTerm)
+          if (aStarts && !bStarts) return -1
+          if (bStarts && !aStarts) return 1
+
+          // Word boundary match (third priority) - e.g., "E-Class" for "e-class"
+          const escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+          const aWordBoundary = new RegExp(`(^|\\s|-)${escapedTerm}($|\\s|-)`, 'i').test(aLower)
+          const bWordBoundary = new RegExp(`(^|\\s|-)${escapedTerm}($|\\s|-)`, 'i').test(bLower)
+          if (aWordBoundary && !bWordBoundary) return -1
+          if (bWordBoundary && !aWordBoundary) return 1
+
+          return 0
+        })
+
+        return models
+          .slice(0, 2)
+          .map(({ modelLower, ...item }) => item)
       } catch {
         return []
       }

@@ -386,16 +386,30 @@ export default function PressureSensorsClient() {
     // Get current cart from localStorage
     const cart = JSON.parse(localStorage.getItem("cart") || "[]")
 
+    // Prepare vehicle info if selected
+    const vehicleInfo = selectedCarBrand && selectedCarModel && selectedYear ? {
+      carBrand: selectedCarBrand.name,
+      carModel: selectedCarModel.name,
+      carYear: selectedYear
+    } : null
+
+    console.log("🚗 Adding to cart with vehicle info:", vehicleInfo)
+
     // Check if item already exists in cart
     const existingItemIndex = cart.findIndex((item: any) => item.id === sensor.id)
 
     if (existingItemIndex >= 0) {
-      // If item exists, increase quantity
+      // If item exists, increase quantity and update vehicle info if provided
       cart[existingItemIndex].quantity = (cart[existingItemIndex].quantity || 1) + 1
+      if (vehicleInfo) {
+        cart[existingItemIndex].vehicle = vehicleInfo
+      }
     } else {
-      // Otherwise add new item
-      cart.push({ ...sensor, quantity: 1 })
+      // Otherwise add new item with vehicle info
+      cart.push({ ...sensor, quantity: 1, ...(vehicleInfo && { vehicle: vehicleInfo }) })
     }
+
+    console.log("💾 Cart after adding:", cart)
 
     // Save updated cart
     localStorage.setItem("cart", JSON.stringify(cart))
@@ -985,7 +999,7 @@ export default function PressureSensorsClient() {
                     : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
                 }`}
               >
-                {vehicle.brand} {vehicle.model}
+                {vehicle.brand} {vehicle.model}{vehicle.year ? ` ${vehicle.year}` : ""}
               </button>
             ))}
             {userVehicles.length < 2 && (

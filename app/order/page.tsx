@@ -37,6 +37,11 @@ interface CartItem {
   spike?: boolean | number | string
   runflat?: boolean | number | string
   cargo?: boolean | number | string
+  vehicle?: {
+    carBrand: string
+    carModel: string
+    carYear: number
+  }
 }
 
 // Данные покупателя по умолчанию (будут загружены из профиля)
@@ -179,6 +184,8 @@ export default function OrderPage() {
         const cartData = localStorage.getItem("cart")
         if (cartData) {
           const parsedCart = JSON.parse(cartData) as CartItem[]
+          console.log("🛒 Loaded cart items:", parsedCart)
+          console.log("🚗 Items with vehicle info:", parsedCart.filter(item => item.vehicle))
           setItems(parsedCart)
         }
       } catch (error) {
@@ -594,6 +601,8 @@ export default function OrderPage() {
               {hasItems ? (
                 <>
                   {items.map((item) => {
+                    console.log("📦 Rendering item:", item.name || item.id, "Vehicle:", item.vehicle)
+
                     const itemPrice = getItemPrice(item)
                     const tireSize = getTireSize(item)
                     const seasonName = getSeasonName(item.season)
@@ -687,6 +696,15 @@ export default function OrderPage() {
                           <h3 className="font-medium text-sm text-white leading-tight">
                             {item.name || item.title || `${item.brand || ""} ${item.model || ""}`}
                           </h3>
+
+                          {/* Информация об автомобиле для программирования */}
+                          {item.vehicle && (
+                            <div className="mt-1.5">
+                              <span className="text-xs text-[#c4d402]">
+                                Программирование для: {item.vehicle.carBrand} {item.vehicle.carModel} {item.vehicle.carYear}
+                              </span>
+                            </div>
+                          )}
 
                           {item.stock !== undefined && item.stock <= 4 && (
                             <p className="text-xs text-orange-400 bg-orange-400/10 px-2 py-1 rounded-lg inline-block w-fit mt-auto">
