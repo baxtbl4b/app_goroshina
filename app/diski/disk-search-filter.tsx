@@ -207,8 +207,10 @@ export default function DiskSearchFilter({
     const loadUserCars = () => {
       try {
         const storedCars = JSON.parse(localStorage.getItem("userCars") || "[]")
+        console.log("📦 Загружены автомобили из localStorage:", storedCars)
+
         const vehicles: VehicleWithWheels[] = storedCars.map((car: any) => {
-          return {
+          const vehicle = {
             id: car.id,
             name: `${car.brand} ${car.model}`,
             wheelSize: {
@@ -219,6 +221,8 @@ export default function DiskSearchFilter({
               hub: car.wheelHub || "",
             },
           }
+          console.log(`🚙 ${vehicle.name}:`, vehicle.wheelSize)
+          return vehicle
         })
         setUserVehicles(vehicles)
       } catch (error) {
@@ -303,6 +307,15 @@ export default function DiskSearchFilter({
 
   // Function to select vehicle and set wheel sizes - memoized
   const selectVehicle = useCallback((vehicle: VehicleWithWheels) => {
+    console.log("🚗 Выбран автомобиль из гаража:", vehicle)
+    console.log("📏 Применяемые параметры дисков:", {
+      diameter: vehicle.wheelSize.diameter,
+      width: vehicle.wheelSize.width,
+      pcd: vehicle.wheelSize.pcd,
+      et: vehicle.wheelSize.et,
+      hub: vehicle.wheelSize.hub
+    })
+
     setSelectedVehicle(vehicle.id)
     setDiameter(vehicle.wheelSize.diameter)
     setWidth(vehicle.wheelSize.width)

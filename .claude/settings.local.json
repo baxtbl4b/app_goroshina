@@ -33,7 +33,8 @@
       "WebFetch(domain:crm.tireshop.ru)",
       "Bash(cat:*)",
       "Bash(copy \"C:\\goroshina_app\\screen\\dokataka.png\" \"C:\\goroshina_app\\public\\images\\dokatka.png\")",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []
