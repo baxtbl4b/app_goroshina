@@ -642,13 +642,13 @@ export default function HomePage() {
               <TabsList className="w-full bg-gray-200 dark:bg-[#1F1F1F] rounded-xl p-2 h-14">
                 <TabsTrigger
                   value="popular"
-                  className="rounded-lg text-gray-700 dark:text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-[#1F1F1F] data-[state=active]:scale-105 data-[state=active]:shadow-lg data-[state=active]:shadow-[#c4d402]/30 data-[state=active]:transform data-[state=active]:font-bold h-10 px-6 text-base font-medium hover:scale-102 hover:bg-gray-300 dark:hover:bg-white/10"
+                  className="rounded-lg text-gray-700 dark:text-white transition-all duration-300 ease-in-out data-[state=active]:!bg-[#c4d402] data-[state=active]:!text-[#1F1F1F] data-[state=active]:scale-105 data-[state=active]:shadow-[0_0_15px_rgba(196,212,2,0.5)] data-[state=active]:transform data-[state=active]:font-bold h-10 px-6 text-base font-medium hover:scale-102 hover:bg-gray-300 dark:hover:bg-white/10"
                 >
                   Товары
                 </TabsTrigger>
                 <TabsTrigger
                   value="sale"
-                  className="rounded-lg text-gray-700 dark:text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-[#1F1F1F] h-10 px-6 text-base font-medium hover:bg-gray-300 dark:hover:bg-white/10"
+                  className="rounded-lg text-gray-700 dark:text-white transition-all duration-300 ease-in-out data-[state=active]:!bg-[#c4d402] data-[state=active]:!text-[#1F1F1F] data-[state=active]:scale-105 data-[state=active]:shadow-[0_0_15px_rgba(196,212,2,0.5)] data-[state=active]:transform data-[state=active]:font-bold h-10 px-6 text-base font-medium hover:scale-102 hover:bg-gray-300 dark:hover:bg-white/10"
                 >
                   Услуги
                 </TabsTrigger>
