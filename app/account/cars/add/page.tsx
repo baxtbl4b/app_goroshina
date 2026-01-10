@@ -651,11 +651,11 @@ export default function AddCarPage() {
   }
 
   return (
-    <main className="flex flex-col min-h-screen bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+    <main className="flex flex-col min-h-screen bg-gray-50 dark:bg-[#121212]">
+      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-2 flex items-center">
           <BackButton />
-          <span className="text-xl font-bold text-white">Добавление автомобиля</span>
+          <span className="text-xl font-bold text-[#1F1F1F] dark:text-white">Добавление автомобиля</span>
         </div>
       </header>
 
@@ -697,8 +697,8 @@ export default function AddCarPage() {
                     }
                   }}
                   placeholder="Введите марку или модель"
-                  className="w-full h-12 px-4 pr-10 text-sm border-0 rounded-xl text-white dark:text-white focus:ring-2 focus:ring-[#c4d402] focus:outline-none"
-                  style={{ fontSize: '16px', backgroundColor: '#1F1F1F' }}
+                  className="w-full h-12 px-4 pr-10 text-sm border-0 rounded-xl bg-gray-100 dark:bg-[#1F1F1F] text-[#1F1F1F] dark:text-white focus:ring-2 focus:ring-[#c4d402] focus:outline-none"
+                  style={{ fontSize: '16px' }}
                 />
                 {carSearchInput && (
                   <button
@@ -706,7 +706,7 @@ export default function AddCarPage() {
                     onClick={clearCarSelection}
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full"
                   >
-                    <X className="w-4 h-4 text-gray-400" />
+                    <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                   </button>
                 )}
               </div>
@@ -719,7 +719,7 @@ export default function AddCarPage() {
                     {carSelectorStep === "brand" && (
                       <>
                         {isSearching && (
-                          <div className="p-4 text-center text-gray-500 text-sm">
+                          <div className="p-4 text-center text-gray-600 dark:text-gray-400 text-sm">
                             Поиск...
                           </div>
                         )}
@@ -759,7 +759,7 @@ export default function AddCarPage() {
                               </div>
                             )}
                             {searchResults.brands?.length === 0 && searchResults.models?.length === 0 && (
-                              <div className="p-4 text-center text-gray-500 text-sm">
+                              <div className="p-4 text-center text-gray-600 dark:text-gray-400 text-sm">
                                 Ничего не найдено
                               </div>
                             )}
@@ -772,7 +772,7 @@ export default function AddCarPage() {
                     {carSelectorStep === "model" && (
                       <>
                         {loadingModels ? (
-                          <div className="p-4 text-center text-gray-500 text-sm">
+                          <div className="p-4 text-center text-gray-600 dark:text-gray-400 text-sm">
                             Загрузка моделей...
                           </div>
                         ) : (
@@ -804,7 +804,7 @@ export default function AddCarPage() {
                     {carSelectorStep === "year" && (
                       <>
                         {loadingYears ? (
-                          <div className="p-4 text-center text-gray-500 text-sm">
+                          <div className="p-4 text-center text-gray-600 dark:text-gray-400 text-sm">
                             Загрузка годов...
                           </div>
                         ) : (
@@ -837,7 +837,7 @@ export default function AddCarPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="plate">Гос. номер</Label>
+              <Label htmlFor="plate" className="text-[#1F1F1F] dark:text-white">Гос. номер</Label>
               <Input
                 id="plate"
                 placeholder="А123БВ777"
@@ -848,7 +848,7 @@ export default function AddCarPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="mileage">Пробег (км)</Label>
+              <Label htmlFor="mileage" className="text-[#1F1F1F] dark:text-white">Пробег (км)</Label>
               <Input
                 id="mileage"
                 type="number"
@@ -866,7 +866,7 @@ export default function AddCarPage() {
                   checked={formData.isPrimary}
                   onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isPrimary: checked === true }))}
                 />
-                <Label htmlFor="primary" className="text-sm font-normal">
+                <Label htmlFor="primary" className="text-sm font-normal text-[#1F1F1F] dark:text-white">
                   Сделать основным автомобилем
                 </Label>
               </div>
@@ -1090,7 +1090,7 @@ export default function AddCarPage() {
 
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-2">
-                <Label htmlFor="tire-width" className="text-center block">Ширина</Label>
+                <Label htmlFor="tire-width" className="text-center block text-[#1F1F1F] dark:text-white">Ширина</Label>
                 <Input
                   id="tire-width"
                   type="number"
@@ -1107,7 +1107,7 @@ export default function AddCarPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tire-profile" className="text-center block">Профиль</Label>
+                <Label htmlFor="tire-profile" className="text-center block text-[#1F1F1F] dark:text-white">Профиль</Label>
                 <Input
                   id="tire-profile"
                   type="number"
@@ -1124,7 +1124,7 @@ export default function AddCarPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tire-diameter" className="text-center block">Диаметр</Label>
+                <Label htmlFor="tire-diameter" className="text-center block text-[#1F1F1F] dark:text-white">Диаметр</Label>
                 <Input
                   id="tire-diameter"
                   type="number"
@@ -1152,7 +1152,7 @@ export default function AddCarPage() {
 
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-2">
-                    <Label htmlFor="rear-tire-width" className="text-center block">Ширина</Label>
+                    <Label htmlFor="rear-tire-width" className="text-center block text-[#1F1F1F] dark:text-white">Ширина</Label>
                     <Input
                       id="rear-tire-width"
                       type="number"
@@ -1170,7 +1170,7 @@ export default function AddCarPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="rear-tire-profile" className="text-center block">Профиль</Label>
+                    <Label htmlFor="rear-tire-profile" className="text-center block text-[#1F1F1F] dark:text-white">Профиль</Label>
                     <Input
                       id="rear-tire-profile"
                       type="number"
@@ -1188,7 +1188,7 @@ export default function AddCarPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="rear-tire-diameter" className="text-center block">Диаметр</Label>
+                    <Label htmlFor="rear-tire-diameter" className="text-center block text-[#1F1F1F] dark:text-white">Диаметр</Label>
                     <Input
                       id="rear-tire-diameter"
                       type="number"
@@ -1317,7 +1317,7 @@ export default function AddCarPage() {
         </div>
 
         {/* Кнопка добавления - с эффектом размытия */}
-        <div className="sticky bottom-0 px-3 sm:px-4 pt-8 py-4 pb-[calc(16px+env(safe-area-inset-bottom))]" style={{ background: 'linear-gradient(to top, rgba(18, 18, 18, 0.9) 0%, rgba(18, 18, 18, 0.6) 60%, rgba(18, 18, 18, 0) 100%)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', maskImage: 'linear-gradient(to top, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to top, black 70%, transparent 100%)' }}>
+        <div className="sticky bottom-0 px-3 sm:px-4 pt-8 py-4 pb-[calc(16px+env(safe-area-inset-bottom))] bg-gradient-to-t from-gray-50/90 via-gray-50/60 to-transparent dark:from-[#121212]/90 dark:via-[#121212]/60 dark:to-transparent" style={{ backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', maskImage: 'linear-gradient(to top, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to top, black 70%, transparent 100%)' }}>
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting}
