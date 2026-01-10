@@ -380,17 +380,17 @@ export default function AccountPage() {
 
   // --- Render Account Details if Logged In ---
   return (
-    <div className="min-h-screen bg-[#121212]">
+    <div className="min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
       {/* Custom Header */}
-      <header className="sticky top-0 z-50 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+      <header className="sticky top-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-2 flex items-center justify-between">
           <div className="flex items-center">
             <BackButton />
-            <h1 className="text-xl font-bold text-white">Профиль</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Профиль</h1>
           </div>
           <Link href="/settings">
             <button className="p-2 transition-colors" aria-label="Настройки">
-              <Settings className="h-5 w-5 text-gray-400" />
+              <Settings className="h-5 w-5 text-gray-600 dark:text-gray-400" />
             </button>
           </Link>
         </div>
@@ -400,7 +400,7 @@ export default function AccountPage() {
       <div className="px-4 pt-5 pb-24 space-y-5">
         {/* User Profile Card */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#c4d402] via-[#B8C736] to-[#009CFF] p-[1px]">
-          <div className="relative bg-[#2A2A2A] rounded-[23px] p-5">
+          <div className="relative bg-white dark:bg-[#2A2A2A] rounded-[23px] p-5">
             <div className="flex items-center gap-4">
               {/* Avatar */}
               <div className="relative">
@@ -447,19 +447,19 @@ export default function AccountPage() {
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       placeholder="Имя"
-                      className="h-9 bg-[#1F1F1F] border-0 text-white rounded-xl text-sm"
+                      className="h-9 bg-gray-100 dark:bg-[#1F1F1F] border border-gray-300 dark:border-0 text-gray-900 dark:text-white rounded-xl text-sm"
                     />
                     <Input
                       value={editPhone}
                       onChange={(e) => setEditPhone(e.target.value)}
                       placeholder="Телефон"
-                      className="h-9 bg-[#1F1F1F] border-0 text-white rounded-xl text-sm"
+                      className="h-9 bg-gray-100 dark:bg-[#1F1F1F] border border-gray-300 dark:border-0 text-gray-900 dark:text-white rounded-xl text-sm"
                     />
                   </div>
                 ) : (
                   <>
-                    <h2 className="text-lg font-bold text-white">{user.name}</h2>
-                    <p className="text-gray-400 text-sm">{user.phone}</p>
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">{user.name}</h2>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">{user.phone}</p>
                   </>
                 )}
               </div>
@@ -468,9 +468,9 @@ export default function AccountPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={cancelEditingProfile}
-                    className="w-8 h-8 rounded-lg bg-[#1F1F1F] flex items-center justify-center hover:bg-[#333] transition-colors"
+                    className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-[#1F1F1F] flex items-center justify-center hover:bg-gray-200 dark:hover:bg-[#333] transition-colors"
                   >
-                    <X className="w-4 h-4 text-gray-400" />
+                    <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                   </button>
                   <button
                     onClick={saveProfile}
@@ -487,28 +487,28 @@ export default function AccountPage() {
               ) : (
                 <button
                   onClick={startEditingProfile}
-                  className="w-8 h-8 rounded-lg bg-[#1F1F1F] flex items-center justify-center hover:bg-[#333] transition-colors"
+                  className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-[#1F1F1F] flex items-center justify-center hover:bg-gray-200 dark:hover:bg-[#333] transition-colors"
                 >
-                  <Pencil className="w-4 h-4 text-gray-400" />
+                  <Pencil className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                 </button>
               )}
             </div>
 
             {/* Loyalty Stats */}
             <div className="mt-5 flex gap-3">
-              <div className="flex-1 bg-[#1F1F1F] rounded-2xl p-3 flex flex-col items-center justify-center text-center">
+              <div className="flex-1 bg-gray-100 dark:bg-[#1F1F1F] rounded-2xl p-3 flex flex-col items-center justify-center text-center">
                 <div className="flex items-center gap-2 mb-1">
                   <Award className="w-4 h-4 text-[#c4d402]" />
-                  <span className="text-xs text-gray-400">Статус</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-400">Статус</span>
                 </div>
-                <p className="text-white font-semibold">{user.loyaltyLevel}</p>
+                <p className="text-gray-900 dark:text-white font-semibold">{user.loyaltyLevel}</p>
               </div>
-              <div className="flex-1 bg-[#1F1F1F] rounded-2xl p-3 flex flex-col items-center justify-center text-center">
+              <div className="flex-1 bg-gray-100 dark:bg-[#1F1F1F] rounded-2xl p-3 flex flex-col items-center justify-center text-center">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-4 h-4 rounded-full bg-[#c4d402]" />
-                  <span className="text-xs text-gray-400">Баллы</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-400">Баллы</span>
                 </div>
-                <p className="text-white font-semibold">{user.loyaltyPoints.toLocaleString()}</p>
+                <p className="text-gray-900 dark:text-white font-semibold">{user.loyaltyPoints.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -517,37 +517,37 @@ export default function AccountPage() {
         {/* Quick Actions Grid */}
         <div className="grid grid-cols-4 gap-3">
           <Link href="/account/cars/add" className="flex flex-col items-center">
-            <div className="w-14 h-14 rounded-2xl bg-[#2A2A2A] flex items-center justify-center mb-2 hover:bg-[#333] transition-colors">
+            <div className="w-14 h-14 rounded-2xl bg-white dark:bg-[#2A2A2A] flex items-center justify-center mb-2 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors">
               <Plus className="h-6 w-6 text-[#c4d402]" />
             </div>
-            <span className="text-xs text-gray-400 text-center">Добавить</span>
+            <span className="text-xs text-gray-600 dark:text-gray-400 text-center">Добавить</span>
           </Link>
           <Link href="/account/orders" className="flex flex-col items-center">
-            <div className="w-14 h-14 rounded-2xl bg-[#2A2A2A] flex items-center justify-center mb-2 hover:bg-[#333] transition-colors">
+            <div className="w-14 h-14 rounded-2xl bg-white dark:bg-[#2A2A2A] flex items-center justify-center mb-2 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors">
               <ShoppingBag className="h-6 w-6 text-[#009CFF]" />
             </div>
-            <span className="text-xs text-gray-400 text-center">Заказы</span>
+            <span className="text-xs text-gray-600 dark:text-gray-400 text-center">Заказы</span>
           </Link>
           <Link href="/favorites" className="flex flex-col items-center">
-            <div className="w-14 h-14 rounded-2xl bg-[#2A2A2A] flex items-center justify-center mb-2 hover:bg-[#333] transition-colors">
+            <div className="w-14 h-14 rounded-2xl bg-white dark:bg-[#2A2A2A] flex items-center justify-center mb-2 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors">
               <Heart className="h-6 w-6 text-red-400" />
             </div>
-            <span className="text-xs text-gray-400 text-center">Избранное</span>
+            <span className="text-xs text-gray-600 dark:text-gray-400 text-center">Избранное</span>
           </Link>
           <Link href="/account/history" className="flex flex-col items-center">
-            <div className="w-14 h-14 rounded-2xl bg-[#2A2A2A] flex items-center justify-center mb-2 hover:bg-[#333] transition-colors">
+            <div className="w-14 h-14 rounded-2xl bg-white dark:bg-[#2A2A2A] flex items-center justify-center mb-2 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors">
               <Clock className="h-6 w-6 text-orange-400" />
             </div>
-            <span className="text-xs text-gray-400 text-center">История</span>
+            <span className="text-xs text-gray-600 dark:text-gray-400 text-center">История</span>
           </Link>
         </div>
 
         {/* My Cars Section */}
-        <div className="bg-[#2A2A2A] rounded-3xl overflow-hidden">
+        <div className="bg-white dark:bg-[#2A2A2A] rounded-3xl overflow-hidden">
           <div className="flex items-center justify-between p-4 pb-2">
             <div className="flex items-center gap-2">
               <Car className="w-5 h-5 text-[#c4d402]" />
-              <h3 className="font-bold text-white">Мои автомобили</h3>
+              <h3 className="font-bold text-gray-900 dark:text-white">Мои автомобили</h3>
             </div>
             <Link href="/account/cars">
               <Button variant="ghost" size="sm" className="text-[#009CFF] hover:bg-[#009CFF]/10 rounded-xl h-8 px-3">
@@ -562,10 +562,10 @@ export default function AccountPage() {
               </div>
             ) : userCars.length === 0 ? (
               <div className="text-center py-6">
-                <div className="w-16 h-16 mx-auto mb-3 bg-[#1F1F1F] rounded-2xl flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto mb-3 bg-gray-100 dark:bg-[#1F1F1F] rounded-2xl flex items-center justify-center">
                   <Car className="w-8 h-8 text-gray-600" />
                 </div>
-                <p className="text-gray-400 mb-4">У вас пока нет автомобилей</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">У вас пока нет автомобилей</p>
                 <Link href="/account/cars/add">
                   <Button className="bg-[#c4d402] text-[#1F1F1F] hover:bg-[#c4d402]/90 rounded-xl h-10 px-6 font-semibold">
                     <Plus className="h-4 w-4 mr-2" /> Добавить авто
@@ -575,15 +575,15 @@ export default function AccountPage() {
             ) : (
               userCars.slice(0, 3).map((car, index) => (
                 <Link key={car.id} href={`/account/cars/${car.id}`}>
-                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-[#1F1F1F] hover:bg-[#252525] transition-colors active:scale-[0.98]">
+                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-gray-100 dark:bg-[#1F1F1F] hover:bg-gray-200 dark:hover:bg-[#252525] transition-colors active:scale-[0.98]">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#009CFF]/20 to-[#c4d402]/20 flex items-center justify-center">
-                      <span className="text-white font-bold">
+                      <span className="text-gray-900 dark:text-white font-bold">
                         {car.brand?.charAt(0) || "A"}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-white truncate">
+                        <p className="font-medium text-gray-900 dark:text-white truncate">
                           {car.brand} {car.model}
                         </p>
                         {car.isPrimary && (
@@ -592,11 +592,11 @@ export default function AccountPage() {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-600 dark:text-gray-500">
                         {car.year} • {car.plate || "Без номера"}
                       </p>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-gray-600 shrink-0" />
+                    <ChevronRight className="h-5 w-5 text-gray-500 dark:text-gray-600 shrink-0" />
                   </div>
                 </Link>
               ))
@@ -605,11 +605,11 @@ export default function AccountPage() {
         </div>
 
         {/* Recent Orders Section */}
-        <div className="bg-[#2A2A2A] rounded-3xl overflow-hidden">
+        <div className="bg-white dark:bg-[#2A2A2A] rounded-3xl overflow-hidden">
           <div className="flex items-center justify-between p-4 pb-2">
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-[#009CFF]" />
-              <h3 className="font-bold text-white">Последние заказы</h3>
+              <h3 className="font-bold text-gray-900 dark:text-white">Последние заказы</h3>
             </div>
             <Link href="/account/orders">
               <Button variant="ghost" size="sm" className="text-[#009CFF] hover:bg-[#009CFF]/10 rounded-xl h-8 px-3">
@@ -624,10 +624,10 @@ export default function AccountPage() {
               </div>
             ) : orders.length === 0 ? (
               <div className="text-center py-6">
-                <div className="w-16 h-16 mx-auto mb-3 bg-[#1F1F1F] rounded-2xl flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto mb-3 bg-gray-100 dark:bg-[#1F1F1F] rounded-2xl flex items-center justify-center">
                   <ShoppingBag className="w-8 h-8 text-gray-600" />
                 </div>
-                <p className="text-gray-400 mb-4">У вас пока нет заказов</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">У вас пока нет заказов</p>
                 <Link href="/category/tires">
                   <Button className="bg-[#009CFF] text-white hover:bg-[#009CFF]/90 rounded-xl h-10 px-6 font-semibold">
                     <ShoppingBag className="h-4 w-4 mr-2" /> Перейти в каталог
@@ -637,7 +637,7 @@ export default function AccountPage() {
             ) : (
               orders.slice(0, 3).map((order) => (
                 <Link key={order.id} href={`/account/orders/details?id=${order.id}`}>
-                  <div className="flex items-center justify-between p-3 rounded-2xl bg-[#1F1F1F] hover:bg-[#252525] transition-colors active:scale-[0.98]">
+                  <div className="flex items-center justify-between p-3 rounded-2xl bg-gray-100 dark:bg-[#1F1F1F] hover:bg-gray-200 dark:hover:bg-[#252525] transition-colors active:scale-[0.98]">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                         order.status === "delivered" || order.status === "Доставлен"
@@ -655,16 +655,16 @@ export default function AccountPage() {
                         }`} />
                       </div>
                       <div>
-                        <p className="font-medium text-white">
+                        <p className="font-medium text-gray-900 dark:text-white">
                           #{order.id?.slice(-6) || order.id}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-600 dark:text-gray-500">
                           {order.date ? new Date(order.date).toLocaleDateString("ru-RU") : "—"}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-white">
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         {(order.total || 0).toLocaleString()} ₽
                       </p>
                       <span className={`text-xs ${
@@ -691,33 +691,33 @@ export default function AccountPage() {
         </div>
 
         {/* Menu Items */}
-        <div className="bg-[#2A2A2A] rounded-3xl overflow-hidden divide-y divide-white/5">
-          <Link href="/settings" className="flex items-center justify-between p-4 hover:bg-[#333] transition-colors active:scale-[0.99]">
+        <div className="bg-white dark:bg-[#2A2A2A] rounded-3xl overflow-hidden divide-y divide-gray-200 dark:divide-white/5">
+          <Link href="/settings" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors active:scale-[0.99]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#1F1F1F] flex items-center justify-center">
-                <Settings className="w-5 h-5 text-gray-400" />
+              <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-[#1F1F1F] flex items-center justify-center">
+                <Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </div>
-              <span className="font-medium text-white">Настройки</span>
+              <span className="font-medium text-gray-900 dark:text-white">Настройки</span>
             </div>
-            <ChevronRight className="h-5 w-5 text-gray-600" />
+            <ChevronRight className="h-5 w-5 text-gray-500 dark:text-gray-600" />
           </Link>
-          <Link href="/help" className="flex items-center justify-between p-4 hover:bg-[#333] transition-colors active:scale-[0.99]">
+          <Link href="/help" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors active:scale-[0.99]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#1F1F1F] flex items-center justify-center">
-                <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-[#1F1F1F] flex items-center justify-center">
+                <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <span className="font-medium text-white">Помощь</span>
+              <span className="font-medium text-gray-900 dark:text-white">Помощь</span>
             </div>
-            <ChevronRight className="h-5 w-5 text-gray-600" />
+            <ChevronRight className="h-5 w-5 text-gray-500 dark:text-gray-600" />
           </Link>
           <button
             onClick={() => {
               localStorage.removeItem("userSession")
               setIsLoggedIn(false)
             }}
-            className="w-full flex items-center justify-between p-4 hover:bg-[#333] transition-colors active:scale-[0.99]"
+            className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors active:scale-[0.99]"
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
@@ -729,7 +729,7 @@ export default function AccountPage() {
         </div>
 
         {/* App Version */}
-        <p className="text-center text-gray-600 text-xs pb-4">
+        <p className="text-center text-gray-500 dark:text-gray-600 text-xs pb-4">
           Горошина v1.0.0
         </p>
       </div>

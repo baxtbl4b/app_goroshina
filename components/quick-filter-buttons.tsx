@@ -463,7 +463,7 @@ export default function QuickFilterButtons({
                 }
               }}
               placeholder={(pathname?.includes("/krepezh") || pathname?.includes("/diski")) ? "Фильтр по модели авто" : "Введите бренд"}
-              className="w-full px-3 py-2 rounded-2xl focus:outline-none bg-[#333333]/50 text-white placeholder-gray-400 placeholder:text-sm"
+              className="w-full px-3 py-2 rounded-2xl focus:outline-none bg-white dark:bg-[#333333]/50 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 placeholder:text-sm border border-gray-300 dark:border-transparent"
               style={{ fontSize: '16px' }}
             />
             {/* Car selector for krepezh and diski pages - внутри контейнера input для одинаковой ширины */}
@@ -613,12 +613,12 @@ export default function QuickFilterButtons({
             }
             className={`p-1.5 rounded-full transition-colors flex-shrink-0 ${
               (pathname?.includes("/krepezh") ? carSearchInput.trim() : selectedBrands.length > 0 || brandSearchInput.trim())
-                ? "hover:bg-gray-600 cursor-pointer bg-[#333333]/50"
-                : "cursor-not-allowed opacity-30 bg-[#333333]/30"
+                ? "hover:bg-gray-300 dark:hover:bg-gray-600 cursor-pointer bg-gray-200 dark:bg-[#333333]/50"
+                : "cursor-not-allowed opacity-30 bg-gray-200 dark:bg-[#333333]/30"
             }`}
             aria-label="Очистить фильтр брендов"
           >
-            <X className="h-4 w-4 text-gray-400" />
+            <X className="h-4 w-4 text-gray-600 dark:text-gray-400" />
           </button>
 
           {/* Упрощенный селектор брендов */}
@@ -683,7 +683,7 @@ export default function QuickFilterButtons({
 
         {/* Правый блок - Сортировка по цене */}
         <div
-          className="flex items-center justify-center bg-[#333333]/50 rounded-2xl px-3 py-2.5 cursor-pointer hover:opacity-70 transition-opacity"
+          className="flex items-center justify-center bg-white dark:bg-[#333333]/50 rounded-2xl px-3 py-2.5 cursor-pointer hover:opacity-70 transition-opacity border border-gray-300 dark:border-transparent"
           onClick={() => {
             // Toggle the price filter
             const newFilter = priceFilter === "cheaper" ? "expensive" : "cheaper"
@@ -718,7 +718,7 @@ export default function QuickFilterButtons({
             alt="Сортировка по цене"
             width={20}
             height={20}
-            className={`transform ${priceFilter === "expensive" ? "rotate-180" : ""} transition-transform`}
+            className={`transform ${priceFilter === "expensive" ? "rotate-180" : ""} transition-transform dark:invert-0 invert`}
           />
         </div>
       </div>

@@ -568,9 +568,9 @@ export default function OrderPage() {
   const totalBeforePromo = subtotal
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] pr-4 flex items-center relative before:content-[''] before:absolute before:top-[-50px] before:left-0 before:right-0 before:h-[50px] before:bg-[#1F1F1F]">
+      <header className="sticky top-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] pr-4 flex items-center relative before:content-[''] before:absolute before:top-[-50px] before:left-0 before:right-0 before:h-[50px] before:bg-white dark:before:bg-[#1F1F1F]">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <button
@@ -578,9 +578,9 @@ export default function OrderPage() {
               className="p-2 transition-colors"
               aria-label="Назад"
             >
-              <ChevronLeft className="h-5 w-5 text-white" />
+              <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-white" />
             </button>
-            <span className="text-xl font-bold text-white">Оформление заказа</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">Оформление заказа</span>
           </div>
         </div>
       </header>
@@ -589,11 +589,11 @@ export default function OrderPage() {
       <main className="flex-1 container mx-auto px-3 sm:px-4 pt-4 pb-6">
         <div className="flex flex-col gap-4">
           {/* Корзина */}
-          <Card className="border-0 shadow-lg bg-[#2A2A2A] rounded-2xl overflow-hidden">
+          <Card className="border-0 shadow-lg bg-white dark:bg-[#2A2A2A] rounded-2xl overflow-hidden">
             <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center justify-between">
-              <h3 className="font-semibold text-lg">Ваша корзина</h3>
+              <h3 className="font-semibold text-lg text-gray-900 dark:text-white">Ваша корзина</h3>
               {hasItems && (
-                <span className="text-sm text-muted-foreground bg-[#3A3A3A] px-3 py-1 rounded-full">
+                <span className="text-sm text-gray-600 dark:text-muted-foreground bg-gray-100 dark:bg-[#3A3A3A] px-3 py-1 rounded-full">
                   {totalQuantity} шт / {totalWeight} кг
                 </span>
               )}
@@ -620,7 +620,7 @@ export default function OrderPage() {
                     return (
                       <div
                         key={item.id}
-                        className="flex items-start gap-4 p-4 bg-[#1F1F1F] rounded-2xl relative"
+                        className="flex items-start gap-4 p-4 bg-gray-100 dark:bg-[#1F1F1F] rounded-2xl relative"
                       >
                         {/* Иконки: грузовая, шипы - абсолютное позиционирование относительно карточки */}
                         {(item.spike || item.cargo) && (
@@ -682,7 +682,7 @@ export default function OrderPage() {
                                 </span>
                               )}
                               {seasonName && (
-                                <span className="text-xs text-gray-400 bg-[#2A2A2A] px-2 py-1 rounded-lg">
+                                <span className="text-xs text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-[#2A2A2A] px-2 py-1 rounded-lg">
                                   {seasonName}
                                 </span>
                               )}
@@ -696,7 +696,7 @@ export default function OrderPage() {
                             </div>
                           </div>
 
-                          <h3 className="font-medium text-sm text-white leading-tight">
+                          <h3 className="font-medium text-sm text-gray-900 dark:text-white leading-tight">
                             {item.name || item.title || `${item.brand || ""} ${item.model || ""}`}
                           </h3>
 
@@ -716,7 +716,7 @@ export default function OrderPage() {
                           )}
 
                         {/* Сумма "Всего" - абсолютное позиционирование в правый нижний угол */}
-                        <span className="absolute bottom-4 right-4 text-sm font-semibold text-white">
+                        <span className="absolute bottom-4 right-4 text-sm font-semibold text-gray-900 dark:text-white">
                           Всего: {formatPrice(itemPrice * item.quantity)}
                         </span>
                         </div>
@@ -725,9 +725,9 @@ export default function OrderPage() {
                   })}
 
                   {/* Итоги */}
-                  <div className="bg-[#1F1F1F] rounded-2xl p-4 space-y-3">
+                  <div className="bg-gray-100 dark:bg-[#1F1F1F] rounded-2xl p-4 space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400">Сумма заказа:</span>
+                      <span className="text-gray-600 dark:text-gray-400">Сумма заказа:</span>
                       <div className="flex items-center gap-2">
                         {appliedPointsDiscount > 0 && (
                           <span className="text-lg animate-bounce">👍</span>
@@ -738,13 +738,13 @@ export default function OrderPage() {
                               {formatPrice(subtotal)}
                             </span>
                           )}
-                          <span className={appliedPointsDiscount > 0 ? "text-green-400" : "text-white"}>
+                          <span className={appliedPointsDiscount > 0 ? "text-green-400" : "text-gray-900 dark:text-white"}>
                             {formatPrice(total)}
                           </span>
                         </span>
                       </div>
                     </div>
-                    <div className="flex justify-between items-center pt-2 border-t border-[#3A3A3A]">
+                    <div className="flex justify-between items-center pt-2 border-t border-gray-300 dark:border-[#3A3A3A]">
                       <span className="text-[#c4d402]">Баллы за покупку:</span>
                       <span className="font-medium text-[#c4d402]">
                         +{formatPrice(cashbackAmount)}
@@ -753,9 +753,9 @@ export default function OrderPage() {
                   </div>
 
                   {/* Списать баллы */}
-                  <div className="bg-[#1F1F1F] rounded-2xl p-4">
+                  <div className="bg-gray-100 dark:bg-[#1F1F1F] rounded-2xl p-4">
                     <div className="flex justify-between items-center mb-3">
-                      <h2 className="text-sm font-medium text-gray-300">Списать баллы</h2>
+                      <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300">Списать баллы</h2>
                       <div className="flex items-center gap-1.5">
                         <div className="w-5 h-5 rounded-full bg-[#c4d402] flex items-center justify-center">
                           <span className="text-[10px] font-bold text-black">₽</span>
@@ -779,7 +779,7 @@ export default function OrderPage() {
                               background: `linear-gradient(to right, #c4d402 ${(pointsToUse / Math.min(userPoints, Math.round(subtotal * 0.1))) * 100}%, #2A2A2A ${(pointsToUse / Math.min(userPoints, Math.round(subtotal * 0.1))) * 100}%)`
                             }}
                           />
-                          <span className="text-sm font-medium text-white min-w-[80px] text-right">
+                          <span className="text-sm font-medium text-gray-900 dark:text-white min-w-[80px] text-right">
                             {formatPrice(pointsToUse)}
                           </span>
                         </div>
@@ -792,7 +792,7 @@ export default function OrderPage() {
                                 className={`px-3 py-1.5 text-xs rounded-lg transition-all ${
                                   pointsToUse === amount
                                     ? "bg-[#c4d402] text-black font-medium"
-                                    : "bg-[#2A2A2A] text-gray-400 hover:bg-[#3A3A3A]"
+                                    : "bg-gray-200 dark:bg-[#2A2A2A] text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-[#3A3A3A]"
                                 }`}
                               >
                                 {amount === userPoints ? "Все" : formatPrice(amount)}
@@ -821,7 +821,7 @@ export default function OrderPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 text-xs px-3 text-gray-400 hover:text-white hover:bg-[#3A3A3A] rounded-lg"
+                          className="h-8 text-xs px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-[#3A3A3A] rounded-lg"
                           onClick={() => {
                             setIsPointsApplied(false)
                             setPointsToUse(0)
@@ -835,7 +835,7 @@ export default function OrderPage() {
                 </>
               ) : (
                 <div className="py-12 text-center">
-                  <div className="mx-auto w-20 h-20 mb-4 bg-[#1F1F1F] rounded-2xl flex items-center justify-center">
+                  <div className="mx-auto w-20 h-20 mb-4 bg-gray-100 dark:bg-[#1F1F1F] rounded-2xl flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="40"
@@ -853,8 +853,8 @@ export default function OrderPage() {
                       <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium mb-2 text-white">Корзина пуста</h3>
-                  <p className="text-sm text-gray-400 mb-6">Добавьте товары в корзину, чтобы оформить заказ</p>
+                  <h3 className="text-lg font-medium mb-2 text-gray-900 dark:text-white">Корзина пуста</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Добавьте товары в корзину, чтобы оформить заказ</p>
                   <Link href="/category/tires">
                     <Button className="bg-[#c4d402] hover:bg-[#C4CF2E] text-black font-medium px-6 py-2.5 rounded-xl">
                       Перейти к каталогу
@@ -867,9 +867,9 @@ export default function OrderPage() {
           {hasItems && (
             <>
               {/* Способ получения */}
-              <Card className="border-0 shadow-lg bg-[#2A2A2A] rounded-2xl overflow-hidden">
+              <Card className="border-0 shadow-lg bg-white dark:bg-[#2A2A2A] rounded-2xl overflow-hidden">
                 <CardHeader className="pb-3 pt-4 px-4">
-                  <h2 className="font-semibold text-lg">Способ получения</h2>
+                  <h2 className="font-semibold text-lg text-gray-900 dark:text-white">Способ получения</h2>
                 </CardHeader>
                 <CardContent className="px-4 pb-4">
                   <div className="grid grid-cols-3 gap-2">
@@ -879,7 +879,7 @@ export default function OrderPage() {
                       className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all ${
                         deliveryMethod === "pickup"
                           ? "bg-[#c4d402] text-black"
-                          : "bg-[#1F1F1F] text-white hover:bg-[#3A3A3A]"
+                          : "bg-gray-100 dark:bg-[#1F1F1F] text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#3A3A3A]"
                       }`}
                     >
                       <MapPin className="h-5 w-5" />
@@ -892,7 +892,7 @@ export default function OrderPage() {
                       className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all ${
                         deliveryMethod === "delivery"
                           ? "bg-[#c4d402] text-black"
-                          : "bg-[#1F1F1F] text-white hover:bg-[#3A3A3A]"
+                          : "bg-gray-100 dark:bg-[#1F1F1F] text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#3A3A3A]"
                       }`}
                     >
                       <Truck className="h-5 w-5" />
@@ -905,7 +905,7 @@ export default function OrderPage() {
                       className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all ${
                         deliveryMethod === "russia"
                           ? "bg-[#c4d402] text-black"
-                          : "bg-[#1F1F1F] text-white hover:bg-[#3A3A3A]"
+                          : "bg-gray-100 dark:bg-[#1F1F1F] text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#3A3A3A]"
                       }`}
                     >
                       <Globe className="h-5 w-5" />
@@ -914,15 +914,15 @@ export default function OrderPage() {
                   </div>
 
                   {deliveryMethod === "pickup" && (
-                    <div className="mt-4 bg-[#1F1F1F] rounded-xl p-4">
-                      <h3 className="text-base font-medium mb-3">Выберите магазин</h3>
+                    <div className="mt-4 bg-gray-100 dark:bg-[#1F1F1F] rounded-xl p-4">
+                      <h3 className="text-base font-medium mb-3 text-gray-900 dark:text-white">Выберите магазин</h3>
                       <div className="space-y-4">
                         {selectedStore ? (
                           <>
                             {stores
                               .filter((store) => store.id === selectedStore)
                               .map((store) => (
-                                <div key={store.id} className="border border-gray-600 rounded-lg p-4">
+                                <div key={store.id} className="border border-gray-300 dark:border-gray-600 rounded-lg p-4">
                                   <div className="flex items-start gap-3">
                                     <input
                                       type="radio"
@@ -933,9 +933,9 @@ export default function OrderPage() {
                                       readOnly
                                     />
                                     <div className="flex-1">
-                                      <div className="font-medium">{store.name}</div>
-                                      <div className="text-sm text-gray-400">{store.address}</div>
-                                      <div className="text-sm text-gray-400">{store.phone}</div>
+                                      <div className="font-medium text-gray-900 dark:text-white">{store.name}</div>
+                                      <div className="text-sm text-gray-600 dark:text-gray-400">{store.address}</div>
+                                      <div className="text-sm text-gray-600 dark:text-gray-400">{store.phone}</div>
 
                                       {/* Яндекс карта */}
                                       <div className="mt-3">
@@ -963,7 +963,7 @@ export default function OrderPage() {
                         ) : (
                           <>
                             {stores.map((store) => (
-                              <div key={store.id} className="border border-gray-600 rounded-lg p-4">
+                              <div key={store.id} className="border border-gray-300 dark:border-gray-600 rounded-lg p-4">
                                 <label className="flex items-start gap-3 cursor-pointer">
                                   <input
                                     type="radio"
@@ -974,9 +974,9 @@ export default function OrderPage() {
                                     className="mt-1 accent-sky-400"
                                   />
                                   <div className="flex-1">
-                                    <div className="font-medium">{store.name}</div>
-                                    <div className="text-sm text-gray-400">{store.address}</div>
-                                    <div className="text-sm text-gray-400">{store.phone}</div>
+                                    <div className="font-medium text-gray-900 dark:text-white">{store.name}</div>
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">{store.address}</div>
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">{store.phone}</div>
 
                                     {/* Яндекс карта */}
                                     <div className="mt-3">
@@ -1000,18 +1000,18 @@ export default function OrderPage() {
                   )}
 
                   {deliveryMethod === "delivery" && (
-                    <div className="bg-[#2A2A2A] rounded-lg p-4 mt-4">
-                      <h2 className="text-lg font-bold mb-4">Доставка по городу</h2>
+                    <div className="bg-gray-100 dark:bg-[#2A2A2A] rounded-lg p-4 mt-4">
+                      <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Доставка по городу</h2>
 
                       {/* Список сохраненных адресов */}
                       {!showNewAddressForm && (
                         <div className="mb-4">
-                          <h3 className="text-sm font-medium mb-3">Выберите адрес доставки</h3>
+                          <h3 className="text-sm font-medium mb-3 text-gray-900 dark:text-white">Выберите адрес доставки</h3>
                           <div className="space-y-2">
                             {savedAddresses.map((address) => (
                               <label
                                 key={address.id}
-                                className="flex items-start justify-between p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-[#3A3A3A]"
+                                className="flex items-start justify-between p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-[#3A3A3A]"
                               >
                                 <div className="flex items-start">
                                   <input
@@ -1023,9 +1023,9 @@ export default function OrderPage() {
                                     className="mr-3 mt-1 accent-sky-400"
                                   />
                                   <div>
-                                    <div className="font-medium text-white">{address.name}</div>
-                                    <div className="text-sm text-gray-400">{address.street}</div>
-                                    <div className="text-sm text-gray-400">{address.city}</div>
+                                    <div className="font-medium text-gray-900 dark:text-white">{address.name}</div>
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">{address.street}</div>
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">{address.city}</div>
                                     {address.isDefault && (
                                       <div className="text-xs text-[#c4d402] mt-1">По умолчанию</div>
                                     )}
@@ -1039,7 +1039,7 @@ export default function OrderPage() {
                           <button
                             type="button"
                             onClick={handleAddNewAddressFormClick}
-                            className="w-full mt-3 p-3 border-2 border-dashed border-gray-600 rounded-lg text-gray-400 hover:border-gray-500 hover:text-gray-300 transition-colors flex items-center justify-center"
+                            className="w-full mt-3 p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors flex items-center justify-center"
                           >
                             <Plus className="h-4 w-4 mr-2" />
                             Добавить новый адрес
@@ -1050,32 +1050,32 @@ export default function OrderPage() {
                       {/* Форма нового адреса */}
                       {showNewAddressForm && (
                         <div className="mb-4">
-                          <h3 className="text-sm font-medium mb-3">Новый адрес доставки</h3>
+                          <h3 className="text-sm font-medium mb-3 text-gray-900 dark:text-white">Новый адрес доставки</h3>
                           <div className="space-y-3">
                             <div>
-                              <label className="block text-xs text-gray-400 mb-1">Город</label>
+                              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Город</label>
                               <input
                                 type="text"
                                 value={newAddress.city}
                                 onChange={(e) => handleAddressChange("city", e.target.value)}
-                                className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
+                                className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1F1F1F] text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                                 placeholder="Москва"
                               />
                             </div>
 
                             <div>
-                              <label className="block text-xs text-gray-400 mb-1">Улица, дом, квартира</label>
+                              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Улица, дом, квартира</label>
                               <input
                                 type="text"
                                 value={newAddress.street}
                                 onChange={(e) => handleAddressChange("street", e.target.value)}
-                                className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
+                                className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1F1F1F] text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                                 placeholder="ул. Пушкина, д. 10, кв. 42"
                               />
                             </div>
 
                             <div>
-                              <label className="flex items-center text-sm text-gray-300">
+                              <label className="flex items-center text-sm text-gray-700 dark:text-gray-300">
                                 <input
                                   type="checkbox"
                                   checked={newAddress.isDefault}
@@ -1100,7 +1100,7 @@ export default function OrderPage() {
                                     isDefault: savedAddresses.length === 0,
                                   })
                                 }}
-                                className="flex-1 px-4 py-2 text-sm border border-gray-600 rounded-md text-gray-400 hover:text-gray-300 hover:border-gray-500 transition-colors"
+                                className="flex-1 px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
                               >
                                 Отмена
                               </button>
@@ -1122,20 +1122,20 @@ export default function OrderPage() {
                       )}
 
                       {/* Информация о доставке */}
-                      <div className="bg-[#1F1F1F] rounded-lg p-4">
-                        <h3 className="text-sm font-medium mb-3">Информация о доставке</h3>
+                      <div className="bg-gray-200 dark:bg-[#1F1F1F] rounded-lg p-4">
+                        <h3 className="text-sm font-medium mb-3 text-gray-900 dark:text-white">Информация о доставке</h3>
                         <div className="space-y-2">
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-400">Стоимость доставки:</span>
-                            <span className="text-sm font-medium text-white">{formatPrice(500)}</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Стоимость доставки:</span>
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">{formatPrice(500)}</span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-400">Срок доставки:</span>
-                            <span className="text-sm font-medium text-white">1-2 дня</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Срок доставки:</span>
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">1-2 дня</span>
                           </div>
-                          <div className="border-t border-gray-600 pt-2 mt-3">
+                          <div className="border-t border-gray-300 dark:border-gray-600 pt-2 mt-3">
                             <div className="flex justify-between items-center">
-                              <span className="text-sm font-medium text-white">Итого к оплате:</span>
+                              <span className="text-sm font-medium text-gray-900 dark:text-white">Итого к оплате:</span>
                               <span className="text-lg font-bold text-[#c4d402]">
                                 {formatPrice(total + 500)}
                               </span>
@@ -1147,17 +1147,17 @@ export default function OrderPage() {
                   )}
 
                   {deliveryMethod === "russia" && (
-                    <div className="bg-[#2A2A2A] rounded-lg p-4 mt-4">
-                      <h2 className="text-lg font-bold mb-4">Доставка по России</h2>
+                    <div className="bg-gray-100 dark:bg-[#2A2A2A] rounded-lg p-4 mt-4">
+                      <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Доставка по России</h2>
 
                       {/* Выбор транспортной компании */}
                       <div className="mb-6">
-                        <h3 className="text-sm font-medium mb-3">Выберите транспортную компанию</h3>
+                        <h3 className="text-sm font-medium mb-3 text-gray-900 dark:text-white">Выберите транспортную компанию</h3>
                         <div className="space-y-2">
                           {deliveryCompanies.map((company) => (
                             <label
                               key={company.id}
-                              className="flex items-center justify-between p-3 border border-gray-600 rounded-lg cursor-pointer hover:bg-[#3A3A3A]"
+                              className="flex items-center justify-between p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-[#3A3A3A]"
                             >
                               <div className="flex items-center">
                                 <input
@@ -1169,12 +1169,12 @@ export default function OrderPage() {
                                   className="mr-3 accent-sky-400"
                                 />
                                 <div>
-                                  <div className="font-medium text-white">{company.name}</div>
-                                  <div className="text-sm text-gray-400">{company.days} дней</div>
+                                  <div className="font-medium text-gray-900 dark:text-white">{company.name}</div>
+                                  <div className="text-sm text-gray-600 dark:text-gray-400">{company.days} дней</div>
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className="font-medium text-white">{formatPrice(company.price)}</div>
+                                <div className="font-medium text-gray-900 dark:text-white">{formatPrice(company.price)}</div>
                               </div>
                             </label>
                           ))}
@@ -1183,10 +1183,10 @@ export default function OrderPage() {
 
                       {/* Данные получателя */}
                       <div className="mb-6">
-                        <h3 className="text-sm font-medium mb-3">Данные получателя</h3>
+                        <h3 className="text-sm font-medium mb-3 text-gray-900 dark:text-white">Данные получателя</h3>
 
                         <div className="mb-3">
-                          <label className="flex items-center text-sm text-gray-300">
+                          <label className="flex items-center text-sm text-gray-700 dark:text-gray-300">
                             <input
                               type="checkbox"
                               checked={useCustomerAsRecipient}
@@ -1199,24 +1199,24 @@ export default function OrderPage() {
 
                         <div className="grid grid-cols-1 gap-3">
                           <div>
-                            <label className="block text-xs text-gray-400 mb-1">ФИО получателя</label>
+                            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">ФИО получателя</label>
                             <input
                               type="text"
                               value={recipientInfo.name}
                               onChange={(e) => handleRecipientChange("name", e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
+                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1F1F1F] text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                               placeholder="Введите ФИО получателя"
                               required
                             />
                           </div>
 
                           <div>
-                            <label className="block text-xs text-gray-400 mb-1">Телефон получателя</label>
+                            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Телефон получателя</label>
                             <input
                               type="tel"
                               value={recipientInfo.phone}
                               onChange={(e) => handleRecipientChange("phone", e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
+                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1F1F1F] text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                               placeholder="+7 (999) 123-45-67"
                               required
                             />
@@ -1227,39 +1227,39 @@ export default function OrderPage() {
 
                       {/* Адрес доставки */}
                       <div className="mb-6">
-                        <h3 className="text-sm font-medium mb-3">Адрес доставки</h3>
+                        <h3 className="text-sm font-medium mb-3 text-gray-900 dark:text-white">Адрес доставки</h3>
                         <div className="grid grid-cols-1 gap-3">
                           <div>
-                            <label className="block text-xs text-gray-400 mb-1">Регион</label>
+                            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Регион</label>
                             <input
                               type="text"
                               value={newAddress.region || ""}
                               onChange={(e) => handleAddressChange("region", e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
+                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1F1F1F] text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                               placeholder="Московская область"
                               required
                             />
                           </div>
 
                           <div>
-                            <label className="block text-xs text-gray-400 mb-1">Город</label>
+                            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Город</label>
                             <input
                               type="text"
                               value={newAddress.city}
                               onChange={(e) => handleAddressChange("city", e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
+                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1F1F1F] text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                               placeholder="Москва"
                               required
                             />
                           </div>
 
                           <div>
-                            <label className="block text-xs text-gray-400 mb-1">Улица, дом, квартира</label>
+                            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Улица, дом, квартира</label>
                             <input
                               type="text"
                               value={newAddress.street}
                               onChange={(e) => handleAddressChange("street", e.target.value)}
-                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-600 bg-[#1F1F1F] text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
+                              className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1F1F1F] text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#c4d402] focus:border-[#c4d402]"
                               placeholder="ул. Пушкина, д. 10, кв. 42"
                               required
                             />
@@ -1268,29 +1268,29 @@ export default function OrderPage() {
                       </div>
 
                       {/* Итоговая информация */}
-                      <div className="bg-[#1F1F1F] rounded-lg p-4">
-                        <h3 className="text-sm font-medium mb-3">Информация о доставке</h3>
+                      <div className="bg-gray-200 dark:bg-[#1F1F1F] rounded-lg p-4">
+                        <h3 className="text-sm font-medium mb-3 text-gray-900 dark:text-white">Информация о доставке</h3>
                         {(() => {
                           const selectedCompany = deliveryCompanies.find((c) => c.id === selectedDeliveryCompany)
                           return selectedCompany ? (
                             <div className="space-y-2">
                               <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-400">Транспортная компания:</span>
-                                <span className="text-sm font-medium text-white">{selectedCompany.name}</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Транспортная компания:</span>
+                                <span className="text-sm font-medium text-gray-900 dark:text-white">{selectedCompany.name}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-400">Стоимость доставки:</span>
-                                <span className="text-sm font-medium text-white">
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Стоимость доставки:</span>
+                                <span className="text-sm font-medium text-gray-900 dark:text-white">
                                   {formatPrice(selectedCompany.price)}
                                 </span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-400">Срок доставки:</span>
-                                <span className="text-sm font-medium text-white">{selectedCompany.days} дней</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Срок доставки:</span>
+                                <span className="text-sm font-medium text-gray-900 dark:text-white">{selectedCompany.days} дней</span>
                               </div>
-                              <div className="border-t border-gray-600 pt-2 mt-3">
+                              <div className="border-t border-gray-300 dark:border-gray-600 pt-2 mt-3">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-sm font-medium text-white">Итого к оплате:</span>
+                                  <span className="text-sm font-medium text-gray-900 dark:text-white">Итого к оплате:</span>
                                   <span className="text-lg font-bold text-[#c4d402]">
                                     {formatPrice(total + selectedCompany.price)}
                                   </span>
@@ -1311,13 +1311,13 @@ export default function OrderPage() {
 
         {/* Данные покупателя - только для доставки по России */}
         {deliveryMethod === "russia" && (
-        <Card className="border-0 shadow-lg bg-[#2A2A2A] rounded-2xl overflow-hidden mt-4">
+        <Card className="border-0 shadow-lg bg-white dark:bg-[#2A2A2A] rounded-2xl overflow-hidden mt-4">
           <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
-              <h2 className="font-semibold text-lg">Данные получателя</h2>
+              <h2 className="font-semibold text-lg text-gray-900 dark:text-white">Данные получателя</h2>
               <button
                 onClick={() => setIsCustomerCardCollapsed(!isCustomerCardCollapsed)}
-                className="p-1.5 text-gray-400 hover:text-white hover:bg-[#3A3A3A] rounded-lg transition-all"
+                className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#3A3A3A] rounded-lg transition-all"
                 aria-label={isCustomerCardCollapsed ? "Развернуть" : "Свернуть"}
               >
                 {isCustomerCardCollapsed ? (
@@ -1335,7 +1335,7 @@ export default function OrderPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 text-xs px-3 text-gray-400 hover:text-white hover:bg-[#3A3A3A] rounded-lg"
+                className="h-8 text-xs px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#3A3A3A] rounded-lg"
                 onClick={() => setIsEditingCustomer(true)}
               >
                 Изменить
@@ -1345,7 +1345,7 @@ export default function OrderPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 text-xs px-3 text-gray-400 hover:text-white hover:bg-[#3A3A3A] rounded-lg"
+                  className="h-8 text-xs px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#3A3A3A] rounded-lg"
                   onClick={() => {
                     setIsEditingCustomer(false)
                     setEditedCustomer({
@@ -1369,77 +1369,77 @@ export default function OrderPage() {
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
             {isCustomerCardCollapsed ? (
-              <div className="flex items-center gap-3 bg-[#1F1F1F] rounded-xl p-3">
-                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#2A2A2A]">
-                  <User className="h-5 w-5 text-gray-400" />
+              <div className="flex items-center gap-3 bg-gray-200 dark:bg-[#1F1F1F] rounded-xl p-3">
+                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-200 dark:bg-[#2A2A2A]">
+                  <User className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 </div>
-                <p className="text-sm font-medium">{customer.name || "Не указано"}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{customer.name || "Не указано"}</p>
               </div>
             ) : !isEditingCustomer ? (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="flex items-center gap-3 bg-[#1F1F1F] rounded-xl p-3">
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#2A2A2A]">
-                    <User className="h-5 w-5 text-gray-400" />
+                <div className="flex items-center gap-3 bg-gray-200 dark:bg-[#1F1F1F] rounded-xl p-3">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-300 dark:bg-[#2A2A2A]">
+                    <User className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">ФИО</p>
-                    <p className="text-sm font-medium text-white">{customer.name || "Не указано"}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{customer.name || "Не указано"}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 bg-[#1F1F1F] rounded-xl p-3">
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#2A2A2A]">
-                    <Phone className="h-5 w-5 text-gray-400" />
+                <div className="flex items-center gap-3 bg-gray-200 dark:bg-[#1F1F1F] rounded-xl p-3">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-300 dark:bg-[#2A2A2A]">
+                    <Phone className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Телефон</p>
-                    <p className="text-sm font-medium text-white">{customer.phone || "Не указан"}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{customer.phone || "Не указан"}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 bg-[#1F1F1F] rounded-xl p-3">
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#2A2A2A]">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                <div className="flex items-center gap-3 bg-gray-200 dark:bg-[#1F1F1F] rounded-xl p-3">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-300 dark:bg-[#2A2A2A]">
+                    <Mail className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Email</p>
-                    <p className="text-sm font-medium text-white">{customer.email || "Не указан"}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{customer.email || "Не указан"}</p>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="space-y-3">
                 <div>
-                  <label htmlFor="customer-name" className="text-xs text-gray-400 mb-1.5 block">ФИО</label>
+                  <label htmlFor="customer-name" className="text-xs text-gray-600 dark:text-gray-400 mb-1.5 block">ФИО</label>
                   <input
                     id="customer-name"
                     type="text"
                     value={editedCustomer.name}
                     onChange={(e) => handleCustomerChange("name", e.target.value)}
                     placeholder="Введите ФИО"
-                    className="w-full px-4 py-2.5 text-sm rounded-xl border-0 bg-[#1F1F1F] text-white focus:outline-none focus:ring-2 focus:ring-[#c4d402]/50"
+                    className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-300 dark:border-0 bg-white dark:bg-[#1F1F1F] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#c4d402]/50"
                   />
                 </div>
                 <div>
-                  <label htmlFor="customer-phone" className="text-xs text-gray-400 mb-1.5 block">Телефон</label>
+                  <label htmlFor="customer-phone" className="text-xs text-gray-600 dark:text-gray-400 mb-1.5 block">Телефон</label>
                   <input
                     id="customer-phone"
                     type="tel"
                     value={editedCustomer.phone}
                     onChange={(e) => handleCustomerChange("phone", e.target.value)}
                     placeholder="+7 (999) 123-45-67"
-                    className="w-full px-4 py-2.5 text-sm rounded-xl border-0 bg-[#1F1F1F] text-white focus:outline-none focus:ring-2 focus:ring-[#c4d402]/50"
+                    className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-300 dark:border-0 bg-white dark:bg-[#1F1F1F] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#c4d402]/50"
                   />
                 </div>
                 <div>
-                  <label htmlFor="customer-email" className="text-xs text-gray-400 mb-1.5 block">Email</label>
+                  <label htmlFor="customer-email" className="text-xs text-gray-600 dark:text-gray-400 mb-1.5 block">Email</label>
                   <input
                     id="customer-email"
                     type="email"
                     value={editedCustomer.email}
                     onChange={(e) => handleCustomerChange("email", e.target.value)}
                     placeholder="example@mail.com"
-                    className="w-full px-4 py-2.5 text-sm rounded-xl border-0 bg-[#1F1F1F] text-white focus:outline-none focus:ring-2 focus:ring-[#c4d402]/50"
+                    className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-300 dark:border-0 bg-white dark:bg-[#1F1F1F] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#c4d402]/50"
                   />
                 </div>
               </div>
@@ -1451,15 +1451,26 @@ export default function OrderPage() {
 
       {/* Кнопка оформления - закреплена внизу */}
       {hasItems && (
-        <div className="sticky bottom-0 px-3 sm:px-4 pt-8 py-4 pb-[calc(16px+env(safe-area-inset-bottom))]" style={{ background: 'linear-gradient(to top, rgba(18, 18, 18, 0.9) 0%, rgba(18, 18, 18, 0.6) 60%, rgba(18, 18, 18, 0) 100%)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', maskImage: 'linear-gradient(to top, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to top, black 70%, transparent 100%)' }}>
-          <Button
-            className="w-full py-8 text-lg bg-[#c4d402] hover:bg-[#C4CF2E] text-black font-bold rounded-t-[32px] rounded-b-[32px] shadow-lg"
-            onClick={handleProceedToCheckout}
-            disabled={!hasItems}
-          >
-            Оформить заказ
-          </Button>
-        </div>
+        <>
+          <style jsx>{`
+            .checkout-button-wrapper {
+              backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px);
+              mask-image: linear-gradient(to top, black 70%, transparent 100%);
+              -webkit-mask-image: linear-gradient(to top, black 70%, transparent 100%);
+              background: transparent;
+            }
+          `}</style>
+          <div className="checkout-button-wrapper sticky bottom-0 px-3 sm:px-4 pt-8 py-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
+            <Button
+              className="w-full py-8 text-lg bg-[#c4d402] hover:bg-[#C4CF2E] text-black font-bold rounded-t-[32px] rounded-b-[32px] shadow-lg"
+              onClick={handleProceedToCheckout}
+              disabled={!hasItems}
+            >
+              Оформить заказ
+            </Button>
+          </div>
+        </>
       )}
     </div>
   )

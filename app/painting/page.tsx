@@ -419,22 +419,22 @@ export default function PaintingPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#121212] text-white">
+    <div className="flex flex-col min-h-screen bg-[#d9d9dd] text-gray-900">
       <SafeAreaHeader title="Покраска дисков" showBackButton backUrl="/" />
 
       <main className="flex-1 pt-[calc(60px+env(safe-area-inset-top)+1rem)]">
-        <div className="px-4 py-6 bg-[#2A2A2A] text-white">
-          <div className="bg-[#121212] rounded-lg p-4 space-y-4 relative">
+        <div className="px-4 py-6 text-gray-900">
+          <div className="bg-white rounded-lg p-4 space-y-4 relative shadow-sm border border-gray-200">
             <Image
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/car_base-zdUvBezNiqgwBsRzXwU0JLWsSHKeYq.png"
               alt="Luxury car with bronze wheels"
               width={188}
               height={141}
-              className="object-contain opacity-50 absolute top-[90px] right-0"
+              className="object-contain absolute top-[90px] right-0"
             />
 
-            <div className="bg-yellow-600 bg-opacity-20 border border-yellow-500 rounded-lg p-3 mb-4">
-              <p className="text-sm text-yellow-200">
+            <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-3 mb-4">
+              <p className="text-sm text-yellow-900">
                 <strong>Примечание:</strong> В стоимость не включены шиномонтажные работы. Цена актуальна только при
                 предоставлении голых дисков.
               </p>
@@ -461,7 +461,7 @@ export default function PaintingPage() {
                           className={`text-xs px-2 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0 transition-colors ${
                             selectedCar === car.id
                               ? "bg-blue-500 border-blue-500 text-white"
-                              : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                              : "bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
                           }`}
                         >
                           {car.displayName}
@@ -478,7 +478,7 @@ export default function PaintingPage() {
               <select
                 value={paintingType}
                 onChange={(e) => setPaintingType(e.target.value)}
-                className="w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 bg-[#2A2A2A] text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm border-2 border-[#c4d402]"
+                className="w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 bg-white text-gray-900 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm border-2 border-[#c4d402]"
               >
                 <option value="powder">Порошковая покраска</option>
                 <option value="acrylic">Акриловая покраска</option>
@@ -619,7 +619,7 @@ export default function PaintingPage() {
                           key={color}
                           onClick={() => setSelectedColor(color)}
                           className={`w-12 h-10 rounded border ${
-                            selectedColor === color ? "border-white border-2" : "border-gray-600"
+                            selectedColor === color ? "border-white border-2" : "border-gray-300"
                           }`}
                           style={{ backgroundColor: color }}
                         />
@@ -643,7 +643,7 @@ export default function PaintingPage() {
                     type="text"
                     value={ralInput}
                     onChange={(e) => setRalInput(e.target.value)}
-                    className="bg-[#2A2A2A] text-white rounded px-2 py-1 text-sm w-20 border border-gray-600"
+                    className="bg-white text-gray-900 border border-gray-200 rounded px-2 py-1 text-sm w-20 border border-gray-300"
                     placeholder="9005"
                   />
                   <button
@@ -672,7 +672,7 @@ export default function PaintingPage() {
                       className={`flex items-center gap-2 px-3 py-2 rounded text-sm border transition-all duration-300 cursor-pointer ${
                         selectedFinish === "matte"
                           ? "border-blue-500 border-2 bg-blue-500 bg-opacity-20"
-                          : "border-gray-600 hover:border-gray-500"
+                          : "border-gray-300 hover:border-gray-500"
                       }`}
                     >
                       <div
@@ -690,7 +690,7 @@ export default function PaintingPage() {
                           </svg>
                         )}
                       </div>
-                      <span className="text-white">Матовый</span>
+                      <span className="text-gray-900">Матовый</span>
                     </div>
 
                     <div
@@ -698,7 +698,7 @@ export default function PaintingPage() {
                       className={`flex items-center gap-2 px-3 py-2 rounded text-sm border transition-all duration-300 cursor-pointer ${
                         selectedFinish === "glossy"
                           ? "border-blue-500 border-2 bg-blue-500 bg-opacity-20"
-                          : "border-gray-600 hover:border-gray-500"
+                          : "border-gray-300 hover:border-gray-500"
                       }`}
                     >
                       <div
@@ -716,7 +716,7 @@ export default function PaintingPage() {
                           </svg>
                         )}
                       </div>
-                      <span className="text-white">Глянцевый</span>
+                      <span className="text-gray-900">Глянцевый</span>
                     </div>
                   </div>
                 </div>
@@ -728,7 +728,7 @@ export default function PaintingPage() {
                   <select
                     value={diameter}
                     onChange={(e) => setDiameter(e.target.value)}
-                    className={`w-1/2 bg-[#2A2A2A] text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 ${
+                    className={`w-1/2 bg-white text-gray-900 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 ${
                       !diameter ? "border-2 border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
                     }`}
                   >
@@ -756,13 +756,13 @@ export default function PaintingPage() {
                         className={`flex-1 rounded-lg px-3 py-2 relative transition-all duration-200 ease-in-out active:scale-95 hover:shadow-md ${
                           key === "disk-painting"
                             ? serviceQuantities[key] > 0
-                              ? "bg-[#1e293b] border-l-4 border-[#c4d402] shadow-lg text-center"
+                              ? "bg-white border-l-4 border-[#c4d402] shadow-lg text-center"
                               : !diameter
-                                ? "bg-gray-800 text-gray-400 text-center"
-                                : "bg-gray-700 text-white cursor-pointer hover:bg-[#1a1a1a] hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 ease-in-out text-center"
+                                ? "bg-gray-100 text-gray-400 text-center"
+                                : "bg-gray-100 text-gray-900 cursor-pointer hover:bg-gray-200 hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 ease-in-out text-center"
                             : !diameter
-                              ? "bg-gray-800 text-gray-400"
-                              : "bg-gray-600 text-white cursor-pointer hover:bg-gray-700 active:bg-gray-800"
+                              ? "bg-gray-100 text-gray-400"
+                              : "bg-gray-100 text-gray-900 cursor-pointer hover:bg-gray-200 active:bg-gray-300 border border-gray-200"
                         }`}
                         onClick={() => {
                           if (diameter) {
@@ -775,7 +775,7 @@ export default function PaintingPage() {
                             <div className="font-medium text-center">{name}</div>
                             {diameter && (
                               <div className="mt-2">
-                                <span className="text-lg font-semibold text-white">
+                                <span className="text-lg font-semibold text-gray-900">
                                   {pricingData[key]?.[paintingType]?.[diameter] || 0} ₽
                                 </span>
                               </div>
@@ -786,7 +786,7 @@ export default function PaintingPage() {
                           <>
                             {name}
                             {diameter && (
-                              <span className="text-sm text-gray-400 ml-2">
+                              <span className="text-sm text-gray-600 ml-2 font-medium">
                                 {pricingData[key]?.[paintingType]?.[diameter] || 0} ₽
                               </span>
                             )}
@@ -825,7 +825,7 @@ export default function PaintingPage() {
                             disabled={!diameter}
                             className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold transition-all duration-200 active:scale-90 ${
                               !diameter
-                                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                 : "bg-[#c4d402] text-black hover:bg-[#c5d135] focus:outline-none focus:ring-2 focus:ring-blue-500"
                             }`}
                           >
@@ -839,8 +839,8 @@ export default function PaintingPage() {
                             disabled={!diameter}
                             className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold transition-all duration-200 active:scale-90 ${
                               !diameter
-                                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                                : "bg-[#484b51] text-white hover:bg-[#5A5D63] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                : "bg-gray-200 text-gray-900 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             }`}
                           >
                             -
@@ -853,15 +853,15 @@ export default function PaintingPage() {
                             disabled={!diameter}
                             className={`w-10 h-10 rounded-lg flex items-center justify-center focus:outline-none transition-all duration-200 active:scale-90 ${
                               !diameter
-                                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                                : "bg-[#484b51] text-white hover:bg-[#5A5D63] focus:ring-2 focus:ring-blue-500"
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                : "bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-blue-500"
                             }`}
                           >
                             -
                           </button>
                           <div
-                            className={`w-10 h-10 text-white rounded-lg flex items-center justify-center text-sm font-medium ${
-                              !diameter ? "bg-gray-800 text-gray-500" : "bg-[#1A1A1A]"
+                            className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-medium border border-gray-200 ${
+                              !diameter ? "bg-gray-100 text-gray-400" : "bg-gray-100 text-gray-900"
                             }`}
                           >
                             {serviceQuantities[key] || 0}
@@ -871,7 +871,7 @@ export default function PaintingPage() {
                             disabled={!diameter}
                             className={`w-10 h-10 rounded-lg flex items-center justify-center focus:outline-none transition-all duration-200 active:scale-90 ${
                               !diameter
-                                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                 : "bg-[#c4d402] text-black hover:bg-[#c5d135] focus:ring-2 focus:ring-blue-500"
                             }`}
                           >
@@ -884,9 +884,9 @@ export default function PaintingPage() {
                 </div>
 
                 <div className="pt-4 flex gap-4 items-stretch">
-                  <div className="w-1/2 bg-[#2A2A2A] rounded-lg p-3">
+                  <div className="w-1/2 bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
                     <div className="mb-3">
-                      <span className="text-sm font-medium text-gray-300">Выбранные услуги:</span>
+                      <span className="text-sm font-medium text-gray-700">Выбранные услуги:</span>
                     </div>
                     <div className="space-y-2 max-h-32 overflow-y-auto">
                       {Object.keys(selectedServices).length === 0 && Object.keys(tireMountingServices).length === 0 ? (
@@ -897,8 +897,8 @@ export default function PaintingPage() {
                             const s = service as { name: string; quantity: number; price: number; total: number }
                             return (
                               <div key={key} className="flex justify-between items-center text-xs">
-                                <span className="text-gray-300">{s.name}</span>
-                                <span className="text-white">
+                                <span className="text-gray-600">{s.name}</span>
+                                <span className="text-gray-900 font-medium">
                                   {s.quantity}x {s.price}₽ = {s.total}₽
                                 </span>
                               </div>
@@ -907,16 +907,16 @@ export default function PaintingPage() {
 
                           {Object.keys(tireMountingServices).length > 0 && (
                             <>
-                              <div className="border-t border-gray-600 pt-2 mt-2">
+                              <div className="border-t border-gray-300 pt-2 mt-2">
                                 <div className="flex justify-between items-center">
-                                  <div className="text-xs text-blue-400 font-medium">Шиномонтаж:</div>
+                                  <div className="text-xs text-blue-600 font-medium">Шиномонтаж:</div>
                                   <button
                                     onClick={() => {
                                       setTireMountingServices({})
                                       setTireMountingTotalPrice(0)
                                       localStorage.removeItem("tireMountingSelectedServices")
                                     }}
-                                    className="text-xs text-red-400 hover:text-red-300"
+                                    className="text-xs text-red-600 hover:text-red-700"
                                   >
                                     Удалить
                                   </button>
@@ -926,8 +926,8 @@ export default function PaintingPage() {
                                 const s = service as { name: string; quantity: number; price: number; total: number }
                                 return (
                                   <div key={`tire-${key}`} className="flex justify-between items-center text-xs">
-                                    <span className="text-blue-300">{s.name}</span>
-                                    <span className="text-blue-200">
+                                    <span className="text-blue-600">{s.name}</span>
+                                    <span className="text-blue-700 font-medium">
                                       {s.quantity}x {s.price}₽ = {s.total}₽
                                     </span>
                                   </div>
@@ -938,10 +938,10 @@ export default function PaintingPage() {
                         </>
                       )}
                     </div>
-                    <div className="border-t border-gray-600 mt-3 pt-2">
+                    <div className="border-t border-gray-300 mt-3 pt-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-lg font-bold">Итого:</span>
-                        <span className="text-xl font-bold text-blue-400">{totalPrice + tireMountingTotalPrice} ₽</span>
+                        <span className="text-lg font-bold text-gray-900">Итого:</span>
+                        <span className="text-xl font-bold text-blue-600">{totalPrice + tireMountingTotalPrice} ₽</span>
                       </div>
                     </div>
                   </div>
@@ -949,10 +949,10 @@ export default function PaintingPage() {
                     <input
                       type="text"
                       placeholder="Введите промокод"
-                      className="w-full bg-[#2A2A2A] text-white rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-600 text-center"
+                      className="w-full bg-white text-gray-900 border border-gray-200 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-300 text-center"
                     />
                     <button
-                      className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 px-4 rounded-lg font-medium transition-colors"
+                      className="w-full bg-gray-200 hover:bg-gray-300 text-gray-900 py-3 px-4 rounded-lg font-medium transition-colors"
                       onClick={() => {
                         alert("Показать полный прайс-лист")
                       }}
@@ -993,7 +993,7 @@ export default function PaintingPage() {
                             : "Записаться на услугу"}
                     </button>
                     <button
-                      className="w-full bg-blue-600/10 hover:bg-blue-700/10 text-white py-3 px-4 rounded-lg font-medium transition-colors"
+                      className="w-full bg-blue-100 hover:bg-blue-200 text-blue-700 py-3 px-4 rounded-lg font-medium transition-colors border border-blue-300"
                       onClick={() => {
                         const paintingData = {
                           selectedServices,
@@ -1016,10 +1016,10 @@ export default function PaintingPage() {
           </div>
         </div>
 
-        <div className="px-4 py-6 bg-[#1A1A1A] text-white">
-          <h2 className="text-xl font-bold mb-4">НАШИ РАБОТЫ</h2>
+        <div className="px-4 py-6 text-gray-900">
+          <h2 className="text-xl font-bold mb-4 text-gray-900">НАШИ РАБОТЫ</h2>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-[#2A2A2A] rounded-lg overflow-hidden">
+            <div className="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/F855ZUoDphU.jpg-ygI2SD9I1F0ouVZIEazZioYNNgkjjm.jpeg"
                 alt="Спортивный диск в сером цвете"
@@ -1028,12 +1028,12 @@ export default function PaintingPage() {
                 className="w-full h-32 object-cover"
               />
               <div className="p-3">
-                <h3 className="font-medium text-sm mb-1">Спортивный Y-дизайн</h3>
-                <p className="text-xs text-gray-400">Порошковая покраска R19</p>
+                <h3 className="font-medium text-sm mb-1 text-gray-900">Спортивный Y-дизайн</h3>
+                <p className="text-xs text-gray-500">Порошковая покраска R19</p>
               </div>
             </div>
 
-            <div className="bg-[#2A2A2A] rounded-lg overflow-hidden">
+            <div className="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/j0wuq85R9nI.jpg-qlz3iJTQoP02X35AqLwzNzCi67qyOz.jpeg"
                 alt="Комплект черных дисков"
@@ -1042,12 +1042,12 @@ export default function PaintingPage() {
                 className="w-full h-32 object-cover"
               />
               <div className="p-3">
-                <h3 className="font-medium text-sm mb-1">Матовый черный комплект</h3>
-                <p className="text-xs text-gray-400">Порошковая покраска R18</p>
+                <h3 className="font-medium text-sm mb-1 text-gray-900">Матовый черный комплект</h3>
+                <p className="text-xs text-gray-500">Порошковая покраска R18</p>
               </div>
             </div>
 
-            <div className="bg-[#2A2A2A] rounded-lg overflow-hidden">
+            <div className="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1U0Ef1hADPo.jpg-MCsDBnm66Cu7us63OcANm4cfncYQ4i.jpeg"
                 alt="Диски с полированной кромкой"
@@ -1056,12 +1056,12 @@ export default function PaintingPage() {
                 className="w-full h-32 object-cover"
               />
               <div className="p-3">
-                <h3 className="font-medium text-sm mb-1">Черный глянец с полировкой</h3>
-                <p className="text-xs text-gray-400">Комбинированная обработка R19</p>
+                <h3 className="font-medium text-sm mb-1 text-gray-900">Черный глянец с полировкой</h3>
+                <p className="text-xs text-gray-500">Комбинированная обработка R19</p>
               </div>
             </div>
 
-            <div className="bg-[#2A2A2A] rounded-lg overflow-hidden">
+            <div className="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/fnpdlVcg1g4.jpg-G0F4aNAx1eQsHQk59EViuSj0poBtrQ.jpeg"
                 alt="Диск BRABUS в матовом сером цвете"
@@ -1070,17 +1070,17 @@ export default function PaintingPage() {
                 className="w-full h-32 object-cover"
               />
               <div className="p-3">
-                <h3 className="font-medium text-sm mb-1">BRABUS матовый серый</h3>
-                <p className="text-xs text-gray-400">Премиум покраска R20</p>
+                <h3 className="font-medium text-sm mb-1 text-gray-900">BRABUS матовый серый</h3>
+                <p className="text-xs text-gray-500">Премиум покраска R20</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="px-4 py-6 bg-[#121212] text-white">
+        <div className="px-4 py-6 text-gray-900">
           <h2 className="text-xl font-bold mb-4">НАШИ ПРЕИМУЩЕСТВА</h2>
           <div className="flex flex-col space-y-4">
-            <div className="bg-[#2A2A2A] rounded-lg overflow-hidden text-white">
+            <div className="bg-gray-50 rounded-lg overflow-hidden text-gray-900 border border-gray-200">
               <div className="flex flex-col sm:flex-row">
                 <div className="sm:w-1/4 p-4 flex justify-center">
                   <div className="w-full h-48 rounded-lg overflow-hidden flex items-center justify-center">
@@ -1094,8 +1094,8 @@ export default function PaintingPage() {
                   </div>
                 </div>
                 <div className="sm:w-3/4 p-4">
-                  <h3 className="font-bold mb-2 text-center sm:text-left">ИДЕАЛЬНЫЙ РЕЗУЛЬТАТ</h3>
-                  <p className="text-sm text-center sm:text-left">
+                  <h3 className="font-bold mb-2 text-center sm:text-left text-gray-900">ИДЕАЛЬНЫЙ РЕЗУЛЬТАТ</h3>
+                  <p className="text-sm text-center sm:text-left text-gray-700">
                     Мы восстанавливаем и красим диски так, будто они только с завода. Идеальное покрытие, стойкий цвет и
                     защита от внешних воздействий.
                   </p>

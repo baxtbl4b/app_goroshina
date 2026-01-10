@@ -16,7 +16,7 @@ export function SafeAreaHeader({ title, showBackButton = false, children, classN
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 bg-[#1f1f1f] text-white px-4 flex items-center justify-between h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] shadow-sm ${className}`}
+      className={`fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1f1f1f] text-gray-900 dark:text-white px-4 flex items-center justify-between h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] shadow-sm ${className}`}
     >
       <div className="flex items-center">
         {showBackButton && (

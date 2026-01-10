@@ -288,10 +288,10 @@ export default function TireMountingBookingPage() {
             isSelected
               ? "bg-[#c4d402] text-[#1F1F1F]"
               : isTodayDate
-                ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300"
+                ? "bg-blue-100 text-blue-600"
                 : isPast
                   ? "text-gray-400 cursor-not-allowed"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-[#1F1F1F] dark:text-white"
+                  : "hover:bg-gray-200 text-gray-900"
           }`}
         >
           {day}
@@ -368,7 +368,7 @@ export default function TireMountingBookingPage() {
 
   if (!bookingData) {
     return (
-      <div className="flex flex-col min-h-screen bg-[#121212] text-white">
+      <div className="flex flex-col min-h-screen bg-white text-gray-900">
         <SafeAreaHeader title="Запись на шиномонтаж" showBackButton backUrl="/tire-mounting" />
         <main className="flex-1 flex items-center justify-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
@@ -380,22 +380,22 @@ export default function TireMountingBookingPage() {
   const selectedStoreData = stores.find((store) => store.id === selectedStore)
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#121212] text-white">
+    <div className="flex flex-col min-h-screen bg-[#d9d9dd] text-gray-900">
       <SafeAreaHeader title="Запись на шиномонтаж" showBackButton backUrl="/tire-mounting" />
 
       <main className="flex-1 px-4 py-6">
         <form onSubmit={(e) => e.preventDefault()} className="max-w-2xl mx-auto space-y-6">
           {/* Контактная информация */}
-          <Card className="bg-white dark:bg-[#2A2A2A] border-none shadow-sm">
+          <Card className="bg-white border border-gray-200 shadow-sm">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-bold text-[#1F1F1F] dark:text-white flex items-center gap-2">
+              <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
                 <User className="h-5 w-5 text-[#c4d402]" />
                 Контактная информация
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-[#1F1F1F] dark:text-white">
+                <Label htmlFor="name" className="text-gray-900">
                   Имя
                 </Label>
                 <Input
@@ -403,11 +403,11 @@ export default function TireMountingBookingPage() {
                   placeholder="Данные из личного кабинета"
                   value={customerInfo.name}
                   onChange={(e) => handleCustomerInfoChange("name", e.target.value)}
-                  className="bg-[#F5F5F5] dark:bg-[#333333] border-none"
+                  className="bg-gray-50 border-gray-200"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone" className="text-[#1F1F1F] dark:text-white">
+                <Label htmlFor="phone" className="text-gray-900">
                   Телефон
                 </Label>
                 <Input
@@ -415,15 +415,15 @@ export default function TireMountingBookingPage() {
                   placeholder="Данные из личного кабинета"
                   value={customerInfo.phone}
                   onChange={(e) => handleCustomerInfoChange("phone", e.target.value)}
-                  className="bg-[#F5F5F5] dark:bg-[#333333] border-none"
+                  className="bg-gray-50 border-gray-200"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="car" className="text-[#1F1F1F] dark:text-white">
+                <Label htmlFor="car" className="text-gray-900">
                   Автомобили
                 </Label>
                 <div className="space-y-2">
-                  <Label className="text-[#1F1F1F] dark:text-white text-lg font-semibold">
+                  <Label className="text-gray-900 text-lg font-semibold">
                     Данные из личного кабинета
                   </Label>
                   <div className="space-y-3">
@@ -445,12 +445,12 @@ export default function TireMountingBookingPage() {
                       className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                         selectedCar === "1"
                           ? "border-[#c4d402] bg-[#c4d402]/10"
-                          : "border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333]"
+                          : "border-gray-300 bg-white"
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-semibold text-[#1F1F1F] dark:text-white">Toyota Camry</div>
+                          <div className="font-semibold text-gray-900">Toyota Camry</div>
                           <div className="text-sm text-gray-500">2019 • А123БВ777</div>
                         </div>
                         <span className="text-xs bg-[#c4d402] text-[#1F1F1F] px-2 py-1 rounded">Основной</span>
@@ -474,18 +474,18 @@ export default function TireMountingBookingPage() {
                       className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                         selectedCar === "2"
                           ? "border-[#c4d402] bg-[#c4d402]/10"
-                          : "border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333]"
+                          : "border-gray-300 bg-white"
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-semibold text-[#1F1F1F] dark:text-white">Volkswagen Tiguan</div>
+                          <div className="font-semibold text-gray-900">Volkswagen Tiguan</div>
                           <div className="text-sm text-gray-500">2020 • В456ГД777</div>
                         </div>
                       </div>
                     </div>
                     <Link href="/account/cars/add">
-                      <div className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-[#F5F5F5] dark:bg-[#333333] cursor-pointer hover:border-[#c4d402] transition-colors">
+                      <div className="p-4 rounded-lg border-2 border-dashed border-gray-300 bg-white cursor-pointer hover:border-[#c4d402] transition-colors">
                         <div className="text-center text-[#009CFF] font-medium">+ Добавить автомобиль</div>
                       </div>
                     </Link>
@@ -493,15 +493,15 @@ export default function TireMountingBookingPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="comment" className="text-[#1F1F1F] dark:text-white">
+                <Label htmlFor="comment" className="text-gray-900">
                   Комментарий
                 </Label>
                 <Textarea
                   id="comment"
-                  placeholder="Дополнительные пожелания или коммента��ии"
+                  placeholder="Дополнительные пожелания или комментарии"
                   value={customerInfo.comment}
                   onChange={(e) => handleCustomerInfoChange("comment", e.target.value)}
-                  className="bg-[#F5F5F5] dark:bg-[#333333] border-none resize-none"
+                  className="bg-gray-50 border-gray-200 resize-none"
                   rows={3}
                 />
               </div>
@@ -509,34 +509,34 @@ export default function TireMountingBookingPage() {
           </Card>
 
           {/* Сводка по услугам */}
-          <div className="bg-[#2A2A2A] rounded-lg p-4">
-            <h2 className="text-lg font-bold mb-3">Выбранные услуги</h2>
+          <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+            <h2 className="text-lg font-bold mb-3 text-gray-900">Выбранные услуги</h2>
             <div className="space-y-2">
               {Object.entries(bookingData.selectedServices).map(([key, service]: [string, any]) => (
                 <div key={key} className="flex justify-between items-center text-sm">
-                  <span className="text-gray-300">{service.name}</span>
-                  <span className="text-white">
+                  <span className="text-gray-600">{service.name}</span>
+                  <span className="text-gray-900 font-medium">
                     {service.quantity}x {service.price}₽ = {service.total}₽
                   </span>
                 </div>
               ))}
             </div>
-            <div className="border-t border-gray-600 mt-3 pt-3">
+            <div className="border-t border-gray-300 mt-3 pt-3">
               <div className="flex justify-between items-center">
-                <span className="text-lg font-bold">Общая стоимость:</span>
+                <span className="text-lg font-bold text-gray-900">Общая стоимость:</span>
                 <span className="text-xl font-bold text-[#c4d402]">{bookingData.totalPrice} ₽</span>
               </div>
             </div>
 
             {/* Дополнительная информация */}
-            <div className="mt-4 pt-3 border-t border-gray-600 space-y-2 text-sm">
+            <div className="mt-4 pt-3 border-t border-gray-300 space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-400">Диаметр шины:</span>
-                <span>{bookingData.diameter?.toUpperCase()}</span>
+                <span className="text-gray-500">Диаметр шины:</span>
+                <span className="text-gray-900">{bookingData.diameter?.toUpperCase()}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Тип автомобиля:</span>
-                <span>
+                <span className="text-gray-500">Тип автомобиля:</span>
+                <span className="text-gray-900">
                   {bookingData.carType === "passenger" && "Легковой автомобиль"}
                   {bookingData.carType === "crossover" && "Кроссовер"}
                   {bookingData.carType === "jeep" && "Джип"}
@@ -548,21 +548,21 @@ export default function TireMountingBookingPage() {
           </div>
 
           {/* Выбор магазина */}
-          <Card ref={storeSelectionRef} className="bg-[#2A2A2A] rounded-lg p-4">
-            <h2 className="text-lg font-bold mb-3">Выберите сервис</h2>
+          <Card ref={storeSelectionRef} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+            <h2 className="text-lg font-bold mb-3 text-gray-900">Выберите сервис</h2>
             <div className="space-y-3">
               {selectedStore ? (
                 <>
                   {stores
                     .filter((store) => store.id === selectedStore)
                     .map((store) => (
-                      <div key={store.id} className="border border-gray-600 rounded-lg p-4">
+                      <div key={store.id} className="border border-gray-300 rounded-lg p-4 bg-gray-50">
                         <div className="flex items-start gap-3">
                           <input type="radio" name="store" value={store.id} checked={true} className="mt-1" readOnly />
                           <div className="flex-1">
-                            <div className="font-medium">{store.name}</div>
-                            <p className="text-sm text-gray-400 mt-1">{store.address}</p>
-                            <p className="text-sm text-gray-400">{store.phone}</p>
+                            <div className="font-medium text-gray-900">{store.name}</div>
+                            <p className="text-sm text-gray-600 mt-1">{store.address}</p>
+                            <p className="text-sm text-gray-600">{store.phone}</p>
                             <p className="text-xs text-gray-500 mt-1">{store.hours}</p>
 
                             {/* Яндекс карта */}
@@ -599,7 +599,7 @@ export default function TireMountingBookingPage() {
                               })
                             }, 100)
                           }}
-                          className="mt-4 text-sm text-blue-400 hover:text-blue-300"
+                          className="mt-4 text-sm text-blue-600 hover:text-blue-700"
                         >
                           Выбрать другой сервис
                         </button>
@@ -609,7 +609,7 @@ export default function TireMountingBookingPage() {
               ) : (
                 <>
                   {stores.map((store) => (
-                    <div key={store.id} className="border border-gray-600 rounded-lg p-4">
+                    <div key={store.id} className="border border-gray-300 rounded-lg p-4 bg-gray-50">
                       <label className="flex items-start gap-3 cursor-pointer">
                         <input
                           type="radio"
@@ -629,9 +629,9 @@ export default function TireMountingBookingPage() {
                           className="mt-1"
                         />
                         <div className="flex-1">
-                          <div className="font-medium">{store.name}</div>
-                          <p className="text-sm text-gray-400 mt-1">{store.address}</p>
-                          <p className="text-sm text-gray-400">{store.phone}</p>
+                          <div className="font-medium text-gray-900">{store.name}</div>
+                          <p className="text-sm text-gray-600 mt-1">{store.address}</p>
+                          <p className="text-sm text-gray-600">{store.phone}</p>
                           <p className="text-xs text-gray-500 mt-1">{store.hours}</p>
 
                           {/* Яндекс карта */}
@@ -666,16 +666,16 @@ export default function TireMountingBookingPage() {
           </Card>
 
           {/* Выбор даты и времени */}
-          <Card ref={dateTimeRef} className="bg-white dark:bg-[#2A2A2A] border-none shadow-sm">
+          <Card ref={dateTimeRef} className="bg-white border border-gray-200 shadow-sm">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-bold text-[#1F1F1F] dark:text-white flex items-center gap-2">
+              <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-[#c4d402]" />
                 Дата и время
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label className="text-sm font-medium text-[#1F1F1F] dark:text-white">Дата и время записи *</Label>
+                <Label className="text-sm font-medium text-gray-900">Дата и время записи *</Label>
                 <div className="mt-1 flex flex-col lg:flex-row gap-4">
                   <div className="flex-1">
                     <div className="flex gap-2 mb-3 justify-center">
@@ -689,7 +689,7 @@ export default function TireMountingBookingPage() {
                         className={`flex-1 px-3 py-2 text-sm rounded-md border transition-all duration-300 transform hover:scale-105 ${
                           selectedQuickDate === "today"
                             ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F] shadow-lg"
-                            : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:shadow-md"
+                            : "bg-white border-gray-300 text-gray-900 hover:border-[#c4d402] hover:shadow-md"
                         }`}
                       >
                         Сегодня
@@ -705,13 +705,13 @@ export default function TireMountingBookingPage() {
                         className={`flex-1 px-3 py-2 text-sm rounded-md border transition-all duration-300 transform hover:scale-105 ${
                           selectedQuickDate === "tomorrow"
                             ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F] shadow-lg"
-                            : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:shadow-md"
+                            : "bg-white border-gray-300 text-gray-900 hover:border-[#c4d402] hover:shadow-md"
                         }`}
                       >
                         Завтра
                       </button>
                     </div>
-                    <div className="w-full bg-[#F5F5F5] dark:bg-[#333333] rounded-lg p-4">
+                    <div className="w-full bg-gray-50 rounded-lg p-4 border border-gray-200">
                       {/* Заголовок календаря */}
                       <div className="flex items-center justify-between mb-4">
                         <button
@@ -719,11 +719,11 @@ export default function TireMountingBookingPage() {
                           onClick={() =>
                             setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))
                           }
-                          className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md"
+                          className="p-2 hover:bg-gray-200 rounded-md"
                         >
-                          <ChevronLeft className="h-4 w-4 text-[#1F1F1F] dark:text-white" />
+                          <ChevronLeft className="h-4 w-4 text-gray-900" />
                         </button>
-                        <h3 className="text-lg font-semibold text-[#1F1F1F] dark:text-white">
+                        <h3 className="text-lg font-semibold text-gray-900">
                           {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
                         </h3>
                         <button
@@ -731,9 +731,9 @@ export default function TireMountingBookingPage() {
                           onClick={() =>
                             setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))
                           }
-                          className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md"
+                          className="p-2 hover:bg-gray-200 rounded-md"
                         >
-                          <ChevronRight className="h-4 w-4 text-[#1F1F1F] dark:text-white" />
+                          <ChevronRight className="h-4 w-4 text-gray-900" />
                         </button>
                       </div>
 
@@ -754,7 +754,7 @@ export default function TireMountingBookingPage() {
                     </div>
                   </div>
                   <div className="flex-1">
-                    <Label className="text-sm font-medium text-[#1F1F1F] dark:text-white mb-2 block">Время</Label>
+                    <Label className="text-sm font-medium text-gray-900 mb-2 block">Время</Label>
                     <div className="grid grid-cols-4 gap-2">
                       {timeSlots.map((time) => (
                         <button
@@ -773,7 +773,7 @@ export default function TireMountingBookingPage() {
                           className={`p-2 text-sm rounded-md border transition-all ${
                             selectedTime === time
                               ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
-                              : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402]"
+                              : "bg-white border-gray-300 text-gray-900 hover:border-[#c4d402]"
                           }`}
                         >
                           {time}
@@ -792,7 +792,7 @@ export default function TireMountingBookingPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 px-4 rounded-lg text-base font-medium transition-colors"
+              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 py-3 px-4 rounded-lg text-base font-medium transition-colors"
             >
               Назад
             </button>
@@ -849,7 +849,7 @@ export default function TireMountingBookingPage() {
           </div>
 
           {/* Согласие с условиями */}
-          <p className="text-xs text-gray-400 text-center mt-4">
+          <p className="text-xs text-gray-500 text-center mt-4">
             Нажимая "Записаться", вы соглашаетесь с{" "}
             <Link href="/settings/terms" className="text-[#c4d402] hover:underline">
               условиями

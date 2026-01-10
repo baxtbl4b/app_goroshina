@@ -16,7 +16,7 @@ export function LoadingScreen({ onLoadingComplete }: LoadingScreenProps) {
   }, [onLoadingComplete])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1F1F1F] dark:bg-black">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-[#1F1F1F]">
       {/* Vibrating logo */}
       <Image
         src="/images/minilogo22.svg"

@@ -16,7 +16,7 @@ export function BackButton({ className = "" }: BackButtonProps) {
       className={`p-2 transition-colors active:text-blue-500 ${className}`}
       aria-label="Назад"
     >
-      <ChevronLeft className="h-6 w-6 text-gray-300 active:text-blue-500" />
+      <ChevronLeft className="h-6 w-6 text-gray-700 dark:text-gray-300 active:text-blue-500" />
     </button>
   )
 }

@@ -197,7 +197,7 @@ export default function TireFilters({ season, onFilterChange }: TireFiltersProps
         <Button
           variant="outline"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+          className="flex items-center gap-2 border-gray-300 dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
         >
           <Filter className="h-4 w-4" />
           Фильтры
@@ -229,7 +229,7 @@ export default function TireFilters({ season, onFilterChange }: TireFiltersProps
                   selectedHeights.includes(size.height) &&
                   selectedDiameters.includes(size.diam)
                     ? "bg-[#c4d402] text-[#1F1F1F] border-[#c4d402]"
-                    : "border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                    : "bg-gray-50 dark:bg-transparent border-gray-300 dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
                 }`}
                 onClick={() => applyQuickSizeFilter(size)}
               >

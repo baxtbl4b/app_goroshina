@@ -559,8 +559,8 @@ export default function KrepezhPageClient() {
             border: none;
             cursor: pointer;
             padding: 5px 10px;
-            color: #B0B5BD;
-            opacity: 0.7;
+            color: #4B5563;
+            opacity: 0.9;
             transition: opacity 0.2s ease;
             -webkit-tap-highlight-color: transparent;
           }
@@ -571,6 +571,7 @@ export default function KrepezhPageClient() {
 
           .dark .fastener-carousel-arrow {
             color: #9CA3AF;
+            opacity: 0.7;
           }
 
           .fastener-carousel-arrow-left {

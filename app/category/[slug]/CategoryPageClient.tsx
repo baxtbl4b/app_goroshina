@@ -895,12 +895,12 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             position: absolute;
             padding: 5px 10px;
             background: transparent;
-            color: #6B7280;
+            color: #1F2937;
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 600;
             border-radius: 50px;
             z-index: 4;
-            opacity: 0.5;
+            opacity: 0.8;
             top: 50%;
           }
 
@@ -916,6 +916,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
           .dark .carousel-item-side {
             color: #9CA3AF;
+            opacity: 0.5;
           }
 
           @media (hover: hover) {
@@ -1135,18 +1136,16 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                       >
                         {tab.position === 'left' ? (
                           <ChevronLeft
-                            className="w-[25px] h-[25px]"
+                            className="w-[25px] h-[25px] text-gray-600 dark:text-[#B0B5BD]"
                             style={{
-                              color: isTarget ? '#1F1F1F' : '#B0B5BD',
-                              opacity: isTarget ? 1 : 0.7,
+                              opacity: isTarget ? 1 : 0.9,
                             }}
                           />
                         ) : (
                           <ChevronRight
-                            className="w-[25px] h-[25px]"
+                            className="w-[25px] h-[25px] text-gray-600 dark:text-[#B0B5BD]"
                             style={{
-                              color: isTarget ? '#1F1F1F' : '#B0B5BD',
-                              opacity: isTarget ? 1 : 0.7,
+                              opacity: isTarget ? 1 : 0.9,
                             }}
                           />
                         )}
@@ -1195,7 +1194,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                 className={`text-xs py-1.5 px-2.5 rounded-xl border transition-all duration-200 whitespace-nowrap snap-start flex-shrink-0 ${
                   currentWidth === size.width && currentProfile === size.profile && currentDiameter === size.diameter
                     ? "bg-[#c4d402] text-[#1F1F1F] border-[#c4d402] font-medium"
-                    : "border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:bg-[#c4d402]/10"
+                    : "bg-gray-50 dark:bg-transparent border-gray-300 dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:bg-[#c4d402]/10"
                 }`}
               >
                 {size.label}

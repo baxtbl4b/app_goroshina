@@ -228,7 +228,7 @@ export default function PressureSensorsClient() {
     const counts: Record<string, number> = {}
 
     cart.forEach((item: any) => {
-      if (item.id.startsWith("sensor-")) {
+      if (item.id && typeof item.id === 'string' && item.id.startsWith("sensor-")) {
         counts[item.id] = item.quantity || 0
       }
     })
@@ -1016,7 +1016,7 @@ export default function PressureSensorsClient() {
                 className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
                   selectedGarageVehicle === vehicle.id
                     ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
-                    : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                    : "bg-gray-50 dark:bg-[#3A3A3A] border-gray-300 dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
                 }`}
               >
                 {vehicle.brand} {vehicle.model}{vehicle.year ? ` ${vehicle.year}` : ""}
@@ -1025,7 +1025,7 @@ export default function PressureSensorsClient() {
             {userVehicles.length < 2 && (
               <a
                 href="/account/cars/add"
-                className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
+                className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-gray-50 dark:bg-[#3A3A3A] border-gray-300 dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
               >
                 + Добавить
               </a>

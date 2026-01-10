@@ -128,7 +128,7 @@ export default function CartButton({ className = "" }: CartButtonProps) {
         <div className={`relative ${isAnimating ? "cart-icon-bounce" : ""}`}>
           <ShoppingCart
             size={21}
-            className="text-white active:text-blue-500"
+            className="text-gray-900 dark:text-white active:text-blue-500"
           />
           {cartItemCount > 0 && (
             <span className="absolute -top-3 -right-3 bg-[#c4d402] text-[#1F1F1F] text-[10px] font-bold rounded-full w-[16px] h-[16px] flex items-center justify-center" style={{ lineHeight: '1', padding: '0' }}>

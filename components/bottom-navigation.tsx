@@ -99,7 +99,7 @@ export function BottomNavigation() {
 
         <path
           d="M 0,0 L 135,0 Q 143,0 147,5 C 156,14 168,25 187.5,25 C 207,25 219,14 228,5 Q 232,0 240,0 L 375,0 L 375,84 L 0,84 Z"
-          fill="#1F1F1F"
+          fill="#ffffff"
           className="dark:fill-[#1F1F1F]"
         />
 
@@ -135,8 +135,8 @@ export function BottomNavigation() {
             href="/"
             className={`flex flex-col items-center justify-center ${pathname === "/" ? "opacity-100" : "opacity-70"}`}
           >
-            <Home className="h-5 w-5 text-white" />
-            <span className="text-[10px] mt-1 text-white">Главная</span>
+            <Home className="h-5 w-5 text-gray-900 dark:text-white" />
+            <span className="text-[10px] mt-1 text-gray-900 dark:text-white">Главная</span>
           </Link>
           <Link
             href="/chat"
@@ -146,16 +146,16 @@ export function BottomNavigation() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.5997 2.37562 15.1116 3.04346 16.4525C3.22094 16.8088 3.28001 17.2161 3.17712 17.6006L2.58151 19.8267C2.32295 20.793 3.20701 21.677 4.17335 21.4185L6.39939 20.8229C6.78393 20.72 7.19121 20.7791 7.54753 20.9565C8.88837 21.6244 10.4003 22 12 22Z"
-                  stroke="white"
+                  className="stroke-gray-900 dark:stroke-white"
                   strokeWidth="2"
                   strokeLinejoin="round"
                 />
-                <path d="M8 12H8.01" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M12 12H12.01" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M16 12H16.01" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M8 12H8.01" className="stroke-gray-900 dark:stroke-white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M12 12H12.01" className="stroke-gray-900 dark:stroke-white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M16 12H16.01" className="stroke-gray-900 dark:stroke-white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <span className="text-[10px] mt-1 text-white">Чат</span>
+            <span className="text-[10px] mt-1 text-gray-900 dark:text-white">Чат</span>
           </Link>
           <Link
             href="/goroshina-assistant"
@@ -217,9 +217,9 @@ export function BottomNavigation() {
             className={`flex flex-col items-center justify-center ${pathname === "/account/orders" ? "opacity-100" : "opacity-70"}`}
           >
             <div className="h-5 w-5 flex items-center justify-center">
-              <ClipboardList className="h-5 w-5 text-white" />
+              <ClipboardList className="h-5 w-5 text-gray-900 dark:text-white" />
             </div>
-            <span className="text-[10px] mt-1 text-white">Заказы</span>
+            <span className="text-[10px] mt-1 text-gray-900 dark:text-white">Заказы</span>
           </Link>
           <Link
             href="/account"
@@ -229,21 +229,21 @@ export function BottomNavigation() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z"
-                  stroke="white"
+                  className="stroke-gray-900 dark:stroke-white"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
                 <path
                   d="M20 21C20 18.2386 16.4183 16 12 16C7.58172 16 4 18.2386 4 21"
-                  stroke="white"
+                  className="stroke-gray-900 dark:stroke-white"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
             </div>
-            <span className="text-[10px] mt-1 text-white">Мой кабинет</span>
+            <span className="text-[10px] mt-1 text-gray-900 dark:text-white">Мой кабинет</span>
           </Link>
         </div>
       </div>

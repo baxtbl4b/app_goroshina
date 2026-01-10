@@ -191,17 +191,17 @@ export default function OrdersPage() {
     return Array(3)
       .fill(0)
       .map((_, index) => (
-        <div key={index} className="bg-[#1F1F1F] rounded-2xl p-5 animate-pulse">
+        <div key={index} className="bg-white dark:bg-[#1F1F1F] rounded-2xl p-5 animate-pulse">
           <div className="flex justify-between items-center mb-3">
-            <div className="h-5 bg-[#2A2A2A] rounded-xl w-1/4"></div>
-            <div className="h-4 bg-[#2A2A2A] rounded-xl w-1/5"></div>
+            <div className="h-5 bg-gray-200 dark:bg-[#2A2A2A] rounded-xl w-1/4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-[#2A2A2A] rounded-xl w-1/5"></div>
           </div>
           <div className="flex justify-between items-center">
             <div>
-              <div className="h-4 bg-[#2A2A2A] rounded-xl w-3/4 mb-2"></div>
-              <div className="h-6 bg-[#2A2A2A] rounded-xl w-1/3"></div>
+              <div className="h-4 bg-gray-200 dark:bg-[#2A2A2A] rounded-xl w-3/4 mb-2"></div>
+              <div className="h-6 bg-gray-200 dark:bg-[#2A2A2A] rounded-xl w-1/3"></div>
             </div>
-            <div className="h-6 w-6 bg-[#2A2A2A] rounded-full"></div>
+            <div className="h-6 w-6 bg-gray-200 dark:bg-[#2A2A2A] rounded-full"></div>
           </div>
         </div>
       ))
@@ -226,18 +226,18 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#121212]">
+    <div className="min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
       {/* Заголовок */}
-      <header className="sticky top-0 z-50 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+      <header className="sticky top-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full flex items-center justify-start pl-4">
           <button
             onClick={() => router.back()}
-            className="p-2 rounded-2xl hover:bg-[#2A2A2A] transition-colors mr-3"
+            className="p-2 rounded-2xl hover:bg-gray-100 dark:hover:bg-[#2A2A2A] transition-colors mr-3"
             aria-label="Вернуться назад"
           >
-            <ChevronLeft className="h-5 w-5 text-gray-300" />
+            <ChevronLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
           </button>
-          <h1 className="text-lg font-bold text-white">Мои заказы</h1>
+          <h1 className="text-lg font-bold text-gray-900 dark:text-white">Мои заказы</h1>
         </div>
       </header>
 
@@ -245,11 +245,11 @@ export default function OrdersPage() {
         {/* Поиск и фильтры */}
         <div className="mb-6 flex items-center gap-4">
           <div className="relative flex-grow">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
             <Input
               type="text"
               placeholder="Поиск по номеру заказа"
-              className="pl-11 pr-4 py-3 w-full bg-[#1F1F1F] border-none rounded-2xl text-white placeholder:text-gray-500 focus:ring-2 focus:ring-[#c4d402] focus:border-transparent"
+              className="pl-11 pr-4 py-3 w-full bg-white dark:bg-[#1F1F1F] border border-gray-300 dark:border-none rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-500 focus:ring-2 focus:ring-[#c4d402] focus:border-transparent"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -258,22 +258,22 @@ export default function OrdersPage() {
 
         {/* Вкладки для фильтрации заказов */}
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid grid-cols-3 mb-6 bg-[#1F1F1F] p-1.5 rounded-2xl shadow-sm h-auto">
+          <TabsList className="grid grid-cols-3 mb-6 bg-gray-200 dark:bg-[#1F1F1F] p-1.5 rounded-2xl shadow-sm h-auto">
             <TabsTrigger
               value="all"
-              className="data-[state=active]:bg-[#c4d402] data-[state=active]:text-black text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
+              className="data-[state=active]:bg-[#c4d402] data-[state=active]:text-black text-gray-600 dark:text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
             >
               Все
             </TabsTrigger>
             <TabsTrigger
               value="active"
-              className="data-[state=active]:bg-[#c4d402] data-[state=active]:text-black text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
+              className="data-[state=active]:bg-[#c4d402] data-[state=active]:text-black text-gray-600 dark:text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
             >
               Активные
             </TabsTrigger>
             <TabsTrigger
               value="completed"
-              className="data-[state=active]:bg-[#c4d402] data-[state=active]:text-black text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
+              className="data-[state=active]:bg-[#c4d402] data-[state=active]:text-black text-gray-600 dark:text-gray-400 py-2.5 rounded-xl font-medium transition-all duration-200"
             >
               Выполнены
             </TabsTrigger>
@@ -300,12 +300,12 @@ export default function OrdersPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-10 bg-[#1F1F1F] rounded-2xl p-6">
-                <div className="w-16 h-16 bg-[#2A2A2A] rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="text-center py-10 bg-white dark:bg-[#1F1F1F] rounded-2xl p-6">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-[#2A2A2A] rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Package className="h-8 w-8 text-gray-500" />
                 </div>
-                <h3 className="text-lg font-medium text-white mb-2">У вас пока нет заказов</h3>
-                <p className="text-gray-500 mb-5">Здесь будет отображаться история ваших заказов</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">У вас пока нет заказов</h3>
+                <p className="text-gray-600 dark:text-gray-500 mb-5">Здесь будет отображаться история ваших заказов</p>
                 <button
                   onClick={() => router.push("/")}
                   className="px-6 py-3 bg-[#c4d402] text-black font-semibold rounded-2xl hover:bg-[#c5d136] transition-colors"
@@ -337,12 +337,12 @@ export default function OrdersPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-10 bg-[#1F1F1F] rounded-2xl p-6">
-                <div className="w-16 h-16 bg-[#2A2A2A] rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="text-center py-10 bg-white dark:bg-[#1F1F1F] rounded-2xl p-6">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-[#2A2A2A] rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Clock className="h-8 w-8 text-gray-500" />
                 </div>
-                <h3 className="text-lg font-medium text-white mb-2">У вас нет активных заказов</h3>
-                <p className="text-gray-500">Активные заказы будут отображаться здесь</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">У вас нет активных заказов</h3>
+                <p className="text-gray-600 dark:text-gray-500">Активные заказы будут отображаться здесь</p>
               </div>
             )}
           </TabsContent>
@@ -368,14 +368,14 @@ export default function OrdersPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-10 bg-[#1F1F1F] rounded-2xl p-6">
-                <div className="w-16 h-16 bg-[#2A2A2A] rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="text-center py-10 bg-white dark:bg-[#1F1F1F] rounded-2xl p-6">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-[#2A2A2A] rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="h-8 w-8 text-gray-500" />
                 </div>
-                <h3 className="text-lg font-medium text-white mb-2">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                   У вас нет выполненных заказов
                 </h3>
-                <p className="text-gray-500">Выполненные заказы будут отображаться здесь</p>
+                <p className="text-gray-600 dark:text-gray-500">Выполненные заказы будут отображаться здесь</p>
               </div>
             )}
           </TabsContent>

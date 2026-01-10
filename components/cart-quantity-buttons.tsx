@@ -91,14 +91,14 @@ const CartQuantityButtons = forwardRef<HTMLButtonElement, CartQuantityButtonsPro
         <button
           onClick={onRemove}
           disabled={disabled || count <= 0 || maxStock <= 0}
-          className={`${currentSize.button} bg-[#484b51] text-white rounded-lg flex items-center justify-center hover:bg-[#5A5D63] transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`${currentSize.button} bg-gray-300 dark:bg-[#484b51] text-gray-900 dark:text-white rounded-lg flex items-center justify-center hover:bg-gray-400 dark:hover:bg-[#5A5D63] transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
           aria-label="Уменьшить количество"
         >
           <Minus className={currentSize.icon} />
         </button>
 
         {/* Счетчик количества */}
-        <div className={`${currentSize.button} bg-[#1A1A1A] ${counterBorderClass} text-white rounded-lg flex items-center justify-center`}>
+        <div className={`${currentSize.button} bg-gray-100 dark:bg-[#1A1A1A] ${counterBorderClass} text-gray-900 dark:text-white rounded-lg flex items-center justify-center`}>
           <span className={`${currentSize.text} font-medium`}>{count}</span>
         </div>
 

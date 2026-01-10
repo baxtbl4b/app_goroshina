@@ -428,7 +428,7 @@ export function FastenerSearchFilter({ fastenerType = "nut", fasteners = [] }: F
                 <Select value={thread} onValueChange={handleThreadChange}>
                   <SelectTrigger
                     id="thread"
-                    className="w-full bg-[#333333] text-white border-0 rounded-xl"
+                    className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl"
                   >
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
@@ -449,7 +449,7 @@ export function FastenerSearchFilter({ fastenerType = "nut", fasteners = [] }: F
                 <Select value={shape} onValueChange={handleShapeChange}>
                   <SelectTrigger
                     id="shape"
-                    className="w-full bg-[#333333] text-white border-0 rounded-xl"
+                    className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl"
                   >
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
@@ -470,7 +470,7 @@ export function FastenerSearchFilter({ fastenerType = "nut", fasteners = [] }: F
                 <Select value={color} onValueChange={handleColorChange} disabled={colorOptions.length === 0}>
                   <SelectTrigger
                     id="color"
-                    className="w-full bg-[#333333] text-white border-0 rounded-xl"
+                    className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl"
                   >
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
@@ -519,7 +519,7 @@ export function FastenerSearchFilter({ fastenerType = "nut", fasteners = [] }: F
                     className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
                       selectedGarageVehicle === vehicle.id
                         ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
-                        : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                        : "bg-gray-50 dark:bg-[#3A3A3A] border-gray-300 dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
                     }`}
                   >
                     {vehicle.brand} {vehicle.model}{vehicle.year ? ` ${vehicle.year}` : ""}
@@ -528,7 +528,7 @@ export function FastenerSearchFilter({ fastenerType = "nut", fasteners = [] }: F
                 {userVehicles.length < 2 && (
                   <a
                     href="/account/cars/add"
-                    className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
+                    className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-gray-50 dark:bg-[#3A3A3A] border-gray-300 dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
                   >
                     + Добавить
                   </a>

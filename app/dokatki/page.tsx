@@ -556,7 +556,7 @@ export default function DokatkiPage() {
                     PCD
                   </Label>
                   <Select value={selectedPCD} onValueChange={setSelectedPCD}>
-                    <SelectTrigger id="pcd-filter" className="w-full bg-[#333333] text-white border-0 rounded-xl text-center">
+                    <SelectTrigger id="pcd-filter" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl text-center">
                       <SelectValue placeholder="~" />
                     </SelectTrigger>
                     <SelectContent>
@@ -574,7 +574,7 @@ export default function DokatkiPage() {
                     DIA
                   </Label>
                   <Select value={selectedDIA} onValueChange={setSelectedDIA}>
-                    <SelectTrigger id="dia-filter" className="w-full bg-[#333333] text-white border-0 rounded-xl text-center">
+                    <SelectTrigger id="dia-filter" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl text-center">
                       <SelectValue placeholder="~" />
                     </SelectTrigger>
                     <SelectContent>
