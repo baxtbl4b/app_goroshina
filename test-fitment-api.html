@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Fitment API</title>
+</head>
+<body>
+    <h1>Test Fitment API Response</h1>
+    <button onclick="testAPI()">Test API</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testAPI() {
+            try {
+                const response = await fetch('https://api.tirebase.ru/api/fitment?access_token=xN6JxoibNEbSFt952_O5kf-VxL61lOX4k5KAS-iGlBU&brand_slug=bmw&model_slug=3-series&year=2020');
+                const data = await response.json();
+
+                // Показываем весь ответ
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+
+                // Проверяем первый элемент на наличие данных о дисках
+                if (data && data.length > 0) {
+                    const firstItem = data[0];
+                    console.log('First fitment item:', firstItem);
+                    console.log('Keys:', Object.keys(firstItem));
+
+                    // Ищем поля, связанные с дисками
+                    const wheelKeys = Object.keys(firstItem).filter(key =>
+                        key.toLowerCase().includes('wheel') ||
+                        key.toLowerCase().includes('rim') ||
+                        key.toLowerCase().includes('bolt') ||
+                        key.toLowerCase().includes('pcd') ||
+                        key.toLowerCase().includes('offset') ||
+                        key.toLowerCase().includes('et') ||
+                        key.toLowerCase().includes('hub') ||
+                        key.toLowerCase().includes('dia')
+                    );
+
+                    console.log('Wheel-related keys:', wheelKeys);
+
+                    if (wheelKeys.length > 0) {
+                        alert('Found wheel data! Check console for details.');
+                    } else {
+                        alert('No wheel data found in API response');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -34,6 +34,7 @@ interface PressureSensor {
 }
 
 export default function PressureSensorsClient() {
+  const [isMounted, setIsMounted] = useState(false)
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   const [selectedCompatibility, setSelectedCompatibility] = useState<string>("")
   const [cartCounts, setCartCounts] = useState<Record<string, number>>({})
@@ -215,8 +216,14 @@ export default function PressureSensorsClient() {
     fetchSensors()
   }, [])
 
+  // Set mounted state
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   // Initialize cart counts from localStorage on component mount
   useEffect(() => {
+    if (!isMounted) return
     const cart = JSON.parse(localStorage.getItem("cart") || "[]")
     const counts: Record<string, number> = {}
 
@@ -227,10 +234,12 @@ export default function PressureSensorsClient() {
     })
 
     setCartCounts(counts)
-  }, [])
+  }, [isMounted])
 
   // Get cart item count
   useEffect(() => {
+    if (!isMounted) return
+
     const updateCartCount = () => {
       try {
         const cart = JSON.parse(localStorage.getItem("cart") || "[]")
@@ -250,10 +259,11 @@ export default function PressureSensorsClient() {
       window.removeEventListener("cartUpdated", updateCartCount)
       window.removeEventListener("cartItemAdded", updateCartCount)
     }
-  }, [])
+  }, [isMounted])
 
   // Initialize favorites from localStorage
   useEffect(() => {
+    if (!isMounted) return
     const storedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]")
     const favoritesMap: Record<string, boolean> = {}
     storedFavorites.forEach((item: any) => {
@@ -262,7 +272,7 @@ export default function PressureSensorsClient() {
       }
     })
     setFavorites(favoritesMap)
-  }, [])
+  }, [isMounted])
 
   // Load user vehicles from localStorage for garage
   useEffect(() => {
@@ -520,6 +530,16 @@ export default function PressureSensorsClient() {
         icon: <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />,
       }
     }
+  }
+
+  if (!isMounted) {
+    return (
+      <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px]">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
+        </div>
+      </main>
+    )
   }
 
   return (

@@ -37,6 +37,7 @@ interface CartItem {
   spike?: boolean | number | string
   runflat?: boolean | number | string
   cargo?: boolean | number | string
+  type?: string
   vehicle?: {
     carBrand: string
     carModel: string
@@ -609,7 +610,9 @@ export default function OrderPage() {
                     const seasonColor = getSeasonColor(item.season)
                     const imageUrl = (item.image && item.image.trim() !== "" && (item.image.startsWith("/") || item.image.startsWith("http")))
                       ? item.image
-                      : getDefaultImage(item.season)
+                      : (item as any).type === "dokatka"
+                        ? "/images/dokatka.png"
+                        : getDefaultImage(item.season)
                     const loadSpeedIndex = item.load_index && item.speed_index
                       ? `${item.load_index}${item.speed_index}`
                       : ""

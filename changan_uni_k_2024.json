@@ -1,0 +1,84 @@
+[
+    {
+        "active": true,
+        "bolt_pattern": "5x114.3",
+        "brand_key": "1",
+        "brand_original": "Changan",
+        "brand_slug": "changan",
+        "center_bore": "60.1",
+        "id": 400598,
+        "model_key": null,
+        "model_original": "UNI-K",
+        "model_slug": "uni-k",
+        "oem_rims": null,
+        "oem_tires": [
+            {
+                "diam": 19,
+                "height": 55,
+                "width": 245
+            },
+            {
+                "diam": 19,
+                "height": 55,
+                "width": 255
+            },
+            {
+                "diam": 20,
+                "height": 50,
+                "width": 255
+            },
+            {
+                "diam": 21,
+                "height": 45,
+                "width": 265
+            }
+        ],
+        "plus_sizes_rims": [],
+        "plus_sizes_tires": null,
+        "thread_size": "M12 x 1.5",
+        "trim_original": "2.0T ",
+        "trim_slug": "2.0t-",
+        "year": 2024
+    },
+    {
+        "active": true,
+        "bolt_pattern": "5x114.3",
+        "brand_key": "1",
+        "brand_original": "Changan",
+        "brand_slug": "changan",
+        "center_bore": "60.1",
+        "id": 400599,
+        "model_key": null,
+        "model_original": "UNI-K",
+        "model_slug": "uni-k",
+        "oem_rims": null,
+        "oem_tires": [
+            {
+                "diam": 19,
+                "height": 55,
+                "width": 245
+            },
+            {
+                "diam": 19,
+                "height": 55,
+                "width": 255
+            },
+            {
+                "diam": 20,
+                "height": 50,
+                "width": 255
+            },
+            {
+                "diam": 21,
+                "height": 45,
+                "width": 265
+            }
+        ],
+        "plus_sizes_rims": [],
+        "plus_sizes_tires": null,
+        "thread_size": "M12 x 1.5",
+        "trim_original": "1.5T PHEV ",
+        "trim_slug": "1.5t-phev-",
+        "year": 2024
+    }
+]

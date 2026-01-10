@@ -91,7 +91,7 @@ export default function QuickFilterButtons({
 
   // Search for cars (brands and models) with debounce
   useEffect(() => {
-    if (!pathname?.includes("/krepezh")) return
+    if (!pathname?.includes("/krepezh") && !pathname?.includes("/diski")) return
     if (!carSearchInput || carSearchInput.length < 2) {
       setSearchResults({ brands: [], models: [] })
       setIsSearching(false)
@@ -359,13 +359,28 @@ export default function QuickFilterButtons({
       if (response.ok) {
         const data = await response.json()
 
-        // Используем распарсенные данные из API
-        if (data.fastener && onCarSelect) {
+        // For /krepezh page - use fastener data
+        if (pathname?.includes("/krepezh") && data.fastener && onCarSelect) {
           console.log("Fastener data from API:", data.fastener)
           onCarSelect({
             type: data.fastener.type,
             thread: data.fastener.thread
           })
+        }
+
+        // For /diski page - dispatch event with wheel data
+        if (pathname?.includes("/diski") && data.wheels) {
+          console.log("Wheel data from API:", data.wheels)
+          window.dispatchEvent(new CustomEvent("carWheelDataSelected", {
+            detail: {
+              wheels: data.wheels,
+              carInfo: {
+                brand: selectedCarBrand?.name,
+                model: selectedCarModel?.name,
+                year: year
+              }
+            }
+          }))
         }
       }
     } catch (error) {
@@ -413,9 +428,9 @@ export default function QuickFilterButtons({
           <div className="relative flex-1">
             <input
               type="text"
-              value={pathname?.includes("/krepezh") ? carSearchInput : brandSearchInput}
+              value={(pathname?.includes("/krepezh") || pathname?.includes("/diski")) ? carSearchInput : brandSearchInput}
               onChange={(e) => {
-                if (pathname?.includes("/krepezh")) {
+                if (pathname?.includes("/krepezh") || pathname?.includes("/diski")) {
                   setCarSearchInput(e.target.value)
                   if (e.target.value.trim()) {
                     setShowCarSelector(true)
@@ -435,24 +450,24 @@ export default function QuickFilterButtons({
                 }
               }}
               onFocus={() => {
-                if (pathname?.includes("/krepezh")) {
+                if (pathname?.includes("/krepezh") || pathname?.includes("/diski")) {
                   setShowCarSelector(true)
                 } else {
                   setShowBrandSelector(true)
                 }
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !pathname?.includes("/krepezh")) {
+                if (e.key === "Enter" && !pathname?.includes("/krepezh") && !pathname?.includes("/diski")) {
                   e.preventDefault()
                   handleBrandSearch(e as any)
                 }
               }}
-              placeholder={pathname?.includes("/krepezh") ? "Фильтр по модели авто" : "Введите бренд"}
+              placeholder={(pathname?.includes("/krepezh") || pathname?.includes("/diski")) ? "Фильтр по модели авто" : "Введите бренд"}
               className="w-full px-3 py-2 rounded-2xl focus:outline-none bg-[#333333]/50 text-white placeholder-gray-400 placeholder:text-sm"
               style={{ fontSize: '16px' }}
             />
-            {/* Car selector for krepezh page - внутри контейнера input для одинаковой ширины */}
-            {pathname?.includes("/krepezh") && showCarSelector && (carSearchInput.length >= 2 || carSelectorStep !== "brand") && (
+            {/* Car selector for krepezh and diski pages - внутри контейнера input для одинаковой ширины */}
+            {(pathname?.includes("/krepezh") || pathname?.includes("/diski")) && showCarSelector && (carSearchInput.length >= 2 || carSelectorStep !== "brand") && (
               <div
                 className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-[#2A2A2A] border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto"
                 id="car-selector-dropdown"

@@ -66,6 +66,51 @@ export async function GET(request: NextRequest) {
         }
       }
 
+      // Парсим данные о дисках из всех fitments
+      const wheels: any[] = []
+
+      // Собираем все уникальные варианты дисков из массива fitment
+      data.forEach((fitment: any) => {
+        if (fitment.oem_rims && Array.isArray(fitment.oem_rims)) {
+          fitment.oem_rims.forEach((rim: any) => {
+            // Проверяем, есть ли уже такой вариант
+            const exists = wheels.some(w =>
+              w.diameter === rim.diam?.toString() &&
+              w.width === rim.width?.toString() &&
+              w.et === rim.et?.toString()
+            )
+
+            if (!exists && rim.diam) {
+              wheels.push({
+                diameter: rim.diam?.toString() || "",
+                width: rim.width?.toString() || "",
+                pcd: fitment.bolt_pattern || "",
+                et: rim.et?.toString() || "",
+                hub: fitment.center_bore || ""
+              })
+            }
+          })
+        } else {
+          // Если oem_rims null или пустой, создаем вариант только с доступными данными
+          const exists = wheels.some(w =>
+            w.pcd === fitment.bolt_pattern &&
+            w.hub === fitment.center_bore
+          )
+
+          if (!exists && fitment.bolt_pattern) {
+            wheels.push({
+              diameter: "",
+              width: "",
+              pcd: fitment.bolt_pattern || "",
+              et: "",
+              hub: fitment.center_bore || ""
+            })
+          }
+        }
+      })
+
+      console.log(`Parsed ${wheels.length} wheel options for ${brandSlug} ${modelSlug} ${year}`)
+
       return NextResponse.json({
         ...firstFitment,
         // Добавляем распарсенные данные для крепежа
@@ -74,6 +119,8 @@ export async function GET(request: NextRequest) {
           thread: threadSize,
           raw: firstFitment.thread_size
         },
+        // Добавляем распарсенные данные о дисках
+        wheels: wheels,
         // Возвращаем также полный массив для других целей
         allFitments: data
       })
