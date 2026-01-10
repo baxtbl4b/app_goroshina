@@ -718,7 +718,7 @@ export default function QuickFilterButtons({
             alt="Сортировка по цене"
             width={20}
             height={20}
-            className={`transform ${priceFilter === "expensive" ? "rotate-180" : ""} transition-transform dark:invert-0 invert`}
+            className={`transform ${priceFilter === "expensive" ? "rotate-180" : ""} transition-transform`}
           />
         </div>
       </div>

@@ -15,7 +15,7 @@ import { BackButton } from "@/components/back-button"
 import { useState, useEffect, useRef } from "react"
 
 interface CategoryPageClientProps {
-  season: "s" | "w" | "a"
+  season: "s" | "w" | "a" | "all"
 }
 
 export default function CategoryPageClient({ season }: CategoryPageClientProps) {
@@ -69,6 +69,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   })
 
   const seasonsList = [
+    { key: "all", path: "/category/all" },
     { key: "s", path: "/category/summer" },
     { key: "w", path: "/category/winter" },
     { key: "a", path: "/category/all-season" },
@@ -997,17 +998,18 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
           {/* Season Horizontal Carousel */}
           {(() => {
             const tabs = [
+              { key: "all", label: "Все", path: "/category/all" },
               { key: "s", label: "Летние", path: "/category/summer" },
               { key: "w", label: "Зимние", path: "/category/winter" },
               { key: "a", label: "Всесезонные", path: "/category/all-season" },
             ]
 
             // Current active index
-            const activeIndex = season === "s" ? 0 : season === "w" ? 1 : 2
+            const activeIndex = season === "all" ? 0 : season === "s" ? 1 : season === "w" ? 2 : 3
 
             // Get prev and next indices (circular)
-            const prevIndex = (activeIndex - 1 + 3) % 3
-            const nextIndex = (activeIndex + 1) % 3
+            const prevIndex = (activeIndex - 1 + 4) % 4
+            const nextIndex = (activeIndex + 1) % 4
 
             // Order: [prev, active, next]
             const orderedTabs = [
@@ -1078,7 +1080,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
                     // Get label for a season key
                     const getSeasonLabel = (key: string) => {
-                      const labels: Record<string, string> = { s: 'Летние', w: 'Зимние', a: 'Всесезонные' }
+                      const labels: Record<string, string> = { all: 'Все', s: 'Летние', w: 'Зимние', a: 'Всесезонные' }
                       return labels[key] || ''
                     }
 
