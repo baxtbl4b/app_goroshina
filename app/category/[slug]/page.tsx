@@ -23,6 +23,10 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   let description = "Широкий выбор шин для вашего автомобиля"
 
   switch (slug) {
+    case "all":
+      title = "Все шины"
+      description = "Широкий выбор шин всех сезонов для вашего автомобиля"
+      break
     case "summer":
       title = "Летние шины"
       description = "Широкий выбор летних шин для вашего автомобиля"
@@ -47,7 +51,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params
-  const normalizedSeason = slug === "summer" ? "s" : slug === "winter" ? "w" : "a"
+  const normalizedSeason = slug === "all" ? "all" : slug === "summer" ? "s" : slug === "winter" ? "w" : "a"
 
   return <CategoryPageClient season={normalizedSeason} />
 }

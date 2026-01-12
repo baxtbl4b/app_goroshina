@@ -34,6 +34,7 @@ interface PressureSensor {
 }
 
 export default function PressureSensorsClient() {
+  const [isMounted, setIsMounted] = useState(false)
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   const [selectedCompatibility, setSelectedCompatibility] = useState<string>("")
   const [cartCounts, setCartCounts] = useState<Record<string, number>>({})
@@ -215,22 +216,30 @@ export default function PressureSensorsClient() {
     fetchSensors()
   }, [])
 
+  // Set mounted state
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   // Initialize cart counts from localStorage on component mount
   useEffect(() => {
+    if (!isMounted) return
     const cart = JSON.parse(localStorage.getItem("cart") || "[]")
     const counts: Record<string, number> = {}
 
     cart.forEach((item: any) => {
-      if (item.id.startsWith("sensor-")) {
+      if (item.id && typeof item.id === 'string' && item.id.startsWith("sensor-")) {
         counts[item.id] = item.quantity || 0
       }
     })
 
     setCartCounts(counts)
-  }, [])
+  }, [isMounted])
 
   // Get cart item count
   useEffect(() => {
+    if (!isMounted) return
+
     const updateCartCount = () => {
       try {
         const cart = JSON.parse(localStorage.getItem("cart") || "[]")
@@ -250,10 +259,11 @@ export default function PressureSensorsClient() {
       window.removeEventListener("cartUpdated", updateCartCount)
       window.removeEventListener("cartItemAdded", updateCartCount)
     }
-  }, [])
+  }, [isMounted])
 
   // Initialize favorites from localStorage
   useEffect(() => {
+    if (!isMounted) return
     const storedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]")
     const favoritesMap: Record<string, boolean> = {}
     storedFavorites.forEach((item: any) => {
@@ -262,7 +272,7 @@ export default function PressureSensorsClient() {
       }
     })
     setFavorites(favoritesMap)
-  }, [])
+  }, [isMounted])
 
   // Load user vehicles from localStorage for garage
   useEffect(() => {
@@ -520,6 +530,16 @@ export default function PressureSensorsClient() {
         icon: <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />,
       }
     }
+  }
+
+  if (!isMounted) {
+    return (
+      <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px]">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
+        </div>
+      </main>
+    )
   }
 
   return (
@@ -996,7 +1016,7 @@ export default function PressureSensorsClient() {
                 className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
                   selectedGarageVehicle === vehicle.id
                     ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
-                    : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                    : "bg-gray-50 dark:bg-[#3A3A3A] border-gray-300 dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
                 }`}
               >
                 {vehicle.brand} {vehicle.model}{vehicle.year ? ` ${vehicle.year}` : ""}
@@ -1005,7 +1025,7 @@ export default function PressureSensorsClient() {
             {userVehicles.length < 2 && (
               <a
                 href="/account/cars/add"
-                className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
+                className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-gray-50 dark:bg-[#3A3A3A] border-gray-300 dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
               >
                 + Добавить
               </a>

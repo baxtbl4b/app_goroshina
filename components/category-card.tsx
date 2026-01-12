@@ -18,8 +18,8 @@ export default function CategoryCard({ title, image, count }: CategoryCardProps)
   }
 
   return (
-    <div className="bg-[#1F1F1F] dark:bg-[#2A2A2A] rounded-xl p-2 flex flex-col items-center">
-      <h3 className="text-white text-sm font-medium text-center mb-2">{title}</h3>
+    <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-2 flex flex-col items-center shadow-sm border border-gray-200 dark:border-transparent">
+      <h3 className="text-gray-900 dark:text-white text-sm font-medium text-center mb-2">{title}</h3>
       <div className={`flex items-center justify-center ${count > 0 ? "h-[85px] mb-1" : "flex-1 h-[102px] pt-3"}`}>
         {/* Use a regular img tag for direct URLs */}
         {title === "Крепеж" ? (
@@ -50,7 +50,7 @@ export default function CategoryCard({ title, image, count }: CategoryCardProps)
           />
         )}
       </div>
-      {count > 0 && <p className="text-[#D9D9DD] text-xs">{count} товаров</p>}
+      {count > 0 && <p className="text-gray-600 dark:text-[#D9D9DD] text-xs">{count} товаров</p>}
     </div>
   )
 }

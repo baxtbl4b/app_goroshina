@@ -78,10 +78,10 @@ export default function CarsListPage() {
 
   if (loading) {
     return (
-      <main className="flex flex-col min-h-screen bg-[#121212]">
+      <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="text-white">Загрузка автомобилей...</div>
+            <div className="text-gray-900 dark:text-white">Загрузка автомобилей...</div>
           </div>
         </div>
       </main>
@@ -89,17 +89,17 @@ export default function CarsListPage() {
   }
 
   return (
-    <main className="flex flex-col min-h-screen bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
+      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-2 flex items-center justify-between">
           <div className="flex items-center">
             <BackButton />
-            <span className="text-xl font-bold text-white">Мои автомобили</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">Мои автомобили</span>
           </div>
 
           <Link href="/account/cars/add">
             <button className="p-2 transition-colors" aria-label="Добавить">
-              <Plus className="h-5 w-5 text-white" />
+              <Plus className="h-5 w-5 text-gray-700 dark:text-white" />
             </button>
           </Link>
         </div>
@@ -112,9 +112,9 @@ export default function CarsListPage() {
               <div key={car.id} className="bg-white dark:bg-[#2A2A2A] rounded-xl p-4 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <Car className={`h-6 w-6 ${car.isPrimary ? "text-[#009CFF]" : "text-[#1F1F1F] dark:text-white"}`} />
+                    <Car className={`h-6 w-6 ${car.isPrimary ? "text-[#009CFF]" : "text-gray-700 dark:text-white"}`} />
                     <div className="flex-1">
-                      <h3 className="font-bold text-[#1F1F1F] dark:text-white">
+                      <h3 className="font-bold text-gray-900 dark:text-white">
                         {car.brand} {car.model}
                       </h3>
                       {car.isPrimary && <span className="text-xs text-[#009CFF] font-medium">Основной автомобиль</span>}
@@ -146,30 +146,30 @@ export default function CarsListPage() {
                 <Link href={`/account/cars/${car.id}`} className="block">
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Год выпуска:</span>
-                      <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">{car.year}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Год выпуска:</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{car.year}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Гос. номер:</span>
-                      <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">{car.plate}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Гос. номер:</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{car.plate}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Пробег:</span>
-                      <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">{car.mileage}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Пробег:</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{car.mileage}</span>
                     </div>
                     <div className="space-y-1">
                       {car.summerTires && car.summerTires !== "Не указано" && (
                         <div className="flex justify-between">
-                          <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Летние:</span>
-                          <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">
+                          <span className="text-sm text-gray-600 dark:text-gray-300">Летние:</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
                             {car.summerTires}
                           </span>
                         </div>
                       )}
                       {car.winterTires && car.winterTires !== "Не указано" && (
                         <div className="flex justify-between">
-                          <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Зимние:</span>
-                          <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">
+                          <span className="text-sm text-gray-600 dark:text-gray-300">Зимние:</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
                             {car.winterTires}
                           </span>
                         </div>
@@ -177,8 +177,8 @@ export default function CarsListPage() {
                       {/* Fallback для старых автомобилей без сезонных данных */}
                       {!car.summerTires && !car.winterTires && car.tires && (
                         <div className="flex justify-between">
-                          <span className="text-sm text-[#1F1F1F] dark:text-gray-300">Шины:</span>
-                          <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">
+                          <span className="text-sm text-gray-600 dark:text-gray-300">Шины:</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
                             {car.tires} {car.tireSeason && `(${car.tireSeason})`}
                           </span>
                         </div>
@@ -191,8 +191,8 @@ export default function CarsListPage() {
           ) : (
             <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-6 shadow-sm text-center">
               <Car className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-              <p className="text-[#1F1F1F] dark:text-white mb-2 font-semibold">У вас пока нет автомобилей</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Добавьте свой первый автомобиль</p>
+              <p className="text-gray-900 dark:text-white mb-2 font-semibold">У вас пока нет автомобилей</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Добавьте свой первый автомобиль</p>
               <Link href="/account/cars/add">
                 <Button className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]">
                   <Plus className="h-4 w-4 mr-2" /> Добавить автомобиль

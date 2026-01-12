@@ -1,4 +1,4 @@
-export type Season = "s" | "w" | "a"
+export type Season = "s" | "w" | "a" | "all"
 
 export interface Disk {
   id: string
@@ -29,6 +29,7 @@ export interface Disk {
   country_code?: string
   flag?: string | any
   description?: string
+  deliveryTime?: string
 }
 
 export interface Tire {

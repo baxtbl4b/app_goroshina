@@ -15,7 +15,7 @@ import { BackButton } from "@/components/back-button"
 import { useState, useEffect, useRef } from "react"
 
 interface CategoryPageClientProps {
-  season: "s" | "w" | "a"
+  season: "s" | "w" | "a" | "all"
 }
 
 export default function CategoryPageClient({ season }: CategoryPageClientProps) {
@@ -69,6 +69,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
   })
 
   const seasonsList = [
+    { key: "all", path: "/category/all" },
     { key: "s", path: "/category/summer" },
     { key: "w", path: "/category/winter" },
     { key: "a", path: "/category/all-season" },
@@ -895,12 +896,12 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
             position: absolute;
             padding: 5px 10px;
             background: transparent;
-            color: #6B7280;
+            color: #1F2937;
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 600;
             border-radius: 50px;
             z-index: 4;
-            opacity: 0.5;
+            opacity: 0.8;
             top: 50%;
           }
 
@@ -916,6 +917,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
           .dark .carousel-item-side {
             color: #9CA3AF;
+            opacity: 0.5;
           }
 
           @media (hover: hover) {
@@ -996,17 +998,18 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
           {/* Season Horizontal Carousel */}
           {(() => {
             const tabs = [
+              { key: "all", label: "Все", path: "/category/all" },
               { key: "s", label: "Летние", path: "/category/summer" },
               { key: "w", label: "Зимние", path: "/category/winter" },
               { key: "a", label: "Всесезонные", path: "/category/all-season" },
             ]
 
             // Current active index
-            const activeIndex = season === "s" ? 0 : season === "w" ? 1 : 2
+            const activeIndex = season === "all" ? 0 : season === "s" ? 1 : season === "w" ? 2 : 3
 
             // Get prev and next indices (circular)
-            const prevIndex = (activeIndex - 1 + 3) % 3
-            const nextIndex = (activeIndex + 1) % 3
+            const prevIndex = (activeIndex - 1 + 4) % 4
+            const nextIndex = (activeIndex + 1) % 4
 
             // Order: [prev, active, next]
             const orderedTabs = [
@@ -1077,7 +1080,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
 
                     // Get label for a season key
                     const getSeasonLabel = (key: string) => {
-                      const labels: Record<string, string> = { s: 'Летние', w: 'Зимние', a: 'Всесезонные' }
+                      const labels: Record<string, string> = { all: 'Все', s: 'Летние', w: 'Зимние', a: 'Всесезонные' }
                       return labels[key] || ''
                     }
 
@@ -1135,18 +1138,16 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                       >
                         {tab.position === 'left' ? (
                           <ChevronLeft
-                            className="w-[25px] h-[25px]"
+                            className="w-[25px] h-[25px] text-gray-600 dark:text-[#B0B5BD]"
                             style={{
-                              color: isTarget ? '#1F1F1F' : '#B0B5BD',
-                              opacity: isTarget ? 1 : 0.7,
+                              opacity: isTarget ? 1 : 0.9,
                             }}
                           />
                         ) : (
                           <ChevronRight
-                            className="w-[25px] h-[25px]"
+                            className="w-[25px] h-[25px] text-gray-600 dark:text-[#B0B5BD]"
                             style={{
-                              color: isTarget ? '#1F1F1F' : '#B0B5BD',
-                              opacity: isTarget ? 1 : 0.7,
+                              opacity: isTarget ? 1 : 0.9,
                             }}
                           />
                         )}
@@ -1195,7 +1196,7 @@ export default function CategoryPageClient({ season }: CategoryPageClientProps) 
                 className={`text-xs py-1.5 px-2.5 rounded-xl border transition-all duration-200 whitespace-nowrap snap-start flex-shrink-0 ${
                   currentWidth === size.width && currentProfile === size.profile && currentDiameter === size.diameter
                     ? "bg-[#c4d402] text-[#1F1F1F] border-[#c4d402] font-medium"
-                    : "border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:bg-[#c4d402]/10"
+                    : "bg-gray-50 dark:bg-transparent border-gray-300 dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:bg-[#c4d402]/10"
                 }`}
               >
                 {size.label}

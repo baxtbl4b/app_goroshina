@@ -93,19 +93,19 @@ export default function SurveyPage() {
   return (
     <div className="min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pb-20">
       {/* Header */}
-      <div className="bg-[#262626] p-4 sticky top-0 z-10 shadow-sm">
+      <div className="bg-white dark:bg-[#262626] p-4 sticky top-0 z-10 shadow-sm">
         <div className="relative flex items-center justify-between">
           <div className="flex items-center">
             <Button variant="ghost" size="icon" className="mr-2" onClick={handlePrevious}>
-              <ArrowLeft className="h-5 w-5 text-white" />
+              <ArrowLeft className="h-5 w-5 text-gray-900 dark:text-white" />
             </Button>
-            <h1 className="text-lg font-medium text-white">Опрос</h1>
+            <h1 className="text-lg font-medium text-gray-900 dark:text-white">Опрос</h1>
           </div>
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="bg-[#262626] px-4 py-2">
+      <div className="bg-white dark:bg-[#262626] px-4 py-2">
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
           <div
             className="bg-[#009CFF] h-2.5 rounded-full transition-all duration-300 ease-in-out"

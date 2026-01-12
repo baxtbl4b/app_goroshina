@@ -404,7 +404,7 @@ export default function HomePage() {
                       onChange={(e) => setChatInput(e.target.value)}
                       className="w-full bg-[#F5F5F5] dark:bg-[#333333] rounded-xl py-3 px-10 text-[#1F1F1F] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#009CFF]"
                     />
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#c4d402] pointer-events-none" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-700 dark:text-[#c4d402] pointer-events-none" />
                     <button
                       type="submit"
                       disabled={!chatInput.trim() || isChatLoading}
@@ -451,7 +451,7 @@ export default function HomePage() {
                     onChange={(e) => setChatInput(e.target.value)}
                     className="w-full bg-[#F5F5F5] dark:bg-[#333333] rounded-xl py-3 px-10 text-[#1F1F1F] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#009CFF]"
                   />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#c4d402] pointer-events-none" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-700 dark:text-[#c4d402] pointer-events-none" />
                   <button
                     type="button"
                     onClick={() => {
@@ -498,9 +498,9 @@ export default function HomePage() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Award className="h-5 w-5 text-[#c4d402]" />
+                      <Award className="h-5 w-5 text-gray-700 dark:text-[#c4d402]" />
                       <div className="flex items-center">
-                        <span className="text-lg font-bold text-[#c4d402]">{user.loyaltyPoints} баллов</span>
+                        <span className="text-lg font-bold text-gray-700 dark:text-[#c4d402]">{user.loyaltyPoints} баллов</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -579,7 +579,7 @@ export default function HomePage() {
             {/* Category Buttons - Moved here from TabsContent */}
             <div className="grid grid-cols-3 gap-5 overflow-hidden">
               <Link href="/category/all-season">
-                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-lg overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                <div className="relative bg-gray-100 dark:bg-[#2A2A2A]/70 rounded-lg overflow-hidden group transition-all hover:shadow-md h-[160px]">
                   <Image
                     src="/images/allseason2-new.png"
                     alt="Всесезонные шины"
@@ -587,8 +587,8 @@ export default function HomePage() {
                     height={200}
                     className="w-full h-full object-cover transition-transform group-hover:scale-[1.03]"
                   />
-                  <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                    <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                  <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                    <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                       ALLSEASON
                     </p>
                   </div>
@@ -596,7 +596,7 @@ export default function HomePage() {
               </Link>
 
               <Link href="/category/winter">
-                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-lg overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                <div className="relative bg-gray-100 dark:bg-[#2A2A2A]/70 rounded-lg overflow-hidden group transition-all hover:shadow-md h-[160px]">
                   <Image
                     src="/images/winter-tire-new.png"
                     alt="Зимние шины"
@@ -608,8 +608,8 @@ export default function HomePage() {
                       ;(e.target as HTMLImageElement).src = "/images/winter-tire-new.png"
                     }}
                   />
-                  <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                    <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                  <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                    <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                       ЗИМНИЕ
                     </p>
                   </div>
@@ -617,7 +617,7 @@ export default function HomePage() {
               </Link>
 
               <Link href="/category/summer">
-                <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-lg overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                <div className="relative bg-gray-100 dark:bg-[#2A2A2A]/70 rounded-lg overflow-hidden group transition-all hover:shadow-md h-[160px]">
                   <Image
                     src="/images/summer-tire-new.png"
                     alt="Летние шины"
@@ -629,8 +629,8 @@ export default function HomePage() {
                       ;(e.target as HTMLImageElement).src = "/images/summer-tire-new.png"
                     }}
                   />
-                  <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                    <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                  <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                    <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                       ЛЕТНИЕ
                     </p>
                   </div>
@@ -639,16 +639,16 @@ export default function HomePage() {
             </div>
 
             <Tabs defaultValue="popular" className="w-full">
-              <TabsList className="w-full bg-[#1F1F1F] rounded-xl p-2 h-14">
+              <TabsList className="w-full bg-gray-200 dark:bg-[#1F1F1F] rounded-xl p-2 h-14">
                 <TabsTrigger
                   value="popular"
-                  className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-[#1F1F1F] data-[state=active]:scale-105 data-[state=active]:shadow-lg data-[state=active]:shadow-[#c4d402]/30 data-[state=active]:transform data-[state=active]:font-bold h-10 px-6 text-base font-medium hover:scale-102 hover:bg-white/10"
+                  className="rounded-lg text-gray-700 dark:text-white transition-all duration-300 ease-in-out data-[state=active]:!bg-[#c4d402] data-[state=active]:!text-[#1F1F1F] data-[state=active]:scale-105 data-[state=active]:shadow-[0_0_15px_rgba(196,212,2,0.5)] data-[state=active]:transform data-[state=active]:font-bold h-10 px-6 text-base font-medium hover:scale-102 hover:bg-gray-300 dark:hover:bg-white/10"
                 >
                   Товары
                 </TabsTrigger>
                 <TabsTrigger
                   value="sale"
-                  className="rounded-lg text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-[#1F1F1F] h-10 px-6 text-base font-medium"
+                  className="rounded-lg text-gray-700 dark:text-white transition-all duration-300 ease-in-out data-[state=active]:!bg-[#c4d402] data-[state=active]:!text-[#1F1F1F] data-[state=active]:scale-105 data-[state=active]:shadow-[0_0_15px_rgba(196,212,2,0.5)] data-[state=active]:transform data-[state=active]:font-bold h-10 px-6 text-base font-medium hover:scale-102 hover:bg-gray-300 dark:hover:bg-white/10"
                 >
                   Услуги
                 </TabsTrigger>
@@ -657,7 +657,7 @@ export default function HomePage() {
               <TabsContent value="popular" className="mt-4 space-y-4">
                 <div className="grid grid-cols-3 gap-5">
                   <Link href="/diski">
-                    <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                    <div className="relative bg-gray-100 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IFG42-Black-ltLo8DgOgWmvAv9qn8DDRw1n1598ox.png"
                         alt="Диски"
@@ -669,8 +669,8 @@ export default function HomePage() {
                           ;(e.target as HTMLImageElement).src = "/images/black-wheel.png"
                         }}
                       />
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ДИСКИ
                         </p>
                       </div>
@@ -678,7 +678,7 @@ export default function HomePage() {
                   </Link>
 
                   <Link href="/krepezh/">
-                    <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                    <div className="relative bg-gray-100 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <div className="w-full h-full flex items-center justify-center">
                         <Image
                           src="/images/wheel-bolts-new.png"
@@ -702,8 +702,8 @@ export default function HomePage() {
                           </div>
                         )}
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           КРЕПЕЖ
                         </p>
                       </div>
@@ -711,7 +711,7 @@ export default function HomePage() {
                   </Link>
 
                   <Link href="/pressure-sensors">
-                    <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                    <div className="relative bg-gray-100 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
                         src="/images/pressure-sensor-new.png"
                         alt="Датчики давления"
@@ -719,15 +719,15 @@ export default function HomePage() {
                         height={200}
                         className="w-full h-full object-cover transition-transform group-hover:scale-105"
                       />
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ДАТЧИКИ
                         </p>
                       </div>
                     </div>
                   </Link>
                   <Link href="/dokatki">
-                    <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                    <div className="relative bg-gray-100 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dokatka-p9ER4iAPFpGuRa3gPnEFh7qm8gm4j7.png"
                         alt="Докатки"
@@ -736,15 +736,15 @@ export default function HomePage() {
                         className="w-full h-full object-contain p-0 transition-transform group-hover:scale-105 scale-[1.5]"
                         priority
                       />
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ДОКАТКИ
                         </p>
                       </div>
                     </div>
                   </Link>
                   <Link href="/autochemistry">
-                    <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                    <div className="relative bg-gray-100 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/himia-HS0SUmhH9HVHBIzvxlCW9aZZLSFIFT.png"
                         alt="Автохимия"
@@ -752,8 +752,8 @@ export default function HomePage() {
                         height={200}
                         className="w-full h-full object-contain p-4 transition-transform group-hover:scale-105 scale-[1.46]"
                       />
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           АВТОХИМИЯ{" "}
                         </p>
                       </div>
@@ -761,7 +761,7 @@ export default function HomePage() {
                   </Link>
 
                   <Link href="/accessories">
-                    <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                    <div className="relative bg-gray-100 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ChatGPT%20Image%2016%20%D0%BC%D0%B0%D1%8F%202025%20%D0%B3.%2C%2017_31_22-dXXB7d63vDqZ9AcOR0YlUWQgjuyiz3.png"
                         alt="Вентиля"
@@ -775,8 +775,8 @@ export default function HomePage() {
                           e.currentTarget.src = "/images/ventili2_matte.png"
                         }}
                       />
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ВЕНТИЛЯ
                         </p>
                       </div>
@@ -788,7 +788,7 @@ export default function HomePage() {
               <TabsContent value="sale" className="mt-4 space-y-4">
                 <div className="grid grid-cols-3 gap-5">
                   <Link href="/tire-mounting">
-                    <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                    <div className="relative bg-gray-100 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/shinka-8z0uipBDWUgTg0RjFwZOJsm6c7YGN8.png"
                         alt="Шиномонтаж"
@@ -803,8 +803,8 @@ export default function HomePage() {
                       <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                         -10%
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ШИНОМОНТАЖ
                         </p>
                       </div>
@@ -812,13 +812,13 @@ export default function HomePage() {
                   </Link>
 
                   <Link href="/painting">
-                    <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                    <div className="relative bg-white dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
                         src="/images/pokraska-2.png"
                         alt="Покраска дисков"
                         width={300}
                         height={200}
-                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105 brightness-110 dark:brightness-100"
                         onError={(e) => {
                           // Fallback to local image if blob URL fails
                           ;(e.target as HTMLImageElement).src =
@@ -828,8 +828,8 @@ export default function HomePage() {
                       <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                         -25%
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ПОКРАСКА
                         </p>
                       </div>
@@ -837,20 +837,20 @@ export default function HomePage() {
                   </Link>
 
                   <Link href="/soundproofing">
-                    <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                    <div className="relative bg-white dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/paralon3-T8UffRFUWXyCauyhYFBiLdMKrsVWuC.png"
                         alt="Шумоизоляция шин"
                         width={300}
                         height={200}
-                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105 brightness-110 dark:brightness-100"
                         onError={(e) => {
                           // Fallback to local image if blob URL fails
                           ;(e.target as HTMLImageElement).src = "/images/tire-noise-reduction.png"
                         }}
                       />
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ШУМОИЗОЛЯЦИЯ
                         </p>
                       </div>
@@ -858,13 +858,13 @@ export default function HomePage() {
                   </Link>
 
                   <Link href="/studding">
-                    <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                    <div className="relative bg-white dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/doship%20%282%29-qrnzmJFcuSX8O7jB6KuI7HC3HzNKJa.png"
                         alt="Дошиповка шин"
                         width={300}
                         height={200}
-                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105 brightness-110 dark:brightness-100"
                         onError={(e) => {
                           // Fallback to local image if blob URL fails
                           ;(e.target as HTMLImageElement).src = "/images/tire-studding-process.png"
@@ -873,8 +873,8 @@ export default function HomePage() {
                       <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                         -10%
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ДОШИПОВКА
                         </p>
                       </div>
@@ -882,13 +882,13 @@ export default function HomePage() {
                   </Link>
 
                   <Link href="/tire-storage">
-                    <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                    <div className="relative bg-white dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/HRAN2%20%282%29-ntreb2IoYiojvgZqL3IylaowalWxR4.png"
                         alt="Хранение шин"
                         width={300}
                         height={200}
-                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105 brightness-110 dark:brightness-100"
                         onError={(e) => {
                           // Fallback to local image if blob URL fails
                           ;(e.target as HTMLImageElement).src = "/images/tire-storage-bags.png"
@@ -897,8 +897,8 @@ export default function HomePage() {
                       <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                         -20%
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ХРАНЕНИЕ ШИН
                         </p>
                       </div>
@@ -906,7 +906,7 @@ export default function HomePage() {
                   </Link>
 
                   <Link href="/book-online">
-                    <div className="relative bg-[#1F1F1F]/70 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
+                    <div className="relative bg-gray-100 dark:bg-[#2A2A2A]/70 rounded-xl overflow-hidden group transition-all hover:shadow-md h-[160px]">
                       <Image
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/zapis-NxYQIfl9BCSbft5pV6f4DPj9mGTOat.png"
                         alt="Запись онлайн"
@@ -921,8 +921,8 @@ export default function HomePage() {
                       <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                         -60%
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ЗАПИСАТЬСЯ ОНЛАЙН
                         </p>
                       </div>

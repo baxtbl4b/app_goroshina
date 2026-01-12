@@ -82,7 +82,7 @@ export default function DonatePointsPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-4 flex items-center">
           <Button
             variant="ghost"
@@ -90,9 +90,9 @@ export default function DonatePointsPage() {
             onClick={() => (currentStep === 1 ? router.back() : resetDonation())}
             className="mr-2"
           >
-            <ArrowLeft className="h-5 w-5 text-[#1F1F1F] dark:text-white" />
+            <ArrowLeft className="h-5 w-5 text-gray-900 dark:text-white" />
           </Button>
-          <h1 className="text-lg font-bold text-[#1F1F1F] dark:text-white">Пожертвовать баллы</h1>
+          <h1 className="text-lg font-bold text-gray-900 dark:text-white">Пожертвовать баллы</h1>
         </div>
       </header>
 

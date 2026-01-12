@@ -92,7 +92,7 @@ export default function AutochemistryPage() {
     const counts: Record<string, number> = {}
 
     cart.forEach((item: any) => {
-      if (item.id.startsWith("chem")) {
+      if (item.id && typeof item.id === 'string' && item.id.startsWith("chem")) {
         counts[item.id] = item.quantity || 0
       }
     })
@@ -426,13 +426,13 @@ export default function AutochemistryPage() {
           animation: cartIconBounce 0.6s ease-in-out;
         }
       `}</style>
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+      <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Link href="/" className="text-[#1F1F1F] dark:text-white">
+            <Link href="/" className="text-gray-700 dark:text-white">
               <ChevronLeft className="h-6 w-6" />
             </Link>
-            <h1 className="text-xl font-bold text-[#1F1F1F] dark:text-white">Автохимия</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Автохимия</h1>
           </div>
 
           <div className="flex items-center space-x-2 h-full">

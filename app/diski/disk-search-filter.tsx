@@ -22,7 +22,7 @@ interface VehicleWithWheels {
 
 interface DiskSearchFilterProps {
   diskType: string
-  onDiskTypeChange?: (type: "stamped" | "cast" | "forged") => void
+  onDiskTypeChange?: (type: "all" | "stamped" | "cast" | "forged") => void
   onFilterHeightChange?: (height: number) => void
 }
 
@@ -202,13 +202,19 @@ export default function DiskSearchFilter({
   const [userVehicles, setUserVehicles] = useState<VehicleWithWheels[]>([])
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null)
 
+  // State for multiple wheel options from car selection
+  const [wheelOptions, setWheelOptions] = useState<any[]>([])
+  const [selectedWheelOptionIndex, setSelectedWheelOptionIndex] = useState<number>(0)
+
   // Load user vehicles from localStorage with wheel sizes
   useEffect(() => {
     const loadUserCars = () => {
       try {
         const storedCars = JSON.parse(localStorage.getItem("userCars") || "[]")
+        console.log("📦 Загружены автомобили из localStorage:", storedCars)
+
         const vehicles: VehicleWithWheels[] = storedCars.map((car: any) => {
-          return {
+          const vehicle = {
             id: car.id,
             name: `${car.brand} ${car.model}`,
             wheelSize: {
@@ -219,6 +225,8 @@ export default function DiskSearchFilter({
               hub: car.wheelHub || "",
             },
           }
+          console.log(`🚙 ${vehicle.name}:`, vehicle.wheelSize)
+          return vehicle
         })
         setUserVehicles(vehicles)
       } catch (error) {
@@ -254,6 +262,37 @@ export default function DiskSearchFilter({
       window.removeEventListener("storage", handleStorageChange)
       window.removeEventListener("focus", handleFocus)
       window.removeEventListener("userCarsUpdated", handleCarsUpdated)
+    }
+  }, [])
+
+  // Listen for car wheel data selection from QuickFilterButtons
+  useEffect(() => {
+    const handleCarWheelDataSelected = (event: any) => {
+      const { wheels, carInfo } = event.detail
+      console.log("🚗 Получены данные о дисках для автомобиля:", carInfo)
+      console.log("🔧 Варианты параметров дисков:", wheels)
+
+      if (wheels && Array.isArray(wheels) && wheels.length > 0) {
+        setWheelOptions(wheels)
+        setSelectedWheelOptionIndex(0)
+
+        // Apply first wheel option
+        const firstWheel = wheels[0]
+        if (firstWheel) {
+          setDiameter(firstWheel.diameter || "")
+          setWidth(firstWheel.width || "")
+          setPcd(firstWheel.pcd || "")
+          setEt(firstWheel.et || "")
+          setHub(firstWheel.hub || "")
+          console.log("✅ Применены параметры диска:", firstWheel)
+        }
+      }
+    }
+
+    window.addEventListener("carWheelDataSelected", handleCarWheelDataSelected)
+
+    return () => {
+      window.removeEventListener("carWheelDataSelected", handleCarWheelDataSelected)
     }
   }, [])
 
@@ -303,6 +342,15 @@ export default function DiskSearchFilter({
 
   // Function to select vehicle and set wheel sizes - memoized
   const selectVehicle = useCallback((vehicle: VehicleWithWheels) => {
+    console.log("🚗 Выбран автомобиль из гаража:", vehicle)
+    console.log("📏 Применяемые параметры дисков:", {
+      diameter: vehicle.wheelSize.diameter,
+      width: vehicle.wheelSize.width,
+      pcd: vehicle.wheelSize.pcd,
+      et: vehicle.wheelSize.et,
+      hub: vehicle.wheelSize.hub
+    })
+
     setSelectedVehicle(vehicle.id)
     setDiameter(vehicle.wheelSize.diameter)
     setWidth(vehicle.wheelSize.width)
@@ -354,6 +402,8 @@ export default function DiskSearchFilter({
   // Get filter title based on disk type - memoized
   const filterTitle = useMemo(() => {
     switch (diskType) {
+      case "all":
+        return "Фильтр дисков"
       case "stamped":
         return "Фильтр штампованных дисков"
       case "cast":
@@ -419,6 +469,38 @@ export default function DiskSearchFilter({
       applySecondAxisFilter(diameter2, width2, value)
     }
   }, [diameter2, width2, applySecondAxisFilter])
+
+  // Navigate to previous wheel option
+  const handlePreviousWheelOption = useCallback(() => {
+    if (wheelOptions.length <= 1) return
+    const newIndex = selectedWheelOptionIndex === 0 ? wheelOptions.length - 1 : selectedWheelOptionIndex - 1
+    setSelectedWheelOptionIndex(newIndex)
+    const wheel = wheelOptions[newIndex]
+    if (wheel) {
+      setDiameter(wheel.diameter || "")
+      setWidth(wheel.width || "")
+      setPcd(wheel.pcd || "")
+      setEt(wheel.et || "")
+      setHub(wheel.hub || "")
+      console.log(`⬅️ Переключено на вариант ${newIndex + 1}:`, wheel)
+    }
+  }, [wheelOptions, selectedWheelOptionIndex])
+
+  // Navigate to next wheel option
+  const handleNextWheelOption = useCallback(() => {
+    if (wheelOptions.length <= 1) return
+    const newIndex = selectedWheelOptionIndex === wheelOptions.length - 1 ? 0 : selectedWheelOptionIndex + 1
+    setSelectedWheelOptionIndex(newIndex)
+    const wheel = wheelOptions[newIndex]
+    if (wheel) {
+      setDiameter(wheel.diameter || "")
+      setWidth(wheel.width || "")
+      setPcd(wheel.pcd || "")
+      setEt(wheel.et || "")
+      setHub(wheel.hub || "")
+      console.log(`➡️ Переключено на вариант ${newIndex + 1}:`, wheel)
+    }
+  }, [wheelOptions, selectedWheelOptionIndex])
 
   return (
     <>
@@ -573,6 +655,32 @@ export default function DiskSearchFilter({
         </div>
         {/* Size selectors - always visible part of the filter */}
         <div className="flex flex-col gap-3 mb-4">
+          {/* Wheel options navigation arrows */}
+          {wheelOptions.length > 1 && (
+            <div className="flex items-center justify-between mb-2">
+              <button
+                onClick={handlePreviousWheelOption}
+                className="flex items-center gap-1 text-xs text-[#1F1F1F] dark:text-white hover:text-[#c4d402] dark:hover:text-[#c4d402] transition-colors"
+                aria-label="Предыдущий вариант параметров"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                Вариант {selectedWheelOptionIndex + 1} из {wheelOptions.length}
+              </div>
+              <button
+                onClick={handleNextWheelOption}
+                className="flex items-center gap-1 text-xs text-[#1F1F1F] dark:text-white hover:text-[#c4d402] dark:hover:text-[#c4d402] transition-colors"
+                aria-label="Следующий вариант параметров"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          )}
           <div className="flex items-end gap-3">
             <div className="grid grid-cols-3 gap-3 flex-1">
               <div>
@@ -580,7 +688,7 @@ export default function DiskSearchFilter({
                   Диаметр
                 </Label>
                 <Select value={diameter} onValueChange={setDiameter}>
-                  <SelectTrigger id="diameter" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                  <SelectTrigger id="diameter" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
@@ -598,7 +706,7 @@ export default function DiskSearchFilter({
                   Ширина
                 </Label>
                 <Select value={width} onValueChange={setWidth}>
-                  <SelectTrigger id="width" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                  <SelectTrigger id="width" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
@@ -616,7 +724,7 @@ export default function DiskSearchFilter({
                   Вылет (ET)
                 </Label>
                 <Select value={et} onValueChange={setEt}>
-                  <SelectTrigger id="et" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                  <SelectTrigger id="et" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl">
                     <SelectValue placeholder="~" />
                   </SelectTrigger>
                   <SelectContent>
@@ -654,7 +762,7 @@ export default function DiskSearchFilter({
                     Диаметр (2 ось)
                   </Label>
                   <Select value={diameter2} onValueChange={handleDiameter2Change}>
-                    <SelectTrigger id="diameter2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                    <SelectTrigger id="diameter2" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl">
                       <SelectValue placeholder="~" />
                     </SelectTrigger>
                     <SelectContent>
@@ -672,7 +780,7 @@ export default function DiskSearchFilter({
                     Ширина (2 ось)
                   </Label>
                   <Select value={width2} onValueChange={handleWidth2Change}>
-                    <SelectTrigger id="width2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                    <SelectTrigger id="width2" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl">
                       <SelectValue placeholder="~" />
                     </SelectTrigger>
                     <SelectContent>
@@ -690,7 +798,7 @@ export default function DiskSearchFilter({
                     Вылет (2 ось)
                   </Label>
                   <Select value={et2} onValueChange={handleEt2Change}>
-                    <SelectTrigger id="et2" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                    <SelectTrigger id="et2" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl">
                       <SelectValue placeholder="~" />
                     </SelectTrigger>
                     <SelectContent>
@@ -715,7 +823,7 @@ export default function DiskSearchFilter({
                 PCD
               </Label>
               <Select value={pcd} onValueChange={setPcd}>
-                <SelectTrigger id="pcd" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                <SelectTrigger id="pcd" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -733,7 +841,7 @@ export default function DiskSearchFilter({
                 Ступица (DIA)
               </Label>
               <Select value={hub} onValueChange={setHub}>
-                <SelectTrigger id="hub" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                <SelectTrigger id="hub" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -751,7 +859,7 @@ export default function DiskSearchFilter({
                 Цвет
               </Label>
               <Select value={color} onValueChange={setColor}>
-                <SelectTrigger id="color" className="w-full bg-[#333333] text-white border-0 rounded-xl">
+                <SelectTrigger id="color" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl">
                   <SelectValue placeholder="~" />
                 </SelectTrigger>
                 <SelectContent>
@@ -788,7 +896,7 @@ export default function DiskSearchFilter({
                       className={`text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 ${
                         selectedVehicle === vehicle.id
                           ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
-                          : "bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
+                          : "bg-gray-50 dark:bg-[#3A3A3A] border-gray-300 dark:border-[#3A3A3A] text-[#1F1F1F] dark:text-white"
                       }`}
                     >
                       {vehicle.name}
@@ -797,7 +905,7 @@ export default function DiskSearchFilter({
                   {userVehicles.length < 2 && (
                     <a
                       href="/account/cars/add"
-                      className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-white dark:bg-[#3A3A3A] border-[#D9D9DD] dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
+                      className="text-xs px-2 py-0.5 rounded-xl border whitespace-nowrap flex-shrink-0 bg-gray-50 dark:bg-[#3A3A3A] border-gray-300 dark:border-[#3A3A3A] text-gray-500 dark:text-gray-400 hover:border-[#c4d402] hover:text-[#1F1F1F] dark:hover:text-white transition-colors"
                     >
                       + Добавить
                     </a>
@@ -843,7 +951,7 @@ export default function DiskSearchFilter({
           <div className="space-y-4">
             <div className="space-y-3">
               {/* Checkbox filters: Second Axis and Today */}
-              <div className="w-full border border-[#D9D9DD] dark:border-[#3A3A3A] rounded-xl p-3 flex items-center justify-center">
+              <div className="w-full border border-gray-300 dark:border-[#3A3A3A] rounded-xl p-3 flex items-center justify-center">
                 <div className="flex flex-row flex-wrap gap-x-4 gap-y-2 items-center justify-center">
                   <div className="flex items-center space-x-2">
                     <Checkbox

@@ -40,13 +40,13 @@ export default function FavoritesPage() {
   if (loading) {
     return (
       <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-        <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+        <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
           <div className="h-full px-4 flex items-center justify-between">
             <div className="flex items-center">
               <Link href="/" className="mr-3">
-                <ChevronLeft className="h-6 w-6 text-white" />
+                <ChevronLeft className="h-6 w-6 text-gray-900 dark:text-white" />
               </Link>
-              <h1 className="text-xl font-bold text-white">Избранное</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Избранное</h1>
             </div>
             <Heart className="h-6 w-6 text-[#c4d402]" />
           </div>
@@ -63,13 +63,13 @@ export default function FavoritesPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/" className="mr-3">
-              <ChevronLeft className="h-6 w-6 text-white" />
+              <ChevronLeft className="h-6 w-6 text-gray-900 dark:text-white" />
             </Link>
-            <h1 className="text-xl font-bold text-white">Избранное</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Избранное</h1>
           </div>
           <Heart className="h-6 w-6 text-[#c4d402]" />
         </div>

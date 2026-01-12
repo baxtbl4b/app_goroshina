@@ -49,7 +49,12 @@ export default function TireResults({ season, selectedBrands = [] }: TireResults
 
   // Создаем мемоизированный объект фильтров
   const filters = useMemo(() => {
-    const result: Record<string, any> = { season }
+    const result: Record<string, any> = {}
+
+    // Добавляем season только если это не "all" (все сезоны)
+    if (season !== "all") {
+      result.season = season
+    }
 
     if (widthFilter) result.width = widthFilter
     if (profileFilter) result.height = profileFilter
@@ -80,7 +85,12 @@ export default function TireResults({ season, selectedBrands = [] }: TireResults
       return null
     }
 
-    const result: Record<string, any> = { season }
+    const result: Record<string, any> = {}
+
+    // Добавляем season только если это не "all" (все сезоны)
+    if (season !== "all") {
+      result.season = season
+    }
 
     result.width = width2Filter
     result.height = profile2Filter

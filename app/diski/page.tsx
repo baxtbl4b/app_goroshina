@@ -44,7 +44,7 @@ export default function DiskiPage() {
   const pathname = usePathname()
   const router = useRouter()
   const [activeFiltersCount, setActiveFiltersCount] = useState(0)
-  const [diskType, setDiskType] = useState("cast") // stamped, cast, forged - начинаем с литых
+  const [diskType, setDiskType] = useState("all") // all, stamped, cast, forged - начинаем со всех
   const [cartItemCount, setCartItemCount] = useState(0)
   const [isCartButtonAnimating, setIsCartButtonAnimating] = useState(false)
   const castButtonRef = useRef<HTMLButtonElement>(null)
@@ -130,6 +130,7 @@ export default function DiskiPage() {
 
   // Фильтруем диски по типу на клиенте - memoized
   const filteredByType = useMemo(() => {
+    if (diskType === "all") return allDisks
     return allDisks.filter((disk) => disk.type === diskType)
   }, [allDisks, diskType])
 
@@ -532,7 +533,7 @@ export default function DiskiPage() {
     console.log("Применена сортировка:", sortValue)
   }, [])
 
-  const handleDiskTypeChange = useCallback((type: "stamped" | "cast" | "forged") => {
+  const handleDiskTypeChange = useCallback((type: "all" | "stamped" | "cast" | "forged") => {
     setDiskType(type)
   }, [])
 
@@ -610,12 +611,12 @@ export default function DiskiPage() {
             position: absolute;
             padding: 5px 10px;
             background: transparent;
-            color: #6B7280;
+            color: #1F2937;
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 600;
             border-radius: 50px;
             z-index: 4;
-            opacity: 0.5;
+            opacity: 0.8;
             top: 50%;
           }
 
@@ -631,6 +632,7 @@ export default function DiskiPage() {
 
           .dark .carousel-item-side {
             color: #9CA3AF;
+            opacity: 0.5;
           }
 
           @media (hover: hover) {
@@ -722,17 +724,18 @@ export default function DiskiPage() {
           {/* Disk Type Horizontal Carousel */}
           {(() => {
             const tabs = [
+              { key: "all", label: "Все" },
               { key: "stamped", label: "Штампы" },
               { key: "cast", label: "Литые" },
               { key: "forged", label: "Кованные" },
             ]
 
             // Current active index
-            const activeIndex = diskType === "stamped" ? 0 : diskType === "cast" ? 1 : 2
+            const activeIndex = diskType === "all" ? 0 : diskType === "stamped" ? 1 : diskType === "cast" ? 2 : 3
 
             // Get prev and next indices (circular)
-            const prevIndex = (activeIndex - 1 + 3) % 3
-            const nextIndex = (activeIndex + 1) % 3
+            const prevIndex = (activeIndex - 1 + 4) % 4
+            const nextIndex = (activeIndex + 1) % 4
 
             // Order: [prev, active, next]
             const orderedTabs = [
@@ -797,7 +800,7 @@ export default function DiskiPage() {
                     return (
                       <button
                         key={tab.key}
-                        onClick={() => setDiskType(tab.key as "stamped" | "cast" | "forged")}
+                        onClick={() => setDiskType(tab.key as "all" | "stamped" | "cast" | "forged")}
                         className={`carousel-item ${positionClass}`}
                         style={{
                           background: 'none',
@@ -807,18 +810,16 @@ export default function DiskiPage() {
                       >
                         {tab.position === 'left' ? (
                           <ChevronLeft
-                            className="w-[25px] h-[25px]"
+                            className="w-[25px] h-[25px] text-gray-600 dark:text-[#B0B5BD]"
                             style={{
-                              color: '#B0B5BD',
-                              opacity: 0.7,
+                              opacity: 0.9,
                             }}
                           />
                         ) : (
                           <ChevronRight
-                            className="w-[25px] h-[25px]"
+                            className="w-[25px] h-[25px] text-gray-600 dark:text-[#B0B5BD]"
                             style={{
-                              color: '#B0B5BD',
-                              opacity: 0.7,
+                              opacity: 0.9,
                             }}
                           />
                         )}

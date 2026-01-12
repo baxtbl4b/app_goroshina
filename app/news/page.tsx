@@ -92,15 +92,15 @@ export default function NewsPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm pt-[env(safe-area-inset-top)]">
+      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm pt-[env(safe-area-inset-top)]">
         <div className="h-[60px] px-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/settings">
               <Button variant="ghost" size="icon" className="mr-2">
-                <ArrowLeft className="h-5 w-5 text-[#1F1F1F] dark:text-white" />
+                <ArrowLeft className="h-5 w-5 text-gray-900 dark:text-white" />
               </Button>
             </Link>
-            <span className="text-xl font-bold text-[#1F1F1F] dark:text-white">Новости</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">Новости</span>
           </div>
         </div>
 

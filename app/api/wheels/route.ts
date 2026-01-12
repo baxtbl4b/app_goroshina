@@ -1,8 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-// Tirebase API configuration
-const API_BASE_URL = "https://api.tirebase.ru"
-const API_TOKEN = "xN6JxoibNEbSFt952_O5kf-VxL61lOX4k5KAS-iGlBU"
+// Remote wheels API configuration
+const API_BASE_URL = "http://188.225.83.192:8000"
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,7 +14,7 @@ export async function GET(request: NextRequest) {
     // Diameter filter
     const diameter = searchParams.get("diameter") || searchParams.get("diam")
     if (diameter) {
-      apiParams.append("diam", diameter)
+      apiParams.append("diameter", diameter)
     }
 
     // Width filter
@@ -39,10 +38,8 @@ export async function GET(request: NextRequest) {
     // CB/DIA filter (center bore)
     const hub = searchParams.get("hub") || searchParams.get("cb")
     if (hub) {
-      apiParams.append("cb", hub)
+      apiParams.append("dia", hub)
     }
-
-    // Note: API does not support type filtering, we filter on client side
 
     // Brand filter
     const brand = searchParams.get("brand")
@@ -50,11 +47,14 @@ export async function GET(request: NextRequest) {
       apiParams.append("brand", brand)
     }
 
-    // Add access token
-    apiParams.append("access_token", API_TOKEN)
+    // Type filter
+    const type = searchParams.get("type")
+    if (type) {
+      apiParams.append("type", type)
+    }
 
     // Construct the API URL
-    const apiUrl = `${API_BASE_URL}/wheels?${apiParams.toString()}`
+    const apiUrl = `${API_BASE_URL}/api/wheels${apiParams.toString() ? `?${apiParams.toString()}` : ''}`
 
     console.log(`Fetching wheels from API: ${apiUrl}`)
 
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
       // Make the request to the API
       const response = await fetch(apiUrl, {
         signal: controller.signal,
-        next: { revalidate: 60 }, // Cache for 60 seconds
+        cache: 'no-store', // Disable cache for development
       })
 
       clearTimeout(timeoutId)
@@ -82,65 +82,66 @@ export async function GET(request: NextRequest) {
 
       const responseData = await response.json()
 
-      console.log(`API returned ${Array.isArray(responseData) ? responseData.length : 0} wheels`)
+      console.log(`API returned data:`, responseData)
 
-      // Check if response is valid array
-      if (!Array.isArray(responseData)) {
-        console.log("API response is not an array")
+      // Check if response has data property with array
+      if (!responseData.data || !Array.isArray(responseData.data)) {
+        console.log("API response is not in expected format")
         return NextResponse.json({
           data: [],
           error: "Invalid API response format",
         })
       }
 
-      // Transform the Tirebase API data to match our application's structure
-      const transformedData = responseData
+      // Helper function to get delivery time based on provider
+      const getDeliveryTime = (provider: string | null): string => {
+        if (!provider) return "Забрать сегодня"
+
+        const providerLower = provider.toLowerCase()
+
+        if (providerLower.includes("exlusive") || providerLower.includes("эксклюзив")) {
+          return "1-2 дня"
+        } else if (providerLower.includes("4tochki") || providerLower.includes("форточки")) {
+          return "2-4 дня"
+        } else if (providerLower.includes("diskoptimo") || providerLower.includes("дископтимо")) {
+          return "2-4 дня"
+        } else if (providerLower.includes("shinservice") || providerLower.includes("шинсервис")) {
+          return "1-2 дня"
+        }
+
+        return "Уточняйте"
+      }
+
+      // Transform the new API data to match our application's structure
+      const transformedData = responseData.data
         .filter((wheel: any) => {
           // Фильтруем только диски в наличии
-          return wheel.quantity && wheel.quantity > 0
+          return wheel.stock && wheel.stock > 0
         })
         .map((wheel: any) => {
-          // Формируем PCD в формате "4x100" из pn и pcd
-          const pcdFormatted = `${wheel.pn || 4}x${wheel.pcd || 100}`
-
-          // Определяем тип диска на английском
-          let wheelType: "stamped" | "cast" | "forged" = "cast"
-          if (wheel.type) {
-            const typeStr = wheel.type.toLowerCase()
-            // "Стальной" или "Штампованный"
-            if (typeStr.includes("сталь") || typeStr.includes("steel") || typeStr.includes("штамп") || typeStr.includes("stamp")) {
-              wheelType = "stamped"
-            }
-            // "Кованый"
-            else if (typeStr.includes("кован") || typeStr.includes("forg")) {
-              wheelType = "forged"
-            }
-            // "Литой"
-            else if (typeStr.includes("лит") || typeStr.includes("cast")) {
-              wheelType = "cast"
-            }
-          }
+          const deliveryTime = getDeliveryTime(wheel.provider)
 
           return {
             id: wheel.id || `wheel-${Math.random()}`,
-            name: wheel.title || `${wheel.brand || "Unknown"} ${wheel.model || ""}`,
-            title: wheel.title,
-            price: wheel.rrc || wheel.opt || wheel.price || 5000,
-            rrc: wheel.rrc || wheel.opt || wheel.price || 5000,
-            stock: wheel.quantity || 0,
+            name: wheel.title || wheel.name || `${wheel.brand || "Unknown"} ${wheel.model || ""}`,
+            title: wheel.title || wheel.name,
+            price: wheel.rrc || wheel.price || 5000,
+            rrc: wheel.rrc || wheel.price || 5000,
+            stock: wheel.stock || 0,
             image: wheel.image || "/images/black-wheel.png",
             brand: wheel.brand || "Unknown",
             model: wheel.model || null,
-            diameter: wheel.diam || 17,
+            diameter: wheel.diameter || 17,
             width: wheel.width || 7,
-            pcd: pcdFormatted,
+            pcd: wheel.pcd || "5x114.3",
             et: wheel.et || 40,
-            dia: wheel.cb || 66.1,
-            type: wheelType,
+            dia: wheel.dia || 66.1,
+            type: wheel.type || "cast",
             color: wheel.color || null,
-            isPromotional: false,
+            isPromotional: wheel.is_promotional || false,
             provider: wheel.provider || null,
             storehouse: wheel.storehouse || {},
+            deliveryTime: deliveryTime,
           }
         })
 

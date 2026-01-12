@@ -105,12 +105,10 @@ export default function DiskProductPage() {
 
   // Get product images from disk data or use placeholder
   const getDiskImage = () => {
-    if (!disk) return "/placeholder.svg"
-
-    const API_TOKEN = "KYf-JMMTweMWASr-zktunkLwnPKfzeIO"
+    if (!disk) return null
 
     // Check if the disk has an image property directly (full URL)
-    if (disk.image && typeof disk.image === "string" && disk.image.startsWith("http")) {
+    if (disk.image && typeof disk.image === "string" && (disk.image.startsWith("http") || disk.image.startsWith("/"))) {
       return disk.image
     }
 
@@ -129,8 +127,8 @@ export default function DiskProductPage() {
     if (disk.img) return disk.img
     if (disk.images && disk.images.length > 0) return disk.images[0]
 
-    // Fallback to placeholder
-    return "/placeholder.svg"
+    // No image available
+    return null
   }
 
   // Load cart count and favorite status on component mount
@@ -682,17 +680,17 @@ export default function DiskProductPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] pr-4 flex items-center">
+      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] pr-4 flex items-center">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
             <BackButton />
             <div className="flex items-center gap-2">
-              <span className="text-xl font-bold text-white">Карточка товара</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">Карточка товара</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={handleShare} className="active:text-blue-500">
-              <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="h-5 w-5 text-gray-900 dark:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="18" cy="5" r="3"/>
                 <circle cx="6" cy="12" r="3"/>
                 <circle cx="18" cy="19" r="3"/>
@@ -707,7 +705,7 @@ export default function DiskProductPage() {
                     ? "animate-wiggle text-blue-500 fill-blue-500"
                     : isFavorite
                       ? "text-blue-500 fill-blue-500"
-                      : "text-white"
+                      : "text-gray-900 dark:text-white"
                 }`}
               />
             </Button>
@@ -721,7 +719,7 @@ export default function DiskProductPage() {
           {/* Image Gallery */}
           <div className="relative">
             {/* Rating overlay - bottom left */}
-            <div className="absolute bottom-2 left-2 z-[5] bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
+            <div className="absolute bottom-2 left-2 z-[5] bg-white/70 dark:bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
               <div className="flex items-center gap-2">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -731,15 +729,15 @@ export default function DiskProductPage() {
                     />
                   ))}
                 </div>
-                <span className="text-xs text-white font-medium">4.0 (86)</span>
+                <span className="text-xs text-gray-900 dark:text-white font-medium">4.0 (86)</span>
               </div>
             </div>
 
             {/* Country/Flag overlay - top right */}
             {hasCountryData() && (
-              <div className="absolute top-2 right-2 z-[5] bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
+              <div className="absolute top-2 right-2 z-[5] bg-white/70 dark:bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-white font-medium">
+                  <span className="text-xs text-gray-900 dark:text-white font-medium">
                     {disk.country || (typeof disk.model === "object" && disk.model?.brand?.country?.name) || ""}
                   </span>
                   {flagError ? (
@@ -764,9 +762,9 @@ export default function DiskProductPage() {
 
             {/* Disk type overlay - bottom right */}
             {getDiskType() !== "—" && (
-              <div className="absolute bottom-2 right-2 z-[5] bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
+              <div className="absolute bottom-2 right-2 z-[5] bg-white/70 dark:bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-white" title={getDiskType()}>
+                  <span className="text-xs font-bold text-gray-900 dark:text-white" title={getDiskType()}>
                     {getDiskType()}
                   </span>
                 </div>
@@ -774,22 +772,28 @@ export default function DiskProductPage() {
             )}
 
             <div className="flex justify-center">
-              <div className="relative w-full max-w-[400px]" style={{ maxHeight: '400px' }}>
-                <Image
-                  src={getDiskImage()}
-                  alt={disk.name || "Disk"}
-                  width={400}
-                  height={400}
-                  className="object-contain w-full h-auto"
-                  style={{ maxHeight: '400px' }}
-                />
+              <div className="relative w-full max-w-[400px] flex items-center justify-center" style={{ minHeight: '400px', maxHeight: '400px' }}>
+                {getDiskImage() ? (
+                  <Image
+                    src={getDiskImage()}
+                    alt={disk.name || "Disk"}
+                    width={400}
+                    height={400}
+                    className="object-contain w-full h-auto"
+                    style={{ maxHeight: '400px' }}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full text-gray-400 dark:text-gray-500">
+                    <span className="text-lg">Изображение отсутствует</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
         <div className="p-4 space-y-1 -mt-2">
-          <h2 className="text-xl font-bold text-white">{disk.name || disk.title || "—"}</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">{disk.name || disk.title || "—"}</h2>
 
           {/* Price section */}
           <div className="flex items-center justify-end gap-2">
@@ -825,12 +829,12 @@ export default function DiskProductPage() {
                   key={index}
                   className={`flex justify-between items-center p-4 rounded-xl transition-all ${
                     locationInfo.stock > 0
-                      ? 'bg-[#2A2A2A]'
-                      : 'bg-[#2A2A2A] opacity-50'
+                      ? 'bg-white dark:bg-[#2A2A2A] border border-gray-200 dark:border-transparent'
+                      : 'bg-white dark:bg-[#2A2A2A] border border-gray-200 dark:border-transparent opacity-50'
                   }`}
                 >
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-white">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
                       {locationInfo.location}
                     </span>
                     <span className={`text-[10px] ${getDeliveryColorClass(deliveryInfo.type)}`}>
@@ -863,103 +867,103 @@ export default function DiskProductPage() {
 
         <div className="p-4 space-y-4">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3 p-3 bg-[#2A2A2A] rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-white dark:bg-[#2A2A2A] rounded-lg border border-gray-200 dark:border-transparent">
               <Truck className="h-5 w-5 text-[#009CFF]" />
               <div>
-                <p className="text-sm font-medium text-white">Бесплатная доставка</p>
-                <p className="text-xs text-gray-400">При оплате сейчас</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Бесплатная доставка</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">При оплате сейчас</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-[#2A2A2A] rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-white dark:bg-[#2A2A2A] rounded-lg border border-gray-200 dark:border-transparent">
               <ShieldCheck className="h-5 w-5 text-[#009CFF]" />
               <div>
-                <p className="text-sm font-medium text-white">Гарантия 1 год</p>
-                <p className="text-xs text-gray-400">Официальная гарантия производителя</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Гарантия 1 год</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Официальная гарантия производителя</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-[#2A2A2A] rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-white dark:bg-[#2A2A2A] rounded-lg border border-gray-200 dark:border-transparent">
               <span className="h-5 w-5 text-[#c4d402] font-bold text-sm flex items-center justify-center">%</span>
               <div>
-                <p className="text-sm font-medium text-white">Скидка на шиномонтаж 20%</p>
-                <p className="text-xs text-gray-400">При покупке комплекта дисков</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Скидка на шиномонтаж 20%</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">При покупке комплекта дисков</p>
               </div>
             </div>
           </div>
 
           <Tabs defaultValue="specs" className="w-full mt-6">
-            <TabsList className="w-full bg-[#2A2A2A] rounded-xl p-1">
+            <TabsList className="w-full bg-white dark:bg-[#2A2A2A] rounded-xl p-1 border border-gray-200 dark:border-transparent">
               <TabsTrigger
                 value="specs"
-                className="rounded-lg text-gray-400 data-[state=active]:bg-[#009CFF] data-[state=active]:text-white"
+                className="rounded-lg text-gray-600 dark:text-gray-400 data-[state=active]:bg-[#009CFF] data-[state=active]:text-white"
               >
                 Характеристики
               </TabsTrigger>
               <TabsTrigger
                 value="description"
-                className="rounded-lg text-gray-400 data-[state=active]:bg-[#009CFF] data-[state=active]:text-white"
+                className="rounded-lg text-gray-600 dark:text-gray-400 data-[state=active]:bg-[#009CFF] data-[state=active]:text-white"
               >
                 Описание
               </TabsTrigger>
               <TabsTrigger
                 value="reviews"
-                className="rounded-lg text-gray-400 data-[state=active]:bg-[#009CFF] data-[state=active]:text-white"
+                className="rounded-lg text-gray-600 dark:text-gray-400 data-[state=active]:bg-[#009CFF] data-[state=active]:text-white"
               >
                 Отзывы
               </TabsTrigger>
             </TabsList>
             <TabsContent value="specs" className="mt-4 space-y-3">
-              <div className="bg-[#2A2A2A] rounded-lg p-4">
-                <div className="flex justify-between py-2 border-b border-gray-600">
-                  <span className="text-sm text-white">Артикул</span>
-                  <span className="text-sm font-medium text-white">{getMid()}</span>
+              <div className="bg-white dark:bg-[#2A2A2A] rounded-lg p-4 border border-gray-200 dark:border-transparent">
+                <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-600">
+                  <span className="text-sm text-gray-900 dark:text-white">Артикул</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{getMid()}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-600">
-                  <span className="text-sm text-white">Бренд</span>
-                  <span className="text-sm font-medium text-white">{getDiskProperty("brand")}</span>
+                <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-600">
+                  <span className="text-sm text-gray-900 dark:text-white">Бренд</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{getDiskProperty("brand")}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-600">
-                  <span className="text-sm text-white">Модель</span>
-                  <span className="text-sm font-medium text-white">{getDiskProperty("model")}</span>
+                <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-600">
+                  <span className="text-sm text-gray-900 dark:text-white">Модель</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{getDiskProperty("model")}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-600">
-                  <span className="text-sm text-white">Диаметр</span>
-                  <span className="text-sm font-medium text-white">R{getDiskProperty("diameter") || getDiskProperty("diam")}</span>
+                <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-600">
+                  <span className="text-sm text-gray-900 dark:text-white">Диаметр</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">R{getDiskProperty("diameter") || getDiskProperty("diam")}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-600">
-                  <span className="text-sm text-white">Ширина</span>
-                  <span className="text-sm font-medium text-white">{getDiskProperty("width")}J</span>
+                <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-600">
+                  <span className="text-sm text-gray-900 dark:text-white">Ширина</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{getDiskProperty("width")}J</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-600">
-                  <span className="text-sm text-white">PCD (разболтовка)</span>
-                  <span className="text-sm font-medium text-white">{getDiskProperty("pcd")}</span>
+                <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-600">
+                  <span className="text-sm text-gray-900 dark:text-white">PCD (разболтовка)</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{getDiskProperty("pcd")}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-600">
-                  <span className="text-sm text-white">Вылет (ET)</span>
-                  <span className="text-sm font-medium text-white">ET{getDiskProperty("et")}</span>
+                <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-600">
+                  <span className="text-sm text-gray-900 dark:text-white">Вылет (ET)</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">ET{getDiskProperty("et")}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-600">
-                  <span className="text-sm text-white">Центральное отверстие (DIA)</span>
-                  <span className="text-sm font-medium text-white">{getDiskProperty("dia")} мм</span>
+                <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-600">
+                  <span className="text-sm text-gray-900 dark:text-white">Центральное отверстие (DIA)</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{getDiskProperty("dia")} мм</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-600">
-                  <span className="text-sm text-white">Тип диска</span>
-                  <span className="text-sm font-medium text-white">{getDiskType()}</span>
+                <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-600">
+                  <span className="text-sm text-gray-900 dark:text-white">Тип диска</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{getDiskType()}</span>
                 </div>
                 {getDiskProperty("color") !== "—" && (
-                  <div className="flex justify-between py-2 border-b border-gray-600">
-                    <span className="text-sm text-white">Цвет</span>
-                    <span className="text-sm font-medium text-white">{getDiskProperty("color")}</span>
+                  <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-600">
+                    <span className="text-sm text-gray-900 dark:text-white">Цвет</span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">{getDiskProperty("color")}</span>
                   </div>
                 )}
                 <div className="flex justify-between py-2">
-                  <span className="text-sm text-white">Страна производства</span>
-                  <span className="text-sm font-medium text-white">{disk.country || (typeof disk.model === "object" && disk.model?.brand?.country?.name) || "—"}</span>
+                  <span className="text-sm text-gray-900 dark:text-white">Страна производства</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{disk.country || (typeof disk.model === "object" && disk.model?.brand?.country?.name) || "—"}</span>
                 </div>
               </div>
             </TabsContent>
             <TabsContent value="description" className="mt-4">
-              <div className="bg-[#2A2A2A] rounded-lg p-4">
-                <p className="text-sm text-white leading-relaxed">
+              <div className="bg-white dark:bg-[#2A2A2A] rounded-lg p-4 border border-gray-200 dark:border-transparent">
+                <p className="text-sm text-gray-900 dark:text-white leading-relaxed">
                   {disk.description ||
                     `${getDiskProperty("brand")} ${getDiskProperty("model")} — качественные ${getDiskType().toLowerCase()} диски для вашего автомобиля. Обеспечивают надежность, долговечность и привлекательный внешний вид.`}
                 </p>
@@ -972,59 +976,59 @@ export default function DiskProductPage() {
               </div>
             </TabsContent>
             <TabsContent value="reviews" className="mt-4">
-              <div className="bg-[#2A2A2A] rounded-lg p-4 space-y-4">
+              <div className="bg-white dark:bg-[#2A2A2A] rounded-lg p-4 space-y-4 border border-gray-200 dark:border-transparent">
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="font-medium text-white">Дмитрий С.</span>
+                    <span className="font-medium text-gray-900 dark:text-white">Дмитрий С.</span>
                     <div className="flex">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className={`h-3 w-3 ${star <= 5 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-600"}`}
+                          className={`h-3 w-3 ${star <= 5 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-300 dark:text-gray-600"}`}
                         />
                       ))}
                     </div>
                   </div>
-                  <p className="text-sm text-white">
+                  <p className="text-sm text-gray-900 dark:text-white">
                     Отличные диски! Качество на высоте, выглядят стильно. Установил на Camry - идеально подошли.
                   </p>
-                  <p className="text-xs text-gray-400">15.01.2024</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">15.01.2024</p>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="font-medium text-white">Анна К.</span>
+                    <span className="font-medium text-gray-900 dark:text-white">Анна К.</span>
                     <div className="flex">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className={`h-3 w-3 ${star <= 4 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-600"}`}
+                          className={`h-3 w-3 ${star <= 4 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-300 dark:text-gray-600"}`}
                         />
                       ))}
                     </div>
                   </div>
-                  <p className="text-sm text-white">
+                  <p className="text-sm text-gray-900 dark:text-white">
                     Хорошие диски за свою цену. Покрытие качественное, не облезает. Рекомендую.
                   </p>
-                  <p className="text-xs text-gray-400">08.01.2024</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">08.01.2024</p>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="font-medium text-white">Сергей М.</span>
+                    <span className="font-medium text-gray-900 dark:text-white">Сергей М.</span>
                     <div className="flex">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className={`h-3 w-3 ${star <= 4 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-600"}`}
+                          className={`h-3 w-3 ${star <= 4 ? "fill-[#c4d402] text-[#c4d402]" : "text-gray-300 dark:text-gray-600"}`}
                         />
                       ))}
                     </div>
                   </div>
-                  <p className="text-sm text-white">
+                  <p className="text-sm text-gray-900 dark:text-white">
                     Быстрая доставка, диски пришли в отличном состоянии. Балансировка прошла без проблем.
                   </p>
-                  <p className="text-xs text-gray-400">02.01.2024</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">02.01.2024</p>
                 </div>
-                <Button variant="outline" className="w-full border-gray-600 text-white bg-transparent">
+                <Button variant="outline" className="w-full border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-transparent">
                   Все отзывы (43)
                 </Button>
               </div>
@@ -1040,7 +1044,7 @@ export default function DiskProductPage() {
           onClick={() => setShowShareMenu(false)}
         >
           {/* Backdrop */}
-          <div className="absolute top-0 left-0 right-0 bottom-0 bg-black/50" />
+          <div className="absolute top-0 left-0 right-0 bottom-0 bg-white/50 dark:bg-black/50" />
 
           {/* Share Sheet */}
           <div

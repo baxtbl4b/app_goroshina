@@ -1,6 +1,7 @@
 import type React from "react"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeColorSync } from "@/components/theme-color-sync"
 import { Rubik, PT_Sans } from "next/font/google"
 import FixedCartButton from "@/components/fixed-cart-button"
 import { Toaster } from "@/components/ui/toaster"
@@ -27,7 +28,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <title>TireShop</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
-        <meta name="theme-color" content="#1f1f1f" />
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#1f1f1f" media="(prefers-color-scheme: dark)" />
 
         {/* PWA Manifest */}
         <link rel="manifest" href="/manifest.json" />
@@ -35,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* PWA Meta Tags */}
         <meta name="application-name" content="Горошина" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Горошина" />
         <meta name="description" content="Интернет-магазин шин и автотоваров" />
         <meta name="format-detection" content="telephone=no" />
@@ -59,6 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {" "}
         {/* Добавлены классы h-full и overflow-y-auto */}
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <ThemeColorSync />
           <div className="bg-[#D9D9DD] dark:bg-[#1f1f1f] min-h-screen">
             {" "}
             {/* Удалены overflow-y-auto и flex-1, добавлен min-h-screen */}

@@ -113,11 +113,11 @@ export default function CarDetailsPage() {
 
   if (loading) {
     return (
-      <main className="flex flex-col min-h-screen bg-[#121212]">
-        <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+      <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
+        <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
           <div className="h-full px-2 flex items-center">
             <BackButton />
-            <span className="text-lg font-semibold text-white">Загрузка...</span>
+            <span className="text-lg font-semibold text-gray-900 dark:text-white">Загрузка...</span>
           </div>
         </header>
         <div className="flex-1 flex items-center justify-center">
@@ -129,16 +129,16 @@ export default function CarDetailsPage() {
 
   if (!car) {
     return (
-      <main className="flex flex-col min-h-screen bg-[#121212]">
-        <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+      <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
+        <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
           <div className="h-full px-2 flex items-center">
             <BackButton />
-            <span className="text-lg font-semibold text-white">Автомобиль не найден</span>
+            <span className="text-lg font-semibold text-gray-900 dark:text-white">Автомобиль не найден</span>
           </div>
         </header>
         <div className="flex-1 flex flex-col items-center justify-center p-4">
           <Car className="w-16 h-16 text-gray-600 mb-4" />
-          <p className="text-gray-400 text-center mb-4">Автомобиль не найден или был удалён</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center mb-4">Автомобиль не найден или был удалён</p>
           <Link href="/account/cars">
             <Button className="bg-[#c4d402] text-[#1F1F1F] hover:bg-[#c4d402]/90 rounded-xl">
               Вернуться к списку
@@ -153,12 +153,12 @@ export default function CarDetailsPage() {
   const hasWinterTires = car.winterTireWidth && car.winterTireProfile && car.winterTireDiameter
 
   return (
-    <main className="flex flex-col min-h-screen bg-[#121212]">
-      <header className="sticky top-0 z-10 bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
+    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
+      <header className="sticky top-0 z-10 bg-white dark:bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
         <div className="h-full px-2 flex items-center justify-between">
           <div className="flex items-center">
             <BackButton />
-            <span className="text-lg font-semibold text-white truncate">
+            <span className="text-lg font-semibold text-gray-900 dark:text-white truncate">
               {car.brand} {car.model}
             </span>
           </div>
@@ -168,15 +168,15 @@ export default function CarDetailsPage() {
                 <Trash2 className="h-5 w-5" />
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="bg-[#2A2A2A] border-gray-700">
+            <AlertDialogContent className="bg-white dark:bg-[#2A2A2A] border-gray-300 dark:border-gray-700">
               <AlertDialogHeader>
-                <AlertDialogTitle className="text-white">Удалить автомобиль?</AlertDialogTitle>
-                <AlertDialogDescription className="text-gray-400">
+                <AlertDialogTitle className="text-gray-900 dark:text-white">Удалить автомобиль?</AlertDialogTitle>
+                <AlertDialogDescription className="text-gray-600 dark:text-gray-400">
                   Вы уверены, что хотите удалить {car.brand} {car.model}? Это действие нельзя отменить.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="bg-[#1F1F1F] text-white border-gray-700 hover:bg-[#333]">
+                <AlertDialogCancel className="bg-gray-100 dark:bg-[#1F1F1F] text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-[#333]">
                   Отмена
                 </AlertDialogCancel>
                 <AlertDialogAction
@@ -193,15 +193,15 @@ export default function CarDetailsPage() {
 
       <div className="flex-1 p-4 space-y-4 pb-20">
         {/* Car Info Card */}
-        <div className="bg-[#2A2A2A] rounded-2xl p-4">
+        <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#009CFF]/20 to-[#c4d402]/20 flex items-center justify-center">
                 <Car className="h-6 w-6 text-[#009CFF]" />
               </div>
               <div>
-                <h3 className="font-bold text-white">{car.brand} {car.model}</h3>
-                {car.trim && <p className="text-sm text-gray-400">{car.trim}</p>}
+                <h3 className="font-bold text-gray-900 dark:text-white">{car.brand} {car.model}</h3>
+                {car.trim && <p className="text-sm text-gray-600 dark:text-gray-400">{car.trim}</p>}
               </div>
             </div>
             {car.isPrimary && (
@@ -211,26 +211,26 @@ export default function CarDetailsPage() {
 
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-sm text-gray-400">Год выпуска</span>
-              <span className="text-sm font-medium text-white">{car.year}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Год выпуска</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{car.year}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-400">Гос. номер</span>
-              <span className="text-sm font-medium text-white">{car.plate || "Не указан"}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Гос. номер</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{car.plate || "Не указан"}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-400">Пробег</span>
-              <span className="text-sm font-medium text-white">{car.mileage || "Не указан"}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Пробег</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{car.mileage || "Не указан"}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-400">Добавлен</span>
-              <span className="text-sm font-medium text-white">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Добавлен</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">
                 {car.createdAt ? new Date(car.createdAt).toLocaleDateString("ru-RU") : "—"}
               </span>
             </div>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-white/10 flex gap-2">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/10 flex gap-2">
             {!car.isPrimary && (
               <Button
                 onClick={handleSetPrimary}
@@ -250,12 +250,12 @@ export default function CarDetailsPage() {
         </div>
 
         {/* Tires Info Card */}
-        <div className="bg-[#2A2A2A] rounded-2xl p-4">
+        <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl p-4">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-[#009CFF]/20 flex items-center justify-center">
               <Tool className="h-5 w-5 text-[#009CFF]" />
             </div>
-            <h3 className="font-bold text-white">Шины</h3>
+            <h3 className="font-bold text-gray-900 dark:text-white">Шины</h3>
           </div>
 
           {(hasSummerTires || hasWinterTires) ? (
@@ -264,18 +264,18 @@ export default function CarDetailsPage() {
                 <TabsTrigger
                   value="summer"
                   disabled={!hasSummerTires}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 data-[state=active]:border-[#c4d402] data-[state=active]:bg-[#c4d402]/10 border-gray-700 disabled:opacity-50 h-auto"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 data-[state=active]:border-[#c4d402] data-[state=active]:bg-[#c4d402]/10 border-gray-300 dark:border-gray-700 disabled:opacity-50 h-auto"
                 >
                   <Sun className="h-5 w-5 text-[#c4d402]" />
-                  <span className="font-medium text-white">Летние</span>
+                  <span className="font-medium text-gray-900 dark:text-white">Летние</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="winter"
                   disabled={!hasWinterTires}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 data-[state=active]:border-[#009CFF] data-[state=active]:bg-[#009CFF]/10 border-gray-700 disabled:opacity-50 h-auto"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 data-[state=active]:border-[#009CFF] data-[state=active]:bg-[#009CFF]/10 border-gray-300 dark:border-gray-700 disabled:opacity-50 h-auto"
                 >
                   <Snowflake className="h-5 w-5 text-[#009CFF]" />
-                  <span className="font-medium text-white">Зимние</span>
+                  <span className="font-medium text-gray-900 dark:text-white">Зимние</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -283,22 +283,22 @@ export default function CarDetailsPage() {
                 {car.summerHasStaggered ? (
                   <>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Передняя ось</span>
-                      <span className="text-sm font-medium text-white">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Передняя ось</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
                         {formatTireSize(car.summerTireWidth, car.summerTireProfile, car.summerTireDiameter)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Задняя ось</span>
-                      <span className="text-sm font-medium text-white">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Задняя ось</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
                         {formatTireSize(car.summerRearTireWidth, car.summerRearTireProfile, car.summerRearTireDiameter)}
                       </span>
                     </div>
                   </>
                 ) : (
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-400">Размер</span>
-                    <span className="text-sm font-medium text-white">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Размер</span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
                       {formatTireSize(car.summerTireWidth, car.summerTireProfile, car.summerTireDiameter)}
                     </span>
                   </div>
@@ -309,22 +309,22 @@ export default function CarDetailsPage() {
                 {car.winterHasStaggered ? (
                   <>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Передняя ось</span>
-                      <span className="text-sm font-medium text-white">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Передняя ось</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
                         {formatTireSize(car.winterTireWidth, car.winterTireProfile, car.winterTireDiameter)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Задняя ось</span>
-                      <span className="text-sm font-medium text-white">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Задняя ось</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
                         {formatTireSize(car.winterRearTireWidth, car.winterRearTireProfile, car.winterRearTireDiameter)}
                       </span>
                     </div>
                   </>
                 ) : (
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-400">Размер</span>
-                    <span className="text-sm font-medium text-white">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Размер</span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
                       {formatTireSize(car.winterTireWidth, car.winterTireProfile, car.winterTireDiameter)}
                     </span>
                   </div>
@@ -333,7 +333,7 @@ export default function CarDetailsPage() {
             </Tabs>
           ) : (
             <div className="text-center py-6">
-              <p className="text-gray-400 mb-4">Информация о шинах не указана</p>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">Информация о шинах не указана</p>
               <Link href={`/account/cars/${car.id}/edit`}>
                 <Button className="bg-[#009CFF] text-white hover:bg-[#009CFF]/90 rounded-xl">
                   Добавить информацию
@@ -344,13 +344,13 @@ export default function CarDetailsPage() {
         </div>
 
         {/* Storage Card */}
-        <div className="bg-[#2A2A2A] rounded-2xl p-4">
+        <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#c4d402]/20 flex items-center justify-center">
                 <Calendar className="h-5 w-5 text-[#c4d402]" />
               </div>
-              <h3 className="font-bold text-white">Хранение шин</h3>
+              <h3 className="font-bold text-gray-900 dark:text-white">Хранение шин</h3>
             </div>
             {car.hasStorage ? (
               <Badge className="bg-[#c4d402]/20 text-[#c4d402]">Активно</Badge>
@@ -362,13 +362,13 @@ export default function CarDetailsPage() {
           {car.hasStorage ? (
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-400">Статус</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Статус</span>
                 <span className="text-sm font-medium text-[#c4d402]">На хранении</span>
               </div>
             </div>
           ) : (
             <div className="text-center py-4">
-              <p className="text-gray-400 text-sm mb-3">Услуга хранения не активна</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">Услуга хранения не активна</p>
               <Link href="/tire-storage">
                 <Button size="sm" className="bg-[#c4d402] text-[#1F1F1F] hover:bg-[#c4d402]/90 rounded-xl">
                   Оформить хранение
@@ -379,32 +379,32 @@ export default function CarDetailsPage() {
         </div>
 
         {/* Expenses Card */}
-        <div className="bg-[#2A2A2A] rounded-2xl p-4">
+        <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#009CFF]/20 flex items-center justify-center">
                 <Wrench className="h-5 w-5 text-[#009CFF]" />
               </div>
-              <h3 className="font-bold text-white">Расходы на обслуживание</h3>
+              <h3 className="font-bold text-gray-900 dark:text-white">Расходы на обслуживание</h3>
             </div>
-            <span className="text-lg font-bold text-white">78 500 ₽</span>
+            <span className="text-lg font-bold text-gray-900 dark:text-white">78 500 ₽</span>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center text-sm">
               <div className="w-3 h-3 rounded-full bg-[#c4d402] mr-2"></div>
-              <span className="flex-1 text-gray-400">Шины и диски</span>
-              <span className="font-medium text-white">32 600 ₽</span>
+              <span className="flex-1 text-gray-600 dark:text-gray-400">Шины и диски</span>
+              <span className="font-medium text-gray-900 dark:text-white">32 600 ₽</span>
             </div>
             <div className="flex items-center text-sm">
               <div className="w-3 h-3 rounded-full bg-[#009CFF] mr-2"></div>
-              <span className="flex-1 text-gray-400">Техобслуживание</span>
-              <span className="font-medium text-white">25 900 ₽</span>
+              <span className="flex-1 text-gray-600 dark:text-gray-400">Техобслуживание</span>
+              <span className="font-medium text-gray-900 dark:text-white">25 900 ₽</span>
             </div>
             <div className="flex items-center text-sm">
               <div className="w-3 h-3 rounded-full bg-gray-500 mr-2"></div>
-              <span className="flex-1 text-gray-400">Прочие расходы</span>
-              <span className="font-medium text-white">20 000 ₽</span>
+              <span className="flex-1 text-gray-600 dark:text-gray-400">Прочие расходы</span>
+              <span className="font-medium text-gray-900 dark:text-white">20 000 ₽</span>
             </div>
           </div>
 
@@ -419,100 +419,100 @@ export default function CarDetailsPage() {
 
         {/* Service History & Reminders Tabs */}
         <Tabs defaultValue="history" className="w-full">
-          <TabsList className="w-full bg-[#1F1F1F] rounded-xl p-1 h-auto">
+          <TabsList className="w-full bg-gray-200 dark:bg-[#1F1F1F] rounded-xl p-1 h-auto">
             <TabsTrigger
               value="history"
-              className="flex-1 rounded-lg text-white py-2.5 data-[state=active]:bg-[#009CFF] data-[state=active]:text-white"
+              className="flex-1 rounded-lg text-gray-900 dark:text-white py-2.5 data-[state=active]:bg-[#009CFF] data-[state=active]:text-white"
             >
               История обслуживания
             </TabsTrigger>
             <TabsTrigger
               value="reminders"
-              className="flex-1 rounded-lg text-white py-2.5 data-[state=active]:bg-[#009CFF] data-[state=active]:text-white"
+              className="flex-1 rounded-lg text-gray-900 dark:text-white py-2.5 data-[state=active]:bg-[#009CFF] data-[state=active]:text-white"
             >
               Напоминания
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="history" className="mt-4 space-y-3">
-            <div className="bg-[#2A2A2A] rounded-2xl p-4">
+            <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl p-4">
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
                   <div className="w-3 h-3 rounded-full bg-[#c4d402] mr-2"></div>
-                  <span className="font-medium text-white">Замена шин</span>
+                  <span className="font-medium text-gray-900 dark:text-white">Замена шин</span>
                 </div>
-                <span className="text-sm text-gray-400">15.04.2023</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">15.04.2023</span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-500">Пробег: 45 000 км</span>
+                <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-500" />
+                <span className="text-sm text-gray-500 dark:text-gray-500">Пробег: 45 000 км</span>
               </div>
-              <div className="mt-3 pt-3 border-t border-white/10">
-                <p className="text-sm text-gray-300">Замена летних шин Michelin Pilot Sport 4</p>
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-white/10">
+                <p className="text-sm text-gray-700 dark:text-gray-300">Замена летних шин Michelin Pilot Sport 4</p>
               </div>
             </div>
 
-            <div className="bg-[#2A2A2A] rounded-2xl p-4">
+            <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl p-4">
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
                   <div className="w-3 h-3 rounded-full bg-[#009CFF] mr-2"></div>
-                  <span className="font-medium text-white">ТО-2</span>
+                  <span className="font-medium text-gray-900 dark:text-white">ТО-2</span>
                 </div>
-                <span className="text-sm text-gray-400">10.03.2023</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">10.03.2023</span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-500">Пробег: 40 000 км</span>
+                <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-500" />
+                <span className="text-sm text-gray-500 dark:text-gray-500">Пробег: 40 000 км</span>
               </div>
-              <div className="mt-3 pt-3 border-t border-white/10">
-                <p className="text-sm text-gray-300">Замена масла, фильтров и тормозных колодок</p>
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-white/10">
+                <p className="text-sm text-gray-700 dark:text-gray-300">Замена масла, фильтров и тормозных колодок</p>
               </div>
             </div>
 
-            <div className="bg-[#2A2A2A] rounded-2xl p-4">
+            <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl p-4">
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
                   <div className="w-3 h-3 rounded-full bg-gray-500 mr-2"></div>
-                  <span className="font-medium text-white">Мойка и химчистка</span>
+                  <span className="font-medium text-gray-900 dark:text-white">Мойка и химчистка</span>
                 </div>
-                <span className="text-sm text-gray-400">05.02.2023</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">05.02.2023</span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-500">Пробег: 38 500 км</span>
+                <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-500" />
+                <span className="text-sm text-gray-500 dark:text-gray-500">Пробег: 38 500 км</span>
               </div>
-              <div className="mt-3 pt-3 border-t border-white/10">
-                <p className="text-sm text-gray-300">Комплексная мойка и химчистка салона</p>
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-white/10">
+                <p className="text-sm text-gray-700 dark:text-gray-300">Комплексная мойка и химчистка салона</p>
               </div>
             </div>
           </TabsContent>
 
           <TabsContent value="reminders" className="mt-4 space-y-3">
-            <div className="bg-[#2A2A2A] rounded-2xl p-4">
+            <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl p-4">
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
                   <div className="w-3 h-3 rounded-full bg-[#009CFF] mr-2"></div>
-                  <span className="font-medium text-white">ТО-3</span>
+                  <span className="font-medium text-gray-900 dark:text-white">ТО-3</span>
                 </div>
                 <span className="text-sm text-red-400">Через 2 000 км</span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-500">Рекомендуемый пробег: 60 000 км</span>
+                <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-500" />
+                <span className="text-sm text-gray-500 dark:text-gray-500">Рекомендуемый пробег: 60 000 км</span>
               </div>
             </div>
 
-            <div className="bg-[#2A2A2A] rounded-2xl p-4">
+            <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl p-4">
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
                   <div className="w-3 h-3 rounded-full bg-[#c4d402] mr-2"></div>
-                  <span className="font-medium text-white">Замена зимних шин</span>
+                  <span className="font-medium text-gray-900 dark:text-white">Замена зимних шин</span>
                 </div>
-                <span className="text-sm text-gray-400">Ноябрь 2023</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Ноябрь 2023</span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-500">Сезонная замена</span>
+                <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-500" />
+                <span className="text-sm text-gray-500 dark:text-gray-500">Сезонная замена</span>
               </div>
             </div>
           </TabsContent>
@@ -521,15 +521,15 @@ export default function CarDetailsPage() {
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">
           <Link href="/tire-mounting/booking" className="block">
-            <div className="bg-[#2A2A2A] rounded-2xl p-4 hover:bg-[#333] transition-colors active:scale-[0.98]">
+            <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl p-4 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors active:scale-[0.98]">
               <Wrench className="h-6 w-6 text-[#009CFF] mb-2" />
-              <p className="font-medium text-white text-sm">Записаться на шиномонтаж</p>
+              <p className="font-medium text-gray-900 dark:text-white text-sm">Записаться на шиномонтаж</p>
             </div>
           </Link>
           <Link href="/tire-storage/booking" className="block">
-            <div className="bg-[#2A2A2A] rounded-2xl p-4 hover:bg-[#333] transition-colors active:scale-[0.98]">
+            <div className="bg-white dark:bg-[#2A2A2A] rounded-2xl p-4 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors active:scale-[0.98]">
               <Calendar className="h-6 w-6 text-[#c4d402] mb-2" />
-              <p className="font-medium text-white text-sm">Оформить хранение</p>
+              <p className="font-medium text-gray-900 dark:text-white text-sm">Оформить хранение</p>
             </div>
           </Link>
         </div>

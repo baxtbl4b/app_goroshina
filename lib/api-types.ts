@@ -1,4 +1,4 @@
-export type Season = "s" | "w" | "a"
+export type Season = "s" | "w" | "a" | "all"
 
 export interface Tire {
   id: string

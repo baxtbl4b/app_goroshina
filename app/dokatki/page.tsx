@@ -1,774 +1,609 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { ChevronLeft, X, Heart, CheckCircle, Clock, Calendar, Plus, Minus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
+import { Heart, CheckCircle, Clock, Calendar } from "lucide-react"
 import { formatPrice } from "@/lib/api"
 import CartButton from "@/components/cart-button"
+import CartQuantityButtons from "@/components/cart-quantity-buttons"
+import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
+import { BackButton } from "@/components/back-button"
 
-// Типы данных для фильтров
-type BoltPattern = "4x100" | "4x108" | "5x100" | "5x108" | "5x112" | "5x114.3" | "5x120"
-type CenterBore = "56.1" | "57.1" | "60.1" | "63.3" | "65.1" | "66.6" | "67.1" | "71.5" | "72.6" | "73.1"
-type Compatibility = "Audi" | "BMW" | "Mercedes" | "Toyota" | "Honda" | "Hyundai" | "Kia" | "Renault"
+interface Dokatka {
+  id: number
+  title: string
+  hash: string
+  price: number
+  wholesalePrice: number
+  quantity: number
+  storages?: any
+  params: {
+    width?: string
+    height?: string
+    diam?: string
+    pn?: string
+    dia?: string
+    ndm?: string
+  }
+  category?: {
+    id: number
+    name: string
+  }
+}
 
-// Тип для статуса наличия
-type StockStatusType = "today" | "oneday" | "moredays"
-
-export default function DokatkaPage() {
-  const router = useRouter()
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const [selectedBoltPattern, setSelectedBoltPattern] = useState<BoltPattern | null>(null)
-  const [selectedCenterBore, setSelectedCenterBore] = useState<CenterBore | null>(null)
-  const [selectedCompatibility, setSelectedCompatibility] = useState<Compatibility | null>(null)
+export default function DokatkiPage() {
+  const [dokatki, setDokatki] = useState<Dokatka[]>([])
+  const [filteredDokatki, setFilteredDokatki] = useState<Dokatka[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [cartCounts, setCartCounts] = useState<Record<number, number>>({})
   const [favorites, setFavorites] = useState<number[]>([])
-  const [inStockOnly, setInStockOnly] = useState(false)
-  const [itemCount, setItemCount] = useState(0)
-  const [isAnimating, setIsAnimating] = useState(false)
-  const cartCountRef = useRef<HTMLSpanElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [cartCountPosition, setCartCountPosition] = useState(0)
 
-  // Данные для фильтров
-  const boltPatterns: BoltPattern[] = ["4x100", "4x108", "5x100", "5x108", "5x112", "5x114.3", "5x120"]
-  const centerBores: CenterBore[] = ["56.1", "57.1", "60.1", "63.3", "65.1", "66.6", "67.1", "71.5", "72.6", "73.1"]
-  const compatibilities: Compatibility[] = ["Audi", "BMW", "Mercedes", "Toyota", "Honda", "Hyundai", "Kia", "Renault"]
+  // Filter states
+  const [selectedPCD, setSelectedPCD] = useState<string>("")
+  const [selectedDIA, setSelectedDIA] = useState<string>("")
 
-  // Примеры докаток для отображения
-  const dokatki = [
-    {
-      id: 1,
-      title: "Докатка R16 5x112",
-      boltPattern: "5x112",
-      centerBore: "57.1",
-      price: 5900,
-      rrc: 6500, // Рекомендованная розничная цена
-      stock: 12, // Количество в наличии
-      country: "Германия",
-      country_code: "de",
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dokatka-p9ER4iAPFpGuRa3gPnEFh7qm8gm4j7.png",
-      description:
-        "Запасное колесо для временного использования. Подходит для большинства автомобилей с разболтовкой 5x112.",
-      compatibility: "Audi A4, VW Passat, Mercedes C-Class",
-      partCode: "DOK-5112-16",
-    },
-    {
-      id: 2,
-      title: "Докатка R17 5x114.3",
-      boltPattern: "5x114.3",
-      centerBore: "67.1",
-      price: 6500,
-      rrc: 7200,
-      stock: 5,
-      country: "Япония",
-      country_code: "jp",
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dokatka-p9ER4iAPFpGuRa3gPnEFh7qm8gm4j7.png",
-      description: "Компактное запасное колесо R17. Идеально для экономии места в багажнике.",
-      compatibility: "Toyota Camry, Honda Accord, Mazda 6",
-      partCode: "DOK-5114-17",
-    },
-    {
-      id: 3,
-      title: "Докатка R15 4x100",
-      boltPattern: "4x100",
-      centerBore: "56.1",
-      price: 4900,
-      rrc: 5500,
-      stock: 0,
-      country: "Китай",
-      country_code: "cn",
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dokatka-p9ER4iAPFpGuRa3gPnEFh7qm8gm4j7.png",
-      description: "Легкая докатка для компактных автомобилей. Разболтовка 4x100 подходит для многих моделей.",
-      compatibility: "Hyundai Solaris, Kia Rio, Renault Logan",
-      partCode: "DOK-4100-15",
-    },
-    {
-      id: 4,
-      title: "Докатка R16 5x120",
-      boltPattern: "5x120",
-      centerBore: "72.6",
-      price: 6200,
-      rrc: 6800,
-      stock: 8,
-      country: "Германия",
-      country_code: "de",
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dokatka-p9ER4iAPFpGuRa3gPnEFh7qm8gm4j7.png",
-      description:
-        "Надежная докатка для автомобилей премиум-класса. Разболтовка 5x120 подходит для BMW и других марок.",
-      compatibility: "BMW 3-Series, BMW 5-Series, Range Rover Evoque",
-      partCode: "DOK-5120-16",
-    },
-  ]
+  // Collapse/swipe states
+  const [isFilterCollapsed, setIsFilterCollapsed] = useState(false)
+  const [touchStartY, setTouchStartY] = useState<number | null>(null)
+  const [touchEndY, setTouchEndY] = useState<number | null>(null)
+  const [handleTouchStartY, setHandleTouchStartY] = useState<number | null>(null)
+  const [isHandleHighlighted, setIsHandleHighlighted] = useState(false)
+  const handleHighlightTimeout = useRef<NodeJS.Timeout | null>(null)
 
-  // Загрузка данных корзины и избранного при монтировании компонента
+  // Available filter values
+  const [availablePCD, setAvailablePCD] = useState<string[]>([])
+  const [availableDIA, setAvailableDIA] = useState<string[]>([])
+
+  // Load dokatki data from API
   useEffect(() => {
-    // Загрузка данных корзины
-    const updateCartCount = () => {
+    async function loadDokatki() {
       try {
-        const cart = JSON.parse(localStorage.getItem("dokatki_cart") || "[]")
-        const newCartCounts: Record<number, number> = {}
-        const count = cart.reduce((total: number, item: any) => {
-          newCartCounts[item.id] = item.quantity || 0
-          return total + (item.quantity || 1)
-        }, 0)
+        const response = await fetch("/api/dokatki")
+        if (response.ok) {
+          const data = await response.json()
+          console.log("Loaded dokatki:", data)
+          setDokatki(data.items)
+          setFilteredDokatki(data.items)
 
-        setCartCounts(newCartCounts)
-        setItemCount(count)
+          // Extract unique filter values
+          const pcdSet = new Set<string>()
+          const diaSet = new Set<string>()
+
+          // Извлекаем параметры только из товаров в наличии
+          data.items.forEach((item: Dokatka) => {
+            if (item.quantity > 0) {
+              if (item.params.pn) pcdSet.add(item.params.pn)
+              if (item.params.dia) diaSet.add(item.params.dia)
+            }
+          })
+
+          setAvailablePCD(Array.from(pcdSet).sort())
+          setAvailableDIA(Array.from(diaSet).sort((a, b) => parseFloat(a) - parseFloat(b)))
+        }
       } catch (error) {
-        console.error("Ошибка при получении данных корзины:", error)
-        setCartCounts({})
-        setItemCount(0)
+        console.error("Error loading dokatki:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    // Загрузка данных избранного
+    loadDokatki()
+  }, [])
+
+  // Load cart and favorites
+  useEffect(() => {
+    const updateCartCount = () => {
+      try {
+        const cart = JSON.parse(localStorage.getItem("cart") || "[]")
+        const newCartCounts: Record<number, number> = {}
+        cart.forEach((item: any) => {
+          if (item.type === "dokatka") {
+            newCartCounts[item.id] = item.quantity || 0
+          }
+        })
+        setCartCounts(newCartCounts)
+      } catch (error) {
+        console.error("Error loading cart:", error)
+      }
+    }
+
     const loadFavorites = () => {
       try {
         const favs = JSON.parse(localStorage.getItem("dokatki_favorites") || "[]")
         setFavorites(favs)
       } catch (error) {
-        console.error("Ошибка при получении данных избранного:", error)
-        setFavorites([])
+        console.error("Error loading favorites:", error)
       }
     }
 
     updateCartCount()
     loadFavorites()
 
-    // Обновляем счетчик при изменении корзины
     window.addEventListener("cartUpdated", updateCartCount)
-    window.addEventListener("cartItemAdded", updateCartCount)
+    return () => window.removeEventListener("cartUpdated", updateCartCount)
+  }, [])
 
-    // Очищаем слушатель событий при размонтировании
+  // Apply filters
+  useEffect(() => {
+    // Сначала фильтруем только товары в наличии
+    let filtered = dokatki.filter(item => item.quantity > 0)
+
+    if (selectedPCD) {
+      filtered = filtered.filter(item =>
+        item.params.pn && item.params.pn === selectedPCD
+      )
+    }
+
+    if (selectedDIA) {
+      filtered = filtered.filter(item =>
+        item.params.dia && item.params.dia === selectedDIA
+      )
+    }
+
+    setFilteredDokatki(filtered)
+  }, [selectedPCD, selectedDIA, dokatki])
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
     return () => {
-      window.removeEventListener("cartUpdated", updateCartCount)
-      window.removeEventListener("cartItemAdded", updateCartCount)
+      if (handleHighlightTimeout.current) {
+        clearTimeout(handleHighlightTimeout.current)
+      }
     }
   }, [])
 
-  // Фильтрация докаток
-  const filteredDokatki = dokatki.filter((item) => {
-    if (selectedBoltPattern && item.boltPattern !== selectedBoltPattern) return false
-    if (selectedCenterBore && item.centerBore !== selectedCenterBore) return false
-    if (selectedCompatibility && !item.compatibility.includes(selectedCompatibility)) return false
-    if (inStockOnly && item.stock <= 0) return false
-    return true
-  })
-
-  // Сброс всех фильтров
   const resetFilters = () => {
-    setSelectedBoltPattern(null)
-    setSelectedCenterBore(null)
-    setSelectedCompatibility(null)
-    setInStockOnly(false)
+    setSelectedPCD("")
+    setSelectedDIA("")
   }
 
-  // Проверка, есть и активные фильтры
-  const hasActiveFilters =
-    selectedBoltPattern !== null || selectedCenterBore !== null || selectedCompatibility !== null || inStockOnly
-
-  // Функция для получения статуса наличия
-  const getStockStatus = (
-    stock: number,
-  ): { type: StockStatusType; tooltip: string; className: string; icon: React.ReactNode } => {
-    if (stock > 10) {
-      return {
-        type: "today",
-        tooltip: "Сегодня",
-        className: "text-green-500",
-        icon: <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />,
-      }
-    } else if (stock > 0) {
-      return {
-        type: "oneday",
-        tooltip: "Доставка 1-2 дня",
-        className: "text-blue-500",
-        icon: <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />,
-      }
-    } else {
-      return {
-        type: "moredays",
-        tooltip: "Доставка 3 и более дня",
-        className: "text-orange-500",
-        icon: <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />,
-      }
+  // Function to highlight handle
+  const highlightHandle = () => {
+    setIsHandleHighlighted(true)
+    if (handleHighlightTimeout.current) {
+      clearTimeout(handleHighlightTimeout.current)
     }
+    handleHighlightTimeout.current = setTimeout(() => {
+      setIsHandleHighlighted(false)
+    }, 1000)
   }
 
-  // Функция для добавления в избранное
   const toggleFavorite = (e: React.MouseEvent, id: number) => {
     e.preventDefault()
     e.stopPropagation()
-
-    const newFavorites = [...favorites]
-    const index = newFavorites.indexOf(id)
-
-    if (index >= 0) {
-      newFavorites.splice(index, 1)
-    } else {
-      newFavorites.push(id)
-    }
-
+    const newFavorites = favorites.includes(id)
+      ? favorites.filter(f => f !== id)
+      : [...favorites, id]
     setFavorites(newFavorites)
     localStorage.setItem("dokatki_favorites", JSON.stringify(newFavorites))
   }
 
-  // Функция для добавления в корзину
-  const addToCart = (e: React.MouseEvent, item: any) => {
+  const addToCart = (e: React.MouseEvent, item: Dokatka) => {
     e.preventDefault()
     e.stopPropagation()
 
-    const newCartCounts = { ...cartCounts }
-    newCartCounts[item.id] = (newCartCounts[item.id] || 0) + 1
-    setCartCounts(newCartCounts)
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]")
+    const existingIndex = cart.findIndex((c: any) => c.id === item.id && c.type === "dokatka")
 
-    // Обновляем localStorage
-    const cart = JSON.parse(localStorage.getItem("dokatki_cart") || "[]")
-    const existingItemIndex = cart.findIndex((cartItem: any) => cartItem.id === item.id)
-
-    if (existingItemIndex >= 0) {
-      cart[existingItemIndex].quantity = (cart[existingItemIndex].quantity || 1) + 1
+    if (existingIndex >= 0) {
+      cart[existingIndex].quantity = (cart[existingIndex].quantity || 1) + 1
     } else {
-      cart.push({ ...item, quantity: 1 })
+      cart.push({ ...item, quantity: 1, type: "dokatka" })
     }
 
-    localStorage.setItem("dokatki_cart", JSON.stringify(cart))
+    localStorage.setItem("cart", JSON.stringify(cart))
 
-    // Отправляем событие для обновления других компонентов
+    // Update local state
+    const newCartCounts = { ...cartCounts, [item.id]: (cartCounts[item.id] || 0) + 1 }
+    setCartCounts(newCartCounts)
+
+    // Dispatch events
     window.dispatchEvent(new Event("cartUpdated"))
+    window.dispatchEvent(new CustomEvent("cartItemAdded", {
+      detail: {
+        totalItems: cart.reduce((total: number, i: any) => total + (i.quantity || 1), 0),
+      },
+    }))
   }
 
-  // Функция для уменьшения количества в корзине
   const removeFromCart = (e: React.MouseEvent, id: number) => {
     e.preventDefault()
     e.stopPropagation()
 
     if (!cartCounts[id]) return
 
-    const newCartCounts = { ...cartCounts }
-    newCartCounts[id] = Math.max(0, (newCartCounts[id] || 0) - 1)
-    setCartCounts(newCartCounts)
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]")
+    const existingIndex = cart.findIndex((item: any) => item.id === id && item.type === "dokatka")
 
-    // Обновляем localStorage
-    const cart = JSON.parse(localStorage.getItem("dokatki_cart") || "[]")
-    const existingItemIndex = cart.findIndex((item: any) => item.id === id)
-
-    if (existingItemIndex >= 0) {
-      cart[existingItemIndex].quantity = Math.max(0, (cart[existingItemIndex].quantity || 1) - 1)
-
-      if (cart[existingItemIndex].quantity === 0) {
-        cart.splice(existingItemIndex, 1)
+    if (existingIndex >= 0) {
+      cart[existingIndex].quantity = Math.max(0, (cart[existingIndex].quantity || 1) - 1)
+      if (cart[existingIndex].quantity === 0) {
+        cart.splice(existingIndex, 1)
       }
     }
 
-    localStorage.setItem("dokatki_cart", JSON.stringify(cart))
+    localStorage.setItem("cart", JSON.stringify(cart))
 
-    // Отправляем событие для обновления других компонентов
-    window.dispatchEvent(new Event("cartUpdated"))
-  }
+    // Update local state
+    const newCartCounts = { ...cartCounts, [id]: Math.max(0, (cartCounts[id] || 0) - 1) }
+    setCartCounts(newCartCounts)
 
-  // Функция для перехода в корзину
-  const handleCartClick = () => {
-    setIsAnimating(true)
-    setTimeout(() => {
-      setIsAnimating(false)
-      router.push("/order") // Переход на страницу корзины
-    }, 300)
-  }
-
-  // Функция для очистки корзины
-  const handleClearCart = () => {
-    // Clear the cart in localStorage
-    localStorage.setItem("dokatki_cart", "[]")
-    // Update cart count
-    setItemCount(0)
-    setCartCounts({})
-    // Dispatch event to notify other components
+    // Dispatch event
     window.dispatchEvent(new Event("cartUpdated"))
   }
 
   return (
-    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <style jsx global>
-        {`
-          /* Cart button animation */
-          @keyframes cartButtonAnimation {
-            0% {
-              transform: scale(1);
-              background-color: rgba(215, 224, 88, 0.1);
-            }
-            25% {
-              transform: scale(1.05);
-              background-color: rgba(215, 224, 88, 0.3);
-            }
-            50% {
-              transform: scale(1);
-              background-color: rgba(215, 224, 88, 0.2);
-            }
-            75% {
-              transform: scale(1.05);
-              background-color: rgba(215, 224, 88, 0.3);
-            }
-            100% {
-              transform: scale(1);
-              background-color: rgba(215, 224, 88, 0.1);
-            }
-          }
-          
-          @keyframes borderFlash {
-            0% {
-              border-color: rgba(215, 224, 88, 0.5);
-            }
-            50% {
-              border-color: rgba(215, 224, 88, 1);
-            }
-            100% {
-              border-color: rgba(215, 224, 88, 0.5);
-            }
-          }
-          
-          .cart-button-animated {
-            animation: cartButtonAnimation 3s ease-in-out infinite, borderFlash 3s ease-in-out infinite;
-            position: relative;
-            overflow: hidden;
-          }
-          
-          .cart-button-animated::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
-            transform: rotate(0deg);
-            animation: rotateGradient 8s linear infinite;
-            z-index: 0;
-            pointer-events: none;
-          }
-          
-          @keyframes rotateGradient {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
-              transform: rotate(360deg);
-            }
-          }
-          
-          /* Cart indicator container animation */
-          @keyframes containerBorderPulse {
-            0% {
-              box-shadow: 0 0 0 1px rgba(215, 224, 88, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
-            }
-            50% {
-              box-shadow: 0 0 0 2px rgba(215, 224, 88, 0.3), 0 4px 15px rgba(0, 0, 0, 0.2);
-            }
-            100% {
-              box-shadow: 0 0 0 1px rgba(215, 224, 88, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
-            }
-          }
+    <main className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212] pt-[60px]">
+      <style jsx global>{`
+        /* Dynamic Island style header */
+        .island-container {
+          position: fixed;
+          left: 50%;
+          top: 30px;
+          transform: translateX(-50%) translateY(-50%);
+          height: 34px;
+          z-index: 51;
+          -webkit-tap-highlight-color: transparent;
+        }
 
-          .cart-container-animated {
-            animation: containerBorderPulse 4s ease-in-out infinite;
-          }
-          
-          /* Basket icon animation */
-          @keyframes basketBounce {
-            0%, 100% {
-              transform: translateY(0);
-            }
-            50% {
-              transform: translateY(-5px);
-            }
-          }
-          
-          .basket-icon-animated {
-            animation: basketBounce 2s ease-in-out infinite;
-          }
-        `}
-      </style>
+        .island-highlight {
+          background: #c4d402;
+          border-radius: 50px;
+          z-index: 2;
+          height: 34px;
+          width: 160px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
 
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-[#1F1F1F] shadow-sm h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]">
-        <div className="h-full px-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="text-[#1F1F1F] dark:text-white">
-              <ChevronLeft className="h-6 w-6" />
-            </Link>
-            <h1 className="text-xl font-bold text-[#1F1F1F] dark:text-white">Докатки</h1>
+        .island-text {
+          color: #1F1F1F;
+          font-size: 14px;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+      `}</style>
+
+      <header
+        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F1F1F] shadow-sm flex flex-col items-center h-[calc(60px+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] overflow-visible"
+        style={{ "--header-height": "60px" } as React.CSSProperties}
+      >
+        <div className="container max-w-md flex items-center justify-center h-full relative overflow-visible">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 z-50">
+            <BackButton />
           </div>
 
-          {/* Cart button */}
-          <CartButton className="fixed right-0 top-2 z-50" />
+          {/* Dynamic Island style title */}
+          <div className="island-container">
+            <div className="island-highlight">
+              <span className="island-text">Докатки</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Global cart button - outside container */}
+        <div style={{ position: "fixed", right: "16px", top: "30px", transform: "translateY(-50%)", zIndex: 100 }}>
+          <CartButton />
         </div>
       </header>
 
-      <div className="flex-1 px-4 pt-20 pb-36">
-        {/* Результаты в стиле карточек шин */}
-        <div className="space-y-4">
-          {filteredDokatki.map((item) => {
-            const stockStatus = getStockStatus(item.stock)
-            return (
-              <div key={item.id} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
-                {/* Левая часть - Изображение */}
-                <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[123px] sm:w-[161px] md:w-[197px] lg:w-[222px] overflow-hidden flex items-center justify-center bg-white rounded-l-xl" style={{ maxHeight: "209px" }}>
-                  <div className="w-full h-full relative flex items-center justify-center">
-                    <Image
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.title}
-                      fill
-                      className="object-contain hover:opacity-90 transition-opacity rounded-lg"
-                      style={{
-                        filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
-                      }}
-                    />
-                  </div>
-                </div>
+      <div className="flex-1 px-4 pt-4 pb-64">
+        {/* Dokatki grid */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#009CFF]"></div>
+          </div>
+        ) : filteredDokatki.length > 0 ? (
+          <div className="space-y-4 pb-32">
+            {filteredDokatki.map((dokatka) => {
+              // Определяем статус доставки на основе количества
+              const getStockStatus = () => {
+                if (dokatka.quantity > 10) {
+                  return {
+                    tooltip: "Сегодня",
+                    className: "text-green-500",
+                    icon: <CheckCircle className="h-[13.2px] w-[13.2px] sm:h-[17.6px] sm:w-[17.6px] md:h-[19.8px] md:w-[19.8px] text-green-500" />
+                  }
+                } else if (dokatka.quantity > 0) {
+                  return {
+                    tooltip: "1-2 дня",
+                    className: "text-blue-500",
+                    icon: <Clock className="h-[13.2px] w-[13.2px] sm:h-[17.6px] sm:w-[17.6px] md:h-[19.8px] md:w-[19.8px] text-blue-500" />
+                  }
+                } else {
+                  return {
+                    tooltip: "3+ дня",
+                    className: "text-orange-500",
+                    icon: <Calendar className="h-[13.2px] w-[13.2px] sm:h-[17.6px] sm:w-[17.6px] md:h-[19.8px] md:w-[19.8px] text-orange-500" />
+                  }
+                }
+              }
 
-                {/* Правая часть - Контент */}
-                <div className="p-2 sm:p-3 md:p-4 flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="mt-0.5 sm:mt-1 md:mt-2 flex items-center gap-1 sm:gap-2 md:gap-3 flex-wrap">
-                      <span className="text-[10px] xs:text-xs sm:text-sm md:text-base font-medium px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 md:py-1.5 bg-gray-100 dark:bg-[#3A3A3A] rounded text-[#1F1F1F] dark:text-white">
-                        {item.boltPattern} | ЦО {item.centerBore}
-                      </span>
-                      <span className="flex-grow"></span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ml-auto sm:ml-0"
-                        onClick={(e) => toggleFavorite(e, item.id)}
-                        aria-label={favorites.includes(item.id) ? "Удалить из избранного" : "Добавить в избранное"}
-                      >
-                        <Heart
-                          className={`h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 transition-colors ${
-                            favorites.includes(item.id)
-                              ? "text-red-500 fill-red-500"
-                              : "text-gray-400 hover:text-red-500"
-                          }`}
-                        />
-                      </Button>
-                    </div>
+              const stockStatus = getStockStatus()
 
-                    <Link href={`/product/${item.id}`}>
-                      <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-xs sm:text-sm md:text-base lg:text-lg">
-                        {item.title}
-                      </h3>
-                    </Link>
-
-                    {/* Новые параметры */}
-                    <div className="mt-1 space-y-1">
-                      <div className="flex items-center gap-1">
-                        <span className="text-[10px] xs:text-xs text-gray-500 dark:text-gray-400">Совместимость:</span>
-                        <span className="text-[10px] xs:text-xs text-[#1F1F1F] dark:text-white line-clamp-1">
-                          {item.compatibility}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-[10px] xs:text-xs text-gray-500 dark:text-gray-400">Код запчасти:</span>
-                        <span className="text-[10px] xs:text-xs text-[#1F1F1F] dark:text-white font-mono">
-                          {item.partCode}
-                        </span>
-                      </div>
+              return (
+                <div key={dokatka.id} className="bg-white dark:bg-[#2A2A2A] rounded-xl overflow-hidden shadow-sm flex">
+                  {/* Image */}
+                  <div className="relative p-2 sm:p-3 md:p-4 flex-shrink-0 w-[145px] sm:w-[190px] md:w-[234px] lg:w-[263px] overflow-hidden flex items-center justify-center bg-white rounded-l-xl">
+                    <div className="w-full h-full relative">
+                      <Image
+                        src="/images/dokatka.png"
+                        alt={dokatka.title}
+                        fill
+                        className="object-contain"
+                      />
                     </div>
                   </div>
 
-                  <div className="mt-0.5 sm:mt-1 flex flex-col relative pb-7 sm:pb-8 md:pb-10">
-                    <div className="flex items-center justify-between w-full mb-1">
-                      <div>
-                        {/* Статус наличия */}
-                        <div className="flex items-center gap-1">
-                          <span className="flex items-center justify-center">{stockStatus.icon}</span>
-                          <span
-                            className={`text-xs sm:text-sm md:text-base lg:text-lg font-medium ${stockStatus.className}`}
-                          >
+                  {/* Content */}
+                  <div className="p-[11px] sm:p-[15.4px] md:p-[22px] flex-1 flex flex-col justify-between gap-[11px] sm:gap-[15.4px]">
+                    <div className="flex flex-col gap-[8.8px]">
+                      <div className="flex items-center gap-[4.4px] sm:gap-[8.8px] md:gap-[13.2px] flex-wrap">
+                        {/* Срок доставки */}
+                        <div className="flex items-center gap-[4.4px] sm:gap-[6.6px] px-[6.6px] sm:px-[8.8px] md:px-[11px] py-[4.4px] bg-gray-100 dark:bg-[#3A3A3A] rounded-full">
+                          <span className="flex items-center justify-center">
+                            {stockStatus.icon}
+                          </span>
+                          <span className={`text-[9px] sm:text-[11px] md:text-[13px] font-medium whitespace-nowrap ${stockStatus.className}`}>
                             {stockStatus.tooltip}
                           </span>
                         </div>
-                      </div>
-                      <div className="flex flex-col items-end">
-                        {item.stock > 0 ? (
-                          <>
-                            <span
-                              className={`text-base sm:text-xl md:text-2xl lg:text-3xl font-medium opacity-80 ${
-                                item.stock > 10
-                                  ? "text-green-500"
-                                  : item.stock > 5
-                                    ? "text-yellow-500"
-                                    : "text-orange-500"
-                              }`}
-                            >
-                              {item.stock} шт
-                            </span>
-                            <span className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 dark:text-gray-400">
-                              Количество:
-                            </span>
-                          </>
-                        ) : (
-                          <span className="text-base sm:text-xl font-medium opacity-80 text-red-500">
-                            Нет в наличии
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center mt-2 sm:mt-0 px-0">
-                      <div>
-                        <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 dark:text-gray-400 line-through">
-                          {formatPrice(item.rrc)}
-                        </p>
-                        <p
-                          className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-[#1F1F1F] dark:text-white relative"
-                          style={{
-                            textShadow:
-                              "1px 1px 0 rgba(0,0,0,0.1), 2px 2px 0 rgba(0,0,0,0.05), 3px 3px 5px rgba(0,0,0,0.1)",
-                            transform: "translateZ(0)",
-                            perspective: "1000px",
-                            transition: "transform 0.3s ease",
-                          }}
-                        >
-                          {formatPrice(item.price)}
-                        </p>
-                      </div>
-                      <div className="flex items-center flex-1 justify-end ml-2">
-                        {/* Кнопки корзины */}
-                        <div className="flex h-7 sm:h-8 md:h-9 rounded-lg overflow-hidden w-full max-w-[140px] sm:max-w-[160px] md:max-w-[180px]">
-                          {/* Кнопка минус */}
-                          <button
-                            onClick={(e) => removeFromCart(e, item.id)}
-                            disabled={!cartCounts[item.id] || item.stock <= 0}
-                            className="bg-gray-500/90 hover:bg-gray-600 text-white h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            aria-label="Уменьшить количество"
-                          >
-                            <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                          </button>
 
-                          {/* Счетчик количества */}
-                          <div className="bg-black/85 text-white h-full flex-1 flex items-center justify-center min-w-[2rem] sm:min-w-[2.5rem] md:min-w-[3rem]">
-                            <span className="text-xs sm:text-sm md:text-base font-medium">
-                              {cartCounts[item.id] || 0}
-                            </span>
+                        <span className="flex-grow"></span>
+
+                        {/* Flag - China for all dokatki */}
+                        <div className="flex items-center gap-1.5">
+                          <div className="relative w-[18px] h-[13px] sm:w-[23px] sm:h-[16px]">
+                            <Image
+                              src="https://flagcdn.com/cn.svg"
+                              alt="Китай"
+                              width={23}
+                              height={16}
+                              className="rounded-sm w-[18px] h-[13px] sm:w-[23px] sm:h-[16px] border border-gray-200"
+                            />
                           </div>
-
-                          {/* Кнопка плюс */}
-                          <button
-                            onClick={(e) => addToCart(e, item)}
-                            disabled={item.stock <= 0}
-                            className="bg-[#c4d402]/90 hover:bg-[#C4CF2E] text-black h-full flex-1 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            aria-label="Увеличить количество"
-                          >
-                            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                          </button>
                         </div>
+
+                        {/* Favorite button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 p-0"
+                          onClick={(e) => toggleFavorite(e, dokatka.id)}
+                          aria-label={favorites.includes(dokatka.id) ? "Удалить из избранного" : "Добавить в избранное"}
+                        >
+                          <Heart
+                            className={`h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 transition-colors ${
+                              favorites.includes(dokatka.id)
+                                ? "text-blue-500 fill-blue-500"
+                                : "text-gray-400"
+                            }`}
+                          />
+                        </Button>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="font-medium text-[#1F1F1F] dark:text-white line-clamp-2 text-[14.3px] sm:text-[16.5px] md:text-[18.7px] lg:text-[22px] leading-tight">
+                        {dokatka.title}
+                      </h3>
+                    </div>
+
+                    {/* Price and cart section */}
+                    <div className="flex flex-col relative pb-8 sm:pb-9 md:pb-11 -mt-[10px]">
+                      <div className="flex items-center justify-end w-full mb-3 sm:mb-4">
+                        <div className="flex flex-row items-end gap-2">
+                          <p className="text-[16.5px] sm:text-[18.7px] md:text-[23.1px] font-bold text-[#1F1F1F] dark:text-white">
+                            {formatPrice(dokatka.price)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center">
+                        <div className="flex flex-col items-start">
+                          {(() => {
+                            const availableStock = dokatka.quantity - (cartCounts[dokatka.id] || 0)
+                            if (availableStock > 0) {
+                              return (
+                                <span
+                                  className={`h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[12px] sm:text-[14px] md:text-[16px] font-medium px-3 rounded-full ${
+                                    availableStock > 10 ? "bg-green-500/20 text-green-600 dark:text-green-400" :
+                                    availableStock > 5 ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" :
+                                    "bg-orange-500/20 text-orange-600 dark:text-orange-400"
+                                  }`}
+                                >
+                                  {availableStock > 20 ? ">20 шт" : `${availableStock} шт`}
+                                </span>
+                              )
+                            } else {
+                              return (
+                                <span className="h-[31px] sm:h-[34px] md:h-[40px] flex items-center text-[12px] sm:text-[14px] md:text-[16px] font-medium px-3 rounded-full bg-red-500/20 text-red-600 dark:text-red-400">
+                                  Нет в наличии
+                                </span>
+                              )
+                            }
+                          })()}
+                        </div>
+                        <CartQuantityButtons
+                          count={cartCounts[dokatka.id] || 0}
+                          maxStock={dokatka.quantity}
+                          onAdd={(e) => addToCart(e, dokatka)}
+                          onRemove={(e) => removeFromCart(e, dokatka.id)}
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )
-          })}
-        </div>
-
-        {filteredDokatki.length === 0 && (
-          <div className="bg-white dark:bg-[#2A2A2A] rounded-xl p-8 text-center mt-4">
-            <p className="text-[#1F1F1F] dark:text-white mb-4">По вашему запросу ничего не найдено</p>
-            <Button className="bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]" onClick={resetFilters}>
-              Сбросить фильтры
-            </Button>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-20 pb-32 text-gray-600 dark:text-gray-400">
+            <p className="text-lg font-medium mb-2">Ничего не найдено</p>
+            <p className="text-sm">Попробуйте изменить фильтры</p>
           </div>
         )}
       </div>
 
-      {/* Модальное окно фильтров */}
-      {isFilterOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center p-0">
-          <div className="bg-white dark:bg-[#2A2A2A] rounded-t-xl sm:rounded-xl w-full max-w-md max-h-[80vh] overflow-y-auto">
-            <div className="p-4 border-b dark:border-gray-700 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-[#1F1F1F] dark:text-white">Фильтры</h2>
-              <Button variant="ghost" size="icon" onClick={() => setIsFilterOpen(false)}>
-                <X className="h-5 w-5" />
-              </Button>
+      {/* Bottom filters */}
+      <div
+        className="px-4 pt-2 pb-8 fixed left-0 right-0 z-40 transition-all duration-300 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] bg-white dark:bg-[#2A2A2A] backdrop-blur-md"
+        style={{
+          bottom: '0',
+          transform: isFilterCollapsed ? 'translateY(calc(100% - 56px))' : 'translateY(0)',
+          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%)',
+          maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%)',
+          touchAction: isFilterCollapsed ? 'none' : 'pan-x pinch-zoom',
+          WebkitOverflowScrolling: 'touch',
+        }}
+        onTouchStart={(e) => {
+          if (isFilterCollapsed) {
+            e.preventDefault()
+            setTouchStartY(e.touches[0].clientY)
+            setTouchEndY(null)
+          }
+        }}
+        onTouchMove={(e) => {
+          if (isFilterCollapsed && touchStartY !== null) {
+            e.preventDefault()
+            setTouchEndY(e.touches[0].clientY)
+          }
+        }}
+        onTouchEnd={() => {
+          if (isFilterCollapsed && touchStartY !== null && touchEndY !== null) {
+            const diff = touchEndY - touchStartY
+            if (diff < -20) {
+              setIsFilterCollapsed(false)
+              highlightHandle()
+            }
+          }
+          setTouchStartY(null)
+          setTouchEndY(null)
+        }}
+      >
+        {/* Swipe handle */}
+        <div
+          className="flex items-center justify-center -mx-4 px-4 py-3"
+          style={{ touchAction: 'none' }}
+        >
+          <button
+            className="flex items-center justify-center cursor-pointer w-full group"
+            style={{ touchAction: 'none' }}
+            onClick={() => {
+              setIsFilterCollapsed(!isFilterCollapsed)
+              highlightHandle()
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault()
+              setHandleTouchStartY(e.touches[0].clientY)
+            }}
+            onTouchMove={(e) => {
+              e.preventDefault()
+              if (handleTouchStartY !== null) {
+                setTouchEndY(e.touches[0].clientY)
+              }
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault()
+              if (handleTouchStartY !== null) {
+                const endY = e.changedTouches[0].clientY
+                const diff = endY - handleTouchStartY
+                if (Math.abs(diff) > 20) {
+                  if (diff < 0) {
+                    if (isFilterCollapsed) {
+                      setIsFilterCollapsed(false)
+                      highlightHandle()
+                    }
+                  } else {
+                    if (!isFilterCollapsed) {
+                      setIsFilterCollapsed(true)
+                      highlightHandle()
+                    }
+                  }
+                }
+                setHandleTouchStartY(null)
+                setTouchEndY(null)
+              }
+            }}
+            aria-label={isFilterCollapsed ? "Нажмите для раскрытия фильтра" : "Нажмите для скрытия фильтра"}
+            aria-expanded={!isFilterCollapsed}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <div className={`w-16 h-1.5 rounded-full transition-colors duration-300 ${isHandleHighlighted ? 'bg-[#c4d402]' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+              {isFilterCollapsed && (
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="text-gray-400 dark:text-gray-500 animate-bounce"
+                >
+                  <path d="M18 15L12 9L6 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
             </div>
+          </button>
+        </div>
 
-            <div className="p-4 space-y-6">
-              {/* Фильтр по разболтовке */}
-              <div>
-                <h3 className="text-sm font-medium text-[#1F1F1F] dark:text-white mb-3">Разболтовка</h3>
-                <div className="grid grid-cols-3 gap-2">
-                  {boltPatterns.map((pattern) => (
-                    <button
-                      key={pattern}
-                      className={`py-2 px-3 text-sm rounded-lg border ${
-                        selectedBoltPattern === pattern
-                          ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
-                          : "bg-white dark:bg-[#333333] border-gray-200 dark:border-gray-700 text-[#1F1F1F] dark:text-white"
-                      }`}
-                      onClick={() => setSelectedBoltPattern(selectedBoltPattern === pattern ? null : pattern)}
-                    >
-                      {pattern}
-                    </button>
-                  ))}
+        {/* Filter content */}
+        <div className={`transition-all duration-300 ${isFilterCollapsed ? 'hidden' : 'block'}`}>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-end gap-3">
+              <div className="grid grid-cols-2 gap-3 flex-1">
+                <div>
+                  <Label htmlFor="pcd-filter" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                    PCD
+                  </Label>
+                  <Select value={selectedPCD} onValueChange={setSelectedPCD}>
+                    <SelectTrigger id="pcd-filter" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl text-center">
+                      <SelectValue placeholder="~" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availablePCD.map((pcd) => (
+                        <SelectItem key={pcd} value={pcd} className="pl-0 pr-0 justify-center [&_svg]:hidden [&>span]:flex [&>span]:w-full [&>span]:justify-center">
+                          {pcd}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="dia-filter" className="text-xs text-[#1F1F1F] dark:text-gray-300 mb-1 block text-center">
+                    DIA
+                  </Label>
+                  <Select value={selectedDIA} onValueChange={setSelectedDIA}>
+                    <SelectTrigger id="dia-filter" className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-300 dark:border-0 rounded-xl text-center">
+                      <SelectValue placeholder="~" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableDIA.map((dia) => (
+                        <SelectItem key={dia} value={dia} className="pl-0 pr-0 justify-center [&_svg]:hidden [&>span]:flex [&>span]:w-full [&>span]:justify-center">
+                          {dia} мм
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
-              <Separator />
-
-              {/* Фильтр по центральному отверстию */}
-              <div>
-                <h3 className="text-sm font-medium text-[#1F1F1F] dark:text-white mb-3">Центральное отверстие</h3>
-                <div className="grid grid-cols-3 gap-2">
-                  {centerBores.map((bore) => (
-                    <button
-                      key={bore}
-                      className={`py-2 px-3 text-sm rounded-lg border ${
-                        selectedCenterBore === bore
-                          ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
-                          : "bg-white dark:bg-[#333333] border-gray-200 dark:border-gray-700 text-[#1F1F1F] dark:text-white"
-                      }`}
-                      onClick={() => setSelectedCenterBore(selectedCenterBore === bore ? null : bore)}
-                    >
-                      {bore}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Фильтр по совместимости */}
-              <div>
-                <h3 className="text-sm font-medium text-[#1F1F1F] dark:text-white mb-3">Совместимость</h3>
-                <div className="grid grid-cols-3 gap-2">
-                  {compatibilities.map((compatibility) => (
-                    <button
-                      key={compatibility}
-                      className={`py-2 px-3 text-sm rounded-lg border ${
-                        selectedCompatibility === compatibility
-                          ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F]"
-                          : "bg-white dark:bg-[#333333] border-gray-200 dark:border-gray-700 text-[#1F1F1F] dark:text-white"
-                      }`}
-                      onClick={() =>
-                        setSelectedCompatibility(selectedCompatibility === compatibility ? null : compatibility)
-                      }
-                    >
-                      {compatibility}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 border-t dark:border-gray-700 flex gap-3">
-              <Button variant="outline" className="flex-1 bg-transparent" onClick={resetFilters}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={resetFilters}
+                className={`h-10 px-3 text-xs border-0 rounded-xl transition-all duration-300 ${
+                  selectedPCD || selectedDIA
+                    ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 hover:scale-105 active:scale-95 shadow-md hover:shadow-red-500/30"
+                    : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                }`}
+                disabled={!selectedPCD && !selectedDIA}
+              >
                 Сбросить
               </Button>
-              <Button
-                className="flex-1 bg-[#c4d402] hover:bg-[#c4d402]/80 text-[#1F1F1F]"
-                onClick={() => setIsFilterOpen(false)}
-              >
-                Применить
-              </Button>
             </div>
           </div>
         </div>
-      )}
-
-      {/* Нижний фильтр докаток в стиле фильтра шин - всегда развернутый */}
-      <div
-        className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-[#2A2A2A] shadow-lg"
-        aria-label="Блок фильтра докаток"
-        data-testid="dokatki-filter-container"
-      >
-        {/* Основные фильтры */}
-        <div className="grid grid-cols-3 gap-3 p-4 relative">
-          <div>
-            <label htmlFor="bolt-pattern" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block">
-              Разболтовка
-            </label>
-            <select
-              id="bolt-pattern"
-              className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#333333] text-[#1F1F1F] dark:text-white"
-              value={selectedBoltPattern || ""}
-              onChange={(e) => setSelectedBoltPattern((e.target.value as BoltPattern) || null)}
-            >
-              <option value="">Все</option>
-              {boltPatterns.map((pattern) => (
-                <option key={pattern} value={pattern}>
-                  {pattern}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="center-bore" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block">
-              ЦО
-            </label>
-            <select
-              id="center-bore"
-              className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#333333] text-[#1F1F1F] dark:text-white"
-              value={selectedCenterBore || ""}
-              onChange={(e) => setSelectedCenterBore((e.target.value as CenterBore) || null)}
-            >
-              <option value="">Все</option>
-              {centerBores.map((bore) => (
-                <option key={bore} value={bore}>
-                  {bore}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="compatibility" className="text-sm text-[#1F1F1F] dark:text-gray-300 mb-1 block">
-              Совместимость
-            </label>
-            <select
-              id="compatibility"
-              className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#333333] text-[#1F1F1F] dark:text-white"
-              value={selectedCompatibility || ""}
-              onChange={(e) => setSelectedCompatibility((e.target.value as Compatibility) || null)}
-            >
-              <option value="">Все</option>
-              {compatibilities.map((compatibility) => (
-                <option key={compatibility} value={compatibility}>
-                  {compatibility}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Фильтр по наличию */}
-        <div className="px-4 pb-4">
-          <div className="flex items-center gap-3">
-            <h4 className="text-sm font-medium text-[#1F1F1F] dark:text-white">Только в наличии</h4>
-            <div
-              className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-200 ${
-                inStockOnly ? "bg-[#c4d402]" : "bg-gray-300 dark:bg-gray-600"
-              }`}
-              onClick={() => setInStockOnly(!inStockOnly)}
-            >
-              <div
-                className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform duration-200 ${
-                  inStockOnly ? "left-7" : "left-1"
-                }`}
-              ></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Кнопка сброса фильтров */}
-        <button
-          onClick={resetFilters}
-          disabled={!hasActiveFilters}
-          className="absolute bottom-4 right-4 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-[#1F1F1F] dark:text-white rounded-md px-2 py-1.5 text-sm flex items-center gap-1 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-gray-200 dark:disabled:hover:bg-gray-700"
-        >
-          <span>Сбросить</span>
-        </button>
       </div>
     </main>
   )

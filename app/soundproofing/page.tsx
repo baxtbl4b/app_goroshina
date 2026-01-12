@@ -151,8 +151,8 @@ export default function SoundproofingPage() {
   }, [showCalculation, isFormValid])
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
-      <SafeAreaHeader title="Шумоизоляция шин" showBackButton backUrl="/" className="bg-white dark:bg-[#1F1F1F]" />
+    <div className="flex flex-col min-h-screen bg-[#d9d9dd] dark:bg-[#1F1F1F]">
+      <SafeAreaHeader title="Шумоизоляция шин" showBackButton backUrl="/" className="bg-white" />
 
       <main className="flex-1 p-4 pb-4 space-y-6 pt-[calc(60px+env(safe-area-inset-top)+1rem)]">
         {/* Service Description */}
@@ -177,7 +177,7 @@ export default function SoundproofingPage() {
                 Ваш браузер не поддерживает воспроизведение видео.
               </video>
             </div>
-            <div className="space-y-3 text-sm text-[#1F1F1F] dark:text-gray-200">
+            <div className="space-y-3 text-sm text-[#1F1F1F] dark:text-white">
               <p>
                 Профессиональная шумоизоляция шин значительно снижает уровень дорожного шума и повышает комфорт
                 вождения.
@@ -216,8 +216,8 @@ export default function SoundproofingPage() {
           </CardHeader>
 
           {/* Price Note */}
-          <div className="bg-yellow-600 bg-opacity-20 border border-yellow-500 rounded-lg p-3 mb-4 mx-6">
-            <p className="text-sm text-yellow-200">
+          <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-3 mb-4 mx-6">
+            <p className="text-sm text-yellow-900">
               <strong>Примечание:</strong> В стоимость не включены шиномонтажные работы. Цена актуальна только при
               предоставлении снятых шин.
             </p>
@@ -247,7 +247,7 @@ export default function SoundproofingPage() {
                           <p className="font-medium text-[#1F1F1F] dark:text-white text-sm whitespace-nowrap">
                             {car.brand} {car.model} {car.year}
                           </p>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">{car.tireSize}</p>
+                          <p className="text-xs text-gray-600">{car.tireSize}</p>
                         </div>
                       </div>
                     )
@@ -341,7 +341,7 @@ export default function SoundproofingPage() {
                 <Button
                   onClick={handleCalculate}
                   disabled={!isFormValid}
-                  className="h-10 px-6 bg-[#c4d402] hover:bg-[#c4d402]/90 text-[#1F1F1F] font-semibold whitespace-nowrap"
+                  className="h-10 px-6 bg-[#c4d402] hover:bg-[#c4d402]/90 text-[#1F1F1F] dark:text-white font-semibold whitespace-nowrap"
                 >
                   Рассчитать стоимость
                 </Button>
@@ -353,7 +353,7 @@ export default function SoundproofingPage() {
               <div ref={calculationResultsRef} className="mt-6 p-4 bg-[#F5F5F5] dark:bg-[#333333] rounded-lg space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-[#1F1F1F] dark:text-white">Размер шины:</span>
-                  <Badge variant="secondary" className="bg-[#c4d402] text-[#1F1F1F]">
+                  <Badge variant="secondary" className="bg-[#c4d402] text-[#1F1F1F] dark:text-white">
                     {selectedWidth}/{selectedProfile} R{selectedDiameter}
                   </Badge>
                 </div>
@@ -381,7 +381,7 @@ export default function SoundproofingPage() {
                       <h4 className="font-semibold text-[#1F1F1F] dark:text-white">Услуги шиномонтажа:</h4>
                       {Object.entries(tireMountingServices.selectedServices || {}).map(([key, service]) => (
                         <div key={key} className="flex justify-between items-center text-sm">
-                          <span className="text-gray-600 dark:text-gray-300">{service.name}</span>
+                          <span className="text-gray-600">{service.name}</span>
                           <span className="text-[#1F1F1F] dark:text-white">
                             {service.quantity}x {service.price}₽ = {service.total}₽
                           </span>
@@ -404,7 +404,7 @@ export default function SoundproofingPage() {
                   </>
                 )}
 
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{getDescription()}</p>
+                <p className="text-xs text-gray-600 mt-2">{getDescription()}</p>
 
                 <div className="mt-4 space-y-2">
                   {!tireMountingServices ? (
@@ -432,7 +432,7 @@ export default function SoundproofingPage() {
                         <span className="text-sm">Добавить шиномонтаж</span>
                       </button>
                       <Link href="/soundproofing/booking" className="flex-1">
-                        <Button className="w-full h-full bg-[#c4d402] hover:bg-[#c4d402]/90 text-[#1F1F1F]">
+                        <Button className="w-full h-full bg-[#c4d402] hover:bg-[#c4d402]/90 text-[#1F1F1F] dark:text-white">
                           <span className="sm:hidden">Записаться</span>
                           <span className="hidden sm:block">Записаться на шумоизоляцию</span>
                         </Button>
@@ -470,15 +470,15 @@ export default function SoundproofingPage() {
               <div className="grid grid-cols-1 gap-4 text-sm">
                 <div className="p-3 bg-[#F5F5F5] dark:bg-[#333333] rounded-lg">
                   <h4 className="font-medium text-[#c4d402] mb-1">Время выполнения</h4>
-                  <p className="text-[#1F1F1F] dark:text-gray-200">30 мин - 1 час только по записи</p>
+                  <p className="text-[#1F1F1F] dark:text-white">30 мин - 1 час только по записи</p>
                 </div>
                 <div className="p-3 bg-[#F5F5F5] dark:bg-[#333333] rounded-lg">
                   <h4 className="font-medium text-[#c4d402] mb-1">Гарантия</h4>
-                  <p className="text-[#1F1F1F] dark:text-gray-200">12 месяцев на материалы и работу</p>
+                  <p className="text-[#1F1F1F] dark:text-white">12 месяцев на материалы и работу</p>
                 </div>
                 <div className="p-3 bg-[#F5F5F5] dark:bg-[#333333] rounded-lg">
                   <h4 className="font-medium text-[#c4d402] mb-1">Материалы</h4>
-                  <p className="text-[#1F1F1F] dark:text-gray-200">Высококачественная звукоизоляция премиум класса</p>
+                  <p className="text-[#1F1F1F] dark:text-white">Высококачественная звукоизоляция премиум класса</p>
                 </div>
               </div>
             </div>

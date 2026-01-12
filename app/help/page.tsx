@@ -105,23 +105,23 @@ export default function HelpPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#121212]">
+    <div className="min-h-screen bg-[#D9D9DD] dark:bg-[#121212]">
       <SafeAreaHeader title="Помощь" showBackButton={true} />
 
       <main className="pt-[82px]">
         <div className="max-w-4xl mx-auto p-4 space-y-6">
           {/* Welcome Section */}
-          <Card className="bg-gradient-to-r from-[#009CFF] to-[#0080D6] text-white border-0">
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
-                <HelpCircle className="h-6 w-6" />
+          <div className="bg-gradient-to-r from-[#009CFF] to-[#0080D6] rounded-lg shadow-sm p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <HelpCircle className="h-6 w-6 text-white" />
+              <h1 className="text-xl font-semibold text-white">
                 Добро пожаловать в справку Горошина!
-              </CardTitle>
-              <CardDescription className="text-blue-100">
-                Здесь вы найдете ответы на часто задаваемые вопросы и подробные инструкции по использованию приложения.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+              </h1>
+            </div>
+            <p className="text-white/90 text-sm">
+              Здесь вы найдете ответы на часто задаваемые вопросы и подробные инструкции по использованию приложения.
+            </p>
+          </div>
 
           {/* Quick Actions */}
           <div>
