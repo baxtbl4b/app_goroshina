@@ -106,12 +106,12 @@ export default function TireStoragePage() {
           disabled={isPast}
           className={`h-10 w-full rounded-md text-sm font-medium transition-all ${
             isSelected
-              ? "bg-[#c4d402] text-[#1F1F1F]"
+              ? "bg-[#c4d402] text-[#1F1F1F] dark:text-white"
               : isTodayDate
                 ? "bg-blue-100 text-blue-600"
                 : isPast
                   ? "text-gray-400 cursor-not-allowed"
-                  : "hover:bg-gray-100 text-[#1F1F1F]"
+                  : "hover:bg-gray-100 text-[#1F1F1F] dark:text-white"
           }`}
         >
           {day}
@@ -140,8 +140,8 @@ export default function TireStoragePage() {
   const weekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#d9d9dd]">
-      <SafeAreaHeader title="Хранение шин" showBackButton backUrl="/" className="bg-white" />
+    <div className="flex flex-col min-h-screen bg-[#d9d9dd] dark:bg-[#1F1F1F]">
+      <SafeAreaHeader title="Хранение шин" showBackButton backUrl="/" className="bg-white dark:bg-[#2A2A2A]" />
 
       <main className="flex-1 p-4 space-y-6 pb-24 pt-[calc(60px+env(safe-area-inset-top)+1rem)]">
         {/* Hero Section */}
@@ -156,14 +156,14 @@ export default function TireStoragePage() {
         </div>
 
         {/* Price Calculator */}
-        <Card className="bg-white border-none shadow-sm">
+        <Card className="bg-white dark:bg-[#2A2A2A] dark:bg-[#2A2A2A] border-none shadow-sm">
           <CardContent className="p-6">
-            <h2 className="text-xl font-bold text-[#1F1F1F] mb-4">Рассчитать стоимость</h2>
+            <h2 className="text-xl font-bold text-[#1F1F1F] dark:text-white mb-4">Рассчитать стоимость</h2>
 
             {/* Date Selection */}
-            <div className="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg">
+            <div className="space-y-4 mb-6 p-4 bg-gray-50 dark:bg-[#333333] rounded-lg">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1F1F1F]">Дата начала хранения</label>
+                <label className="text-sm font-medium text-[#1F1F1F] dark:text-white">Дата начала хранения</label>
                 <div className="flex gap-2 mb-3 justify-center">
                   <button
                     type="button"
@@ -175,8 +175,8 @@ export default function TireStoragePage() {
                     }}
                     className={`flex-1 px-3 py-2 text-sm rounded-md border transition-all duration-300 transform hover:scale-105 ${
                       selectedQuickDate === "today"
-                        ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F] shadow-lg"
-                        : "bg-[#F5F5F5] border-gray-300 text-[#1F1F1F] hover:border-[#c4d402] hover:shadow-md"
+                        ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F] dark:text-white shadow-lg"
+                        : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:shadow-md"
                     }`}
                   >
                     Сегодня
@@ -192,32 +192,32 @@ export default function TireStoragePage() {
                     }}
                     className={`flex-1 px-3 py-2 text-sm rounded-md border transition-all duration-300 transform hover:scale-105 ${
                       selectedQuickDate === "tomorrow"
-                        ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F] shadow-lg"
-                        : "bg-[#F5F5F5] border-gray-300 text-[#1F1F1F] hover:border-[#c4d402] hover:shadow-md"
+                        ? "bg-[#c4d402] border-[#c4d402] text-[#1F1F1F] dark:text-white shadow-lg"
+                        : "bg-[#F5F5F5] dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-[#1F1F1F] dark:text-white hover:border-[#c4d402] hover:shadow-md"
                     }`}
                   >
                     Завтра
                   </button>
                 </div>
-                <div className="w-full bg-[#F5F5F5] rounded-lg p-4">
+                <div className="w-full bg-[#F5F5F5] dark:bg-[#333333] rounded-lg p-4">
                   {/* Заголовок календаря */}
                   <div className="flex items-center justify-between mb-4">
                     <button
                       type="button"
                       onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                      className="p-2 hover:bg-gray-200 rounded-md"
+                      className="p-2 hover:bg-gray-200 dark:hover:bg-[#3A3A3A] dark:bg-[#333333] rounded-md"
                     >
-                      <ChevronLeft className="h-4 w-4 text-[#1F1F1F]" />
+                      <ChevronLeft className="h-4 w-4 text-[#1F1F1F] dark:text-white" />
                     </button>
-                    <h3 className="text-lg font-semibold text-[#1F1F1F]">
+                    <h3 className="text-lg font-semibold text-[#1F1F1F] dark:text-white">
                       {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
                     </h3>
                     <button
                       type="button"
                       onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                      className="p-2 hover:bg-gray-200 rounded-md"
+                      className="p-2 hover:bg-gray-200 dark:hover:bg-[#3A3A3A] dark:bg-[#333333] rounded-md"
                     >
-                      <ChevronRight className="h-4 w-4 text-[#1F1F1F]" />
+                      <ChevronRight className="h-4 w-4 text-[#1F1F1F] dark:text-white" />
                     </button>
                   </div>
 
@@ -235,12 +235,12 @@ export default function TireStoragePage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1F1F1F]">ата окончания хранения</label>
+                <label className="text-sm font-medium text-[#1F1F1F] dark:text-white">ата окончания хранения</label>
                 <input
                   type="date"
                   value={calculateEndDate(startDate, months)}
                   readOnly
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-[#1F1F1F] cursor-not-allowed"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 text-[#1F1F1F] dark:text-white cursor-not-allowed"
                 />
               </div>
             </div>
@@ -249,11 +249,11 @@ export default function TireStoragePage() {
               {/* Months Slider */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <label className="text-sm font-medium text-[#1F1F1F]">
+                  <label className="text-sm font-medium text-[#1F1F1F] dark:text-white">
                     Срок хранения: <span className="font-bold">{months} мес.</span>
                   </label>
                   <div className="text-right">
-                    <span className="text-sm font-medium text-[#1F1F1F]">{pricePerMonth} ₽/мес</span>
+                    <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">{pricePerMonth} ₽/мес</span>
                     <p className="text-xs text-gray-500">цена за одно колесо</p>
                   </div>
                 </div>
@@ -263,12 +263,12 @@ export default function TireStoragePage() {
                     size="icon"
                     onClick={() => setMonths(Math.max(1, months - 1))}
                     disabled={months <= 1}
-                    className="h-10 w-10 rounded-full border-gray-300"
+                    className="h-10 w-10 rounded-full border-gray-300 dark:border-gray-600"
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
                   <div className="mx-4 w-20">
-                    <span className="w-full text-center text-xl font-bold text-[#1F1F1F] block">
+                    <span className="w-full text-center text-xl font-bold text-[#1F1F1F] dark:text-white block">
                       {months}
                     </span>
                   </div>
@@ -277,7 +277,7 @@ export default function TireStoragePage() {
                     size="icon"
                     onClick={() => setMonths(Math.min(12, months + 1))}
                     disabled={months >= 12}
-                    className="h-10 w-10 rounded-full border-gray-300"
+                    className="h-10 w-10 rounded-full border-gray-300 dark:border-gray-600"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -286,19 +286,19 @@ export default function TireStoragePage() {
 
               {/* Tire Count */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1F1F1F]">Количество шин</label>
+                <label className="text-sm font-medium text-[#1F1F1F] dark:text-white">Количество шин</label>
                 <div className="flex items-center justify-center">
                   <Button
                     variant="outline"
                     size="icon"
                     onClick={decrementTireCount}
                     disabled={tireCount <= 1}
-                    className="h-10 w-10 rounded-full border-gray-300 bg-transparent"
+                    className="h-10 w-10 rounded-full border-gray-300 dark:border-gray-600 bg-transparent"
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
                   <div className="mx-4 w-20">
-                    <span className="w-full text-center text-xl font-bold text-[#1F1F1F] block">
+                    <span className="w-full text-center text-xl font-bold text-[#1F1F1F] dark:text-white block">
                       {tireCount}
                     </span>
                   </div>
@@ -307,7 +307,7 @@ export default function TireStoragePage() {
                     size="icon"
                     onClick={incrementTireCount}
                     disabled={tireCount >= 20}
-                    className="h-10 w-10 rounded-full border-gray-300"
+                    className="h-10 w-10 rounded-full border-gray-300 dark:border-gray-600"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -315,17 +315,17 @@ export default function TireStoragePage() {
               </div>
 
               {/* Total Price */}
-              <div className="pt-4 border-t border-gray-200">
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-[#1F1F1F]">Итого:</span>
-                  <span className="text-xl font-bold text-[#1F1F1F]">{totalPrice} ₽</span>
+                  <span className="text-sm font-medium text-[#1F1F1F] dark:text-white">Итого:</span>
+                  <span className="text-xl font-bold text-[#1F1F1F] dark:text-white">{totalPrice} ₽</span>
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
                   {tireCount} шин × {months} мес × {pricePerMonth} ₽
                 </div>
               </div>
 
-              <Button className="w-full bg-[#c4d402] hover:bg-[#c4d402]/90 text-[#1F1F1F]" onClick={handleBookNow}>
+              <Button className="w-full bg-[#c4d402] hover:bg-[#c4d402]/90 text-[#1F1F1F] dark:text-white" onClick={handleBookNow}>
                 Забронировать
               </Button>
             </div>
@@ -334,31 +334,31 @@ export default function TireStoragePage() {
 
         {/* Service Info Tabs */}
         <Tabs defaultValue="about" className="w-full">
-          <TabsList className="w-full bg-gray-200 rounded-xl p-1">
+          <TabsList className="w-full bg-gray-200 dark:bg-[#333333] rounded-xl p-1">
             <TabsTrigger
               value="about"
-              className="rounded-lg text-gray-900 transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-gray-900"
+              className="rounded-lg text-gray-900 dark:text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-gray-900 dark:text-white"
             >
               О услуге
             </TabsTrigger>
             <TabsTrigger
               value="conditions"
-              className="rounded-lg text-gray-900 transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-gray-900"
+              className="rounded-lg text-gray-900 dark:text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-gray-900 dark:text-white"
             >
               Условия
             </TabsTrigger>
             <TabsTrigger
               value="faq"
-              className="rounded-lg text-gray-900 transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-gray-900"
+              className="rounded-lg text-gray-900 dark:text-white transition-all duration-300 ease-in-out data-[state=active]:bg-[#c4d402] data-[state=active]:text-gray-900 dark:text-white"
             >
               FAQ
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="about" className="mt-4">
-            <Card className="bg-white border-none shadow-sm">
+            <Card className="bg-white dark:bg-[#2A2A2A] dark:bg-[#2A2A2A] border-none shadow-sm">
               <CardContent className="p-6 space-y-4">
-                <h3 className="text-lg font-bold text-[#1F1F1F]">Профессиональное хранение шин</h3>
+                <h3 className="text-lg font-bold text-[#1F1F1F] dark:text-white">Профессиональное хранение шин</h3>
                 <p className="text-sm text-gray-700">
                   Мы предлагаем профессиональное хранение шин в специализированном помещении с контролируемой
                   температурой и влажностью. Это позволяет сохранить качество и продлить срок службы ваших шин.
@@ -368,7 +368,7 @@ export default function TireStoragePage() {
                   <div className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-[#c4d402] flex-shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="text-sm font-bold text-[#1F1F1F]">Контроль температуры</h4>
+                      <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Контроль температуры</h4>
                       <p className="text-xs text-gray-700">
                         Хранение при оптимальной температуре от +5°C до +25°C предотвращает старение резины.
                       </p>
@@ -378,7 +378,7 @@ export default function TireStoragePage() {
                   <div className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-[#c4d402] flex-shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="text-sm font-bold text-[#1F1F1F]">Контроль влажности</h4>
+                      <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Контроль влажности</h4>
                       <p className="text-xs text-gray-700">
                         Поддержание оптимального уровня влажности защищает шины от растрескивания и деформации.
                       </p>
@@ -388,7 +388,7 @@ export default function TireStoragePage() {
                   <div className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-[#c4d402] flex-shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="text-sm font-bold text-[#1F1F1F]">Защита от УФ-излучения</h4>
+                      <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Защита от УФ-излучения</h4>
                       <p className="text-xs text-gray-700">
                         Хранение в темном помещении защищает резину от вредного воздействия ультрафиолета.
                       </p>
@@ -398,7 +398,7 @@ export default function TireStoragePage() {
                   <div className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-[#c4d402] flex-shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="text-sm font-bold text-[#1F1F1F]">Экономия места</h4>
+                      <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Экономия места</h4>
                       <p className="text-xs text-gray-700">
                         Освободите место в гараже или на балконе, доверив хранение шин профессионалам.
                       </p>
@@ -410,9 +410,9 @@ export default function TireStoragePage() {
           </TabsContent>
 
           <TabsContent value="conditions" className="mt-4">
-            <Card className="bg-white border-none shadow-sm">
+            <Card className="bg-white dark:bg-[#2A2A2A] dark:bg-[#2A2A2A] border-none shadow-sm">
               <CardContent className="p-6 space-y-4">
-                <h3 className="text-lg font-bold text-[#1F1F1F]">Условия хранения</h3>
+                <h3 className="text-lg font-bold text-[#1F1F1F] dark:text-white">Условия хранения</h3>
 
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -420,7 +420,7 @@ export default function TireStoragePage() {
                       <CalendarDays className="h-5 w-5 text-[#c4d402]" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-[#1F1F1F]">Минимальный срок</h4>
+                      <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Минимальный срок</h4>
                       <p className="text-xs text-gray-700">Минимальный срок хранения — 1 месяц</p>
                     </div>
                   </div>
@@ -430,7 +430,7 @@ export default function TireStoragePage() {
                       <Info className="h-5 w-5 text-[#c4d402]" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-[#1F1F1F]">Состояние шин</h4>
+                      <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Состояние шин</h4>
                       <p className="text-xs text-gray-700">
                         Шины должны быть чистыми и сухими. Мы предлагаем услугу мойки шин перед хранением.
                       </p>
@@ -442,7 +442,7 @@ export default function TireStoragePage() {
                       <Info className="h-5 w-5 text-[#c4d402]" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-[#1F1F1F]">Маркировка</h4>
+                      <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Маркировка</h4>
                       <p className="text-xs text-gray-700">
                         Каждый комплект шин маркируется и заносится в базу данных для быстрого поиска.
                       </p>
@@ -454,7 +454,7 @@ export default function TireStoragePage() {
                       <Info className="h-5 w-5 text-[#c4d402]" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-[#1F1F1F]">Доступ</h4>
+                      <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Доступ</h4>
                       <p className="text-xs text-gray-700">
                         Вы можете забрать свои шины в любое время в рабочие часы сервиса, предварительно уведомив нас за
                         24 часа.
@@ -467,13 +467,13 @@ export default function TireStoragePage() {
           </TabsContent>
 
           <TabsContent value="faq" className="mt-4">
-            <Card className="bg-white border-none shadow-sm">
+            <Card className="bg-white dark:bg-[#2A2A2A] dark:bg-[#2A2A2A] border-none shadow-sm">
               <CardContent className="p-6 space-y-4">
-                <h3 className="text-lg font-bold text-[#1F1F1F]">Часто задаваемые вопросы</h3>
+                <h3 className="text-lg font-bold text-[#1F1F1F] dark:text-white">Часто задаваемые вопросы</h3>
 
                 <div className="space-y-4">
                   <div className="space-y-1">
-                    <h4 className="text-sm font-bold text-[#1F1F1F]">
+                    <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">
                       Можно ли хранить шины на дисках?
                     </h4>
                     <p className="text-xs text-gray-700">
@@ -483,7 +483,7 @@ export default function TireStoragePage() {
                   </div>
 
                   <div className="space-y-1">
-                    <h4 className="text-sm font-bold text-[#1F1F1F]">
+                    <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">
                       Что если я захочу забрать шины раньше срока?
                     </h4>
                     <p className="text-xs text-gray-700">
@@ -492,7 +492,7 @@ export default function TireStoragePage() {
                   </div>
 
                   <div className="space-y-1">
-                    <h4 className="text-sm font-bold text-[#1F1F1F]">
+                    <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">
                       Можно ли продлить срок хранения?
                     </h4>
                     <p className="text-xs text-gray-700">
@@ -502,7 +502,7 @@ export default function TireStoragePage() {
                   </div>
 
                   <div className="space-y-1">
-                    <h4 className="text-sm font-bold text-[#1F1F1F]">Застрахованы ли мои шины?</h4>
+                    <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-white">Застрахованы ли мои шины?</h4>
                     <p className="text-xs text-gray-700">
                       Да, все шины, находящиеся на хранении, застрахованы от кражи, пожара и других непредвиденных
                       обстоятельств.

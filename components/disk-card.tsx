@@ -214,10 +214,13 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
   // Получаем изображение диска
   const getImageUrl = (): string => {
     if (imageError) {
-      return "/images/black-wheel.png"
+      return ""
     }
-    return disk.image || "/images/black-wheel.png"
+    return disk.image || ""
   }
+
+  // Проверяем, есть ли изображение
+  const hasImage = !imageError && disk.image && disk.image.trim() !== ""
 
   return (
     <div
@@ -231,43 +234,51 @@ const DiskCard = memo(function DiskCard({ disk }: DiskCardProps) {
             className="flex justify-center items-center h-full w-full relative overflow-hidden bg-transparent"
             style={{ zIndex: 1 }}
           >
-            <img
-              src={getImageUrl() || "/placeholder.svg"}
-              alt={disk.name || "Диск"}
-              className="w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                setImageModalOpen(true)
-              }}
-              onError={() => setImageError(true)}
-              style={{
-                filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
-                backgroundColor: "transparent",
-              }}
-            />
-          </div>
-
-        <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
-          <DialogContent
-            className="sm:max-w-[600px] flex items-center justify-center p-1 border-0 shadow-none bg-transparent"
-            style={{ zIndex: 50 }}
-            hideCloseButton={true}
-          >
-            <div className="relative w-full h-full max-h-[80vh] flex items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-[#2a2a2a] dark:to-[#1a1a1a] rounded-lg">
+            {hasImage ? (
               <img
-                src={getImageUrl() || "/placeholder.svg"}
+                src={getImageUrl()}
                 alt={disk.name || "Диск"}
-                className="object-contain max-h-[80vh]"
+                className="w-full h-full object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setImageModalOpen(true)
+                }}
                 onError={() => setImageError(true)}
                 style={{
                   filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
                   backgroundColor: "transparent",
                 }}
               />
-            </div>
-          </DialogContent>
-        </Dialog>
+            ) : (
+              <div className="flex items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 text-center px-4">
+                <span className="text-xs sm:text-sm">Изображение отсутствует</span>
+              </div>
+            )}
+          </div>
+
+        {hasImage && (
+          <Dialog open={imageModalOpen} onOpenChange={setImageModalOpen}>
+            <DialogContent
+              className="sm:max-w-[600px] flex items-center justify-center p-1 border-0 shadow-none bg-transparent"
+              style={{ zIndex: 50 }}
+              hideCloseButton={true}
+            >
+              <div className="relative w-full h-full max-h-[80vh] flex items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-[#2a2a2a] dark:to-[#1a1a1a] rounded-lg">
+                <img
+                  src={getImageUrl()}
+                  alt={disk.name || "Диск"}
+                  className="object-contain max-h-[80vh]"
+                  onError={() => setImageError(true)}
+                  style={{
+                    filter: "drop-shadow(0 0 1px rgba(0,0,0,0.1))",
+                    backgroundColor: "transparent",
+                  }}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {/* Правая часть - Контент */}

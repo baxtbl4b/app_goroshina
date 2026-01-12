@@ -29,6 +29,7 @@ export interface Disk {
   country_code?: string
   flag?: string | any
   description?: string
+  deliveryTime?: string
 }
 
 export interface Tire {

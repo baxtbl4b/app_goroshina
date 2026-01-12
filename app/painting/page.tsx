@@ -419,12 +419,12 @@ export default function PaintingPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#d9d9dd] text-gray-900">
+    <div className="flex flex-col min-h-screen bg-[#d9d9dd] dark:bg-[#1F1F1F] text-gray-900 dark:text-white">
       <SafeAreaHeader title="Покраска дисков" showBackButton backUrl="/" />
 
       <main className="flex-1 pt-[calc(60px+env(safe-area-inset-top)+1rem)]">
-        <div className="px-4 py-6 text-gray-900">
-          <div className="bg-white rounded-lg p-4 space-y-4 relative shadow-sm border border-gray-200">
+        <div className="px-4 py-6 text-gray-900 dark:text-white">
+          <div className="bg-white dark:bg-[#2A2A2A] rounded-lg p-4 space-y-4 relative shadow-sm border border-gray-200 dark:border-gray-700">
             <Image
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/car_base-zdUvBezNiqgwBsRzXwU0JLWsSHKeYq.png"
               alt="Luxury car with bronze wheels"
@@ -461,7 +461,7 @@ export default function PaintingPage() {
                           className={`text-xs px-2 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0 transition-colors ${
                             selectedCar === car.id
                               ? "bg-blue-500 border-blue-500 text-white"
-                              : "bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
+                              : "bg-white dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-[#3A3A3A]"
                           }`}
                         >
                           {car.displayName}
@@ -478,7 +478,7 @@ export default function PaintingPage() {
               <select
                 value={paintingType}
                 onChange={(e) => setPaintingType(e.target.value)}
-                className="w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 bg-white text-gray-900 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm border-2 border-[#c4d402]"
+                className="w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm border-2 border-[#c4d402]"
               >
                 <option value="powder">Порошковая покраска</option>
                 <option value="acrylic">Акриловая покраска</option>
@@ -643,7 +643,7 @@ export default function PaintingPage() {
                     type="text"
                     value={ralInput}
                     onChange={(e) => setRalInput(e.target.value)}
-                    className="bg-white text-gray-900 border border-gray-200 rounded px-2 py-1 text-sm w-20 border border-gray-300"
+                    className="bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-sm w-20 border border-gray-300 dark:border-gray-600"
                     placeholder="9005"
                   />
                   <button
@@ -672,7 +672,7 @@ export default function PaintingPage() {
                       className={`flex items-center gap-2 px-3 py-2 rounded text-sm border transition-all duration-300 cursor-pointer ${
                         selectedFinish === "matte"
                           ? "border-blue-500 border-2 bg-blue-500 bg-opacity-20"
-                          : "border-gray-300 hover:border-gray-500"
+                          : "border-gray-300 dark:border-gray-600 hover:border-gray-500"
                       }`}
                     >
                       <div
@@ -690,7 +690,7 @@ export default function PaintingPage() {
                           </svg>
                         )}
                       </div>
-                      <span className="text-gray-900">Матовый</span>
+                      <span className="text-gray-900 dark:text-white">Матовый</span>
                     </div>
 
                     <div
@@ -698,7 +698,7 @@ export default function PaintingPage() {
                       className={`flex items-center gap-2 px-3 py-2 rounded text-sm border transition-all duration-300 cursor-pointer ${
                         selectedFinish === "glossy"
                           ? "border-blue-500 border-2 bg-blue-500 bg-opacity-20"
-                          : "border-gray-300 hover:border-gray-500"
+                          : "border-gray-300 dark:border-gray-600 hover:border-gray-500"
                       }`}
                     >
                       <div
@@ -716,7 +716,7 @@ export default function PaintingPage() {
                           </svg>
                         )}
                       </div>
-                      <span className="text-gray-900">Глянцевый</span>
+                      <span className="text-gray-900 dark:text-white">Глянцевый</span>
                     </div>
                   </div>
                 </div>
@@ -728,7 +728,7 @@ export default function PaintingPage() {
                   <select
                     value={diameter}
                     onChange={(e) => setDiameter(e.target.value)}
-                    className={`w-1/2 bg-white text-gray-900 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 ${
+                    className={`w-1/2 bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 ${
                       !diameter ? "border-2 border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
                     }`}
                   >
@@ -756,13 +756,13 @@ export default function PaintingPage() {
                         className={`flex-1 rounded-lg px-3 py-2 relative transition-all duration-200 ease-in-out active:scale-95 hover:shadow-md ${
                           key === "disk-painting"
                             ? serviceQuantities[key] > 0
-                              ? "bg-white border-l-4 border-[#c4d402] shadow-lg text-center"
+                              ? "bg-white dark:bg-[#2A2A2A] border-l-4 border-[#c4d402] shadow-lg text-center"
                               : !diameter
-                                ? "bg-gray-100 text-gray-400 text-center"
-                                : "bg-gray-100 text-gray-900 cursor-pointer hover:bg-gray-200 hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 ease-in-out text-center"
+                                ? "bg-gray-100 dark:bg-[#333333] text-gray-400 text-center"
+                                : "bg-gray-100 dark:bg-[#333333] text-gray-900 dark:text-white cursor-pointer hover:bg-gray-200 dark:hover:bg-[#3A3A3A] hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 ease-in-out text-center"
                             : !diameter
-                              ? "bg-gray-100 text-gray-400"
-                              : "bg-gray-100 text-gray-900 cursor-pointer hover:bg-gray-200 active:bg-gray-300 border border-gray-200"
+                              ? "bg-gray-100 dark:bg-[#333333] text-gray-400"
+                              : "bg-gray-100 dark:bg-[#333333] text-gray-900 dark:text-white cursor-pointer hover:bg-gray-200 dark:hover:bg-[#3A3A3A] active:bg-gray-300 dark:active:bg-[#3A3A3A] border border-gray-200 dark:border-gray-700"
                         }`}
                         onClick={() => {
                           if (diameter) {
@@ -825,7 +825,7 @@ export default function PaintingPage() {
                             disabled={!diameter}
                             className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold transition-all duration-200 active:scale-90 ${
                               !diameter
-                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                ? "bg-gray-100 dark:bg-[#333333] text-gray-400 cursor-not-allowed"
                                 : "bg-[#c4d402] text-black hover:bg-[#c5d135] focus:outline-none focus:ring-2 focus:ring-blue-500"
                             }`}
                           >
@@ -839,8 +839,8 @@ export default function PaintingPage() {
                             disabled={!diameter}
                             className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold transition-all duration-200 active:scale-90 ${
                               !diameter
-                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                : "bg-gray-200 text-gray-900 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                ? "bg-gray-100 dark:bg-[#333333] text-gray-400 cursor-not-allowed"
+                                : "bg-gray-200 dark:bg-[#333333] text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-[#3A3A3A] focus:outline-none focus:ring-2 focus:ring-blue-500"
                             }`}
                           >
                             -
@@ -853,15 +853,15 @@ export default function PaintingPage() {
                             disabled={!diameter}
                             className={`w-10 h-10 rounded-lg flex items-center justify-center focus:outline-none transition-all duration-200 active:scale-90 ${
                               !diameter
-                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                : "bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-blue-500"
+                                ? "bg-gray-100 dark:bg-[#333333] text-gray-400 cursor-not-allowed"
+                                : "bg-gray-200 dark:bg-[#333333] text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-[#3A3A3A] focus:ring-2 focus:ring-blue-500"
                             }`}
                           >
                             -
                           </button>
                           <div
-                            className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-medium border border-gray-200 ${
-                              !diameter ? "bg-gray-100 text-gray-400" : "bg-gray-100 text-gray-900"
+                            className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-medium border border-gray-200 dark:border-gray-700 ${
+                              !diameter ? "bg-gray-100 dark:bg-[#333333] text-gray-400" : "bg-gray-100 dark:bg-[#333333] text-gray-900 dark:text-white"
                             }`}
                           >
                             {serviceQuantities[key] || 0}
@@ -871,7 +871,7 @@ export default function PaintingPage() {
                             disabled={!diameter}
                             className={`w-10 h-10 rounded-lg flex items-center justify-center focus:outline-none transition-all duration-200 active:scale-90 ${
                               !diameter
-                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                ? "bg-gray-100 dark:bg-[#333333] text-gray-400 cursor-not-allowed"
                                 : "bg-[#c4d402] text-black hover:bg-[#c5d135] focus:ring-2 focus:ring-blue-500"
                             }`}
                           >
@@ -884,7 +884,7 @@ export default function PaintingPage() {
                 </div>
 
                 <div className="pt-4 flex gap-4 items-stretch">
-                  <div className="w-1/2 bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                  <div className="w-1/2 bg-white dark:bg-[#2A2A2A] rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm">
                     <div className="mb-3">
                       <span className="text-sm font-medium text-gray-700">Выбранные услуги:</span>
                     </div>
@@ -949,10 +949,10 @@ export default function PaintingPage() {
                     <input
                       type="text"
                       placeholder="Введите промокод"
-                      className="w-full bg-white text-gray-900 border border-gray-200 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-300 text-center"
+                      className="w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-300 dark:border-gray-600 text-center"
                     />
                     <button
-                      className="w-full bg-gray-200 hover:bg-gray-300 text-gray-900 py-3 px-4 rounded-lg font-medium transition-colors"
+                      className="w-full bg-gray-200 dark:bg-[#333333] hover:bg-gray-300 dark:hover:bg-[#3A3A3A] text-gray-900 dark:text-white py-3 px-4 rounded-lg font-medium transition-colors"
                       onClick={() => {
                         alert("Показать полный прайс-лист")
                       }}
@@ -1016,10 +1016,10 @@ export default function PaintingPage() {
           </div>
         </div>
 
-        <div className="px-4 py-6 text-gray-900">
-          <h2 className="text-xl font-bold mb-4 text-gray-900">НАШИ РАБОТЫ</h2>
+        <div className="px-4 py-6 text-gray-900 dark:text-white">
+          <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">НАШИ РАБОТЫ</h2>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+            <div className="bg-white dark:bg-[#2A2A2A] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/F855ZUoDphU.jpg-ygI2SD9I1F0ouVZIEazZioYNNgkjjm.jpeg"
                 alt="Спортивный диск в сером цвете"
@@ -1028,12 +1028,12 @@ export default function PaintingPage() {
                 className="w-full h-32 object-cover"
               />
               <div className="p-3">
-                <h3 className="font-medium text-sm mb-1 text-gray-900">Спортивный Y-дизайн</h3>
+                <h3 className="font-medium text-sm mb-1 text-gray-900 dark:text-white">Спортивный Y-дизайн</h3>
                 <p className="text-xs text-gray-500">Порошковая покраска R19</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+            <div className="bg-white dark:bg-[#2A2A2A] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/j0wuq85R9nI.jpg-qlz3iJTQoP02X35AqLwzNzCi67qyOz.jpeg"
                 alt="Комплект черных дисков"
@@ -1042,12 +1042,12 @@ export default function PaintingPage() {
                 className="w-full h-32 object-cover"
               />
               <div className="p-3">
-                <h3 className="font-medium text-sm mb-1 text-gray-900">Матовый черный комплект</h3>
+                <h3 className="font-medium text-sm mb-1 text-gray-900 dark:text-white">Матовый черный комплект</h3>
                 <p className="text-xs text-gray-500">Порошковая покраска R18</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+            <div className="bg-white dark:bg-[#2A2A2A] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1U0Ef1hADPo.jpg-MCsDBnm66Cu7us63OcANm4cfncYQ4i.jpeg"
                 alt="Диски с полированной кромкой"
@@ -1056,12 +1056,12 @@ export default function PaintingPage() {
                 className="w-full h-32 object-cover"
               />
               <div className="p-3">
-                <h3 className="font-medium text-sm mb-1 text-gray-900">Черный глянец с полировкой</h3>
+                <h3 className="font-medium text-sm mb-1 text-gray-900 dark:text-white">Черный глянец с полировкой</h3>
                 <p className="text-xs text-gray-500">Комбинированная обработка R19</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+            <div className="bg-white dark:bg-[#2A2A2A] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/fnpdlVcg1g4.jpg-G0F4aNAx1eQsHQk59EViuSj0poBtrQ.jpeg"
                 alt="Диск BRABUS в матовом сером цвете"
@@ -1070,17 +1070,17 @@ export default function PaintingPage() {
                 className="w-full h-32 object-cover"
               />
               <div className="p-3">
-                <h3 className="font-medium text-sm mb-1 text-gray-900">BRABUS матовый серый</h3>
+                <h3 className="font-medium text-sm mb-1 text-gray-900 dark:text-white">BRABUS матовый серый</h3>
                 <p className="text-xs text-gray-500">Премиум покраска R20</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="px-4 py-6 text-gray-900">
+        <div className="px-4 py-6 text-gray-900 dark:text-white">
           <h2 className="text-xl font-bold mb-4">НАШИ ПРЕИМУЩЕСТВА</h2>
           <div className="flex flex-col space-y-4">
-            <div className="bg-gray-50 rounded-lg overflow-hidden text-gray-900 border border-gray-200">
+            <div className="bg-gray-50 dark:bg-[#333333] rounded-lg overflow-hidden text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
               <div className="flex flex-col sm:flex-row">
                 <div className="sm:w-1/4 p-4 flex justify-center">
                   <div className="w-full h-48 rounded-lg overflow-hidden flex items-center justify-center">
@@ -1094,7 +1094,7 @@ export default function PaintingPage() {
                   </div>
                 </div>
                 <div className="sm:w-3/4 p-4">
-                  <h3 className="font-bold mb-2 text-center sm:text-left text-gray-900">ИДЕАЛЬНЫЙ РЕЗУЛЬТАТ</h3>
+                  <h3 className="font-bold mb-2 text-center sm:text-left text-gray-900 dark:text-white">ИДЕАЛЬНЫЙ РЕЗУЛЬТАТ</h3>
                   <p className="text-sm text-center sm:text-left text-gray-700">
                     Мы восстанавливаем и красим диски так, будто они только с завода. Идеальное покрытие, стойкий цвет и
                     защита от внешних воздействий.

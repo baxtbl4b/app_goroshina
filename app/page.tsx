@@ -587,8 +587,8 @@ export default function HomePage() {
                     height={200}
                     className="w-full h-full object-cover transition-transform group-hover:scale-[1.03]"
                   />
-                  <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                    <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                  <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                    <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                       ALLSEASON
                     </p>
                   </div>
@@ -608,8 +608,8 @@ export default function HomePage() {
                       ;(e.target as HTMLImageElement).src = "/images/winter-tire-new.png"
                     }}
                   />
-                  <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                    <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                  <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                    <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                       ЗИМНИЕ
                     </p>
                   </div>
@@ -629,8 +629,8 @@ export default function HomePage() {
                       ;(e.target as HTMLImageElement).src = "/images/summer-tire-new.png"
                     }}
                   />
-                  <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                    <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                  <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                    <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                       ЛЕТНИЕ
                     </p>
                   </div>
@@ -669,8 +669,8 @@ export default function HomePage() {
                           ;(e.target as HTMLImageElement).src = "/images/black-wheel.png"
                         }}
                       />
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ДИСКИ
                         </p>
                       </div>
@@ -702,8 +702,8 @@ export default function HomePage() {
                           </div>
                         )}
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           КРЕПЕЖ
                         </p>
                       </div>
@@ -719,8 +719,8 @@ export default function HomePage() {
                         height={200}
                         className="w-full h-full object-cover transition-transform group-hover:scale-105"
                       />
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ДАТЧИКИ
                         </p>
                       </div>
@@ -736,8 +736,8 @@ export default function HomePage() {
                         className="w-full h-full object-contain p-0 transition-transform group-hover:scale-105 scale-[1.5]"
                         priority
                       />
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ДОКАТКИ
                         </p>
                       </div>
@@ -752,8 +752,8 @@ export default function HomePage() {
                         height={200}
                         className="w-full h-full object-contain p-4 transition-transform group-hover:scale-105 scale-[1.46]"
                       />
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           АВТОХИМИЯ{" "}
                         </p>
                       </div>
@@ -775,8 +775,8 @@ export default function HomePage() {
                           e.currentTarget.src = "/images/ventili2_matte.png"
                         }}
                       />
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ВЕНТИЛЯ
                         </p>
                       </div>
@@ -803,8 +803,8 @@ export default function HomePage() {
                       <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                         -10%
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ШИНОМОНТАЖ
                         </p>
                       </div>
@@ -828,8 +828,8 @@ export default function HomePage() {
                       <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                         -25%
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ПОКРАСКА
                         </p>
                       </div>
@@ -849,8 +849,8 @@ export default function HomePage() {
                           ;(e.target as HTMLImageElement).src = "/images/tire-noise-reduction.png"
                         }}
                       />
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ШУМОИЗОЛЯЦИЯ
                         </p>
                       </div>
@@ -873,8 +873,8 @@ export default function HomePage() {
                       <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                         -10%
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ДОШИПОВКА
                         </p>
                       </div>
@@ -897,8 +897,8 @@ export default function HomePage() {
                       <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                         -20%
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ХРАНЕНИЕ ШИН
                         </p>
                       </div>
@@ -921,8 +921,8 @@ export default function HomePage() {
                       <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                         -60%
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-black/50">
-                        <p className="text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 bg-white/70 dark:bg-black/50">
+                        <p className="text-gray-900 dark:text-white text-xs sm:text-sm md:text-base lg:text-lg font-bold uppercase tracking-tight">
                           ЗАПИСАТЬСЯ ОНЛАЙН
                         </p>
                       </div>

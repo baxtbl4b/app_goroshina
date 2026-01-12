@@ -145,20 +145,40 @@ export function getDeliveryForCategory(
   provider: string | null | undefined,
   storehouse: Record<string, number> | null | undefined
 ): DeliveryInfo {
-  const providerLower = (provider || "").toLowerCase()
-
-  // Если есть локальные склады — используем стандартную логику по провайдеру
-  if (hasLocalWarehouse(storehouse)) {
-    return getDeliveryByProvider(provider)
+  // Если нет поставщика - товар на собственном складе
+  if (!provider) {
+    return { text: "Забрать сегодня", type: "today" }
   }
 
-  // Если только удалённые склады (Под заказ) — используем увеличенные сроки
+  const providerLower = provider.toLowerCase()
+
+  // Эксклюзив - 1-2 дня
+  if (providerLower.includes("exlusive") || providerLower.includes("эксклюзив")) {
+    return { text: "Доставка 1-2 дня", type: "fast" }
+  }
+
+  // 4tochki (Форточки) - 2-4 дня
+  if (providerLower.includes("4tochki") || providerLower.includes("форточки")) {
+    return { text: "Доставка 2-4 дня", type: "medium" }
+  }
+
+  // Дископтимо - 2-4 дня
+  if (providerLower.includes("diskoptimo") || providerLower.includes("дископтимо")) {
+    return { text: "Доставка 2-4 дня", type: "medium" }
+  }
+
+  // Шинсервис - 1-2 дня
+  if (providerLower.includes("shinservice") || providerLower.includes("шинсервис")) {
+    return { text: "Доставка 1-2 дня", type: "fast" }
+  }
+
+  // Старые поставщики (оставляем для совместимости)
   if (providerLower === "tireshop") return { text: "Доставка 5-7 дней", type: "medium" }
   if (providerLower === "yst") return { text: "Доставка 2-3 дня", type: "fast" }
   if (providerLower === "severauto") return { text: "Доставка 3-4 дня", type: "medium" }
   if (providerLower === "ikon") return { text: "Доставка 3-5 дней", type: "medium" }
   if (providerLower === "mosautoshina") return { text: "Доставка 4-7 дней", type: "medium" }
-  if (["brinex", "exclusive", "fourtochki", "shinservice"].includes(providerLower)) {
+  if (["brinex", "exclusive", "fourtochki"].includes(providerLower)) {
     return { text: "Доставка 2-3 дня", type: "fast" }
   }
   if (["bagoria", "severautodist"].includes(providerLower)) {
@@ -167,7 +187,7 @@ export function getDeliveryForCategory(
   if (providerLower === "vels") return { text: "Доставка 6-10 дней", type: "medium" }
   if (providerLower === "sibzapaska") return { text: "Доставка 5-7 дней", type: "medium" }
 
-  return { text: "Доставка 10-14 дней", type: "medium" }
+  return { text: "Уточняйте", type: "medium" }
 }
 
 // Получить CSS класс цвета по типу доставки

@@ -263,7 +263,7 @@ export default function BookOnlinePage() {
                 ? "bg-blue-100 text-blue-600"
                 : isPast
                   ? "text-gray-400 cursor-not-allowed"
-                  : "hover:bg-gray-100 text-gray-900"
+                  : "hover:bg-gray-100 dark:hover:bg-[#3A3A3A] text-gray-900 dark:text-white"
           }`}
         >
           {day}
@@ -292,20 +292,20 @@ export default function BookOnlinePage() {
   const weekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#d9d9dd]">
-      <SafeAreaHeader title="Онлайн запись" showBackButton backUrl="/" className="bg-white" />
+    <div className="flex flex-col min-h-screen bg-[#d9d9dd] dark:bg-[#1F1F1F]">
+      <SafeAreaHeader title="Онлайн запись" showBackButton backUrl="/" className="bg-white dark:bg-[#2A2A2A]" />
 
       <main className="flex-1 p-4 pb-20 pt-[calc(60px+env(safe-area-inset-top))]">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Personal Information */}
           <CollapsibleCard
             title="Контактная информация"
-            className="bg-white border-none shadow-sm"
+            className="bg-white dark:bg-[#2A2A2A] border-none shadow-sm"
             defaultOpen={true} // Set to true to have it open by default
           >
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-gray-900">
+                <Label htmlFor="name" className="text-gray-900 dark:text-white">
                   Имя
                 </Label>
                 <Input
@@ -313,11 +313,11 @@ export default function BookOnlinePage() {
                   placeholder="Данные из личного кабинета"
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
-                  className="bg-gray-50 border-gray-200"
+                  className="bg-gray-50 dark:bg-[#333333] border-gray-200 dark:border-gray-700"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone" className="text-gray-900">
+                <Label htmlFor="phone" className="text-gray-900 dark:text-white">
                   Телефон
                 </Label>
                 <Input
@@ -325,15 +325,15 @@ export default function BookOnlinePage() {
                   placeholder="Данные из личного кабинета"
                   value={formData.phone}
                   onChange={(e) => handleInputChange("phone", e.target.value)}
-                  className="bg-gray-50 border-gray-200"
+                  className="bg-gray-50 dark:bg-[#333333] border-gray-200 dark:border-gray-700"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="car" className="text-gray-900">
+                <Label htmlFor="car" className="text-gray-900 dark:text-white">
                   Автомобили
                 </Label>
                 <div className="space-y-2">
-                  <Label className="text-gray-900 text-lg font-semibold">
+                  <Label className="text-gray-900 dark:text-white text-lg font-semibold">
                     Данные из личного кабинета
                   </Label>
                   {isLoadingCars ? (
@@ -347,12 +347,12 @@ export default function BookOnlinePage() {
                           className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                             selectedCar === car.id
                               ? "border-[#c4d402] bg-[#c4d402]/10"
-                              : "border-gray-300 bg-gray-50"
+                              : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#333333]"
                           }`}
                         >
                           <div className="flex items-center justify-between">
                             <div>
-                              <div className="font-semibold text-gray-900">
+                              <div className="font-semibold text-gray-900 dark:text-white">
                                 {car.brand} {car.model}
                               </div>
                               <div className="text-sm text-gray-500">
@@ -366,7 +366,7 @@ export default function BookOnlinePage() {
                         </div>
                       ))}
                       <Link href="/account/cars/add">
-                        <div className="p-4 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 cursor-pointer hover:border-[#c4d402] transition-colors">
+                        <div className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#333333] cursor-pointer hover:border-[#c4d402] transition-colors">
                           <div className="text-center text-[#009CFF] font-medium">+ Добавить автомобиль</div>
                         </div>
                       </Link>
@@ -378,11 +378,11 @@ export default function BookOnlinePage() {
           </CollapsibleCard>
 
           {/* Shop Selection */}
-          <Card className="bg-white" ref={shopSectionRef}>
+          <Card className="bg-white dark:bg-[#2A2A2A]" ref={shopSectionRef}>
             <CardContent className="p-4">
               {/* Store Selection */}
-              <div className="bg-white rounded-lg p-4">
-                <h2 className="text-lg font-bold mb-4 text-gray-900">Выберите магазин</h2>
+              <div className="bg-white dark:bg-[#2A2A2A] rounded-lg p-4">
+                <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Выберите магазин</h2>
                 <div className="space-y-4">
                   {[
                     {
@@ -416,7 +416,7 @@ export default function BookOnlinePage() {
                   ]
                     .filter((store) => showAllStores || selectedShop === store.id)
                     .map((store) => (
-                      <div key={store.id} className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+                      <div key={store.id} className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-[#333333]">
                         <label className="flex items-start gap-3 cursor-pointer">
                           <input
                             type="radio"
@@ -439,7 +439,7 @@ export default function BookOnlinePage() {
                             className="mt-1"
                           />
                           <div className="flex-1">
-                            <div className="font-medium text-gray-900">{store.name}</div>
+                            <div className="font-medium text-gray-900 dark:text-white">{store.name}</div>
                             <div className="text-sm text-gray-600">{store.address}</div>
                             <div className="text-sm text-gray-600">{store.phone}</div>
 
@@ -463,7 +463,7 @@ export default function BookOnlinePage() {
                     <Button
                       variant="outline"
                       onClick={() => setShowAllStores(true)}
-                      className="w-full mt-4 text-gray-900 border-gray-300 hover:bg-gray-100"
+                      className="w-full mt-4 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#3A3A3A]"
                     >
                       Показать все магазины
                     </Button>
@@ -474,9 +474,9 @@ export default function BookOnlinePage() {
           </Card>
 
           {/* Date and Time Selection */}
-          <Card ref={dateTimeRef} className="bg-white border-none shadow-sm">
+          <Card ref={dateTimeRef} className="bg-white dark:bg-[#2A2A2A] border-none shadow-sm">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
+              <CardTitle className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
@@ -501,9 +501,9 @@ export default function BookOnlinePage() {
               <CollapsibleCard title="Запись на услуги" description="Выберите услугу, дату и время" defaultOpen={true}>
                 <div className="grid gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="service" className="text-gray-900">Услуга</Label>
+                    <Label htmlFor="service" className="text-gray-900 dark:text-white">Услуга</Label>
                     <Select>
-                      <SelectTrigger id="service" className="bg-gray-50 border-gray-200 text-gray-900">
+                      <SelectTrigger id="service" className="bg-gray-50 dark:bg-[#333333] border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
                         <SelectValue placeholder="Выберите услугу" />
                       </SelectTrigger>
                       <SelectContent>
@@ -516,12 +516,12 @@ export default function BookOnlinePage() {
                     </Select>
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="date" className="text-gray-900">Дата</Label>
+                    <Label htmlFor="date" className="text-gray-900 dark:text-white">Дата</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant={"outline"}
-                          className={cn("w-full justify-start text-left font-normal bg-gray-50 border-gray-200 text-gray-900", !date && "text-gray-500")}
+                          className={cn("w-full justify-start text-left font-normal bg-gray-50 dark:bg-[#333333] border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white", !date && "text-gray-500")}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {date ? format(date, "PPP") : <span>Выберите дату</span>}
@@ -533,12 +533,12 @@ export default function BookOnlinePage() {
                     </Popover>
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="time" className="text-gray-900">Время</Label>
-                    <Input id="time" type="time" defaultValue="10:00" className="bg-gray-50 border-gray-200 text-gray-900" />
+                    <Label htmlFor="time" className="text-gray-900 dark:text-white">Время</Label>
+                    <Input id="time" type="time" defaultValue="10:00" className="bg-gray-50 dark:bg-[#333333] border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white" />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="comment" className="text-gray-900">Комментарий</Label>
-                    <Textarea id="comment" placeholder="Дополнительная информация" className="bg-gray-50 border-gray-200 text-gray-900" />
+                    <Label htmlFor="comment" className="text-gray-900 dark:text-white">Комментарий</Label>
+                    <Textarea id="comment" placeholder="Дополнительная информация" className="bg-gray-50 dark:bg-[#333333] border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white" />
                   </div>
                 </div>
                 <CardFooter className="mt-6 p-0">

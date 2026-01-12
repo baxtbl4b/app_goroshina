@@ -593,7 +593,7 @@ export default function QuickFilterButtons({
           {/* Clear button - вынесен за блок справа */}
           <button
             onClick={() => {
-              if (pathname?.includes("/krepezh")) {
+              if (pathname?.includes("/krepezh") || pathname?.includes("/diski")) {
                 clearCarSelection()
               } else {
                 if (selectedBrands.length > 0 || brandSearchInput.trim()) {
@@ -607,12 +607,12 @@ export default function QuickFilterButtons({
               }
             }}
             disabled={
-              pathname?.includes("/krepezh")
+              (pathname?.includes("/krepezh") || pathname?.includes("/diski"))
                 ? !carSearchInput.trim()
                 : selectedBrands.length === 0 && !brandSearchInput.trim()
             }
             className={`p-1.5 rounded-full transition-colors flex-shrink-0 ${
-              (pathname?.includes("/krepezh") ? carSearchInput.trim() : selectedBrands.length > 0 || brandSearchInput.trim())
+              ((pathname?.includes("/krepezh") || pathname?.includes("/diski")) ? carSearchInput.trim() : selectedBrands.length > 0 || brandSearchInput.trim())
                 ? "hover:bg-gray-300 dark:hover:bg-gray-600 cursor-pointer bg-gray-200 dark:bg-[#333333]/50"
                 : "cursor-not-allowed opacity-30 bg-gray-200 dark:bg-[#333333]/30"
             }`}

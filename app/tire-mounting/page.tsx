@@ -284,7 +284,7 @@ export default function TireMountingPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#d9d9dd] text-gray-900">
+    <div className="flex flex-col min-h-screen bg-[#d9d9dd] dark:bg-[#1F1F1F] text-gray-900 dark:text-white">
       <SafeAreaHeader title="Шиномонтаж" showBackButton backUrl="/" />
 
       <main className="flex-1 pt-[calc(60px+env(safe-area-inset-top)+1rem)] relative">
@@ -295,10 +295,10 @@ export default function TireMountingPage() {
           height={160} // Adjusted height for better visibility
           className="absolute top-0 right-0 z-50 object-contain" // Positioning and layering
         />
-        <div className="px-4 py-6 text-gray-900">
-          <div className="bg-white rounded-lg p-4 space-y-4 shadow-sm border border-gray-200">
+        <div className="px-4 py-6 text-gray-900 dark:text-white">
+          <div className="bg-white dark:bg-[#2A2A2A] rounded-lg p-4 space-y-4 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-2 text-gray-900">Мой гараж</label>
+              <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Мой гараж</label>
               <div className="flex gap-1 overflow-x-auto scrollbar-hide">
                 {isLoadingCars ? (
                   <div className="text-xs px-2 py-0.5 text-gray-400">Загрузка автомобилей...</div>
@@ -315,7 +315,7 @@ export default function TireMountingPage() {
                         className={`text-xs px-2 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0 transition-colors ${
                           selectedCar === car.id
                             ? "bg-blue-500 border-blue-500 text-white"
-                            : "bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
+                            : "bg-white dark:bg-[#333333] border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-[#3A3A3A]"
                         }`}
                       >
                         {car.displayName}
@@ -329,7 +329,7 @@ export default function TireMountingPage() {
             <div className="space-y-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <label className="block text-sm font-medium">Тип авто</label>
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white">Тип авто</label>
                   <button
                     onClick={() => setShowCarTypeInfoModal(true)}
                     className="w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors"
@@ -343,10 +343,10 @@ export default function TireMountingPage() {
                   onChange={(e) => setCarType(e.target.value)}
                   className={`w-full rounded-lg px-3 py-2 focus:outline-none focus:ring-2 transition-all duration-300 ${
                     highlightCarType
-                      ? "bg-red-100 border-2 border-red-500 text-red-900 animate-pulse shadow-lg shadow-red-500/50"
+                      ? "bg-red-100 dark:bg-red-900/30 border-2 border-red-500 text-red-900 dark:text-red-300 animate-pulse shadow-lg shadow-red-500/50"
                       : carType === ""
-                        ? "bg-white text-gray-900 border-2 border-red-500 focus:ring-red-500"
-                        : "bg-white border-2 border-[#c4d402] text-gray-900 focus:ring-blue-500"
+                        ? "bg-white dark:bg-[#333333] text-gray-900 dark:text-white border-2 border-red-500 focus:ring-red-500"
+                        : "bg-white dark:bg-[#333333] border-2 border-[#c4d402] text-gray-900 dark:text-white focus:ring-blue-500"
                   }`}
                 >
                   <option value="">Выберите тип автомобиля</option>
@@ -359,14 +359,14 @@ export default function TireMountingPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Диаметр шины (R)</label>
+                <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Диаметр шины (R)</label>
                 <select
                   value={diameter}
                   onChange={(e) => setDiameter(e.target.value)}
-                  className={`w-full text-gray-900 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 ${
+                  className={`w-full text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 ${
                     diameter === ""
-                      ? "bg-white border-2 border-red-500 focus:ring-red-500"
-                      : "bg-white border-2 border-[#c4d402] focus:ring-blue-500"
+                      ? "bg-white dark:bg-[#333333] border-2 border-red-500 focus:ring-red-500"
+                      : "bg-white dark:bg-[#333333] border-2 border-[#c4d402] focus:ring-blue-500"
                   }`}
                 >
                   <option value="">Выберите диаметр</option>
@@ -383,8 +383,8 @@ export default function TireMountingPage() {
                 </select>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="text-lg font-bold mb-3 text-gray-900">Комплекс шиномонтажных работ</h3>
+              <div className="bg-gray-50 dark:bg-[#333333] rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-bold mb-3 text-gray-900 dark:text-white">Комплекс шиномонтажных работ</h3>
                 {(() => {
                   const isServiceSelectionDisabled = !carType || !diameter
                   return (
@@ -395,7 +395,7 @@ export default function TireMountingPage() {
                       <div className="space-y-3">
                         <div className="flex items-center gap-3">
                           <div
-                            className="flex-1 rounded-lg px-3 py-2 text-center flex flex-col items-center justify-center bg-white text-gray-900 cursor-pointer hover:bg-gray-50 transition-all duration-200 border border-gray-200"
+                            className="flex-1 rounded-lg px-3 py-2 text-center flex flex-col items-center justify-center bg-white dark:bg-[#2A2A2A] text-gray-900 dark:text-white cursor-pointer hover:bg-gray-50 dark:hover:bg-[#333333] transition-all duration-200 border border-gray-200 dark:border-gray-700"
                             onClick={() => {
                               setServiceQuantities((prev) => ({
                                 ...prev,
@@ -411,7 +411,7 @@ export default function TireMountingPage() {
                             <div className="text-xs text-gray-400">Снятие, монтаж, балансировка, установка</div>
                             {diameter && (
                               <div className="flex justify-end mt-2">
-                                <span className="text-lg font-semibold text-gray-900">
+                                <span className="text-lg font-semibold text-gray-900 dark:text-white">
                                   {pricingData["tire-complex-1"]?.[diameter] || 0} ₽
                                 </span>
                               </div>
@@ -448,7 +448,7 @@ export default function TireMountingPage() {
                                 }))
                               }}
                               disabled={isServiceSelectionDisabled}
-                              className="w-12 h-12 bg-gray-200 text-gray-900 rounded-lg flex items-center justify-center hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-xl font-bold"
+                              className="w-12 h-12 bg-gray-200 dark:bg-[#333333] text-gray-900 dark:text-white rounded-lg flex items-center justify-center hover:bg-gray-300 dark:hover:bg-[#3A3A3A] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-xl font-bold"
                             >
                               -
                             </button>
@@ -457,7 +457,7 @@ export default function TireMountingPage() {
 
                         <div className="flex items-center gap-3">
                           <div
-                            className="flex-1 rounded-lg px-3 py-2 text-center flex flex-col items-center justify-center bg-white text-gray-900 cursor-pointer hover:bg-gray-50 transition-all duration-200 border border-gray-200"
+                            className="flex-1 rounded-lg px-3 py-2 text-center flex flex-col items-center justify-center bg-white dark:bg-[#2A2A2A] text-gray-900 dark:text-white cursor-pointer hover:bg-gray-50 dark:hover:bg-[#333333] transition-all duration-200 border border-gray-200 dark:border-gray-700"
                             onClick={() => {
                               setServiceQuantities((prev) => ({
                                 ...prev,
@@ -475,7 +475,7 @@ export default function TireMountingPage() {
                             </div>
                             {diameter && (
                               <div className="flex justify-end mt-2">
-                                <span className="text-lg font-semibold text-gray-900">
+                                <span className="text-lg font-semibold text-gray-900 dark:text-white">
                                   {pricingData["tire-complex-4"]?.[diameter] || 0} ₽
                                 </span>
                               </div>
@@ -512,7 +512,7 @@ export default function TireMountingPage() {
                                 }))
                               }}
                               disabled={isServiceSelectionDisabled}
-                              className="w-12 h-12 bg-gray-200 text-gray-900 rounded-lg flex items-center justify-center hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-xl font-bold"
+                              className="w-12 h-12 bg-gray-200 dark:bg-[#333333] text-gray-900 dark:text-white rounded-lg flex items-center justify-center hover:bg-gray-300 dark:hover:bg-[#3A3A3A] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-xl font-bold"
                             >
                               -
                             </button>
@@ -524,14 +524,14 @@ export default function TireMountingPage() {
                 })()}
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div className="bg-gray-50 dark:bg-[#333333] rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                 <div className="flex justify-between items-center mb-3">
-                  <h3 className="text-lg font-bold text-gray-900">Общие услуги</h3>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">Общие услуги</h3>
                   <button
                     onClick={() => {
                       setServiceQuantities({})
                     }}
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-900 px-3 py-1 rounded-lg text-sm font-medium transition-colors"
+                    className="bg-gray-200 dark:bg-[#333333] hover:bg-gray-300 dark:hover:bg-[#3A3A3A] text-gray-900 dark:text-white px-3 py-1 rounded-lg text-sm font-medium transition-colors"
                   >
                     Сброс
                   </button>
@@ -553,7 +553,7 @@ export default function TireMountingPage() {
                       <div className="space-y-2">
                         {Object.entries(additionalServices).map(([key, name]) => (
                           <div key={key} className="flex items-center gap-2">
-                            <div className="flex-1 rounded-lg px-3 py-2 bg-white text-gray-900 border border-gray-200">
+                            <div className="flex-1 rounded-lg px-3 py-2 bg-white dark:bg-[#2A2A2A] text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
                               {name}
                               {diameter && (
                                 <span className="text-sm text-gray-400 ml-2">
@@ -564,11 +564,11 @@ export default function TireMountingPage() {
                             <button
                               onClick={() => decrementService(key)}
                               disabled={isServiceSelectionDisabled}
-                              className="w-10 h-10 bg-gray-200 text-gray-900 rounded-lg flex items-center justify-center hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="w-10 h-10 bg-gray-200 dark:bg-[#333333] text-gray-900 dark:text-white rounded-lg flex items-center justify-center hover:bg-gray-300 dark:hover:bg-[#3A3A3A] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               -
                             </button>
-                            <div className="w-10 h-10 bg-gray-100 text-gray-900 rounded-lg flex items-center justify-center text-sm font-medium border border-gray-200">
+                            <div className="w-10 h-10 bg-gray-100 dark:bg-[#333333] text-gray-900 dark:text-white rounded-lg flex items-center justify-center text-sm font-medium border border-gray-200 dark:border-gray-700">
                               {serviceQuantities[key] || 0}
                             </div>
                             <button
@@ -587,7 +587,7 @@ export default function TireMountingPage() {
               </div>
 
               <div className="pt-4 flex gap-4 items-stretch">
-                <div className="w-3/5 bg-white rounded-lg p-3 border border-gray-200">
+                <div className="w-3/5 bg-white dark:bg-[#2A2A2A] rounded-lg p-3 border border-gray-200 dark:border-gray-700">
                   <div className="mb-3">
                     <span className="text-sm font-medium text-gray-700">Выбранные услуги:</span>
                   </div>
@@ -598,7 +598,7 @@ export default function TireMountingPage() {
                       Object.entries(selectedServices).map(([key, service]) => (
                         <div key={key} className="flex justify-between items-center text-xs">
                           <span className="text-gray-600">{service.name}</span>
-                          <span className="text-gray-900 font-medium">
+                          <span className="text-gray-900 dark:text-white font-medium">
                             {service.quantity}x {service.price}₽ = {service.total}₽
                           </span>
                         </div>
@@ -619,7 +619,7 @@ export default function TireMountingPage() {
                       </div>
                     )}
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold text-gray-900">Итого:</span>
+                      <span className="text-lg font-bold text-gray-900 dark:text-white">Итого:</span>
                       <span className="text-xl font-bold text-blue-600">{Math.round(totalPrice)} ₽</span>
                     </div>
                   </div>
@@ -639,7 +639,7 @@ export default function TireMountingPage() {
                         setPromoApplied(false)
                       }
                     }}
-                    className={`w-full bg-white text-gray-900 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 border text-center ${
+                    className={`w-full bg-white dark:bg-[#333333] text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 border dark:border-gray-700 text-center ${
                       promoApplied ? "border-green-500 bg-green-50" : "border-gray-300"
                     }`}
                   />
@@ -647,7 +647,7 @@ export default function TireMountingPage() {
                     <div className="text-green-600 text-xs text-center font-medium">Промокод "ЖИЗНЬ" применен! Скидка 15%</div>
                   )}
                   <button
-                    className="w-full bg-gray-200 hover:bg-gray-300 text-gray-900 py-3 px-4 rounded-lg font-medium transition-colors"
+                    className="w-full bg-gray-200 dark:bg-[#333333] hover:bg-gray-300 dark:hover:bg-[#3A3A3A] text-gray-900 dark:text-white py-3 px-4 rounded-lg font-medium transition-colors"
                     onClick={downloadPriceList}
                   >
                     Скачать полный прайс
@@ -680,7 +680,7 @@ export default function TireMountingPage() {
                                   : `Добавить к заказу шумоизоляции (${totalPrice} ₽)`}
                             </button>
                             <button
-                              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-900 py-2 px-4 rounded-lg font-medium transition-colors"
+                              className="w-full bg-gray-200 dark:bg-[#333333] hover:bg-gray-300 dark:hover:bg-[#3A3A3A] text-gray-900 dark:text-white py-2 px-4 rounded-lg font-medium transition-colors"
                               onClick={() => safeNavigate("/soundproofing")}
                             >
                               Вернуться без добавления
@@ -742,10 +742,10 @@ export default function TireMountingPage() {
           </div>
         </div>
 
-        <div className="px-4 py-6 text-gray-900">
+        <div className="px-4 py-6 text-gray-900 dark:text-white">
           <h2 className="text-xl font-bold mb-4">НАШИ РАБОТЫ</h2>
           <div className="mb-6">
-            <div className="w-full aspect-video bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+            <div className="w-full aspect-video bg-gray-200 dark:bg-[#333333] rounded-lg overflow-hidden flex items-center justify-center">
               <video className="w-full h-full object-cover" autoPlay loop muted playsInline>
                 <source
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_3030-VijVlfs9vTIIpWTRscyB5lM1JL9vQr.MP4"
@@ -757,13 +757,13 @@ export default function TireMountingPage() {
           </div>
         </div>
 
-        <div className="px-4 py-6 text-gray-900">
+        <div className="px-4 py-6 text-gray-900 dark:text-white">
           <h2 className="text-xl font-bold mb-4">НАШИ ПРЕИМУЩЕСТВА</h2>
           <div className="flex flex-col space-y-4">
-            <div className="bg-gray-50 rounded-lg overflow-hidden text-gray-900 border border-gray-200">
-              <div className="flex flex-row">
+            <div className="bg-gray-50 dark:bg-[#2A2A2A] rounded-lg overflow-hidden text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
+              <div className="flex flex-row bg-gray-50 dark:bg-[#2A2A2A]">
                 <div className="w-1/3 p-4 flex justify-center">
-                  <div className="w-32 h-32 bg-white rounded-lg overflow-hidden flex items-center justify-center border-2 border-gray-300">
+                  <div className="w-32 h-32 bg-white dark:bg-[#333333] rounded-lg overflow-hidden flex items-center justify-center border-2 border-gray-300 dark:border-gray-600">
                     <Image
                       src="/images/sivik-tire-machine-updated.png"
                       alt="Монтаж и демонтаж"
@@ -773,18 +773,18 @@ export default function TireMountingPage() {
                     />
                   </div>
                 </div>
-                <div className="w-2/3 p-4">
-                  <h3 className="font-bold mb-2 text-left">МОНТАЖ И ДЕМОНТАЖ ЛЕГКОВЫХ ШИН</h3>
-                  <p className="text-sm text-left">(выполняется на специализированном профессиональном стенде)</p>
+                <div className="w-2/3 p-4 bg-white dark:bg-[#2A2A2A] rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold mb-2 text-left text-gray-900 dark:text-white">МОНТАЖ И ДЕМОНТАЖ ЛЕГКОВЫХ ШИН</h3>
+                  <p className="text-sm text-left text-gray-900 dark:text-white">(выполняется на специализированном профессиональном стенде)</p>
                 </div>
               </div>
             </div>
 
             {/* Добавленные элементы */}
-            <div className="bg-gray-50 rounded-lg overflow-hidden text-gray-900 border border-gray-200">
-              <div className="flex flex-row">
+            <div className="bg-gray-50 dark:bg-[#2A2A2A] rounded-lg overflow-hidden text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
+              <div className="flex flex-row bg-gray-50 dark:bg-[#2A2A2A]">
                 <div className="w-1/3 p-4 flex justify-center">
-                  <div className="w-32 h-32 bg-white rounded-lg overflow-hidden flex items-center justify-center border-2 border-gray-300">
+                  <div className="w-32 h-32 bg-white dark:bg-[#333333] rounded-lg overflow-hidden flex items-center justify-center border-2 border-gray-300 dark:border-gray-600">
                     <Image
                       src="/images/sivik-balancing-machine-galaxy.png"
                       alt="Лазерная балансировка"
@@ -794,17 +794,17 @@ export default function TireMountingPage() {
                     />
                   </div>
                 </div>
-                <div className="w-2/3 p-4">
-                  <h3 className="font-bold mb-2 text-left">ЛАЗЕРНАЯ БАЛАНСИРОВКА</h3>
-                  <p className="text-sm text-left">(высокоточная балансировка для идеальной езды)</p>
+                <div className="w-2/3 p-4 bg-white dark:bg-[#2A2A2A] rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold mb-2 text-left text-gray-900 dark:text-white">ЛАЗЕРНАЯ БАЛАНСИРОВКА</h3>
+                  <p className="text-sm text-left text-gray-900 dark:text-white">(высокоточная балансировка для идеальной езды)</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-lg overflow-hidden text-gray-900 border border-gray-200">
-              <div className="flex flex-row">
+            <div className="bg-gray-50 dark:bg-[#2A2A2A] rounded-lg overflow-hidden text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
+              <div className="flex flex-row bg-gray-50 dark:bg-[#2A2A2A]">
                 <div className="w-1/3 p-4 flex justify-center">
-                  <div className="w-32 h-32 bg-white rounded-lg overflow-hidden flex items-center justify-center border-2 border-gray-300">
+                  <div className="w-32 h-32 bg-white dark:bg-[#333333] rounded-lg overflow-hidden flex items-center justify-center border-2 border-gray-300 dark:border-gray-600">
                     <Image
                       src="/images/sibek-wheel-repair-machine.png"
                       alt="Ремонт дисков"
@@ -814,17 +814,17 @@ export default function TireMountingPage() {
                     />
                   </div>
                 </div>
-                <div className="w-2/3 p-4">
-                  <h3 className="font-bold mb-2 text-left">РЕМОНТ ДИСКОВ ЛЮБОЙ СЛОЖНОСТИ</h3>
-                  <p className="text-sm text-left">(восстановление геометрии и внешнего вида дисков)</p>
+                <div className="w-2/3 p-4 bg-white dark:bg-[#2A2A2A] rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold mb-2 text-left text-gray-900 dark:text-white">РЕМОНТ ДИСКОВ ЛЮБОЙ СЛОЖНОСТИ</h3>
+                  <p className="text-sm text-left text-gray-900 dark:text-white">(восстановление геометрии и внешнего вида дисков)</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-lg overflow-hidden text-gray-900 border border-gray-200">
-              <div className="flex flex-row">
+            <div className="bg-gray-50 dark:bg-[#2A2A2A] rounded-lg overflow-hidden text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
+              <div className="flex flex-row bg-gray-50 dark:bg-[#2A2A2A]">
                 <div className="w-1/3 p-4 flex justify-center">
-                  <div className="w-32 h-32 bg-white rounded-lg overflow-hidden flex items-center justify-center border-2 border-gray-300">
+                  <div className="w-32 h-32 bg-white dark:bg-[#333333] rounded-lg overflow-hidden flex items-center justify-center border-2 border-gray-300 dark:border-gray-600">
                     <Image
                       src="/images/hot-vulcanization-machine.png"
                       alt="Горячая вулканизация"
@@ -834,17 +834,17 @@ export default function TireMountingPage() {
                     />
                   </div>
                 </div>
-                <div className="w-2/3 p-4">
-                  <h3 className="font-bold mb-2 text-left">ГОРЯЧАЯ ВУЛКАНИЗАЦИЯ</h3>
-                  <p className="text-sm text-left">(надежный ремонт проколов и порезов шин)</p>
+                <div className="w-2/3 p-4 bg-white dark:bg-[#2A2A2A] rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold mb-2 text-left text-gray-900 dark:text-white">ГОРЯЧАЯ ВУЛКАНИЗАЦИЯ</h3>
+                  <p className="text-sm text-left text-gray-900 dark:text-white">(надежный ремонт проколов и порезов шин)</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-lg overflow-hidden text-gray-900 border border-gray-200">
-              <div className="flex flex-row">
+            <div className="bg-gray-50 dark:bg-[#2A2A2A] rounded-lg overflow-hidden text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
+              <div className="flex flex-row bg-gray-50 dark:bg-[#2A2A2A]">
                 <div className="w-1/3 p-4 flex justify-center">
-                  <div className="w-32 h-32 bg-white rounded-lg overflow-hidden flex items-center justify-center border-2 border-gray-300">
+                  <div className="w-32 h-32 bg-white dark:bg-[#333333] rounded-lg overflow-hidden flex items-center justify-center border-2 border-gray-300 dark:border-gray-600">
                     <Image
                       src="/images/tig-welding-machine.png"
                       alt="Сварка в аргоне"
@@ -854,9 +854,9 @@ export default function TireMountingPage() {
                     />
                   </div>
                 </div>
-                <div className="w-2/3 p-4">
-                  <h3 className="font-bold mb-2 text-left">СВАРКА В АРГОНЕ</h3>
-                  <p className="text-sm text-left">(профессиональная сварка дисков и других металлических деталей)</p>
+                <div className="w-2/3 p-4 bg-white dark:bg-[#2A2A2A] rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold mb-2 text-left text-gray-900 dark:text-white">СВАРКА В АРГОНЕ</h3>
+                  <p className="text-sm text-left text-gray-900 dark:text-white">(профессиональная сварка дисков и других металлических деталей)</p>
                 </div>
               </div>
             </div>
